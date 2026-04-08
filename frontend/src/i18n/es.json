@@ -1,0 +1,17 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "search": "Búsqueda",
+    "companies": "Compañías",
+    "announcements": "Anuncios",
+    "api": "API"
+  },
+  "search": {
+    "placeholder": "Buscar en el corpus...",
+    "filters": "Filtros"
+  },
+  "launch": {
+    "progress": "{{count}} de {{threshold}} registros publicados",
+    "inactive_message": "El portal estará disponible cuando se alcancen {{threshold}} registros publicados."
+  }
+}
