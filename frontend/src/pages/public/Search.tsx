@@ -103,6 +103,14 @@ export default function Search() {
       })
   }
 
+  function handleExportClick() {
+    if (total > 100) {
+      const confirmExport = window.confirm(`Su búsqueda arrojó ${total} registros. Para evitar sobrecargas, el sistema solo exportará los primeros 100 registros. ¿Desea continuar?`)
+      if (!confirmExport) return
+    }
+    handleExportCSV()
+  }
+
   return (
     <main style={{ maxWidth: 1200, margin: '2rem auto', padding: '0 1.5rem' }}>
       <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
@@ -155,20 +163,23 @@ export default function Search() {
                 Registros encontrados: <strong style={{ color: 'var(--primary-color)' }}>{total}</strong>
               </div>
               {results.length > 0 && (
-                <button
-                  onClick={handleExportCSV}
-                  style={{
-                    padding: '0.5rem 1rem',
-                    borderRadius: '8px',
-                    border: '1px solid var(--primary-color, #ffaa00)',
-                    background: 'transparent',
-                    color: 'var(--primary-color, #ffaa00)',
-                    cursor: 'pointer',
-                    fontWeight: 600,
-                  }}
-                >
-                  Exportar CSV
-                </button>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.5rem' }}>
+                  <button
+                    onClick={handleExportClick}
+                    style={{
+                      padding: '0.5rem 1rem',
+                      borderRadius: '8px',
+                      border: '1px solid var(--primary-color, #ffaa00)',
+                      background: 'transparent',
+                      color: 'var(--primary-color, #ffaa00)',
+                      cursor: 'pointer',
+                      fontWeight: 600,
+                    }}
+                  >
+                    Exportar CSV (Máx 100)
+                  </button>
+                  {total > 100 && <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>Solo se incluirán los primeros 100.</span>}
+                </div>
               )}
             </div>
           )}
