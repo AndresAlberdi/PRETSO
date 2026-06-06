@@ -153,6 +153,8 @@ from backend.src.api.private.audit import router as audit_router
 from backend.src.api.private.comments import router as comments_router
 from backend.src.api.private.users import router as priv_users_router
 from backend.src.api.private.etl import router as priv_etl_router
+from backend.src.api.private.bulk import router as priv_bulk_router
+from backend.src.api.private.rollback import router as priv_rollback_router
 
 admin_router = APIRouter(prefix="/admin")
 admin_router.include_router(priv_records_router)
@@ -161,6 +163,8 @@ admin_router.include_router(audit_router)
 admin_router.include_router(comments_router)
 admin_router.include_router(priv_users_router)
 admin_router.include_router(priv_etl_router)
+admin_router.include_router(priv_bulk_router)
+admin_router.include_router(priv_rollback_router)
 
 api_router.include_router(admin_router)
 

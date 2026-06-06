@@ -58,6 +58,20 @@ def delete_document(collection: str, doc_id: str) -> None:
     with_retry(_op)
 
 
+def batch_set_documents(collection: str, documents: list[tuple[str, dict]]) -> None:
+    """Create or overwrite multiple documents in a single atomic batch."""
+    def _op():
+        db = get_db()
+        batch = db.batch()
+        coll_ref = db.collection(collection)
+        for doc_id, data in documents:
+            doc_ref = coll_ref.document(doc_id)
+            batch.set(doc_ref, data)
+        batch.commit()
+
+    with_retry(_op)
+
+
 def query_collection(
     collection: str,
     filters: list[tuple] = [],
@@ -116,6 +130,10 @@ async def async_update_document(collection: str, doc_id: str, data: dict) -> Non
 
 async def async_delete_document(collection: str, doc_id: str) -> None:
     await _run(delete_document, collection, doc_id)
+
+
+async def async_batch_set_documents(collection: str, documents: list[tuple[str, dict]]) -> None:
+    await _run(batch_set_documents, collection, documents)
 
 
 async def async_query_collection(
@@ -215,6 +233,20 @@ def add_record_to_transaction(transaction_id: str, record_id: str) -> None:
         )
 
     with_retry(_op)
+
+
+def add_records_to_transaction(transaction_id: str, record_ids: list[str]) -> None:
+    """Append multiple record_ids to the transaction's record_ids array (idempotent)."""
+    def _op():
+        get_db().collection(TRANSACTIONS).document(transaction_id).update(
+            {"record_ids": ArrayUnion(record_ids)}
+        )
+
+    with_retry(_op)
+
+
+async def async_add_records_to_transaction(transaction_id: str, record_ids: list[str]) -> None:
+    await _run(add_records_to_transaction, transaction_id, record_ids)
 
 
 def remove_record_from_transaction(transaction_id: str, record_id: str) -> None:

@@ -5,6 +5,7 @@ class PublicationStatus(str, Enum):
     borrador = "borrador"
     en_revision = "en_revision"
     publicado = "publicado"
+    rechazado = "rechazado"
 
 
 class SourceTable(str, Enum):

@@ -7,12 +7,14 @@ const STATUS_LABELS: Record<string, string> = {
   borrador: 'Borrador',
   en_revision: 'En revisión',
   publicado: 'Publicado',
+  rechazado: 'Rechazado',
 }
 
 const STATUS_COLORS: Record<string, string> = {
   borrador: '#888',
   en_revision: '#e65100',
   publicado: '#2e7d32',
+  rechazado: '#d32f2f',
 }
 
 interface RecordRow {
@@ -87,10 +89,25 @@ export default function RecordsList() {
     try {
       const token = await getToken()
       const headers = { Authorization: `Bearer ${token}` }
-      await api.put(`/admin/records/${id}/status`, { new_status: 'borrador', rejection_comment: reason }, { headers })
-      setRecords((prev) => prev.map(r => r.id === id ? { ...r, status: 'borrador' } : r))
+      await api.put(`/admin/records/${id}/status`, { new_status: 'rechazado', rejection_comment: reason }, { headers })
+      setRecords((prev) => prev.map(r => r.id === id ? { ...r, status: 'rechazado' } : r))
     } catch (e) {
       alert('Error al rechazar')
+    }
+  }
+
+  const handleApproveAll = async () => {
+    if (!window.confirm("¿Estás seguro de que quieres aprobar todos los registros en revisión?")) return
+    try {
+      const token = await getToken()
+      const headers = { Authorization: `Bearer ${token}` }
+      const res = await api.post('/admin/bulk/approve_all', {}, { headers })
+      alert(res.data.message)
+      // Reload page data
+      setPage(1)
+      window.location.reload()
+    } catch (e: any) {
+      alert(e.response?.data?.error?.message || 'Error al aprobar todos los registros.')
     }
   }
 
@@ -98,9 +115,17 @@ export default function RecordsList() {
     <main style={{ maxWidth: 1000, margin: '2rem auto', padding: '0 1rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1>Registros</h1>
-        <button onClick={() => navigate('/admin/records/new')} style={{ padding: '0.5rem 1rem' }}>
-          + Nuevo registro
-        </button>
+        <div style={{ display: 'flex', gap: '1rem' }}>
+          <button
+            onClick={handleApproveAll}
+            style={{ padding: '0.5rem 1rem', background: '#2e7d32', color: 'white', border: 'none', borderRadius: 4, cursor: 'pointer' }}
+          >
+            Aprobar Todo (En revisión)
+          </button>
+          <button onClick={() => navigate('/admin/records/new')} style={{ padding: '0.5rem 1rem', cursor: 'pointer' }}>
+            + Nuevo registro
+          </button>
+        </div>
       </div>
 
       <div style={{ marginBottom: '1rem' }}>
@@ -111,6 +136,7 @@ export default function RecordsList() {
             <option value="borrador">Borrador</option>
             <option value="en_revision">En revisión</option>
             <option value="publicado">Publicado</option>
+            <option value="rechazado">Rechazado</option>
           </select>
         </label>
         <span style={{ marginLeft: '1rem', color: '#666' }}>{total} registros</span>

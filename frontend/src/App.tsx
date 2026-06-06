@@ -19,6 +19,7 @@ import Dashboard from './pages/admin/Dashboard'
 import RecordEditor from './pages/admin/RecordEditor'
 import RecordsList from './pages/admin/RecordsList'
 import EtlUpload from './pages/admin/EtlUpload'
+import BulkImport from './pages/admin/BulkImport'
 import UserManagement from './pages/admin/UserManagement'
 import AnnouncementsManagement from './pages/admin/AnnouncementsManagement'
 
@@ -51,6 +52,7 @@ export default function App() {
             <Route path="/admin/records/new" element={<RecordEditor />} />
             <Route path="/admin/records/:id" element={<RecordEditor />} />
             <Route path="/admin/etl" element={<EtlUpload />} />
+            <Route path="/admin/bulk-import" element={<BulkImport />} />
             <Route path="/admin/users" element={<UserManagement />} />
             <Route path="/admin/announcements" element={<AnnouncementsManagement />} />
           </Route>

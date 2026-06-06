@@ -37,6 +37,9 @@ export default function Dashboard() {
         <button style={btn} onClick={() => navigate('/admin/etl')}>
           {t('admin.etl')}
         </button>
+        <button style={btn} onClick={() => navigate('/admin/bulk-import')}>
+          Importación Masiva (CSV)
+        </button>
         <button style={btn} onClick={() => navigate('/admin/announcements')}>
           Anuncios
         </button>

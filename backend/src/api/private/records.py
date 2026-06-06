@@ -103,7 +103,7 @@ async def change_record_status(
     elif new_status == PublicationStatus.en_revision:
         if role not in (UserRole.editor.value, UserRole.administrador.value):
             raise HTTPException(status_code=403, detail={"code": "INSUFFICIENT_PERMISSIONS", "message": "Se requiere rol editor o administrador para enviar a revisión.", "field": None})
-    elif new_status == PublicationStatus.borrador:
+    elif new_status in (PublicationStatus.borrador, PublicationStatus.rechazado):
         if role not in (UserRole.revisor.value, UserRole.administrador.value):
             raise HTTPException(status_code=403, detail={"code": "INSUFFICIENT_PERMISSIONS", "message": "Se requiere rol revisor o administrador para rechazar.", "field": None})
 
@@ -142,7 +142,7 @@ async def update_record(
         record_id=record_id,
         user_uid=user["uid"],
         action=AuditAction.modificacion,
-        details={"fields": list(updates.keys())},
+        details={"fields": list(updates.keys()), "previous_state": record},
     )
 
     return {**record, **updates}

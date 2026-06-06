@@ -12,6 +12,8 @@ interface StatsData {
 
 const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#AF19FF', '#FF19A3']
 
+import PdfReportGenerator from './PdfReportGenerator'
+
 export default function Dashboard() {
   const [data, setData] = useState<StatsData | null>(null)
   const [loading, setLoading] = useState(true)
@@ -28,7 +30,10 @@ export default function Dashboard() {
 
   return (
     <div style={{ marginTop: '3rem', padding: '1.5rem', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '12px' }}>
-      <h3 style={{ marginBottom: '2rem', textAlign: 'center' }}>Estadísticas del Corpus Publicado</h3>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
+        <h3 style={{ margin: 0 }}>Estadísticas del Corpus Publicado</h3>
+        <PdfReportGenerator />
+      </div>
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '2rem' }}>
         
         {/* Gráfico de Años */}

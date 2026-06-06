@@ -19,9 +19,10 @@ VALID_TRANSITIONS: dict[PublicationStatus, set[PublicationStatus]] = {
     PublicationStatus.borrador: {PublicationStatus.en_revision},
     PublicationStatus.en_revision: {
         PublicationStatus.publicado,
-        PublicationStatus.borrador,
+        PublicationStatus.rechazado,
     },
-    PublicationStatus.publicado: set(),  # no direct transitions from published
+    PublicationStatus.rechazado: {PublicationStatus.en_revision, PublicationStatus.borrador},
+    PublicationStatus.publicado: {PublicationStatus.borrador},  # admins can unpublish
 }
 
 
@@ -61,7 +62,7 @@ async def transition_status(
         )
 
     # Rejection requires a comment of at least 10 characters
-    if new_status == PublicationStatus.borrador:
+    if new_status == PublicationStatus.rechazado:
         comment = rejection_comment or ""
         if len(comment) < 10:
             raise HTTPException(
@@ -89,7 +90,7 @@ async def transition_status(
             except Exception as e:
                 pass
 
-    if new_status == PublicationStatus.borrador and rejection_comment:
+    if new_status == PublicationStatus.rechazado and rejection_comment:
         updates["rejection_comment"] = rejection_comment
 
     await async_update_document(RECORDS, record_id, updates)
@@ -105,7 +106,7 @@ async def transition_status(
         record_id=record_id,
         user_uid=user_uid,
         action=AuditAction.cambio_estado,
-        details={"from": old_status.value, "to": new_status.value},
+        details={"from": old_status.value, "to": new_status.value, "previous_state": record},
     )
 
     updated_record = {**record, **updates}

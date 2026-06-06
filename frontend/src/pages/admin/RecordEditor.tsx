@@ -449,6 +449,27 @@ export default function RecordEditor() {
                       {JSON.stringify(log.details, null, 2)}
                     </pre>
                   )}
+                  {log.details?.previous_state && isReviewer && (
+                    <button
+                      onClick={async () => {
+                        if (!window.confirm("¿Restaurar a esta versión? Perderás los cambios no guardados en el historial.")) return;
+                        setSaving(true);
+                        try {
+                          const token = await getToken();
+                          await api.post(`/admin/records/${id}/rollback/${log.id}`, {}, { headers: { Authorization: `Bearer ${token}` } });
+                          window.location.reload();
+                        } catch {
+                          alert("Error al restaurar.");
+                        } finally {
+                          setSaving(false);
+                        }
+                      }}
+                      disabled={saving}
+                      style={{ marginTop: '0.5rem', padding: '0.3rem 0.6rem', fontSize: '0.8rem', background: '#f57c00', color: 'white', border: 'none', borderRadius: 4, cursor: 'pointer' }}
+                    >
+                      Restaurar esta versión
+                    </button>
+                  )}
                 </div>
               ))}
               {auditLogs.length === 0 && <p style={{ fontSize: '0.9rem', opacity: 0.6 }}>No hay historial.</p>}
