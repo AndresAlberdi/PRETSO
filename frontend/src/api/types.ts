@@ -8,6 +8,10 @@ export interface RecordMaestro {
   noticia: string
   fuente_bibliografica: string
   monto_reales?: number | null
+  autor_bib?: string | null
+  titulo?: string | null
+  concepto_caja?: string | null
+  compania_id?: string | null
   [key: string]: unknown
 }
 

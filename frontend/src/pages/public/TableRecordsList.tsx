@@ -66,38 +66,90 @@ export default function TableRecordsList({ sourceTable, title }: Props) {
         <>
           <div style={{ overflowX: 'auto', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '12px', border: '1px solid rgba(255, 255, 255, 0.1)' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '2px solid rgba(255, 255, 255, 0.15)' }}>
-                  <th style={th}>Ciudad</th>
-                  <th style={th}>Año</th>
-                  <th style={th}>Noticia / Descripción</th>
-                  <th style={th}>Acción</th>
-                </tr>
-              </thead>
-              <tbody>
-                {records.map((r) => (
-                  <tr key={r.id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)', transition: 'background 0.2s' }}>
-                    <td style={td}>{r.city || '—'}</td>
-                    <td style={td}>{r.year || '—'}</td>
-                    <td style={{ ...td, maxWidth: '400px' }}>
-                      <div style={{ 
-                        display: '-webkit-box', 
-                        WebkitLineClamp: 3, 
-                        WebkitBoxOrient: 'vertical', 
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis' 
-                      }}>
-                        {r.noticia || '—'}
-                      </div>
-                    </td>
-                    <td style={td}>
-                      <Link to={`/transactions/${r.transaction_id}`} style={{ fontWeight: 600, color: 'var(--primary-color, #ffaa00)', textDecoration: 'none' }}>
-                        Ver detalle
-                      </Link>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+              {sourceTable === 'B' ? (
+                <>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid rgba(255, 255, 255, 0.15)' }}>
+                      <th style={th}>Indicador de registro</th>
+                      <th style={th}>Autores</th>
+                      <th style={th}>Referencias bibliográficas</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {records.map((r) => (
+                      <tr key={r.id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)', transition: 'background 0.2s' }}>
+                        <td style={td}>{r.id || '—'}</td>
+                        <td style={td}>{r.autor_bib || '—'}</td>
+                        <td style={{ ...td, maxWidth: '500px', whiteSpace: 'pre-wrap' }}>{r.titulo || '—'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </>
+              ) : sourceTable === 'I' ? (
+                <>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid rgba(255, 255, 255, 0.15)' }}>
+                      <th style={th}>Indicador de registro</th>
+                      <th style={th}>Indicador</th>
+                      <th style={th}>Ciudad</th>
+                      <th style={th}>Años</th>
+                      <th style={th}>Concepto</th>
+                      <th style={th}>Monto</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {records.map((r) => (
+                      <tr key={r.id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)', transition: 'background 0.2s' }}>
+                        <td style={td}>{r.id || '—'}</td>
+                        <td style={{ ...td, maxWidth: '300px' }}>{r.noticia || '—'}</td>
+                        <td style={td}>{r.city || '—'}</td>
+                        <td style={td}>{r.year || '—'}</td>
+                        <td style={td}>{r.concepto_caja || '—'}</td>
+                        <td style={td}>{r.monto_reales != null ? `${r.monto_reales} reales` : '—'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </>
+              ) : (
+                <>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid rgba(255, 255, 255, 0.15)' }}>
+                      <th style={th}>Indicador de registro</th>
+                      <th style={th}>Transacción</th>
+                      <th style={th}>Noticia</th>
+                      <th style={th}>Ciudad</th>
+                      <th style={th}>Año</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {records.map((r) => (
+                      <tr key={r.id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)', transition: 'background 0.2s' }}>
+                        <td style={td}>{r.id || '—'}</td>
+                        <td style={td}>
+                          {r.transaction_id ? (
+                            <Link to={`/transactions/${r.transaction_id}`} style={{ fontWeight: 600, color: 'var(--primary-color, #ffaa00)', textDecoration: 'none' }}>
+                              {r.transaction_id}
+                            </Link>
+                          ) : '—'}
+                        </td>
+                        <td style={{ ...td, maxWidth: '400px' }}>
+                          <div style={{ 
+                            display: '-webkit-box', 
+                            WebkitLineClamp: 3, 
+                            WebkitBoxOrient: 'vertical', 
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis' 
+                          }}>
+                            {r.noticia || '—'}
+                          </div>
+                        </td>
+                        <td style={td}>{r.city || '—'}</td>
+                        <td style={td}>{r.year || '—'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </>
+              )}
             </table>
           </div>
 
