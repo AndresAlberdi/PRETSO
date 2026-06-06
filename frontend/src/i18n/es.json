@@ -1,17 +1,94 @@
 {
   "nav": {
     "home": "Inicio",
-    "search": "Búsqueda",
+    "search": "Buscar",
     "companies": "Compañías",
-    "announcements": "Anuncios",
-    "api": "API"
+    "announcements": "Noticias",
+    "api": "API",
+    "admin": "Panel de administración",
+    "login": "Iniciar sesión",
+    "logout": "Cerrar sesión"
   },
-  "search": {
-    "placeholder": "Buscar en el corpus...",
-    "filters": "Filtros"
+  "home": {
+    "title": "PRETSO",
+    "subtitle": "Plataforma de Recursos para el Estudio del Teatro del Siglo de Oro",
+    "description": "Corpus histórico del teatro hispanoamericano de los siglos XVI y XVII.",
+    "coming_soon": "Próximamente",
+    "launch_message": "La plataforma estará disponible cuando se alcancen {{threshold}} registros publicados."
   },
   "launch": {
     "progress": "{{count}} de {{threshold}} registros publicados",
-    "inactive_message": "El portal estará disponible cuando se alcancen {{threshold}} registros publicados."
+    "active": "Portal activo",
+    "inactive": "Portal en preparación"
+  },
+  "search": {
+    "placeholder": "Buscar en el corpus...",
+    "button": "Buscar",
+    "filters": "Filtros",
+    "city": "Ciudad",
+    "year_from": "Año desde",
+    "year_to": "Año hasta",
+    "source_table": "Tabla",
+    "company": "Compañía",
+    "no_results": "No se encontraron resultados.",
+    "suggestions": "Sugerencias:",
+    "results_count": "{{count}} resultados"
+  },
+  "record": {
+    "transaction": "Transacción",
+    "city": "Ciudad",
+    "year": "Año",
+    "source": "Fuente",
+    "amount": "Monto (reales)",
+    "amount_maravedis": "Equivalencia en maravedís"
+  },
+  "company": {
+    "siglas": "Siglas",
+    "authors": "Autores",
+    "seasons": "Temporadas",
+    "scope": "Ámbito",
+    "transactions": "Transacciones vinculadas"
+  },
+  "announcements": {
+    "title": "Noticias y convocatorias",
+    "categories": {
+      "articulo": "Artículo",
+      "noticia_proyecto": "Noticia del proyecto",
+      "convocatoria": "Convocatoria"
+    }
+  },
+  "auth": {
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "login": "Iniciar sesión",
+    "register": "Registrarse",
+    "name": "Nombre completo",
+    "institution": "Institución",
+    "verify_email": "Verifica tu correo electrónico para activar tu cuenta.",
+    "login_required": "Debes iniciar sesión para acceder a esta sección."
+  },
+  "admin": {
+    "dashboard": "Panel de control",
+    "records": "Registros",
+    "new_record": "Nuevo registro",
+    "etl": "Importar CSV",
+    "users": "Usuarios",
+    "status": {
+      "borrador": "Borrador",
+      "en_revision": "En revisión",
+      "publicado": "Publicado"
+    },
+    "actions": {
+      "submit": "Enviar a revisión",
+      "approve": "Aprobar",
+      "reject": "Rechazar",
+      "edit": "Editar",
+      "delete": "Eliminar"
+    }
+  },
+  "errors": {
+    "not_found": "No encontrado",
+    "portal_inactive": "El portal aún no está activo.",
+    "generic": "Ha ocurrido un error."
   }
 }

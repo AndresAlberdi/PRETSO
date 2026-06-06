@@ -235,7 +235,7 @@ def get_launch_rule() -> dict:
     """Return the launch rule document, creating defaults if absent."""
     doc = get_document(CONFIG, LAUNCH_RULE_DOC)
     if doc is None:
-        doc = {"published_count": 0, "threshold": 20, "portal_active": False}
+        doc = {"published_count": 0, "threshold": 10, "portal_active": False}
         set_document(CONFIG, LAUNCH_RULE_DOC, doc)
     return doc
 
@@ -255,7 +255,7 @@ def increment_published_count(delta: int = 1) -> int:
         doc = updated.to_dict() or {}
         new_count: int = doc.get("published_count", 0)
         # Keep portal_active in sync
-        threshold: int = doc.get("threshold", 20)
+        threshold: int = doc.get("threshold", 10)
         if doc.get("portal_active") != (new_count >= threshold):
             ref.update({"portal_active": new_count >= threshold})
         return new_count

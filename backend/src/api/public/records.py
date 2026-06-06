@@ -3,8 +3,9 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 
+from backend.src.api.auth import get_current_user
 from backend.src.db.repositories import get_record, query_records
 
 router = APIRouter(tags=["public-records"])
@@ -19,6 +20,7 @@ async def list_records(
     company: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(25, ge=1, le=100),
+    user: dict = Depends(get_current_user),
 ):
     """Listado paginado de registros publicados con filtros opcionales."""
     records, total = query_records(
@@ -43,7 +45,10 @@ async def list_records(
 
 
 @router.get("/records/{record_id}")
-async def get_record_detail(record_id: str):
+async def get_record_detail(
+    record_id: str,
+    user: dict = Depends(get_current_user),
+):
     """Detalle completo de un registro publicado."""
     record = get_record(record_id)
     if record is None or record.get("status") != "publicado":

@@ -20,7 +20,7 @@ _FALLBACK_SUGGESTIONS = ["compañía", "representación", "Corpus Christi"]
 # ---------------------------------------------------------------------------
 
 async def search(
-    query: str,
+    query: str | None = None,
     city: str | None = None,
     year_from: int | None = None,
     year_to: int | None = None,
@@ -34,11 +34,12 @@ async def search(
     Flujo:
     1. Construye filtros Firestore: status=="publicado" + filtros opcionales.
     2. Recupera candidatos de Firestore (máx. 1 000).
-    3. Genera embedding de la query.
-    4. Calcula similitud coseno entre query_embedding y embedding de cada candidato.
-    5. Filtra por SIMILARITY_THRESHOLD.
-    6. Ordena por score descendente.
-    7. Pagina y devuelve resultados.
+    3. Si query está vacía, devuelve los candidatos aplicando paginación.
+    4. Genera embedding de la query.
+    5. Calcula similitud coseno entre query_embedding y embedding de cada candidato.
+    6. Filtra por SIMILARITY_THRESHOLD.
+    7. Ordena por score descendente.
+    8. Pagina y devuelve resultados.
     """
     # 1. Construir filtros
     filters: list[tuple] = [("status", "==", "publicado")]
@@ -59,6 +60,29 @@ async def search(
         filters=filters,
         limit=_MAX_CANDIDATES,
     )
+
+    if not query:
+        total = len(candidates)
+        offset = (page - 1) * page_size
+        page_items = candidates[offset: offset + page_size]
+        results = [
+            {
+                "id": doc.get("id"),
+                "transaction_id": doc.get("transaction_id"),
+                "city": doc.get("city"),
+                "year": doc.get("year"),
+                "noticia_fragment": _fragment(doc.get("noticia", "")),
+                "score": 1.0,
+            }
+            for doc in page_items
+        ]
+        return {
+            "results": results,
+            "total": total,
+            "page": page,
+            "page_size": page_size,
+            "suggestions": [],
+        }
 
     # 3. Generar embedding de la query
     query_embedding = await generate_embedding(query)

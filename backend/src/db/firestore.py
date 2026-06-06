@@ -18,13 +18,28 @@ def _init_firebase() -> None:
     global _app
     if _app is not None:
         return
+
+    # Opción 1: credenciales en base64 (Cloud Run con Secret Manager)
+    cred_b64 = os.getenv("GOOGLE_APPLICATION_CREDENTIALS_B64")
+    if cred_b64:
+        import base64
+        import json
+        import tempfile
+        decoded = base64.b64decode(cred_b64)
+        sa_info = json.loads(decoded)
+        cred = credentials.Certificate(sa_info)
+        _app = firebase_admin.initialize_app(cred)
+        return
+
+    # Opción 2: ruta a archivo JSON (desarrollo local)
     cred_path = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")
     if cred_path:
         cred = credentials.Certificate(cred_path)
         _app = firebase_admin.initialize_app(cred)
-    else:
-        # Use Application Default Credentials
-        _app = firebase_admin.initialize_app()
+        return
+
+    # Opción 3: Application Default Credentials (Cloud Run con cuenta de servicio)
+    _app = firebase_admin.initialize_app()
 
 
 def get_db():

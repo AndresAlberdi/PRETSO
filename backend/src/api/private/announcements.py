@@ -29,11 +29,16 @@ async def create_announcement(
     short_uuid = uuid.uuid4().hex[:8]
     ann_id = f"ann-{short_uuid}"
 
+    expires_at_iso = None
+    if body.expires_at:
+        expires_at_iso = body.expires_at.isoformat() if hasattr(body.expires_at, "isoformat") else body.expires_at
+
     data = {
         "id": ann_id,
         "created_by": user["uid"],
         **body.model_dump(),
         "published_at": body.published_at.isoformat() if hasattr(body.published_at, "isoformat") else body.published_at,
+        "expires_at": expires_at_iso,
     }
 
     await async_set_document(ANNOUNCEMENTS, ann_id, data)
@@ -61,6 +66,8 @@ async def update_announcement(
     updates = body.model_dump()
     if hasattr(updates.get("published_at"), "isoformat"):
         updates["published_at"] = updates["published_at"].isoformat()
+    if updates.get("expires_at") and hasattr(updates.get("expires_at"), "isoformat"):
+        updates["expires_at"] = updates["expires_at"].isoformat()
 
     await async_update_document(ANNOUNCEMENTS, ann_id, updates)
     return {**ann, **updates}

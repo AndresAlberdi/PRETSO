@@ -22,3 +22,5 @@ dist/
 .vscode/
 .idea/
 *.swp
+service-account.json
+backend/service-account.json

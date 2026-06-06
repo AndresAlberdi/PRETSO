@@ -1,15 +1,19 @@
 """Endpoints públicos para transacciones."""
 from __future__ import annotations
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 
+from backend.src.api.auth import get_current_user
 from backend.src.db.repositories import get_transaction, query_collection, RECORDS
 
 router = APIRouter(tags=["public-transactions"])
 
 
 @router.get("/transactions/{transaction_id}")
-async def get_transaction_detail(transaction_id: str):
+async def get_transaction_detail(
+    transaction_id: str,
+    user: dict = Depends(get_current_user),
+):
     """Devuelve la transacción con todos sus registros vinculados (solo publicados)."""
     transaction = get_transaction(transaction_id)
     if transaction is None:

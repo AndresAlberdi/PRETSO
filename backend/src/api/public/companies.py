@@ -4,8 +4,9 @@ from __future__ import annotations
 import math
 from typing import Optional
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Depends
 
+from backend.src.api.auth import get_current_user
 from backend.src.db.repositories import (
     get_document,
     query_collection,
@@ -20,6 +21,7 @@ router = APIRouter(tags=["public-companies"])
 async def list_companies(
     page: int = Query(1, ge=1),
     page_size: int = Query(25, ge=1, le=100),
+    user: dict = Depends(get_current_user),
 ):
     """Listado paginado de compañías."""
     offset = (page - 1) * page_size
@@ -37,7 +39,10 @@ async def list_companies(
 
 
 @router.get("/companies/{company_id}")
-async def get_company_detail(company_id: str):
+async def get_company_detail(
+    company_id: str,
+    user: dict = Depends(get_current_user),
+):
     """Detalle de una compañía con sus transaction_ids."""
     company = get_document(COMPANIES, company_id)
     if company is None:

@@ -1,0 +1,22 @@
+connectorId: example
+generate:
+  javascriptSdk:
+    - outputDir: ../../src/dataconnect-generated
+      package: "@dataconnect/generated"
+      packageJsonDir: ../..
+      react: false
+      angular: false
+      clientCache: {}
+    - outputDir: ../../frontend/src/dataconnect-generated
+      package: "@dataconnect/generated"
+      packageJsonDir: ../../frontend
+      react: true
+      angular: false
+      clientCache: {}
+  adminNodeSdk:
+    - outputDir: ../../pretsocodebase/src/dataconnect-admin-generated
+      package: "@dataconnect/admin-generated"
+      packageJsonDir: ../../pretsocodebase
+    - outputDir: ../../functions/src/dataconnect-admin-generated
+      package: "@dataconnect/admin-generated"
+      packageJsonDir: ../../functions

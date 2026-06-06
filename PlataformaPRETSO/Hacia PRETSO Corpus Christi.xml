@@ -1,0 +1,228 @@
+<?xml version="1.0" ?>
+<dataset name="Corpus_Christi">
+  <row>
+    <Indicador_de_registro>CC-1</Indicador_de_registro>
+    <Transacción>Tra-67</Transacción>
+    <Documento>[Doc. 15] Acta del Cabildo municipal de la Ciudad de México fechada el 22 de febrero de 1592</Documento>
+    <Noticia>Según el acta, Luis Lagarto había recibido 850 pesos de oro común (6800 reales) por &quot;la comedia de la fiesta del Corpus Christi&quot; de 1591.</Noticia>
+    <Ciudad>México</Ciudad>
+    <Año>1591</Año>
+    <Encargo>Una comedia</Encargo>
+    <Encargado>Luis Lagarto</Encargado>
+    <Compañía>X</Compañía>
+    <Monto_a_pagar>6800 reales</Monto_a_pagar>
+    <Fondos>Cabildo municipal, sin especificar</Fondos>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en Ramos Smith (2011, p. 170)</Fuentes_para_la_generación_del_dato>
+    <Códigos_documentos>[Doc. 15]</Códigos_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>CC-2</Indicador_de_registro>
+    <Transacción>Tra-68</Transacción>
+    <Documento>[Doc. 19][Doc. 20][Doc. 21] Actas del Cabildo municipal de la ciudad de México fechadas el 6 de abril, el 17 de abril y el 6 de junio de 1592</Documento>
+    <Noticia>Según las actas, el bachiller Arias Villalobos, después de una serie de negociaciones, representó una comedia nueva en el Corpus de este año por 1000 pesos de oro común (8000 reales). </Noticia>
+    <Ciudad>México</Ciudad>
+    <Año>1592</Año>
+    <Encargo>Una comedia </Encargo>
+    <Encargado>Arias de Villalobos</Encargado>
+    <Compañía>X</Compañía>
+    <Monto_a_pagar>8000 reales</Monto_a_pagar>
+    <Fondos>Cabildo municipal, sin especificar</Fondos>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en Ramos Smith (2011, p. 170)</Fuentes_para_la_generación_del_dato>
+    <Códigos_documentos>[Doc. 19][Doc. 20][Doc. 21]</Códigos_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>CC-3</Indicador_de_registro>
+    <Transacción>Tra-69</Transacción>
+    <Documento>[Doc. 16] Acta del Cabildo municipal de la Ciudad de México fechada el 14 de abril de 1593</Documento>
+    <Noticia>Según el acta, el Cabildo acordó con el virrey Luis de Velasco “hacer los tres autos para la fiesta del Corpus Christi, lo cual hace y se obligó Luis Lagarto en 1.000 pesos de oro común (8000 reales)”</Noticia>
+    <Ciudad>México</Ciudad>
+    <Año>1593</Año>
+    <Encargo>Tres autos</Encargo>
+    <Encargado>Luis Lagarto</Encargado>
+    <Compañía>X</Compañía>
+    <Monto_a_pagar>8000 reales</Monto_a_pagar>
+    <Fondos>Cabildo municipal, sin especificar</Fondos>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en Ramos Smith (2011, pp. 170-171)</Fuentes_para_la_generación_del_dato>
+    <Códigos_documentos>[Doc. 16]</Códigos_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>CC-4</Indicador_de_registro>
+    <Transacción>Tra-70</Transacción>
+    <Documento>[Doc. 17] Acta del Cabildo municipal de la Ciudad de México fechada el 28 de mayo de 1593</Documento>
+    <Noticia>Según el acta, el Cabildo decidió en la sesión de dicho día que Luis Lagarto hiciera para el Corpus, además de lo que ya tenía acordado, &quot;la danza de los gigantes&quot;, por la cual se le pagaría 300 pesos de oro común (2400 reales). Lo que se tenía acordado anteriormente era una comedia por 1000 pesos de oro común (8000 reales). </Noticia>
+    <Ciudad>México</Ciudad>
+    <Año>1593</Año>
+    <Encargo>Una danza de los gigantes</Encargo>
+    <Encargado>Luis Lagarto</Encargado>
+    <Compañía>X</Compañía>
+    <Monto_a_pagar>2400 reales</Monto_a_pagar>
+    <Fondos>Cabildo municipal, sin especificar</Fondos>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en Ramos Smith (2011, pp. 170-171)</Fuentes_para_la_generación_del_dato>
+    <Códigos_documentos>[Doc. 17]</Códigos_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>CC-5</Indicador_de_registro>
+    <Transacción>Tra-71</Transacción>
+    <Documento>[Doc. 18] Acta del Cabildo municipal de la Ciudad de México fechada el 13 de mayo de 1594</Documento>
+    <Noticia>Según el acta, Luis Lagarto pidió al Cabildo 1300 pesos de oro común (10400 reales) por las comedias que iba a preparar para el Corpus. En el mismo documento, se especifica que Lagarto dio fianzas al respecto y que se comprometió a presentar, antes de la fiesta, una “muestra” de lo que haría; en consecuencia, se ordenó “que el señor Gaspar de Valdés, comisario de la fiesta del Corpus Christi, con la escritura en la mano, vea si ha cumplido Luis Lagarto con lo que está obligado” —la fuente no detalla la cantidad de comedias que Lagarto se comprometió a representar— .</Noticia>
+    <Ciudad>México</Ciudad>
+    <Año>1594</Año>
+    <Encargo>Comedias (no se especifica la cantidad)</Encargo>
+    <Encargado>Luis Lagarto</Encargado>
+    <Compañía>X</Compañía>
+    <Monto_a_pagar>10400 reales</Monto_a_pagar>
+    <Fondos>Cabildo municipal, sin especificar</Fondos>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en Ramos Smith (2011, p. 171)</Fuentes_para_la_generación_del_dato>
+    <Códigos_documentos>[Doc. 18]</Códigos_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>CC-6</Indicador_de_registro>
+    <Transacción>Tra-72</Transacción>
+    <Documento>[Doc. 22][Doc. 23][Doc. 24] Actas del Cabildo municipal de la ciudad de México fechadas el 11 de mayo, el 14 de mayo y el 4 de junio de 1600</Documento>
+    <Noticia>Según las actas, se acordó que las representaciones del Corpus de este año estuvieran a cargo de dos compañías, la primera encabezada por Marco Antonio Ferrer y Juan Corral y la segunda por Gonzalo de Riancho y Alonso Velázquez. Ambas compañías tendrían que unirse y colaborar para la representación de dos comedias, una el jueves de Corpus y otra el día de la Octava: “representando cada comedia las dichas dos compañías de farsantes para que se hagan más cumplidamente”. Se pagaría un total de 2000 pesos de oro común (16000 reales) por las dos comedias. Por otro lado, para la misma ocasión, se contrató al maestro de danzas Florián Vargas, a quien se acordó pagar 200 pesos (1600 reales) por &quot;un carro con danzas y muchas cosas de pólvora y música, como está por la escritura dentro y fuera de la iglesia&quot; y posteriormente 100 pesos (800 reales) &quot;por otra danza de doce hombres más&quot;.</Noticia>
+    <Ciudad>México</Ciudad>
+    <Año>1601</Año>
+    <Encargo>Dos comedias</Encargo>
+    <Encargado>Marco Antonio Ferrer y Juan Corral / Gonzalo de Riancho y Alonso Velázquez</Encargado>
+    <Compañía>MAF-JC / GR-AV</Compañía>
+    <Monto_a_pagar>16000 reales</Monto_a_pagar>
+    <Fondos>Cabildo municipal, sin especificar</Fondos>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en Ramos Smith (2011, pp. 256-257)</Fuentes_para_la_generación_del_dato>
+    <Códigos_documentos>[Doc. 22][Doc. 23][Doc. 24]</Códigos_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>CC-7</Indicador_de_registro>
+    <Transacción>Tra-73</Transacción>
+    <Documento>[Doc. 22][Doc. 23][Doc. 24] Actas del Cabildo municipal de la ciudad de México fechadas el 11 de mayo, el 14 de mayo y el 4 de junio de 1601</Documento>
+    <Noticia>Según las actas, además de las comedias, para la misma ocasión, se contrató al maestro de danzas Florián Vargas, a quien se acordó pagar 200 pesos (1600 reales) por &quot;un carro con danzas y muchas cosas de pólvora y música, como está por la escritura dentro y fuera de la iglesia&quot; y posteriormente 100 pesos (800 reales) &quot;por otra danza de doce hombres más&quot;.</Noticia>
+    <Ciudad>México</Ciudad>
+    <Año>1601</Año>
+    <Encargo>Un carro con danzas, música y cosas de pólvora / una danza de doce hombres</Encargo>
+    <Encargado>Florián Vargas</Encargado>
+    <Compañía>X</Compañía>
+    <Monto_a_pagar>2400 reales</Monto_a_pagar>
+    <Fondos>Cabildo municipal, sin especificar</Fondos>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en Ramos Smith (2011, pp. 256-257)</Fuentes_para_la_generación_del_dato>
+    <Códigos_documentos>[Doc. 22][Doc. 23][Doc. 24]</Códigos_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>CC-8</Indicador_de_registro>
+    <Transacción>Tra-74</Transacción>
+    <Documento>[Doc. 25][Doc. 26][Doc. 27] Actas del Cabildo municipal de la ciudad de México fechadas el 20, 21 y 24 de mayo de 1602</Documento>
+    <Noticia>Según se desprende de las actas, este año hubo problemas porque el Cabildo estaba falto de fondos y los comediantes no aceptaban hacer las representaciones del Corpus por menos de 2000 pesos de oro corriente, que era lo que se había pagado el año anterior. Finalmente, el cabildo acordó con Marco Antonio Ferrer que él se encargaría de sacar dos comedias por 1600 pesos (12800 reales). Las comedias en cuestión serían “la de Santa Leocadia para el día del Santísimo Sacramento, con pasos y sus entremeses y todos los ropajes de seda de Castilla nuevos, que sean en conformidad del personaje que se representare, y la seda se entiende terciopelos, damascos, rasos y tafetanes; y la otra para la octava de Santa Teodora alejandrina”. Marco Antonio Ferrer se compromete, a su vez, a realizar un ensayo de las obras delante del capitular Francisco Escudero de Figueroa, quien tendía que aprobarlas. El cabildo acepta, como parte del trato, prestar por tres meses 300 pesos al comediante &quot; (RaS, 257) —la fuente no especifica el acuerdo reflejado en cada una de las actas—.</Noticia>
+    <Ciudad>México</Ciudad>
+    <Año>1602</Año>
+    <Encargo>Dos comedias</Encargo>
+    <Encargado>Marco Antonio Ferrer</Encargado>
+    <Compañía>X</Compañía>
+    <Monto_a_pagar>12800 reales</Monto_a_pagar>
+    <Fondos>Cabildo municipal, sin especificar</Fondos>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en Ramos Smith (2011, p. 257)</Fuentes_para_la_generación_del_dato>
+    <Códigos_documentos>[Doc. 25][Doc. 26][Doc. 27]</Códigos_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>CC-9</Indicador_de_registro>
+    <Transacción>Tra-75</Transacción>
+    <Documento>[Doc. 28]  Acta del Cabildo municipal de la ciudad de México fechada el 6 de mayo de 1605</Documento>
+    <Noticia>Según el acta, tras bastantes negociaciones, los comediantes (cuyos nombres no se especifica) accedieron a hacer las dos comedias para el Corpus Christi y la Octava por 1800 pesos de oro común (14400 reales). </Noticia>
+    <Ciudad>México</Ciudad>
+    <Año>1605</Año>
+    <Encargo>Dos comedias</Encargo>
+    <Encargado>X</Encargado>
+    <Compañía>X</Compañía>
+    <Monto_a_pagar>14400 reales</Monto_a_pagar>
+    <Fondos>Cabildo municipal, sin especificar</Fondos>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en Ramos Smith (2011, p. 257)</Fuentes_para_la_generación_del_dato>
+    <Códigos_documentos>[Doc. 28]</Códigos_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>CC-10</Indicador_de_registro>
+    <Transacción>Tra-76</Transacción>
+    <Documento>[Doc. 29][Doc. 30][Doc. 31] Actas del Cabildo municipal de la ciudad de México fechadas el 10 y el 13 de marzo y el 18 de abril de 1608</Documento>
+    <Noticia>Según las actas, el Cabildo estuvo mucho tiempo tratando de negociar rebajas con los comediantes que debían representar para el Corpus Christi. Este año se presentaron ante el cabildo dos compañías: una dirigida por Gonzalo de Riancho y Alonso Velázquez y la otra por Fernando Ramírez. Ambas compañías, en conjunto, pedían un total de 2500 pesos de oro común (20000 reales) para representar dos comedias (una en el Corpus y otra en la Octava). El cabildo se negó a tal petición y, por falta de fondos, algunos capitulares sugirieron que solo se sacaran danzas, lo cual, sin embargo, no logró aprobarse. Se decidió, en cambio, pedir al virrey (Luis de Velasco II) que obligara a los comediantes a que realizaran gratuitamente las representaciones para el Corpus y la Octava debido a lo mucho que se beneficiaban representando en la ciudad el resto del año (RaS, 258) —la fuente no especifica el acuerdo reflejado en cada una de las actas—. Haciendo una revisión del acta capitular del 18 de abril se puede ver que el virrey, finalmente, pidió al corregidor, Garcí López de Espinar, que le dijera cuánto podría costar la fiesta si los comediantes hicieran las comedias sin recibir ganancias. El corregidor habría estimado que serían suficientes alrededor de 1200 pesos (9600 reales). El virrey, ante tal dato, autoriza a que el cabildo utilice de sus fondos de rentas y propios 1700 pesos (13600 reales) para la fiesta: 1200 para el conjunto de las celebraciones del Corpus y la Octava y 500 (4000 reales) para las dos compañías teatrales, si estas aceptaran hacer las obras sin ganancias, para ayudar con los “gastos de adorno de los representantes” (ACM, libro XVII). </Noticia>
+    <Ciudad>México</Ciudad>
+    <Año>1608</Año>
+    <Encargo>Dos comedias. En el documento se da información sobre lo que se gasta para toda la fiesta y lo que se da a los comediantes, no como pago, sino “gastos de adorno de los representantes”</Encargo>
+    <Encargado>Gonzalo de Riancho y Alonso Velázquez / Fernando Ramírez</Encargado>
+    <Compañía>GR-AV / FR</Compañía>
+    <Monto_a_pagar>4000 reales para ayudar a los comediantes con los “gastos de adorno de los representantes”. 13600 reales en total para la fiesta. 9600 para los gastos generales del Corpus y la Octava, aparte de los 4000 para los comediantes. </Monto_a_pagar>
+    <Fondos>Cabildo municipal, fondo de rentas y propios. </Fondos>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en Ramos Smith (2011, p. 258). Reelaborada a partir de los datos extraídos directamente del Libro XVII de la Actas de Cabildo de México. </Fuentes_para_la_generación_del_dato>
+    <Códigos_documentos>[Doc. 29][Doc. 30][Doc. 31] </Códigos_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>CC-11</Indicador_de_registro>
+    <Transacción>Tra-77</Transacción>
+    <Documento>[Doc. 33] Escritura fechada en Badajoz el 5 de mayo de 1601</Documento>
+    <Noticia>En la escritura, Gonzalo de Alarcón se compromete con el Cabildo de ciudad a realizar el día de Corpus Christi una comedia: la comedia El monte santo. Se pagaría a Alarcón por la comedia: 330 reales (100 por adelantado y 230 el día de Corpus). –En la escritura, según las fuentes, se especifica que no intervendrían actores locales de Badajoz. Cabe remarcar que esto se presenta como una cosa positiva que hace más valiosa la representación. </Noticia>
+    <Ciudad>Badajoz</Ciudad>
+    <Año>1601</Año>
+    <Encargo>Una comedia</Encargo>
+    <Encargado>Gonzalo de Alarcón</Encargado>
+    <Compañía>GA</Compañía>
+    <Monto_a_pagar>330 reales</Monto_a_pagar>
+    <Fondos>Cabildo municipal, sin especificar</Fondos>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de  Marcos  Álvarez (1997, pp. 114-115).</Fuentes_para_la_generación_del_dato>
+    <Códigos_documentos>[Doc. 33]</Códigos_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>CC-12</Indicador_de_registro>
+    <Transacción>Tra-78</Transacción>
+    <Documento>[Doc. 43] Escritura fechada en Valladolid el 26 de mayo de 1580</Documento>
+    <Noticia>En le escritura, Juan Granado se compromete a representar el lunes siguiente al Corpus Christi, en Tordesillas, desde las ocho de la mañana, dos obras: un auto (que sería uno de los que representó en Valladolid para el Corpus Christi de este año) y la comedia de Los Abencerrajes con sus entremeses. En esta escritura se precisa que Granado pide para cumplir con su tare: tres carretas para el transporte de su compañía de Valladolid a Tordesillas, el tablado y 500 reales. </Noticia>
+    <Ciudad>Tordesillas</Ciudad>
+    <Año>1580</Año>
+    <Encargo>Un auto y una comedia con sus entremeses</Encargo>
+    <Encargado>Juan Granado</Encargado>
+    <Compañía>JG2</Compañía>
+    <Monto_a_pagar>500 reales</Monto_a_pagar>
+    <Fondos>Cabildo municipal, sin especificar</Fondos>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de Rojo Vega (1999, p. 322). Se ha consultado el texto de Rojo Vega para mayor claridad; Rojo Vega ofrece la ubicación del documento: legajo 455, fol. 204 de los protocolos del Archivo Histórico Provincial de Valladolid. </Fuentes_para_la_generación_del_dato>
+    <Códigos_documentos>[Doc. 43]</Códigos_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>CC-13</Indicador_de_registro>
+    <Transacción>Tra-79</Transacción>
+    <Documento>[Doc. 46] Registros del Cabildo municipal de la ciudad de Sevilla del año 1575 relativos al Corpus Christi. </Documento>
+    <Noticia>Según la lectura de los documentos del Cabildo de Sevilla que realiza Jean Sentaurens y recoge DICAT, este año se habría contratado a Ganassa para que representara un auto en el Corpus Christi. Se contrata también a otros autores para que saquen más autos (en específico a Luis Díaz, Francisco de Segura y Pedro de Montiel). Ganassa habría cobrado por su participación 51000 maravedís (1500 reales). DICAT hace referencia también a que, según los estudios de Sentaurens, el dinero que el Cabildo paga a Ganassa es mucho mayor al que acostumbraba pagar a los autores españoles. –Sentaurens transcribe de los documentos originales los nombres de los autores como: Luys Días, Francisco de Sigura y Montiel. DICAT propone las modernizaciones que usamos también aquí.– El Cabildo también costea el carro de representación para el auto de Ganassa, el cual se describe como “dos medios carros”. Sentaurens da el dato de que se gastó en el carro un total de 45118 maravedís y así lo recoge DICAT. Creemos que es un error pues, el mismo investigador, muestra el desglose de los gastos para el carro que encuentra en el libro de caja y la suma real es de 45028 maravedís (1324,35 reales). </Noticia>
+    <Ciudad>Sevilla</Ciudad>
+    <Año>1575</Año>
+    <Encargo>Un auto (sin contar el carro de representación, el cual es un gasto aparte)</Encargo>
+    <Encargado>Alberto Naselli (Ganassa)</Encargado>
+    <Compañía>X</Compañía>
+    <Monto_a_pagar>1500 reales</Monto_a_pagar>
+    <Fondos>Cabildo municipal, sin especificar</Fondos>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de Sentaurens (1984, pp. 139, 171, 178, 180-181, 190, 198, 217, 1261). Se ha consultado el texto de Sentaures. Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), Papeles Importantes, siglo XVI, tomo 3, vol. 44: registros de las deliberaciones de la comisión de Corpus de 1575 (en el original: registre des délibérations de la comission du Corpus de 1575). </Fuentes_para_la_generación_del_dato>
+    <Códigos_documentos>[Doc. 46]</Códigos_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>CC-14</Indicador_de_registro>
+    <Transacción>Tra-80</Transacción>
+    <Documento>[Doc. 50] Libro de cajas del Cabildo de Sevilla del año 1578</Documento>
+    <Noticia>Según la lectura de los documentos del Cabildo de Sevilla que realiza Jean Sentaurens y recoge DICAT, este año se habría contratado a Ganassa para que representara dos autos en el Corpus Christi. La ciudad se habría costeado los carros y habría pagado a Ganassa 400 ducados (4400 reales). </Noticia>
+    <Ciudad>Sevilla</Ciudad>
+    <Año>1578</Año>
+    <Encargo>Dos autos (sin contar los carros de representación, los cuales son un gasto aparte)</Encargo>
+    <Encargado>Alberto Naselli (Ganassa)</Encargado>
+    <Compañía>X</Compañía>
+    <Monto_a_pagar>4400 reales</Monto_a_pagar>
+    <Fondos>Cabildo municipal, sin especificar</Fondos>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de Sentaurens (1984, pp. 179, 181, 1261). Se ha consultado el texto de Sentaures. Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), II, libro de caja, año 1578. </Fuentes_para_la_generación_del_dato>
+    <Códigos_documentos>[Doc. 50]</Códigos_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>CC-15</Indicador_de_registro>
+    <Transacción>Tra-81</Transacción>
+    <Documento>[Doc. 51] Carta de pago, fechada el 23 de junio de 1579 en Toledo, firmada por Vicenzo Botanelli (Curtio Romano) por el dinero que pagó la Catedral a su compañía, que es la de Alberto Naselli (Ganassa), para representar en el Corpus Christi. </Documento>
+    <Noticia>En la carta de pago, Vicenzo Botanelli (Curzio Romano) afirma que la catedral le pagó 25000 marevedís (735,29 reales) por representar en el Corpus Christi de Toledo delante del rey. DICAT explica que Francisco Asenjo Barbieri (1889) traduce el documento al italiano, mientras que  Critóbal Pérez Pastor (1914) lo parefrasea y, al hacerlo, ubica a Botanelli como autor de comedias. En DICAT se explica que es un error, que Botanelli era el procurador de la compañía de Alberto Naselli (Ganassa). Este rol de Botanelli se vería en el asiento de la compañía de Ganassa de 1580 (ver [Doc. 52]). –Vicenzo Botanelli en los documento españoles figura como Curtio Romano, Curcio Romano o Curzio Romano. El mismo año, según registra también DICAT, Hernando de Arce, receptor general de la Catedral de Toledo, da una orden, fechada el 20 de junio, para pagar los 25000 maravedís a la compañía de Botanelli por un auto que habría representado en el Corpus Chirsti. </Noticia>
+    <Ciudad>Toledo</Ciudad>
+    <Año>1579</Año>
+    <Encargo>Un auto</Encargo>
+    <Encargado>Alberto Naselli (Ganassa)</Encargado>
+    <Compañía>AN</Compañía>
+    <Monto_a_pagar>735,29 reales</Monto_a_pagar>
+    <Fondos>Catedral, sin especificar</Fondos>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de Asenjo Barbieri (1889, pp. 2-3), Pérez Pastor (1914, p. 6), Cotarelo y Mori (1908, p. 50). </Fuentes_para_la_generación_del_dato>
+    <Códigos_documentos>[Doc. 51]</Códigos_documentos>
+  </row>
+</dataset>

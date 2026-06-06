@@ -29,6 +29,12 @@ class AnnouncementCategory(str, Enum):
     convocatoria = "convocatoria"
 
 
+class AnnouncementImportance(str, Enum):
+    normal = "normal"
+    destacado = "destacado"
+    urgente = "urgente"
+
+
 class AuditAction(str, Enum):
     creacion = "creacion"
     modificacion = "modificacion"

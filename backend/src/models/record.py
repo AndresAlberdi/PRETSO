@@ -1,21 +1,35 @@
 from __future__ import annotations
 
+import re
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from .enums import PublicationStatus, SourceTable
 
+_ID_PATTERN = re.compile(r"^(CM|CS|CC|IdI|I|Com|B)-\d+$")
+_TRA_PATTERN = re.compile(r"^Tra-\d+$")
+
 
 class RecordMaestro(BaseModel):
-    model_config = ConfigDict(
-        json_encoders={datetime: lambda v: v.isoformat()},
-    )
+    # Config is not needed since Pydantic V2 handles datetime isoformat natively
 
     # Common fields
-    id: str = Field(..., pattern=r"^(CM|CS|CC|IdI|I|Com|B)-\d+$")
-    transaction_id: str = Field(..., pattern=r"^Tra-\d+$")
+    id: str = Field(...)
+    transaction_id: str = Field(...)
+
+    @field_validator("id")
+    def validate_id(cls, v):
+        if not _ID_PATTERN.match(v):
+            raise ValueError(f"id must match pattern ^(CM|CS|CC|IdI|I|Com|B)-\\d+$, got: {v}")
+        return v
+
+    @field_validator("transaction_id")
+    def validate_transaction_id(cls, v):
+        if not _TRA_PATTERN.match(v):
+            raise ValueError(f"transaction_id must match pattern ^Tra-\\d+$, got: {v}")
+        return v
     source_table: SourceTable
     status: PublicationStatus = PublicationStatus.borrador
     city: str
@@ -67,7 +81,13 @@ class RecordMaestro(BaseModel):
 
 
 class RecordMaestroCreate(BaseModel):
-    transaction_id: str = Field(..., pattern=r"^Tra-\d+$")
+    transaction_id: str = Field(...)
+
+    @field_validator("transaction_id")
+    def validate_transaction_id(cls, v):
+        if not _TRA_PATTERN.match(v):
+            raise ValueError(f"transaction_id must match pattern ^Tra-\\d+$, got: {v}")
+        return v
     source_table: SourceTable
     city: str
     year: int = Field(..., ge=1500, le=1700)
@@ -114,8 +134,20 @@ class RecordMaestroCreate(BaseModel):
 
 
 class RecordMaestroUpdate(BaseModel):
-    id: str = Field(..., pattern=r"^(CM|CS|CC|IdI|I|Com|B)-\d+$")
-    transaction_id: Optional[str] = Field(None, pattern=r"^Tra-\d+$")
+    id: str = Field(...)
+    transaction_id: Optional[str] = None
+
+    @field_validator("id")
+    def validate_id(cls, v):
+        if not _ID_PATTERN.match(v):
+            raise ValueError(f"id must match pattern ^(CM|CS|CC|IdI|I|Com|B)-\\d+$, got: {v}")
+        return v
+
+    @field_validator("transaction_id", mode="before")
+    def validate_transaction_id(cls, v):
+        if v is not None and not _TRA_PATTERN.match(v):
+            raise ValueError(f"transaction_id must match pattern ^Tra-\\d+$, got: {v}")
+        return v
     source_table: Optional[SourceTable] = None
     status: Optional[PublicationStatus] = None
     city: Optional[str] = None

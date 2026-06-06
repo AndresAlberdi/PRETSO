@@ -1,0 +1,94 @@
+<?xml version="1.0" ?>
+<dataset name="Indice_de_companias">
+  <row>
+    <Indicador_de_registro>Com-1</Indicador_de_registro>
+    <Siglas>AG-PV</Siglas>
+    <Autores>Antonio Granados y Pedro de Valdés</Autores>
+    <Temporadas_teatrales>De 1603 a 1605</Temporadas_teatrales>
+    <España_América>España</España_América>
+  </row>
+  <row>
+    <Indicador_de_registro>Com-2</Indicador_de_registro>
+    <Siglas>MAF-JC / GR-AV</Siglas>
+    <Autores>Marco Antonio Ferrer y Juan Corral / Gonzalo de Riancho y Alonso Velázquez</Autores>
+    <Temporadas_teatrales>Activa en 1601 [desconocemos el intervalo de tiempo]</Temporadas_teatrales>
+    <España_América>América</España_América>
+  </row>
+  <row>
+    <Indicador_de_registro>Com-3</Indicador_de_registro>
+    <Siglas>GA-AR-MR</Siglas>
+    <Autores>Gonzalo de Alarcón, Alonso de Riquelme y Miguel del Rosal Ríos</Autores>
+    <Temporadas_teatrales>De 1600 a 1601</Temporadas_teatrales>
+    <España_América>España</España_América>
+  </row>
+  <row>
+    <Indicador_de_registro>Com-4</Indicador_de_registro>
+    <Siglas>JA-JO-AA</Siglas>
+    <Autores>Juan de Arteaga, Juan Osorio y Antonio Amoroso</Autores>
+    <Temporadas_teatrales>De 1606 a 1608</Temporadas_teatrales>
+    <España_América>España</España_América>
+  </row>
+  <row>
+    <Indicador_de_registro>Com-5</Indicador_de_registro>
+    <Siglas>GP</Siglas>
+    <Autores>Gaspar de Porras</Autores>
+    <Temporadas_teatrales>De 1606 a 1608</Temporadas_teatrales>
+    <España_América>España</España_América>
+  </row>
+  <row>
+    <Indicador_de_registro>Com-6</Indicador_de_registro>
+    <Siglas>GA-JR</Siglas>
+    <Autores>Gonzalo de Alarcón y Juan Ramírez </Autores>
+    <Temporadas_teatrales>De 1600 a 1601</Temporadas_teatrales>
+    <España_América>España</España_América>
+  </row>
+  <row>
+    <Indicador_de_registro>Com-7</Indicador_de_registro>
+    <Siglas>GA</Siglas>
+    <Autores>Gonzalo de Alarcón</Autores>
+    <Temporadas_teatrales>De 1601 a 1602</Temporadas_teatrales>
+    <España_América>España</España_América>
+  </row>
+  <row>
+    <Indicador_de_registro>Com-8</Indicador_de_registro>
+    <Siglas>JG</Siglas>
+    <Autores>Juan Granado</Autores>
+    <Temporadas_teatrales>De 1579 a 1580</Temporadas_teatrales>
+    <España_América>España</España_América>
+  </row>
+  <row>
+    <Indicador_de_registro>Com-9</Indicador_de_registro>
+    <Siglas>JG2</Siglas>
+    <Autores>Juan Granado</Autores>
+    <Temporadas_teatrales>De 1580 a 1581</Temporadas_teatrales>
+    <España_América>España</España_América>
+  </row>
+  <row>
+    <Indicador_de_registro>Com-10</Indicador_de_registro>
+    <Siglas>JG-JeG3</Siglas>
+    <Autores>Juan Granado y Jerónimo de Gálvez</Autores>
+    <Temporadas_teatrales>De 1581 a 1582</Temporadas_teatrales>
+    <España_América>España</España_América>
+  </row>
+  <row>
+    <Indicador_de_registro>Com-11</Indicador_de_registro>
+    <Siglas>AN</Siglas>
+    <Autores>Alberto Naselli (Ganassa)</Autores>
+    <Temporadas_teatrales>De 1579 a 1581</Temporadas_teatrales>
+    <España_América>España</España_América>
+  </row>
+  <row>
+    <Indicador_de_registro>Com-12</Indicador_de_registro>
+    <Siglas>AN2</Siglas>
+    <Autores>Alberto Naselli (Ganassa)</Autores>
+    <Temporadas_teatrales>De 1581 a 1582</Temporadas_teatrales>
+    <España_América>España</España_América>
+  </row>
+  <row>
+    <Indicador_de_registro>Com-13</Indicador_de_registro>
+    <Siglas>AN3</Siglas>
+    <Autores>Alberto Naselli (Ganassa)</Autores>
+    <Temporadas_teatrales>De 1582 a 1583</Temporadas_teatrales>
+    <España_América>España</España_América>
+  </row>
+</dataset>

@@ -16,6 +16,7 @@ from backend.src.db.repositories import (
     add_record_to_transaction,
     RECORDS,
     TRANSACTIONS,
+    COMPANIES,
 )
 from backend.src.models.enums import PublicationStatus, SourceTable
 
@@ -223,6 +224,40 @@ async def run_etl(content: bytes, source_table: str, user_uid: str) -> dict:
 
         # Persistir registro
         await async_set_document(RECORDS, record_id, record_dict)
+
+        # Si es un registro de la tabla Com, creamos/actualizamos el documento en la colección 'companies'
+        if source_table == "Com":
+            temporadas = []
+            val_ind = record_dict.get("valor_indicador")
+            if val_ind:
+                temporadas = [t.strip() for t in val_ind.split(",") if t.strip()]
+            
+            company_doc = {
+                "id": record_id,
+                "siglas": record_dict.get("siglas") or "",
+                "autor_principal": record_dict.get("autor_principal") or "",
+                "ambito": record_dict.get("ambito") or "España",
+                "temporadas": temporadas,
+                "transaction_ids": [],
+            }
+            await async_set_document(COMPANIES, record_id, company_doc)
+
+        # Si el registro tiene compania_id (siglas) y transaction_id, vinculamos el transaction_id a la compañía
+        compania_id = record_dict.get("compania_id")
+        transaction_id = record_dict.get("transaction_id")
+        if compania_id and transaction_id:
+            from google.cloud.firestore_v1 import ArrayUnion
+            import asyncio
+            from backend.src.db.firestore import get_db, with_retry
+
+            def _link_tx_to_company():
+                ref = get_db().collection(COMPANIES)
+                docs = list(ref.where("siglas", "==", compania_id).stream())
+                for doc in docs:
+                    doc.reference.update({"transaction_ids": ArrayUnion([transaction_id])})
+
+            loop = asyncio.get_event_loop()
+            await loop.run_in_executor(None, lambda: with_retry(_link_tx_to_company))
 
         # Gestionar transacción si aplica
         transaction_id = record_dict.get("transaction_id")

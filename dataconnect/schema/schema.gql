@@ -1,0 +1,55 @@
+type User @table {
+  displayName: String!
+  createdAt: Timestamp!
+  email: String
+  affiliation: String
+  photoUrl: String
+}
+
+type Author @table {
+  name: String!
+  birthYear: Int!
+  deathYear: Int!
+  createdAt: Timestamp!
+  biography: String
+  bibliography: String
+}
+
+type Play @table {
+  author: Author
+  title: String!
+  year: Int!
+  textUrl: String!
+  createdAt: Timestamp!
+  genre: String
+  summary: String
+  setting: String
+}
+
+type Essay @table {
+  author: Author
+  play: Play
+  title: String!
+  authorName: String!
+  publicationYear: Int!
+  url: String!
+  createdAt: Timestamp!
+  journal: String
+  abstract: String
+}
+
+type Collection @table {
+  user: User!
+  name: String!
+  createdAt: Timestamp!
+  updatedAt: Timestamp!
+  description: String
+}
+
+type CollectionItem @table {
+  collection: Collection!
+  createdAt: Timestamp!
+  playId: UUID
+  authorId: UUID
+  essayId: UUID
+}

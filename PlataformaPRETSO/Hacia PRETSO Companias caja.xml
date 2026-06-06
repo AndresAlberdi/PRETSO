@@ -1,0 +1,1059 @@
+<?xml version="1.0" ?>
+<dataset name="Companias_caja">
+  <row>
+    <Indicador_de_registro>CM-1</Indicador_de_registro>
+    <Transacción>Tra-1</Transacción>
+    <Documento>[Doc. 1] Escritura, fechada en Toledo el 18 de enero de 1603, por la cual Pedro de Valdés y Antonio Granados conforman una compañía de dos años: del Carnaval de 1603 hasta el Carnaval de 1605.</Documento>
+    <Noticia>En el concierto  se dice que el hato y las comedias de ambos autores pasarían a formar parte de los bienes de la compañía. Recientemente, Antonio Granados habría adquirido cinco comedias nuevas por 2450 reales; visto que estas comedias pasan a ser parte de la compañía, Valdés habría pagado a Granados la mitad: 1220 reales. Las cinco compañías son: El cuerdo loco, Los esclavos libres y El príncipe desdeñado de Lope de Vega; El español de más fuerzas de Damián Salustio del Poyo y Roldán Casado de Alonso Remón. </Noticia>
+    <Ciudad>Toledo</Ciudad>
+    <Año>1603</Año>
+    <Autores>Antonio Granados y Pedro de Valdés</Autores>
+    <Compañía>AG-PV</Compañía>
+    <Data>2450 reales [inversión inicial utilizada para cinco comedias]</Data>
+    <Cargo>X</Cargo>
+    <Otros_bienes_de_la_compañía>Hato y comedias de los autores Antonio Granados y Pedro de Valdés. Cinco comedias nuevas que han costado 2450 reales.</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de San Román (1935, pp. 71-76).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 1]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-2</Indicador_de_registro>
+    <Transacción>Tra-2</Transacción>
+    <Documento>[Doc. 1] Escritura, fechada en Toledo el 18 de enero de 1603, por la cual Pedro de Valdés y Antonio Granados conforman una compañía de dos años: del Carnaval de 1603 hasta el Carnaval de 1605.</Documento>
+    <Noticia>En el concierto se dice que cada uno de ellos recibiría por representación 4 reales de la caja de la compañía. </Noticia>
+    <Ciudad>Toledo</Ciudad>
+    <Año>1603</Año>
+    <Autores>Antonio Granados y Pedro de Valdés</Autores>
+    <Compañía>AG-PV</Compañía>
+    <Data>X</Data>
+    <Cargo>8 reales [por representación]</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de San Román (1935, pp. 71-76).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 1]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-3</Indicador_de_registro>
+    <Transacción>Tra-3</Transacción>
+    <Documento>[Doc. 1] Escritura, fechada en Toledo el 18 de enero de 1603, por la cual Pedro de Valdés y Antonio Granados conforman una compañía de dos años: del Carnaval de 1603 hasta el Carnaval de 1605.</Documento>
+    <Noticia>En el concierto se dice que, luego de cada representación, se depositaría 50 reales en la caja. Este dinero estaría destinado a los gastos de la compañía. Se designa a Valdés como encargado de la contabilidad. </Noticia>
+    <Ciudad>Toledo</Ciudad>
+    <Año>1603</Año>
+    <Autores>Antonio Granados y Pedro de Valdés</Autores>
+    <Compañía>AG-PV</Compañía>
+    <Data>50 reales [por representación]</Data>
+    <Cargo>X</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de San Román (1935, pp. 71-76).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 1]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-4</Indicador_de_registro>
+    <Transacción>Tra-4</Transacción>
+    <Documento>[Doc. 1] Escritura, fechada en Toledo el 18 de enero de 1603, por la cual Pedro de Valdés y Antonio Granados conforman una compañía de dos años: del Carnaval de 1603 hasta el Carnaval de 1605.</Documento>
+    <Noticia>En el concierto se define como pena en caso de incumplimiento de responsabilidades: 200 ducados (2200 reales).  </Noticia>
+    <Ciudad>Toledo</Ciudad>
+    <Año>1603</Año>
+    <Autores>Antonio Granados y Pedro de Valdés</Autores>
+    <Compañía>AG-PV</Compañía>
+    <Data>[hipotético] 2200 reales [en caso de incumplimiento de responsabilidades]</Data>
+    <Cargo>X</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de San Román (1935, pp. 71-76).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 1]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-5</Indicador_de_registro>
+    <Transacción>Tra-5</Transacción>
+    <Documento>[Doc. 2] Escritura, fechada en Toledo el 12 de febrero de 1603, por la cual Simón Gutiérrez, vecino de Toledo, se compromete a representar por dos años en la compañía de Antonio Granados y Pedro de Valdés. </Documento>
+    <Noticia>En la escritura se dice que Simón Gutierrez tiene que representar lo que se le ordenara y viajar a donde se le ordenara. Se le pagaría: 10 reales por cada representación, 3 reales de ración diaria, y por el Corpus Christi &quot;lo acostumbrado&quot;. La compañía cubriría sus gastos de viajes. </Noticia>
+    <Ciudad>Toledo</Ciudad>
+    <Año>1603</Año>
+    <Autores>Antonio Granados y Pedro de Valdés</Autores>
+    <Compañía>AG-PV</Compañía>
+    <Data>X</Data>
+    <Cargo>10 reales [por representación]; 3 reales [ración diaria]; paga especial por Corpus Christi [sin especificar]; gastos de viajes</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de San Román (1935, p. 80).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 2]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-6</Indicador_de_registro>
+    <Transacción>Tra-6</Transacción>
+    <Documento>[Doc. 3] Escritura, fechada en Toledo el 12 de febrero de 1603, por la cual Francisco de Ribera, vecino de Sevilla, se compromete a representar por dos años en la compañía de Antonio de Granados y Pedro de Valdés. </Documento>
+    <Noticia>En la escritura se dice que Francisco de Ribera debe representar: “todas las comedias, entremeses y artes sin límite alguno”. Se le pagaría: 11 reales por cada representación, 4 reales de ración diaria, y por el Corpus Christi “lo acostumbrado”. La compañía cubriría sus gastos de viajes.</Noticia>
+    <Ciudad>Toledo</Ciudad>
+    <Año>1603</Año>
+    <Autores>Antonio Granados y Pedro de Valdés</Autores>
+    <Compañía>AG-PV</Compañía>
+    <Data>X</Data>
+    <Cargo>11 reales [por representación]; 4 reales [ración diaria]; paga especial por Corpus Christi [sin especificar]; gastos de viajes</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de San Román (1935, p. 81).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 3]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-7</Indicador_de_registro>
+    <Transacción>Tra-7</Transacción>
+    <Documento>[Doc. 4] Escritura, fechada en Toledo el 12 de febrero de 1603, por la cual Cristóbal López, vecino de Madrid, se compromete a trabajar por dos años en la compañía de Antonio de Granados y Pedro de Valdés. </Documento>
+    <Noticia>En la escritura se dice que Cristóbal López debe trabajar “haciendo los teatros y todo lo que más se me ordenare tocante a las representaciones y guardando el hato de manera que no falte cosa alguna”. López asegura que dará cuenta de todo a Pedro de Valdés y que, si faltara algo, él mismo pagará su valor. Se le pagaría: 3 reales por cada representación, 3 reales de ración diaria, y por el Corpus Christi “lo acostumbrado”. La compañía cubriría sus gastos de viajes.</Noticia>
+    <Ciudad>Toledo</Ciudad>
+    <Año>1603</Año>
+    <Autores>Antonio Granados y Pedro de Valdés</Autores>
+    <Compañía>AG-PV</Compañía>
+    <Data>X</Data>
+    <Cargo>3 reales [por representación]; 3 reales [ración diaria]; paga especial por Corpus Christi [sin especificar]; gastos de viajes</Cargo>
+    <Otros_bienes_de_la_compañía>Cristóbal López es el encargado del hato de la compañía</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de San Román (1935, pp. 81-82).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 4]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-8</Indicador_de_registro>
+    <Transacción>Tra-8</Transacción>
+    <Documento>[Doc. 5] Escritura, fechada en Toledo el 12 de febrero de 1603, por la cual Andrés de Lastra, vecino de Murcia, se compromete a representar por un año en la compañía de Antonio de Granados y Pedro de Valdés. Es decir, trabajaría en la compañía desde la firma de este contrato hasta el Carnaval de 1604. </Documento>
+    <Noticia>En la escritura se dice que Andrés de Lastra debe representar en “todas representaciones, comedias y entremeses públicas y secretas” que le ordenaran y viajar a donde le ordenaran. Se le pagaría: 11 reales por cada representación, 4 reales de ración diaria, y por el Corpus Christi “lo acostumbrado”. La compañía cubriría sus gastos de viajes.</Noticia>
+    <Ciudad>Toledo</Ciudad>
+    <Año>1603</Año>
+    <Autores>Antonio Granados y Pedro de Valdés</Autores>
+    <Compañía>AG-PV</Compañía>
+    <Data>X</Data>
+    <Cargo>11 reales [por representación]; 4 reales [ración diaria]; paga especial por Corpus Christi [sin especificar]; gastos de viajes</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de San Román (1935, p. 82).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 5]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-9</Indicador_de_registro>
+    <Transacción>Tra-9</Transacción>
+    <Documento>[Doc. 6] Escritura, fechada en Toledo el 13 de febrero de 1603, por la cual Antonio de Esquivel, vecino de Zaragoza, se compromete a representar por dos años en la compañía de Antonio de Granados y Pedro de Valdés. </Documento>
+    <Noticia>En la escritura se dice que Antonio de Esquivel se compromete a representar en &quot;todas las representaciones y entremeses y comedias públicas e secretas y en todas las partes que me ordenare&quot;. Se le pagaría: 8 reales por cada representación, 3 reales de ración diaria, y por el Corpus Christi “lo acostumbrado”. La compañía cubriría sus gastos de viajes.</Noticia>
+    <Ciudad>Toledo</Ciudad>
+    <Año>1603</Año>
+    <Autores>Antonio Granados y Pedro de Valdés</Autores>
+    <Compañía>AG-PV</Compañía>
+    <Data>X</Data>
+    <Cargo>8 reales [por representación]; 3 reales [ración diaria]; paga especial por Corpus Christi [sin especificar]; gastos de viajes</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de San Román (1935, pp. 82-83).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 6]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-10</Indicador_de_registro>
+    <Transacción>Tra-10</Transacción>
+    <Documento>[Doc. 7] Escritura, fechada en Toledo el 14 de febrero de 1603, por la cual Andrés Rodríguez, vecino de Toledo, se compromete a representar por dos años en la compañía de Antonio de Granados y Pedro de Valdés. </Documento>
+    <Noticia>En la escritura se dice que Andrés Rodríguez se compromete a representar “de simple, y de todo lo demás que se me ordenare en todas las comedias y entremeses, públicos y secretos, e partes que me ordenare&quot;. Se le pagaría: 8 reales por cada representación el primer año y 10 reales el segundo año, 3 reales de ración diaria, y por el Corpus Christi “lo acostumbrado”. La compañía cubriría sus gastos de viajes.</Noticia>
+    <Ciudad>Toledo</Ciudad>
+    <Año>1603</Año>
+    <Autores>Antonio Granados y Pedro de Valdés</Autores>
+    <Compañía>AG-PV</Compañía>
+    <Data>X</Data>
+    <Cargo>8 reales [por representación el primer año], 9 reales [por representación el segundo año]; 3 reales [ración diaria]; paga especial por Corpus Christi [sin especificar]; gastos de viajes</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de San Román (1935, p. 83).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 7]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-11</Indicador_de_registro>
+    <Transacción>Tra-11</Transacción>
+    <Documento>[Doc. 8] Escritura, fechada en Toledo el 14 de febrero de 1603, por la cual Dionisio Vázquez, vecino de Andújar, mayor de 25 años, se compromete a representar por dos años en la compañía de Antonio de Granados y Pedro de Valdés. </Documento>
+    <Noticia>En la escritura se dice que Dionisio Vázquez se compromete a representar representar en “todas las comedias y entremeses, públicos y secretos, y sirviendo y haciendo todo lo demás que se me ordenare, y haciendo carteles, y yendo a todas las partes que fuere la compañía&quot;. Se le pagaría: 5 reales por cada representación el primer año y 6 reales el segundo año, 3 reales de ración diaria, y por el Corpus Christi “lo acostumbrado”. La compañía cubriría sus gastos de viajes.</Noticia>
+    <Ciudad>Toledo</Ciudad>
+    <Año>1603</Año>
+    <Autores>Antonio Granados y Pedro de Valdés</Autores>
+    <Compañía>AG-PV</Compañía>
+    <Data>X</Data>
+    <Cargo>5 reales [por representación el primer año], 6 reales [por representación el segundo año]; 3 reales [ración diaria]; paga especial por Corpus Christi [sin especificar]; gastos de viajes</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de San Román (1935, p. 84).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 8]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-12</Indicador_de_registro>
+    <Transacción>Tra-12</Transacción>
+    <Documento>[Doc. 9] Escritura, fechada en Toledo el 22 de febrero de 1603, por la cual Juan de Arguello, vecino de Valladolid, se compromete y compromete a su mujer, María Gutierrez, a representar por dos años en la compañía de Antonio de Granados y Pedro de Valdés. </Documento>
+    <Noticia>En la escritura se dice que Juan de Arguello se compromete y compromete a su mujer, María Gutiérrez, a representar en “todas las comedias y entremeses y representaciones que hiciere [la compañía] en cualesquier partes públicas o secretas”. Se pagaría a la pareja: 14 reales por cada representación, 6 reales de ración diaria. La compañía cubriría sus gastos de viajes. Juan de Arguello se compromete a que su mujer ratifique esta escritura.</Noticia>
+    <Ciudad>Toledo</Ciudad>
+    <Año>1603</Año>
+    <Autores>Antonio Granados y Pedro de Valdés</Autores>
+    <Compañía>AG-PV</Compañía>
+    <Data>X</Data>
+    <Cargo>14 reales [por representación]; 6 reales [ración diaria]; gastos de viajes</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de San Román (1935, pp. 87-88).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 9]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-13</Indicador_de_registro>
+    <Transacción>Tra-13</Transacción>
+    <Documento>[Doc. 11] Escritura, fechada en Toledo el 21 de marzo de 1603, por la cual Juan de Corcha, vecino de Madrid, se compromete a trabajar por dos años en la compañía de Antonio de Granados y Pedro de Valdés. </Documento>
+    <Noticia>En la escritura se dice que Juan de Corcha se compromete a andar con la compañía “representando, y tañendo, y cantando y haciendo todo lo que se me ordenare en cualesquier representaciones, públicas o secretas, y en cualesquier partes&quot;. Se le pagaría: 7 reales por cada representación el primer año y 8 reales el segundo año, 3 reales de ración diaria, y por el Corpus Christi “lo acostumbrado”. La compañía cubriría sus gastos de viajes. En la escritura se especifica también que Juan de Corcha ha cobrado a cuenta 1230 reales en forma de &quot;partidas que por mí ha pagado [Pedro de Valdés] de vestidos que ha sacado y ha pagado por mí y dádome&quot;. Corcha se compromete a compensar el pago a cuenta con lo que le correspondería de las primeras representaciones de la compañía.    </Noticia>
+    <Ciudad>Toledo</Ciudad>
+    <Año>1603</Año>
+    <Autores>Antonio Granados y Pedro de Valdés</Autores>
+    <Compañía>AG-PV</Compañía>
+    <Data>1230 reales [compensación que se compromete a hacer Juan de Corcha, con el dinero que le corresponde de cada representación, del pago a cuenta que le hace la compañía comprándole vestidos]</Data>
+    <Cargo>1230 reales [pago a cuenta que hace la compañía a Juan de Corcha comprándole vestidos] / 7 reales [por representación el primer año], 8 reales [por representación el segundo año]; 3 reales [ración diaria]; paga especial por Corpus Christi [sin especificar]; gastos de viajes</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de San Román (1935, pp. 84-85).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 11]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-14</Indicador_de_registro>
+    <Transacción>Tra-14</Transacción>
+    <Documento>[Doc. 12] Escritura, fechada en Toledo el 21 de marzo de 1603, por la cual Gabriel de Acevedo, vecino de Lisboa, se compromete a trabajar por dos años en la compañía de Antonio de Granados y Pedro de Valdés. </Documento>
+    <Noticia>En la escritura, Gabriel de Acevedo se compromete a andar con la compañía “tañendo y cantando en todas las comedias y representaciones que hicieren, públicas o secretas, en cualesquier partes, representando e haciendo todo lo que se me ordenare&quot;. Se le pagaría: 7 reales por cada representación el primer año y 8 reales el segundo año, 3 reales de ración diaria, y por el Corpus Christi “lo acostumbrado”. La compañía cubriría sus gastos de viajes. En la escritura se especifica también que Gabriel de Acevedo ha cobrado a cuenta 984 reales en forma de &quot;dos vestidos que [Pedro de Valdés] me ha pagado en dineros”. Es decir, Pedro de Valdés ha comprado vestidos para Acevedo. Este se compromete a compensar el pago a cuenta con lo que le correspondería de las primeras representaciones de la compañía.    </Noticia>
+    <Ciudad>Toledo</Ciudad>
+    <Año>1603</Año>
+    <Autores>Antonio Granados y Pedro de Valdés</Autores>
+    <Compañía>AG-PV</Compañía>
+    <Data>934 reales [compensación que se compromete a hacer Gabriel de Acevedo, con el dinero que le corresponde de cada representación, del pago a cuenta que le hace la compañía comprándole vestidos]</Data>
+    <Cargo>934 reales [pago a cuenta que hace la compañía a Gabriel de Acevedo comprándole vestidos] / 7 reales [por representación el primer año], 8 reales [por representación el segundo año]; 3 reales [ración diaria]; paga especial por Corpus Christi [sin especificar]; gastos de viajes</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de San Román (1935, pp. 88-89).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 12]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-15</Indicador_de_registro>
+    <Transacción>Tra-15</Transacción>
+    <Documento>[Doc. 22] [Doc. 23] [Doc. 24] Actas del cabildo municipal de la ciudad de México fechadas el 11 de mayo, el 14 de mayo y el 4 de junio de 1601</Documento>
+    <Noticia>El cabildo municipal de la ciudad de México acordó que las representaciones del Corpus de este año estuvieran a cargo de dos compañías, la primera encabezada por Marco Antonio Ferrer y Juan Corral y la segunda por Gonzalo de Riancho y Alonso Velázquez. Ambas compañías tendrían que unirse y colaborar para la representación de dos comedias, una el jueves de Corpus y otra el día de la Octava: “representando cada comedia las dichas dos compañías de farsantes para que se hagan más cumplidamente”. Se pagaría un total de 2000 pesos de oro común (16000 reales) por las dos comedias. Por otro lado, para la misma ocasión, se contrató al maestro de danzas Florián Vargas, a quien se acordó pagar 200 pesos (1600 reales) por &quot;un carro con danzas y muchas cosas de pólvora y música, como está por la escritura dentro y fuera de la iglesia&quot; y posteriormente 100 pesos (800 reales) &quot;por otra danza de doce hombres más&quot;.</Noticia>
+    <Ciudad>México</Ciudad>
+    <Año>1601</Año>
+    <Autores>Marco Antonio Ferrer y Juan Corral / Gonzalo de Riancho y Alonso Velázquez</Autores>
+    <Compañía>MAF-JC / GR-AV</Compañía>
+    <Data>16000 reales [Corpus Christi de 1601]</Data>
+    <Cargo>X</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en Maya Ramos Smith (2011, pp. 256-257)</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 22][Doc. 23][Doc. 24]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-16</Indicador_de_registro>
+    <Transacción>Tra-16</Transacción>
+    <Documento>[Doc. 13] Escritura, fechada en Sevilla el 29 de febrero de 1600, por la cual Gonzalo de Alarcón, Alonso de Riquelme, Micaela de Gadea (esposa de Alonso de Riquelme), Miguel del Rosal Ríos, María de Castrillo (esposa de Miguel del Rosal Ríos), Bartolomé de Torres y Luis de Avíla se conciertan para formar una compañía por un año: desde la fecha hasta el Carnaval de 1601. Ninguna de las fuentes dice nada al respecto, pero parece que esta compañía se disuelve poco después de su creación pues Gonzalo de Alarcón firma otro concierto de compañía en Sevilla el 14 de marzo ver: [Doc.14]. </Documento>
+    <Noticia>En el concierto se dice que la caja de dos llaves de la compañía estará en poder de Alonso de Riquelme, aunque una llave estará en poder de Gonzalo de Alarcón y otra en poder de Miguel del Rosal Ríos.</Noticia>
+    <Ciudad>Sevilla</Ciudad>
+    <Año>1600</Año>
+    <Autores>Gonzalo de Alarcón, Alonso de Riquelme y Miguel del Rosal Ríos</Autores>
+    <Compañía>GA-AR-MR</Compañía>
+    <Data>X</Data>
+    <Cargo>X</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de Rodríguez Marín (1914, pp. 172-173).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 13]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-17</Indicador_de_registro>
+    <Transacción>Tra-17</Transacción>
+    <Documento>[Doc. 13] Escritura, fechada en Sevilla el 29 de febrero de 1600, por la cual Gonzalo de Alarcón, Alonso de Riquelme, Micaela de Gadea (esposa de Alonso de Riquelme), Miguel del Rosal Ríos, María de Castrillo (esposa de Miguel del Rosal Ríos), Bartolomé de Torres y Luis de Avíla se conciertan para formar una compañía por un año: desde la fecha hasta el Carnaval de 1601. Ninguna de las fuentes dice nada al respecto, pero parece que esta compañía se disuelve poco después de su creación pues Gonzalo de Alarcón firma otro concierto de compañía en Sevilla el 14 de marzo ver: [Doc.14]. </Documento>
+    <Noticia>En el concierto se dice que se pagará a Gonzalo de Alarcón y  Antolina Rodríguez: 16 reales por cada representación y 5 reales de ración diaria. Antolina Rodríguez es costurera y, en este mismo concierto, se decide que cada día de representación se le pague 6 reales por los vestidos que ella cedería a la compañía, además, se decide que  se encargue de los vestidos del Corpus. —Según se indica en las fuentes, el documento original contendría detalles sobre los vestuarios que no se llegan a recabar.</Noticia>
+    <Ciudad>Sevilla</Ciudad>
+    <Año>1600</Año>
+    <Autores>Gonzalo de Alarcón, Alonso de Riquelme y Miguel del Rosal Ríos</Autores>
+    <Compañía>GA-AR-MR</Compañía>
+    <Data>X</Data>
+    <Cargo>22 reales [por representación, los 16 estipulados inicialmente más los 6 que se pagaría a Antolina Rodríguez por el vestuario]; 5 reales [ración diaria]</Cargo>
+    <Otros_bienes_de_la_compañía>Los vestuarios que hace Antolina Rodríguez</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de Rodríguez Marín (1914, pp. 172-173).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 13]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-18</Indicador_de_registro>
+    <Transacción>Tra-18</Transacción>
+    <Documento>[Doc. 13] Escritura, fechada en Sevilla el 29 de febrero de 1600, por la cual Gonzalo de Alarcón, Alonso de Riquelme, Micaela de Gadea (esposa de Alonso de Riquelme), Miguel del Rosal Ríos, María de Castrillo (esposa de Miguel del Rosal Ríos), Bartolomé de Torres y Luis de Avíla se conciertan para formar una compañía por un año: desde la fecha hasta el Carnaval de 1601. Ninguna de las fuentes dice nada al respecto, pero parece que esta compañía se disuelve poco después de su creación pues Gonzalo de Alarcón firma otro concierto de compañía en Sevilla el 14 de marzo ver: [Doc.14]. </Documento>
+    <Noticia>En el concierto se dice que se pagará a Alonso de Riquelme y  Micaela de Gadea: 14 reales por cada representación y 5 reales de ración diaria. </Noticia>
+    <Ciudad>Sevilla</Ciudad>
+    <Año>1600</Año>
+    <Autores>Gonzalo de Alarcón, Alonso de Riquelme y Miguel del Rosal Ríos</Autores>
+    <Compañía>GA-AR-MR</Compañía>
+    <Data>X</Data>
+    <Cargo>14 reales [por representación]; 5 reales [ración diaria]</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de Rodríguez Marín (1914, pp. 172-173).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 13]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-19</Indicador_de_registro>
+    <Transacción>Tra-19</Transacción>
+    <Documento>[Doc. 13] Escritura, fechada en Sevilla el 29 de febrero de 1600, por la cual Gonzalo de Alarcón, Alonso de Riquelme, Micaela de Gadea (esposa de Alonso de Riquelme), Miguel del Rosal Ríos, María de Castrillo (esposa de Miguel del Rosal Ríos), Bartolomé de Torres y Luis de Avíla se conciertan para formar una compañía por un año: desde la fecha hasta el Carnaval de 1601. Ninguna de las fuentes dice nada al respecto, pero parece que esta compañía se disuelve poco después de su creación pues Gonzalo de Alarcón firma otro concierto de compañía en Sevilla el 14 de marzo ver: [Doc.14]. </Documento>
+    <Noticia>En el concierto se dice que se pagará a Miguel del Rosal Ríos y María de Castrillo: 16 reales por cada representación y 5 reales de ración diaria. </Noticia>
+    <Ciudad>Sevilla</Ciudad>
+    <Año>1600</Año>
+    <Autores>Gonzalo de Alarcón, Alonso de Riquelme y Miguel del Rosal Ríos</Autores>
+    <Compañía>GA-AR-MR</Compañía>
+    <Data>X</Data>
+    <Cargo>16 reales [por representación]; 5 reales [ración diaria]</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de Rodríguez Marín (1914, pp. 172-173).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 13]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-20</Indicador_de_registro>
+    <Transacción>Tra-20</Transacción>
+    <Documento>[Doc. 13] Escritura, fechada en Sevilla el 29 de febrero de 1600, por la cual Gonzalo de Alarcón, Alonso de Riquelme, Micaela de Gadea (esposa de Alonso de Riquelme), Miguel del Rosal Ríos, María de Castrillo (esposa de Miguel del Rosal Ríos), Bartolomé de Torres y Luis de Avíla se conciertan para formar una compañía por un año: desde la fecha hasta el Carnaval de 1601. Ninguna de las fuentes dice nada al respecto, pero parece que esta compañía se disuelve poco después de su creación pues Gonzalo de Alarcón firma otro concierto de compañía en Sevilla el 14 de marzo ver: [Doc.14]. </Documento>
+    <Noticia>En el concierto se dice que se pagará a Bartolomé de Torres: 10 reales por cada representación y 2,5 reales de ración diaria.</Noticia>
+    <Ciudad>Sevilla</Ciudad>
+    <Año>1600</Año>
+    <Autores>Gonzalo de Alarcón, Alonso de Riquelme y Miguel del Rosal Ríos</Autores>
+    <Compañía>GA-AR-MR</Compañía>
+    <Data>X</Data>
+    <Cargo>10 reales [por representación]; 2,5 reales [ración diaria]</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de Rodríguez Marín (1914, pp. 172-173).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 13]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-21</Indicador_de_registro>
+    <Transacción>Tra-21</Transacción>
+    <Documento>[Doc. 13] Escritura, fechada en Sevilla el 29 de febrero de 1600, por la cual Gonzalo de Alarcón, Alonso de Riquelme, Micaela de Gadea (esposa de Alonso de Riquelme), Miguel del Rosal Ríos, María de Castrillo (esposa de Miguel del Rosal Ríos), Bartolomé de Torres y Luis de Avíla se conciertan para formar una compañía por un año: desde la fecha hasta el Carnaval de 1601. Ninguna de las fuentes dice nada al respecto, pero parece que esta compañía se disuelve poco después de su creación pues Gonzalo de Alarcón firma otro concierto de compañía en Sevilla el 14 de marzo ver: [Doc.14]. </Documento>
+    <Noticia>En el concierto se dice que se pagará a a Luis de Ávila: 7 reales por cada representación y 2,5 reales de ración diaria. </Noticia>
+    <Ciudad>Sevilla</Ciudad>
+    <Año>1600</Año>
+    <Autores>Gonzalo de Alarcón, Alonso de Riquelme y Miguel del Rosal Ríos</Autores>
+    <Compañía>GA-AR-MR</Compañía>
+    <Data>X</Data>
+    <Cargo>7 reales [por representación]; 2,5 reales [ración diaria]</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de Rodríguez Marín (1914, pp. 172-173).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 13]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-22</Indicador_de_registro>
+    <Transacción>Tra-22</Transacción>
+    <Documento>[Doc. 14] Escritura, fechada en Sevilla el 14 de marzo de 1600, por la cual Gonzalo de Alarcón, Antolina Rodríguez (esposa de Gonzalo de Alarcón), Juan Ramírez y Ana Manrique (esposa de Juan Ramírez) se conciertan para formar una compañía por un año: desde la fecha hasta el Carnaval de 1601. </Documento>
+    <Noticia>En el concierto se dice que se contrataría al resto de los miembros de la compañía y que se les pagaría a partes iguales.</Noticia>
+    <Ciudad>Sevilla</Ciudad>
+    <Año>1600</Año>
+    <Autores>Gonzalo de Alarcón y Juan Ramírez</Autores>
+    <Compañía>GA-JR</Compañía>
+    <Data>X</Data>
+    <Cargo>Se pagará el mismo monto a todos los miembros que contrate la compañía. </Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de Bolaños Donoso (2022, p.100).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 14]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-23</Indicador_de_registro>
+    <Transacción>Tra-23</Transacción>
+    <Documento>[Doc. 14] Escritura, fechada en Sevilla el 14 de marzo de 1600, por la cual Gonzalo de Alarcón, Antolina Rodríguez (esposa de Gonzalo de Alarcón), Juan Ramírez y Ana Manrique (esposa de Juan Ramírez) se conciertan para formar una compañía por un año: desde la fecha hasta el Carnaval de 1601. </Documento>
+    <Noticia>En el concierto se señala que los ensayos se realizarán alternadamente en la casa de los dos autores. Se define como pena en caso de incumplimiento de responsabilidades: 200 ducados (2200 reales). —las fuentes señalan que en el documento original se indica que la compañía tendrá caja de dos llaves, pero no se dice más. Podemos asumir que cada uno de los dos autores debía llevar una de las dos llaves. </Noticia>
+    <Ciudad>Sevilla</Ciudad>
+    <Año>1600</Año>
+    <Autores>Gonzalo de Alarcón y Juan Ramírez</Autores>
+    <Compañía>GA-JR</Compañía>
+    <Data>[hipotético] 2200 reales [en caso de incumplimiento de responsabilidades de uno de los autores]</Data>
+    <Cargo>X</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de Bolaños Donoso (2022, p.100).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 14]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-24</Indicador_de_registro>
+    <Transacción>Tra-24</Transacción>
+    <Documento>[Doc. 32] Escritura, fechada en Badajoz el 13 de marzo de 1601, por la cual Bernaldino Sarmiento y su hijo pasan a formar parte de la compañía de Gonzalo de Alarcón por todo un año: hasta el Carnaval de 1602. — las fuentes no señalan el nombre del hijo de Bernaldino de Sarmiento.</Documento>
+    <Noticia>En la escritura se dice que se pagará a Bernaldino de Sarmiento: 5,5 reales por representación, 5 reales de ración diaria y 5,5 ducados (60,5 reales) el día del Corpus. Se define como pena en caso de incumplimiento de responsabilidades para Bernaldino de Sarmiento: 50 ducados (550 reales). </Noticia>
+    <Ciudad>Badajoz</Ciudad>
+    <Año>1601</Año>
+    <Autores>Gonzalo de Alarcón</Autores>
+    <Compañía>GA</Compañía>
+    <Data>[hipotético] 550 reales [en caso de incumplimiento de responsabilidades del actor]</Data>
+    <Cargo>5,5 reales [por representación]; 5 reales [ración diaria]; 60,5 reales [paga especial de Corpus Christi]</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de Marcos Álvarez (1997, pp.113-114).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 32]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-25</Indicador_de_registro>
+    <Transacción>Tra-25</Transacción>
+    <Documento>[Doc. 34] Escritura, fechada en Sevilla el 19 de noviembre de 1605, por la cual Juan de Arteaga, Ana María de la Peña (esposa de Juan de Arteaga), Juan Osorio, Juana de Sigura (esposa de Juan de Osorio), Antonio Amoroso y María Hurtado (esposa de Antonio Amoroso), conforman una compañía por dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. </Documento>
+    <Noticia>En la escritura se dice que cada uno de los tres autores pondrá en la caja de la compañía 300 ducados (3300 reales). 100 ducados (1100 reales) se destinarían al vestuario y hato de la compañía y a la compra de comedias nuevas.  </Noticia>
+    <Ciudad>Sevilla</Ciudad>
+    <Año>1605</Año>
+    <Autores>Juan de Arteaga, Juan Osorio y Antonio Amoroso</Autores>
+    <Compañía>JA-JO-AA</Compañía>
+    <Data>9900 reales [inversión inicial de los tres autores para conformar la compañía]</Data>
+    <Cargo>3300 reales [compra inicial de vestuarios, hato y comedias nuevas para la compañía]</Cargo>
+    <Otros_bienes_de_la_compañía>Se planea una compra inicial de hatos, vesturio y comedias nuevas para la compañía</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de Rodríguez Marín (1914, p.178).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 34]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-26</Indicador_de_registro>
+    <Transacción>Tra-26</Transacción>
+    <Documento>[Doc. 34] Escritura, fechada en Sevilla el 19 de noviembre de 1605, por la cual Juan de Arteaga, Ana María de la Peña (esposa de Juan de Arteaga), Juan Osorio, Juana de Sigura (esposa de Juan de Osorio), Antonio Amoroso y María Hurtado (esposa de Antonio Amoroso), conforman una compañía por dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. </Documento>
+    <Noticia>En la escritura se dice que se pagará a Juan de Arteaga y Ana María de la Peña: 24 reales por representación y 8 reales de ración diaria. Juan de Arteaga y Ana María se compromenten a salir representando, tocando o bailando en todas las comedias que presente la compañía, tanto en casas privadas, como en teatros de Sevilla o de otros lugares de España. A esto hay que sumarle la labor de autor de Juan de Arteaga.  </Noticia>
+    <Ciudad>Sevilla</Ciudad>
+    <Año>1605</Año>
+    <Autores>Juan de Arteaga, Juan Osorio y Antonio Amoroso</Autores>
+    <Compañía>JA-JO-AA</Compañía>
+    <Data>X</Data>
+    <Cargo>24 reales [por representación]; 8 reales [ración diaria]</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de Rodríguez Marín (1914, p.178).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 34]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-27</Indicador_de_registro>
+    <Transacción>Tra-27</Transacción>
+    <Documento>[Doc. 34] Escritura, fechada en Sevilla el 19 de noviembre de 1605, por la cual Juan de Arteaga, Ana María de la Peña (esposa de Juan de Arteaga), Juan Osorio, Juana de Sigura (esposa de Juan de Osorio), Antonio Amoroso y María Hurtado (esposa de Antonio Amoroso), conforman una compañía por dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. </Documento>
+    <Noticia>En la escritura se dice que se pagará a Juan de Osorio y Juana de Sigura: 22 reales por representación y 8 reales de ración diaria. Juan de Osorio y Juana de Sigura se compromenten a salir representando, tocando o bailando en todas las comedias que presente la compañía, tanto en casas privadas, como en teatros de Sevilla o de otros lugares de España. A esto hay que sumarle la labor de autor de Juan de Osorio.  </Noticia>
+    <Ciudad>Sevilla</Ciudad>
+    <Año>1605</Año>
+    <Autores>Juan de Arteaga, Juan Osorio y Antonio Amoroso</Autores>
+    <Compañía>JA-JO-AA</Compañía>
+    <Data>X</Data>
+    <Cargo>22 reales [por representación]; 8 reales [ración diaria]</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de Rodríguez Marín (1914, p.178).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 34]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-28</Indicador_de_registro>
+    <Transacción>Tra-28</Transacción>
+    <Documento>[Doc. 34] Escritura, fechada en Sevilla el 19 de noviembre de 1605, por la cual Juan de Arteaga, Ana María de la Peña (esposa de Juan de Arteaga), Juan Osorio, Juana de Sigura (esposa de Juan de Osorio), Antonio Amoroso y María Hurtado (esposa de Antonio Amoroso), conforman una compañía por dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. </Documento>
+    <Noticia>En la escritura se dice que se pagará a Antonio Amoroso y María Hurtado: 23 reales por representación y 7 reales de ración diaria. María Hurtado se compromete a salir representando, tocando o bailando en todas las comedias que presente la compañía, tanto en casas privadas, como en teatros de Sevilla o de otros lugares de España. Antonio Amoroso, en cambio, se compromete a gestionar todo lo necesario para el buen funcionamiento de las comedias y a realizar las cobranzas. </Noticia>
+    <Ciudad>Sevilla</Ciudad>
+    <Año>1605</Año>
+    <Autores>Juan de Arteaga, Juan Osorio y Antonio Amoroso</Autores>
+    <Compañía>JA-JO-AA</Compañía>
+    <Data>X</Data>
+    <Cargo>23 reales [por representación]; 7 reales [ración diaria]</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de Rodríguez Marín (1914, p.178).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 34]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-29</Indicador_de_registro>
+    <Transacción>Tra-29</Transacción>
+    <Documento>[Doc. 34] Escritura, fechada en Sevilla el 19 de noviembre de 1605, por la cual Juan de Arteaga, Ana María de la Peña (esposa de Juan de Arteaga), Juan Osorio, Juana de Sigura (esposa de Juan de Osorio), Antonio Amoroso y María Hurtado (esposa de Antonio Amoroso), conforman una compañía por dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. </Documento>
+    <Noticia>En la escritura, se señala el pago que se haría a cada uno de los tres matrimonios luego de cada representación [consultar las entradas correspondientes a cada uno de estos movimientos]. Este monto, en total, es de 92 reales. Ahora bien, se especifica también que, luego de cada representación, una vez repartido el salario de los autores y sus esposas, se guardaría 40 reales en la caja de la compañía para los gastos de la misma. Se dice también que, si después de que la compañía hubiera realizado todos sus gastos y pagado a todos sus representantes quedara dinero, este se repartiría en partes iguales entre los tres matrimonios de autores. </Noticia>
+    <Ciudad>Sevilla</Ciudad>
+    <Año>1605</Año>
+    <Autores>Juan de Arteaga, Juan Osorio y Antonio Amoroso</Autores>
+    <Compañía>JA-JO-AA</Compañía>
+    <Data>40 reales [por representación]</Data>
+    <Cargo>X</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de Rodríguez Marín (1914, p.178).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 34]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-30</Indicador_de_registro>
+    <Transacción>Tra-30</Transacción>
+    <Documento>[Doc. 35] Escritura, fechada en Sevilla el 22 de noviembre de 1605, por la cual pedro de España se compromente a representar por dos años, del Carnaval de 1606 al Carnaval de 1608, en la compañía de Juan de Arteaga, Juan Osorio y Antonio Amoroso. ­–Juan de Arteaga tiene poder otorgado por los otros dos autores de comedias para contratar a los demás mimebros de la compañía.</Documento>
+    <Noticia>En la escritura se dice que se pagará a Pedro España: 6 reales por representación y 3 reales de ración diaria. </Noticia>
+    <Ciudad>Sevilla</Ciudad>
+    <Año>1605</Año>
+    <Autores>Juan de Arteaga, Juan Osorio y Antonio Amoroso</Autores>
+    <Compañía>JA-JO-AA</Compañía>
+    <Data>X</Data>
+    <Cargo>6 reales [por representación]; 3 reales [ración diaria]</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de Rodríguez Marín (1914, p.179).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 35]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-31</Indicador_de_registro>
+    <Transacción>Tra-31</Transacción>
+    <Documento>[Doc. 36] Escritura, fechada en Sevilla el 22 de noviembre de 1605, por la cual Sebastián Sereno se compromente a representar por dos años, del Carnaval de 1606 al Carnaval de 1608, en la compañía de Juan de Arteaga, Juan Osorio y Antonio Amoroso. –Juan de Arteaga tiene poder otorgado por los otros dos autores de comedias para contratar a los demás mimebros de la compañía. </Documento>
+    <Noticia>En la escritura se dice que se pagará a Sebastián Sereno: 6 reales por representación y 3 reales de ración diaria. </Noticia>
+    <Ciudad>Sevilla</Ciudad>
+    <Año>1605</Año>
+    <Autores>Juan de Arteaga, Juan Osorio y Antonio Amoroso</Autores>
+    <Compañía>JA-JO-AA</Compañía>
+    <Data>X</Data>
+    <Cargo>6 reales [por representación]; 3 reales [ración diaria]</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de Rodríguez Marín (1914, p.179).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 36]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-32</Indicador_de_registro>
+    <Transacción>Tra-32</Transacción>
+    <Documento>[Doc. 37] Escritura, fechada en Sevilla el 22 de noviembre de 1605, por la cual Andrés de Arce se compromente a representar por un año, del Carnaval de 1606 al Carnaval de 1607, en la compañía de Juan de Arteaga, Juan Osorio y Antonio Amoroso. –Juan de Arteaga tiene poder otorgado por los otros dos autores de comedias para contratar a los demás mimebros de la compañía.</Documento>
+    <Noticia>En la escritura se dice que se pagará a Andrés de Arce: 9 reales por representación y 3 reales de ración diaria. Además, Juan de Arteaga, en nombre de la compañía, asegura a Andrés de Arce que a lo largo del año se harán por lo menos 250 representaciones y se compromete a que, si se hicieran menos, le pagarían la diferencia. Esto significa que, mínimamente, a lo largo del año, se pagaría a Andrés de Arce 3000 reales (12 reales multiplicados por 250 representaciones).  </Noticia>
+    <Ciudad>Sevilla</Ciudad>
+    <Año>1605</Año>
+    <Autores>Juan de Arteaga, Juan Osorio y Antonio Amoroso</Autores>
+    <Compañía>JA-JO-AA</Compañía>
+    <Data>X</Data>
+    <Cargo>3000 reales al año. 9 reales [por representación]; 3 reales [ración diaria]. Se le asegura un mínimo de 250 representaciones del Carnaval de 1606 al Carnaval de 1607, es decir, de 3000 reales en un año. </Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de Rodríguez Marín (1914, p.179).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 37]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-33</Indicador_de_registro>
+    <Transacción>Tra-33</Transacción>
+    <Documento>[Doc. 38] Escritura, fechada en Sevilla el 20 de febrero de 1606, por la cual Tomás Fernández se compromente a representar por un año, del Carnaval de 1606 al Carnaval de 1607, en la compañía de Juan de Arteaga, Juan Osorio y Antonio Amoroso. </Documento>
+    <Noticia>En la escritura se dice que se pagará a Tomás Fernández: 9 reales por representación y 3 reales de ración diaria. </Noticia>
+    <Ciudad>Sevilla</Ciudad>
+    <Año>1606</Año>
+    <Autores>Juan de Arteaga, Juan Osorio y Antonio Amoroso</Autores>
+    <Compañía>JA-JO-AA</Compañía>
+    <Data>X</Data>
+    <Cargo>9 reales [por representación]; 3 reales [ración diaria]</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de Rodríguez Marín (1914, p.321).</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 38]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-34</Indicador_de_registro>
+    <Transacción>Tra-34</Transacción>
+    <Documento>[Doc. 39] Escritura, fechada en Toro el 16 de diciembre de 1605, por la cual se conciertan en compañía: Gaspar de Porras, autor de comedias, Salvador de Ochoa, Marina de Avilés (esposa de Salvador Ochoa), Domingo Balbín, Isabel de Vérrez (esposa de Domingo Balbín), Bernardino Álvarez, Lorenzo Pérez, Francisco de Robles, Jerónimo del Barco, Pedro Cerezo de Guevara y Juan Pérez. La compañía duraría dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. –Según DICAT, la referencia a Marina de Avilés hecha por John Allen sería un error y el nombre adecuado sería Marina de Velasco. Según DICAT el nombre de Isabel Vérrez a veces figura como Isabel Bérriz.</Documento>
+    <Noticia>En las cláusulas de la compañía Gaspar de Porres se compromete a proveer, sin que nadie tuviera que pagar nada por ello, &quot;todo el hato y adorno suficiente para las comedias que se hicieran en los dichos dos años y para las fiestas del Corpus&quot;. </Noticia>
+    <Ciudad>Toro</Ciudad>
+    <Año>1605</Año>
+    <Autores>Gaspar de Porras</Autores>
+    <Compañía>GP</Compañía>
+    <Data>X</Data>
+    <Cargo>X</Cargo>
+    <Otros_bienes_de_la_compañía>Gaspar de Porras proporciona todo el hato para la compañía </Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de John Allen  (1991, pp. 237-241). John Allen (1994), en el libro que publica junto con José María Ruano de la Haza, ofrece la ubicación exacta de este documento y, además, en los anexos, presenta la transcripción del mismo. El documento se encuentra en el Archivo Histórico de Zamora, Sección Notariales, signatura 3555. </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 39]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-35</Indicador_de_registro>
+    <Transacción>Tra-35</Transacción>
+    <Documento>[Doc. 39] Escritura, fechada en Toro el 16 de diciembre de 1605, por la cual se conciertan en compañía: Gaspar de Porras, autor de comedias, Salvador de Ochoa, Marina de Avilés (esposa de Salvador Ochoa), Domingo Balbín, Isabel de Vérrez (esposa de Domingo Balbín), Bernardino Álvarez, Lorenzo Pérez, Francisco de Robles, Jerónimo del Barco, Pedro Cerezo de Guevara y Juan Pérez. La compañía duraría dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. –Según DICAT, la referencia a Marina de Avilés hecha por John Allen sería un error y el nombre adecuado sería Marina de Velasco. Según DICAT el nombre de Isabel Vérrez a veces figura como Isabel Bérriz.</Documento>
+    <Noticia>En las cláusulas de la compañía se dice que, si algún miembro de la compañía no cumpliera su deber y, en su lugar, otro tuviera que hacerlo, se pagaría a esta persona con el dinero que le hubiera correspondido a quien ha incumplido. Esto sería válido incluso si el sustituto es otro miembro de la compañía. </Noticia>
+    <Ciudad>Toro</Ciudad>
+    <Año>1605</Año>
+    <Autores>Gaspar de Porras</Autores>
+    <Compañía>GP</Compañía>
+    <Data>X</Data>
+    <Cargo>X</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de John Allen  (1991, pp. 237-241). John Allen (1994), en el libro que publica junto con José María Ruano de la Haza, ofrece la ubicación exacta de este documento y, además, en los anexos, presenta la transcripción del mismo. El documento se encuentra en el Archivo Histórico de Zamora, Sección Notariales, signatura 3555. </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 39]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-36</Indicador_de_registro>
+    <Transacción>Tra-36</Transacción>
+    <Documento>[Doc. 39] Escritura, fechada en Toro el 16 de diciembre de 1605, por la cual se conciertan en compañía: Gaspar de Porras, autor de comedias, Salvador de Ochoa, Marina de Avilés (esposa de Salvador Ochoa), Domingo Balbín, Isabel de Vérrez (esposa de Domingo Balbín), Bernardino Álvarez, Lorenzo Pérez, Francisco de Robles, Jerónimo del Barco, Pedro Cerezo de Guevara y Juan Pérez. La compañía duraría dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. –Según DICAT, la referencia a Marina de Avilés hecha por John Allen sería un error y el nombre adecuado sería Marina de Velasco. Según DICAT el nombre de Isabel Vérrez a veces figura como Isabel Bérriz.</Documento>
+    <Noticia>En las cláusulas de la compañía se dice que cada semana se designará a dos de los miembros de la compañía para que se encarguen de los cobros y que, si alguno no acudiera a este deber, se le quitaría su ración diaria y se la pasaría a la persona que lo sustituyera. </Noticia>
+    <Ciudad>Toro</Ciudad>
+    <Año>1605</Año>
+    <Autores>Gaspar de Porras</Autores>
+    <Compañía>GP</Compañía>
+    <Data>X</Data>
+    <Cargo>X</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de John Allen  (1991, pp. 237-241). John Allen (1994), en el libro que publica junto con José María Ruano de la Haza, ofrece la ubicación exacta de este documento y, además, en los anexos, presenta la transcripción del mismo. El documento se encuentra en el Archivo Histórico de Zamora, Sección Notariales, signatura 3555. </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 39]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-37</Indicador_de_registro>
+    <Transacción>Tra-37</Transacción>
+    <Documento>[Doc. 39] Escritura, fechada en Toro el 16 de diciembre de 1605, por la cual se conciertan en compañía: Gaspar de Porras, autor de comedias, Salvador de Ochoa, Marina de Avilés (esposa de Salvador Ochoa), Domingo Balbín, Isabel de Vérrez (esposa de Domingo Balbín), Bernardino Álvarez, Lorenzo Pérez, Francisco de Robles, Jerónimo del Barco, Pedro Cerezo de Guevara y Juan Pérez. La compañía duraría dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. –Según DICAT, la referencia a Marina de Avilés hecha por John Allen sería un error y el nombre adecuado sería Marina de Velasco. Según DICAT el nombre de Isabel Vérrez a veces figura como Isabel Bérriz.</Documento>
+    <Noticia>En las cláusulas de la compañía se dice que cada semana se pondrá en depósito en la caja de la compañía lo ganado en alguna de las representaciones, a elección. </Noticia>
+    <Ciudad>Toro</Ciudad>
+    <Año>1605</Año>
+    <Autores>Gaspar de Porras</Autores>
+    <Compañía>GP</Compañía>
+    <Data>Cada semana se ingresaría a la caja todo lo ganado en una de las representaciones hechas esa misma semana</Data>
+    <Cargo>X</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de John Allen  (1991, pp. 237-241). John Allen (1994), en el libro que publica junto con José María Ruano de la Haza, ofrece la ubicación exacta de este documento y, además, en los anexos, presenta la transcripción del mismo. El documento se encuentra en el Archivo Histórico de Zamora, Sección Notariales, signatura 3555. </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 39]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-38</Indicador_de_registro>
+    <Transacción>Tra-38</Transacción>
+    <Documento>[Doc. 39] Escritura, fechada en Toro el 16 de diciembre de 1605, por la cual se conciertan en compañía: Gaspar de Porras, autor de comedias, Salvador de Ochoa, Marina de Avilés (esposa de Salvador Ochoa), Domingo Balbín, Isabel de Vérrez (esposa de Domingo Balbín), Bernardino Álvarez, Lorenzo Pérez, Francisco de Robles, Jerónimo del Barco, Pedro Cerezo de Guevara y Juan Pérez. La compañía duraría dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. –Según DICAT, la referencia a Marina de Avilés hecha por John Allen sería un error y el nombre adecuado sería Marina de Velasco. Según DICAT el nombre de Isabel Vérrez a veces figura como Isabel Bérriz.</Documento>
+    <Noticia>En las cláusulas de la compañía se dice que lo que se ahorrara en la caja se repartiría posteriormente según lo que a cada miembro de la compañía le correspondiera. Se especifica también que cada vez que se realice un préstamo de la caja se lo debe saldar con mucha puntualidad. Se dice, a su vez, que si todo los miembros estuvieran de acuerdo, se podría finalizar la compañía antes de los dos años y repartir lo ahorrado en caja. </Noticia>
+    <Ciudad>Toro</Ciudad>
+    <Año>1605</Año>
+    <Autores>Gaspar de Porras</Autores>
+    <Compañía>GP</Compañía>
+    <Data>X</Data>
+    <Cargo>Todo lo que queda en la caja, al finalizar los dos años de la compañía, se reparte entre los miembros de la compañía</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de John Allen  (1991, pp. 237-241). John Allen (1994), en el libro que publica junto con José María Ruano de la Haza, ofrece la ubicación exacta de este documento y, además, en los anexos, presenta la transcripción del mismo. El documento se encuentra en el Archivo Histórico de Zamora, Sección Notariales, signatura 3555. </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 39]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-39</Indicador_de_registro>
+    <Transacción>Tra-39</Transacción>
+    <Documento>[Doc. 39] Escritura, fechada en Toro el 16 de diciembre de 1605, por la cual se conciertan en compañía: Gaspar de Porras, autor de comedias, Salvador de Ochoa, Marina de Avilés (esposa de Salvador Ochoa), Domingo Balbín, Isabel de Vérrez (esposa de Domingo Balbín), Bernardino Álvarez, Lorenzo Pérez, Francisco de Robles, Jerónimo del Barco, Pedro Cerezo de Guevara y Juan Pérez. La compañía duraría dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. –Según DICAT, la referencia a Marina de Avilés hecha por John Allen sería un error y el nombre adecuado sería Marina de Velasco. Según DICAT el nombre de Isabel Vérrez a veces figura como Isabel Bérriz.</Documento>
+    <Noticia>En las cláusulas de la compañía se  especifica que cada vez que se realice un préstamo de la caja se lo debe saldar con mucha puntualidad.</Noticia>
+    <Ciudad>Toro</Ciudad>
+    <Año>1605</Año>
+    <Autores>Gaspar de Porras</Autores>
+    <Compañía>GP</Compañía>
+    <Data>[hipotético] Se saldan préstamos con la caja</Data>
+    <Cargo>[hipotético] Se realizan préstamos de la caja</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de John Allen  (1991, pp. 237-241). John Allen (1994), en el libro que publica junto con José María Ruano de la Haza, ofrece la ubicación exacta de este documento y, además, en los anexos, presenta la transcripción del mismo. El documento se encuentra en el Archivo Histórico de Zamora, Sección Notariales, signatura 3555. </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 39]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-40</Indicador_de_registro>
+    <Transacción>Tra-40</Transacción>
+    <Documento>[Doc. 39] Escritura, fechada en Toro el 16 de diciembre de 1605, por la cual se conciertan en compañía: Gaspar de Porras, autor de comedias, Salvador de Ochoa, Marina de Avilés (esposa de Salvador Ochoa), Domingo Balbín, Isabel de Vérrez (esposa de Domingo Balbín), Bernardino Álvarez, Lorenzo Pérez, Francisco de Robles, Jerónimo del Barco, Pedro Cerezo de Guevara y Juan Pérez. La compañía duraría dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. –Según DICAT, la referencia a Marina de Avilés hecha por John Allen sería un error y el nombre adecuado sería Marina de Velasco. Según DICAT el nombre de Isabel Vérrez a veces figura como Isabel Bérriz.</Documento>
+    <Noticia>En las cláusulas de la compañía se especifica como motivos para que un miembro pierda el derecho de recibir, al final, lo que le corresponde de la caja: que deje la compañía antes de que se cumplan sus dos años o que, en este periodo, decida dejar “el oficio de representación”. Se podría, a su vez, cobrar daños y perjuicios a quien esto hiciera. También se podría cobrar daños y perjuicios  si alguien “hiciere o diere algún escándalo en que ponga nota en la compañía o por ello le viniere algún daño y perjuicio”. </Noticia>
+    <Ciudad>Toro</Ciudad>
+    <Año>1605</Año>
+    <Autores>Gaspar de Porras</Autores>
+    <Compañía>GP</Compañía>
+    <Data>[hipotético] Se cobran daños y perjuicios</Data>
+    <Cargo>X</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de John Allen  (1991, pp. 237-241). John Allen (1994), en el libro que publica junto con José María Ruano de la Haza, ofrece la ubicación exacta de este documento y, además, en los anexos, presenta la transcripción del mismo. El documento se encuentra en el Archivo Histórico de Zamora, Sección Notariales, signatura 3555. </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 39]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-41</Indicador_de_registro>
+    <Transacción>Tra-41</Transacción>
+    <Documento>[Doc. 39] Escritura, fechada en Toro el 16 de diciembre de 1605, por la cual se conciertan en compañía: Gaspar de Porras, autor de comedias, Salvador de Ochoa, Marina de Avilés (esposa de Salvador Ochoa), Domingo Balbín, Isabel de Vérrez (esposa de Domingo Balbín), Bernardino Álvarez, Lorenzo Pérez, Francisco de Robles, Jerónimo del Barco, Pedro Cerezo de Guevara y Juan Pérez. La compañía duraría dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. –Según DICAT, la referencia a Marina de Avilés hecha por John Allen sería un error y el nombre adecuado sería Marina de Velasco. Según DICAT el nombre de Isabel Vérrez a veces figura como Isabel Bérriz.</Documento>
+    <Noticia>En las cláusulas de la compañía se dice que se puede despedir a un miembro por incumplir sus funciones o si “revolviere la compañía”. En caso de despido, sí se pagaría a la persona el dinero que hasta el momento del despido le correspondiera.</Noticia>
+    <Ciudad>Toro</Ciudad>
+    <Año>1605</Año>
+    <Autores>Gaspar de Porras</Autores>
+    <Compañía>GP</Compañía>
+    <Data>X</Data>
+    <Cargo>[hipotético] En caso de despido, se paga a la persona despedida lo que le correspondiera hasta ese momento</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de John Allen  (1991, pp. 237-241). John Allen (1994), en el libro que publica junto con José María Ruano de la Haza, ofrece la ubicación exacta de este documento y, además, en los anexos, presenta la transcripción del mismo. El documento se encuentra en el Archivo Histórico de Zamora, Sección Notariales, signatura 3555. </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 39]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-42</Indicador_de_registro>
+    <Transacción>Tra-42</Transacción>
+    <Documento>[Doc. 39] Escritura, fechada en Toro el 16 de diciembre de 1605, por la cual se conciertan en compañía: Gaspar de Porras, autor de comedias, Salvador de Ochoa, Marina de Avilés (esposa de Salvador Ochoa), Domingo Balbín, Isabel de Vérrez (esposa de Domingo Balbín), Bernardino Álvarez, Lorenzo Pérez, Francisco de Robles, Jerónimo del Barco, Pedro Cerezo de Guevara y Juan Pérez. La compañía duraría dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. –Según DICAT, la referencia a Marina de Avilés hecha por John Allen sería un error y el nombre adecuado sería Marina de Velasco. Según DICAT el nombre de Isabel Vérrez a veces figura como Isabel Bérriz.</Documento>
+    <Noticia>En las cláusulas de la compañía se dice que, si alguien cayera enfermo, se le seguiría pagando lo que le corresponde por el tiempo que fuera necesario. </Noticia>
+    <Ciudad>Toro</Ciudad>
+    <Año>1605</Año>
+    <Autores>Gaspar de Porras</Autores>
+    <Compañía>GP</Compañía>
+    <Data>X</Data>
+    <Cargo>[hipotético] En caso de enfermedad, se sigue pagando al enfermo lo que le corresponde</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de John Allen  (1991, pp. 237-241). John Allen (1994), en el libro que publica junto con José María Ruano de la Haza, ofrece la ubicación exacta de este documento y, además, en los anexos, presenta la transcripción del mismo. El documento se encuentra en el Archivo Histórico de Zamora, Sección Notariales, signatura 3555. </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 39]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-43</Indicador_de_registro>
+    <Transacción>Tra-43</Transacción>
+    <Documento>[Doc. 39] Escritura, fechada en Toro el 16 de diciembre de 1605, por la cual se conciertan en compañía: Gaspar de Porras, autor de comedias, Salvador de Ochoa, Marina de Avilés (esposa de Salvador Ochoa), Domingo Balbín, Isabel de Vérrez (esposa de Domingo Balbín), Bernardino Álvarez, Lorenzo Pérez, Francisco de Robles, Jerónimo del Barco, Pedro Cerezo de Guevara y Juan Pérez. La compañía duraría dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. –Según DICAT, la referencia a Marina de Avilés hecha por John Allen sería un error y el nombre adecuado sería Marina de Velasco. Según DICAT el nombre de Isabel Vérrez a veces figura como Isabel Bérriz.</Documento>
+    <Noticia>En las cláusulas de la compañía se dice que si alguien falleciera, se entregaría su parte de la caja a sus herederos. Y, si no tuviera herederos, el dinero se gastaría “por su alma a nuestra disposición”. </Noticia>
+    <Ciudad>Toro</Ciudad>
+    <Año>1605</Año>
+    <Autores>Gaspar de Porras</Autores>
+    <Compañía>GP</Compañía>
+    <Data>[hipotético] Si alguien muere sin herederos, su parte se queda en la compañía</Data>
+    <Cargo>[hipotético] Si alguien muere con herederos, su parte se entrega a los mismos</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de John Allen  (1991, pp. 237-241). John Allen (1994), en el libro que publica junto con José María Ruano de la Haza, ofrece la ubicación exacta de este documento y, además, en los anexos, presenta la transcripción del mismo. El documento se encuentra en el Archivo Histórico de Zamora, Sección Notariales, signatura 3555. </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 39]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-44</Indicador_de_registro>
+    <Transacción>Tra-44</Transacción>
+    <Documento>[Doc. 39] Escritura, fechada en Toro el 16 de diciembre de 1605, por la cual se conciertan en compañía: Gaspar de Porras, autor de comedias, Salvador de Ochoa, Marina de Avilés (esposa de Salvador Ochoa), Domingo Balbín, Isabel de Vérrez (esposa de Domingo Balbín), Bernardino Álvarez, Lorenzo Pérez, Francisco de Robles, Jerónimo del Barco, Pedro Cerezo de Guevara y Juan Pérez. La compañía duraría dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. –Según DICAT, la referencia a Marina de Avilés hecha por John Allen sería un error y el nombre adecuado sería Marina de Velasco. Según DICAT el nombre de Isabel Vérrez a veces figura como Isabel Bérriz.</Documento>
+    <Noticia>En las cláusulas de la compañía se dice que, si alguien entrara a prisión por hacer algo relacionado con la compañía o en beneficio de la misma, se le ayudaría con dinero de la caja.</Noticia>
+    <Ciudad>Toro</Ciudad>
+    <Año>1605</Año>
+    <Autores>Gaspar de Porras</Autores>
+    <Compañía>GP</Compañía>
+    <Data>X</Data>
+    <Cargo>[hipotético] Si alguien entra a la cárcel por causa de la compañía, se le ayuda con dinero de la caja</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de John Allen  (1991, pp. 237-241). John Allen (1994), en el libro que publica junto con José María Ruano de la Haza, ofrece la ubicación exacta de este documento y, además, en los anexos, presenta la transcripción del mismo. El documento se encuentra en el Archivo Histórico de Zamora, Sección Notariales, signatura 3555. </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 39]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-45</Indicador_de_registro>
+    <Transacción>Tra-45</Transacción>
+    <Documento>[Doc. 39] Escritura, fechada en Toro el 16 de diciembre de 1605, por la cual se conciertan en compañía: Gaspar de Porras, autor de comedias, Salvador de Ochoa, Marina de Avilés (esposa de Salvador Ochoa), Domingo Balbín, Isabel de Vérrez (esposa de Domingo Balbín), Bernardino Álvarez, Lorenzo Pérez, Francisco de Robles, Jerónimo del Barco, Pedro Cerezo de Guevara y Juan Pérez. La compañía duraría dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. –Según DICAT, la referencia a Marina de Avilés hecha por John Allen sería un error y el nombre adecuado sería Marina de Velasco. Según DICAT el nombre de Isabel Vérrez a veces figura como Isabel Bérriz.</Documento>
+    <Noticia>En las cláusulas de la compañía se dice que se pagará del dinero de la caja el transporte del hato y de los miembros de la compañía en los viajes que se hicieran para representar. </Noticia>
+    <Ciudad>Toro</Ciudad>
+    <Año>1605</Año>
+    <Autores>Gaspar de Porras</Autores>
+    <Compañía>GP</Compañía>
+    <Data>X</Data>
+    <Cargo>Gastos de transporte del hato y de los miembros de la compañía</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de John Allen  (1991, pp. 237-241). John Allen (1994), en el libro que publica junto con José María Ruano de la Haza, ofrece la ubicación exacta de este documento y, además, en los anexos, presenta la transcripción del mismo. El documento se encuentra en el Archivo Histórico de Zamora, Sección Notariales, signatura 3555. </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 39]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-46</Indicador_de_registro>
+    <Transacción>Tra-46</Transacción>
+    <Documento>[Doc. 39] Escritura, fechada en Toro el 16 de diciembre de 1605, por la cual se conciertan en compañía: Gaspar de Porras, autor de comedias, Salvador de Ochoa, Marina de Avilés (esposa de Salvador Ochoa), Domingo Balbín, Isabel de Vérrez (esposa de Domingo Balbín), Bernardino Álvarez, Lorenzo Pérez, Francisco de Robles, Jerónimo del Barco, Pedro Cerezo de Guevara y Juan Pérez. La compañía duraría dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. –Según DICAT, la referencia a Marina de Avilés hecha por John Allen sería un error y el nombre adecuado sería Marina de Velasco. Según DICAT el nombre de Isabel Vérrez a veces figura como Isabel Bérriz.</Documento>
+    <Noticia>En las cláusulas de la compañía se dice que si algún particular, o más de uno, solicitara que la compañía represente, de día o de noche, en su casa o en otro lugar, iban a acordar entre todos los miembros si aceptar o no la propuesta. En caso de que se aceptara y un miembro decidiera posteriormente no participar, este debería pagar una penalización. Se dice: “pague a la dicha compañía el interés que diere el tal particular”. El modo de pago sería descontar el dinero de la penalización de la parte de la caja que le correspondería al penalizado. </Noticia>
+    <Ciudad>Toro</Ciudad>
+    <Año>1605</Año>
+    <Autores>Gaspar de Porras</Autores>
+    <Compañía>GP</Compañía>
+    <Data>[hipotético] Penalizaciones por  incumplimiento de responsabilidades: en específico, por no asistir a las representaciones contratadas por particulares</Data>
+    <Cargo>X</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de John Allen  (1991, pp. 237-241). John Allen (1994), en el libro que publica junto con José María Ruano de la Haza, ofrece la ubicación exacta de este documento y, además, en los anexos, presenta la transcripción del mismo. El documento se encuentra en el Archivo Histórico de Zamora, Sección Notariales, signatura 3555. </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 39]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-47</Indicador_de_registro>
+    <Transacción>Tra-47</Transacción>
+    <Documento>[Doc. 39] Escritura, fechada en Toro el 16 de diciembre de 1605, por la cual se conciertan en compañía: Gaspar de Porras, autor de comedias, Salvador de Ochoa, Marina de Avilés (esposa de Salvador Ochoa), Domingo Balbín, Isabel de Vérrez (esposa de Domingo Balbín), Bernardino Álvarez, Lorenzo Pérez, Francisco de Robles, Jerónimo del Barco, Pedro Cerezo de Guevara y Juan Pérez. La compañía duraría dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. –Según DICAT, la referencia a Marina de Avilés hecha por John Allen sería un error y el nombre adecuado sería Marina de Velasco. Según DICAT el nombre de Isabel Vérrez a veces figura como Isabel Bérriz.</Documento>
+    <Noticia>En la escritura se dice que se pagará a Gaspar de Porras: 20 reales por representación y 8 reales de ración diaria.</Noticia>
+    <Ciudad>Toro</Ciudad>
+    <Año>1605</Año>
+    <Autores>Gaspar de Porras</Autores>
+    <Compañía>GP</Compañía>
+    <Data>X</Data>
+    <Cargo>20 reales [por representación]; 8 reales [ración diaria]. </Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de John Allen  (1991, pp. 237-241). John Allen (1994), en el libro que publica junto con José María Ruano de la Haza, ofrece la ubicación exacta de este documento y, además, en los anexos, presenta la transcripción del mismo. El documento se encuentra en el Archivo Histórico de Zamora, Sección Notariales, signatura 3555. </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 39]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-48</Indicador_de_registro>
+    <Transacción>Tra-48</Transacción>
+    <Documento>[Doc. 39] Escritura, fechada en Toro el 16 de diciembre de 1605, por la cual se conciertan en compañía: Gaspar de Porras, autor de comedias, Salvador de Ochoa, Marina de Avilés (esposa de Salvador Ochoa), Domingo Balbín, Isabel de Vérrez (esposa de Domingo Balbín), Bernardino Álvarez, Lorenzo Pérez, Francisco de Robles, Jerónimo del Barco, Pedro Cerezo de Guevara y Juan Pérez. La compañía duraría dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. –Según DICAT, la referencia a Marina de Avilés hecha por John Allen sería un error y el nombre adecuado sería Marina de Velasco. Según DICAT el nombre de Isabel Vérrez a veces figura como Isabel Bérriz.</Documento>
+    <Noticia>En la escritura se dice que se pagará a Salvador Ochoa y Marina de Avilés : 30 reales por representación y 8 reales de ración diaria.</Noticia>
+    <Ciudad>Toro</Ciudad>
+    <Año>1605</Año>
+    <Autores>Gaspar de Porras</Autores>
+    <Compañía>GP</Compañía>
+    <Data>X</Data>
+    <Cargo>30 reales [por representación]; 8 reales [ración diaria]. </Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de John Allen  (1991, pp. 237-241). John Allen (1994), en el libro que publica junto con José María Ruano de la Haza, ofrece la ubicación exacta de este documento y, además, en los anexos, presenta la transcripción del mismo. El documento se encuentra en el Archivo Histórico de Zamora, Sección Notariales, signatura 3555. </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 39]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-49</Indicador_de_registro>
+    <Transacción>Tra-49</Transacción>
+    <Documento>[Doc. 39] Escritura, fechada en Toro el 16 de diciembre de 1605, por la cual se conciertan en compañía: Gaspar de Porras, autor de comedias, Salvador de Ochoa, Marina de Avilés (esposa de Salvador Ochoa), Domingo Balbín, Isabel de Vérrez (esposa de Domingo Balbín), Bernardino Álvarez, Lorenzo Pérez, Francisco de Robles, Jerónimo del Barco, Pedro Cerezo de Guevara y Juan Pérez. La compañía duraría dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. –Según DICAT, la referencia a Marina de Avilés hecha por John Allen sería un error y el nombre adecuado sería Marina de Velasco. Según DICAT el nombre de Isabel Vérrez a veces figura como Isabel Bérriz.</Documento>
+    <Noticia>En la escritura se dice que se pagará a Domingo Balbín e Isabel de Vérrez: 20 reales por representación y 8 reales de ración diaria.</Noticia>
+    <Ciudad>Toro</Ciudad>
+    <Año>1605</Año>
+    <Autores>Gaspar de Porras</Autores>
+    <Compañía>GP</Compañía>
+    <Data>X</Data>
+    <Cargo>20 reales [por representación]; 8 reales [ración diaria]. </Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de John Allen  (1991, pp. 237-241). John Allen (1994), en el libro que publica junto con José María Ruano de la Haza, ofrece la ubicación exacta de este documento y, además, en los anexos, presenta la transcripción del mismo. El documento se encuentra en el Archivo Histórico de Zamora, Sección Notariales, signatura 3555. </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 39]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-50</Indicador_de_registro>
+    <Transacción>Tra-50</Transacción>
+    <Documento>[Doc. 39] Escritura, fechada en Toro el 16 de diciembre de 1605, por la cual se conciertan en compañía: Gaspar de Porras, autor de comedias, Salvador de Ochoa, Marina de Avilés (esposa de Salvador Ochoa), Domingo Balbín, Isabel de Vérrez (esposa de Domingo Balbín), Bernardino Álvarez, Lorenzo Pérez, Francisco de Robles, Jerónimo del Barco, Pedro Cerezo de Guevara y Juan Pérez. La compañía duraría dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. –Según DICAT, la referencia a Marina de Avilés hecha por John Allen sería un error y el nombre adecuado sería Marina de Velasco. Según DICAT el nombre de Isabel Vérrez a veces figura como Isabel Bérriz.</Documento>
+    <Noticia>En la escritura se dice que se pagará a Bernardino Álvarez: 12 reales por representación y 5 reales de ración diaria.</Noticia>
+    <Ciudad>Toro</Ciudad>
+    <Año>1605</Año>
+    <Autores>Gaspar de Porras</Autores>
+    <Compañía>GP</Compañía>
+    <Data>X</Data>
+    <Cargo>12 reales [por representación]; 5 reales [ración diaria]. </Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de John Allen  (1991, pp. 237-241). John Allen (1994), en el libro que publica junto con José María Ruano de la Haza, ofrece la ubicación exacta de este documento y, además, en los anexos, presenta la transcripción del mismo. El documento se encuentra en el Archivo Histórico de Zamora, Sección Notariales, signatura 3555. </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 39]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-51</Indicador_de_registro>
+    <Transacción>Tra-51</Transacción>
+    <Documento>[Doc. 39] Escritura, fechada en Toro el 16 de diciembre de 1605, por la cual se conciertan en compañía: Gaspar de Porras, autor de comedias, Salvador de Ochoa, Marina de Avilés (esposa de Salvador Ochoa), Domingo Balbín, Isabel de Vérrez (esposa de Domingo Balbín), Bernardino Álvarez, Lorenzo Pérez, Francisco de Robles, Jerónimo del Barco, Pedro Cerezo de Guevara y Juan Pérez. La compañía duraría dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. –Según DICAT, la referencia a Marina de Avilés hecha por John Allen sería un error y el nombre adecuado sería Marina de Velasco. Según DICAT el nombre de Isabel Vérrez a veces figura como Isabel Bérriz.</Documento>
+    <Noticia>En la escritura se dice que se pagará a Jerónimo del Varco: 11 reales por representación y 4 reales de ración diaria.</Noticia>
+    <Ciudad>Toro</Ciudad>
+    <Año>1605</Año>
+    <Autores>Gaspar de Porras</Autores>
+    <Compañía>GP</Compañía>
+    <Data>X</Data>
+    <Cargo>11 reales [por representación]; 4 reales [ración diaria]. </Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de John Allen  (1991, pp. 237-241). John Allen (1994), en el libro que publica junto con José María Ruano de la Haza, ofrece la ubicación exacta de este documento y, además, en los anexos, presenta la transcripción del mismo. El documento se encuentra en el Archivo Histórico de Zamora, Sección Notariales, signatura 3555. </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 39]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-52</Indicador_de_registro>
+    <Transacción>Tra-52</Transacción>
+    <Documento>[Doc. 39] Escritura, fechada en Toro el 16 de diciembre de 1605, por la cual se conciertan en compañía: Gaspar de Porras, autor de comedias, Salvador de Ochoa, Marina de Avilés (esposa de Salvador Ochoa), Domingo Balbín, Isabel de Vérrez (esposa de Domingo Balbín), Bernardino Álvarez, Lorenzo Pérez, Francisco de Robles, Jerónimo del Barco, Pedro Cerezo de Guevara y Juan Pérez. La compañía duraría dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. –Según DICAT, la referencia a Marina de Avilés hecha por John Allen sería un error y el nombre adecuado sería Marina de Velasco. Según DICAT el nombre de Isabel Vérrez a veces figura como Isabel Bérriz.</Documento>
+    <Noticia>En la escritura se dice que se pagará a Lorenzo Pérez: 10 reales por representación y 8 reales de ración diaria.</Noticia>
+    <Ciudad>Toro</Ciudad>
+    <Año>1605</Año>
+    <Autores>Gaspar de Porras</Autores>
+    <Compañía>GP</Compañía>
+    <Data>X</Data>
+    <Cargo>10 reales [por representación]; 8 reales [ración diaria]. </Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de John Allen  (1991, pp. 237-241). John Allen (1994), en el libro que publica junto con José María Ruano de la Haza, ofrece la ubicación exacta de este documento y, además, en los anexos, presenta la transcripción del mismo. El documento se encuentra en el Archivo Histórico de Zamora, Sección Notariales, signatura 3555. </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 39]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-53</Indicador_de_registro>
+    <Transacción>Tra-53</Transacción>
+    <Documento>[Doc. 39] Escritura, fechada en Toro el 16 de diciembre de 1605, por la cual se conciertan en compañía: Gaspar de Porras, autor de comedias, Salvador de Ochoa, Marina de Avilés (esposa de Salvador Ochoa), Domingo Balbín, Isabel de Vérrez (esposa de Domingo Balbín), Bernardino Álvarez, Lorenzo Pérez, Francisco de Robles, Jerónimo del Barco, Pedro Cerezo de Guevara y Juan Pérez. La compañía duraría dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. –Según DICAT, la referencia a Marina de Avilés hecha por John Allen sería un error y el nombre adecuado sería Marina de Velasco. Según DICAT el nombre de Isabel Vérrez a veces figura como Isabel Bérriz.</Documento>
+    <Noticia>En la escritura se dice que se pagará a Francisco de Robles: 10 reales por representación y 8 reales de ración diaria.</Noticia>
+    <Ciudad>Toro</Ciudad>
+    <Año>1605</Año>
+    <Autores>Gaspar de Porras</Autores>
+    <Compañía>GP</Compañía>
+    <Data>X</Data>
+    <Cargo>10 reales [por representación]; 8 reales [ración diaria]. </Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de John Allen  (1991, pp. 237-241). John Allen (1994), en el libro que publica junto con José María Ruano de la Haza, ofrece la ubicación exacta de este documento y, además, en los anexos, presenta la transcripción del mismo. El documento se encuentra en el Archivo Histórico de Zamora, Sección Notariales, signatura 3555. </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 39]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-54</Indicador_de_registro>
+    <Transacción>Tra-54</Transacción>
+    <Documento>[Doc. 39] Escritura, fechada en Toro el 16 de diciembre de 1605, por la cual se conciertan en compañía: Gaspar de Porras, autor de comedias, Salvador de Ochoa, Marina de Avilés (esposa de Salvador Ochoa), Domingo Balbín, Isabel de Vérrez (esposa de Domingo Balbín), Bernardino Álvarez, Lorenzo Pérez, Francisco de Robles, Jerónimo del Barco, Pedro Cerezo de Guevara y Juan Pérez. La compañía duraría dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. –Según DICAT, la referencia a Marina de Avilés hecha por John Allen sería un error y el nombre adecuado sería Marina de Velasco. Según DICAT el nombre de Isabel Vérrez a veces figura como Isabel Bérriz.</Documento>
+    <Noticia>En la escritura se dice que se pagará a Juan Pérez: 10 reales por representación y 3 reales de ración diaria.</Noticia>
+    <Ciudad>Toro</Ciudad>
+    <Año>1605</Año>
+    <Autores>Gaspar de Porras</Autores>
+    <Compañía>GP</Compañía>
+    <Data>X</Data>
+    <Cargo>10 reales [por representación]; 3 reales [ración diaria]. </Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de John Allen  (1991, pp. 237-241). John Allen (1994), en el libro que publica junto con José María Ruano de la Haza, ofrece la ubicación exacta de este documento y, además, en los anexos, presenta la transcripción del mismo. El documento se encuentra en el Archivo Histórico de Zamora, Sección Notariales, signatura 3555. </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 39]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-55</Indicador_de_registro>
+    <Transacción>Tra-55</Transacción>
+    <Documento>[Doc. 39] Escritura, fechada en Toro el 16 de diciembre de 1605, por la cual se conciertan en compañía: Gaspar de Porras, autor de comedias, Salvador de Ochoa, Marina de Avilés (esposa de Salvador Ochoa), Domingo Balbín, Isabel de Vérrez (esposa de Domingo Balbín), Bernardino Álvarez, Lorenzo Pérez, Francisco de Robles, Jerónimo del Barco, Pedro Cerezo de Guevara y Juan Pérez. La compañía duraría dos años, desde el Carnaval de 1606 hasta el Carnaval de 1608. –Según DICAT, la referencia a Marina de Avilés hecha por John Allen sería un error y el nombre adecuado sería Marina de Velasco. Según DICAT el nombre de Isabel Vérrez a veces figura como Isabel Bérriz.</Documento>
+    <Noticia>En la escritura se dice que se pagará a Pedro Cerezo de Guevara: 11 reales por representación y 3 reales de ración diaria.</Noticia>
+    <Ciudad>Toro</Ciudad>
+    <Año>1605</Año>
+    <Autores>Gaspar de Porras</Autores>
+    <Compañía>GP</Compañía>
+    <Data>X</Data>
+    <Cargo>11 reales [por representación]; 3 reales [ración diaria]. </Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>No</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de John Allen  (1991, pp. 237-241). John Allen (1994), en el libro que publica junto con José María Ruano de la Haza, ofrece la ubicación exacta de este documento y, además, en los anexos, presenta la transcripción del mismo. El documento se encuentra en el Archivo Histórico de Zamora, Sección Notariales, signatura 3555. </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 39]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-56</Indicador_de_registro>
+    <Transacción>Tra-56</Transacción>
+    <Documento>[Doc. 44] Escritura, fechada en Valladolid el 8 de febrero de 1581, por la cual Fabián de Ribera, vecino de Córdoba, se compromete a representar en la compañía de Juan Granado desde la Pascua de Resurrección de este año hasta el Carnaval del siguiente. </Documento>
+    <Noticia>En la escritura se dice que Juan Granado se compromete a dar a Fabián de Ribera de comer, beber, cama y camisa lavada. Además, pasado dicho tiempo, es decir, llegado el Carnaval de 1582, el autor pagaría al actor 120 ducados (1320 reales) “como les fuere pedido”. El autor se compromete también a dar a Fabián de Ribera cabalgadura para llevar sus pertenencias y, también (según se entiende por la manera en la cual reporta el documento Fernández Martín) le daría, al finalizar el contrato, cabalgadura hasta Córdoba. Fernández Martín especifica: “los ciento veinte ducados se le han de dar ya represente o no”. — DICAT transcribe el apellido como &quot;Ribera&quot; mientras que Fernández Martín mantiene la forma &quot;Rivera&quot;. </Noticia>
+    <Ciudad>Valladolid </Ciudad>
+    <Año>1581</Año>
+    <Autores>Juan Granado</Autores>
+    <Compañía>JG-JeG3</Compañía>
+    <Data>X</Data>
+    <Cargo>1320 reales [por representar un año]; comida, bebida, vestidos y cabalgadura. </Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Referencia al documento ubicada en DICAT; DICAT extrae la referencia de Fernández Martín  (1988, pp. 26-27).  Se ha consultado el texto de Fernández Martín para los detalles sobre el contrato que registramos; Fernández Martín ofrece la ubicación del documento: AHPV (Archivo Histórico Provincial de Valladolid), 517; 8-II-1581.  </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 44]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-57</Indicador_de_registro>
+    <Transacción>Tra-57</Transacción>
+    <Documento>[Doc. 45] Escritura, fechada en Valladolid el 9 de febrero de 1581, por la cual Juan de Morales, a través de su curador ad ítem Pedro de Aranda, procurado de número de Valladolid, se asienta de “soldada y servicio” por un año en la compañía de Juan Granado. </Documento>
+    <Noticia>En la escritura se especifica que durante el tiempo del contrato Juan de Granado le ha de dar a Juan de Morales “de comer y beber, cama y camisa lavada”. Además, le pagaría 27 ducados (297 reales). Por su parte, Juan de Morales se compromete a representar todo lo que se le mande. –Fernández Martín no especifica en qué momento se pagarán los 27 ducados, información que de seguro se puedo hallar en el documento. </Noticia>
+    <Ciudad>Valladolid </Ciudad>
+    <Año>1581</Año>
+    <Autores>Juan Granado</Autores>
+    <Compañía>JG-JeG3</Compañía>
+    <Data>X</Data>
+    <Cargo>297 reales [por representar un año]; comida, bebida, vestidos.</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Referencia al documento ubicada en DICAT; DICAT extrae la referencia de Fernández Martín  (1988, p.30). DICAT no registra los detalles del contrato, para esto se ha consultado el texto de Fernández Martín; Fernández Martín ofrece la ubicación del documento: AHPV (Archivo Histórico Provincial de Valladolid), 517; 9-II-1581.  </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 45]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-58</Indicador_de_registro>
+    <Transacción>Tra-58</Transacción>
+    <Documento>[Doc. 52] Escritura, fechada en Madrid el 13 de marzo de 1580, por la cual se conciertan en compañía: Alberto Naselli (Ganassa), Barbara Flaminia (esposa de Alberto Naselli), Vicenzo Botanelli (Curzio Romano), Cesare dei Nobili, Abagaro Fiescobaldi (Stefanello Bottarga), Giovan Pietro Pasquarello, Scipione Graselli, Giulio Vigilante y Giaccomo Portalupo. –Como se puede ver en DICAT, el nombre de los italianos varía mucho en la documentación española. Vicenzo Botanelli, según el documento, figura como Curtio Romano, Curcio Romano o Curzio Romano. Abagaro Fiescobaldi es más conocido como Abagaro Francesco Baldi y Taciano, pero su nombre presenta muchas variaciones, entre ellas: Agabaro Frescobaldi o Agabaro Francisco Valdés; de la misma manera, su nombre artístico a veces figura como Stefanelo Botarga y, a veces, como Stefanello Bottarga. En este documento, según la transcripción de García García, los nombres aparecen de la siguiente manera: Alverto Anaseli, Barvora Flaminia, Vicenzo de Tricurçio, Chesar de Nobili, Juan Pietro alias Trastulo, Cipios Graseli, Abagaro Fiescovaldi dito Stefanelo Votarga, Jacobe Portalupi y Jullio Villanti. Esta escritura, como se dice en ella misma, sería la renovación de otra que se firmó en italiano el 28 de marzo de 1579 en Sevilla. La compañía renovada duraría hasta el Carnaval de 1581. </Documento>
+    <Noticia>En la escritura se especifica que si alguno de los miembros abandona la compañía antes de tiempo tendrá que pagar como pena 50 ducados (550 reales): “la mitad para los pobres del hospital del pueblo donde lo semejante acaeciere y la otra mitad para la dicha compañía por razón de los dineros y menoscabos que de salirse el tal compañero de ella se hobieren seguido e pudieren seguir”. La pena no se aplicaría si quien deja la compañía lo hace por algún motivo de fuerza mayor; es decir, si cayera enfermo o si tuviera que escapar de la justicia “por razón de algún delito que por accidente o en otra cualquier manera haya cometido, e para liberarse de la pena que por él podía recibir”. Tampoco tendría que pagar la pena quien abandone la compañía por la muerte de un familiar del cual debe recibir herencia. En este caso, el representante en cuestión, antes de irse tendría que representar ocho comedias y perdería la parte de ropa que le correspondería del hato.  </Noticia>
+    <Ciudad>Madrid</Ciudad>
+    <Año>1580</Año>
+    <Autores>Alberto Naselli (Ganassa)</Autores>
+    <Compañía>AN</Compañía>
+    <Data>[hipotético] 550 reales [en caso de incumplimiento de responsabilidades de alguno de los miembros de la compañía]</Data>
+    <Cargo>X</Cargo>
+    <Otros_bienes_de_la_compañía>Si un representante abandona la compañía, pierde la parte de ropa del hato que le correspondería. </Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en el documento de concierto transcrito por García García (1993, pp. 361-165). DICAT también recoge datos de esta fuente. García García ofrece la ubicación del documento: Archivo Zabálburu, carpeta 212, doc. 68.</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 52]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-59</Indicador_de_registro>
+    <Transacción>Tra-59</Transacción>
+    <Documento>[Doc. 52] Escritura, fechada en Madrid el 13 de marzo de 1580, por la cual se conciertan en compañía: Alberto Naselli (Ganassa), Barbara Flaminia (esposa de Alberto Naselli), Vicenzo Botanelli (Curzio Romano), Cesare dei Nobili, Abagaro Fiescobaldi (Stefanello Bottarga), Giovan Pietro Pasquarello, Scipione Graselli, Giulio Vigilante y Giaccomo Portalupo. –Como se puede ver en DICAT, el nombre de los italianos varía mucho en la documentación española. Vicenzo Botanelli, según el documento, figura como Curtio Romano, Curcio Romano o Curzio Romano. Abagaro Fiescobaldi es más conocido como Abagaro Francesco Baldi y Taciano, pero su nombre presenta muchas variaciones, entre ellas: Agabaro Frescobaldi o Agabaro Francisco Valdés; de la misma manera, su nombre artístico a veces figura como Stefanelo Botarga y, a veces, como Stefanello Bottarga. En este documento, según la transcripción de García García, los nombres aparecen de la siguiente manera: Alverto Anaseli, Barvora Flaminia, Vicenzo de Tricurçio, Chesar de Nobili, Juan Pietro alias Trastulo, Cipios Graseli, Abagaro Fiescovaldi dito Stefanelo Votarga, Jacobe Portalupi y Jullio Villanti. Esta escritura, como se dice en ella misma, sería la renovación de otra que se firmó en italiano el 28 de marzo de 1579 en Sevilla. La compañía renovada duraría hasta el Carnaval de 1581. </Documento>
+    <Noticia>En la escritura se dice que Alberto Naselli y Barbara Flaminia (esposa de Alberto Naselli) recibirán como paga dos partes y media de las ganancias de la compañía. </Noticia>
+    <Ciudad>Madrid</Ciudad>
+    <Año>1580</Año>
+    <Autores>Alberto Naselli (Ganassa)</Autores>
+    <Compañía>AN</Compañía>
+    <Data>X</Data>
+    <Cargo>2 partes y ½ de parte de las ganancias</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en el documento de concierto transcrito por García García (1993, pp. 361-165). DICAT también recoge datos de esta fuente. García García ofrece la ubicación del documento: Archivo Zabálburu, carpeta 212, doc. 68.</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 52]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-60</Indicador_de_registro>
+    <Transacción>Tra-60</Transacción>
+    <Documento>[Doc. 52] Escritura, fechada en Madrid el 13 de marzo de 1580, por la cual se conciertan en compañía: Alberto Naselli (Ganassa), Barbara Flaminia (esposa de Alberto Naselli), Vicenzo Botanelli (Curzio Romano), Cesare dei Nobili, Abagaro Fiescobaldi (Stefanello Bottarga), Giovan Pietro Pasquarello, Scipione Graselli, Giulio Vigilante y Giaccomo Portalupo. –Como se puede ver en DICAT, el nombre de los italianos varía mucho en la documentación española. Vicenzo Botanelli, según el documento, figura como Curtio Romano, Curcio Romano o Curzio Romano. Abagaro Fiescobaldi es más conocido como Abagaro Francesco Baldi y Taciano, pero su nombre presenta muchas variaciones, entre ellas: Agabaro Frescobaldi o Agabaro Francisco Valdés; de la misma manera, su nombre artístico a veces figura como Stefanelo Botarga y, a veces, como Stefanello Bottarga. En este documento, según la transcripción de García García, los nombres aparecen de la siguiente manera: Alverto Anaseli, Barvora Flaminia, Vicenzo de Tricurçio, Chesar de Nobili, Juan Pietro alias Trastulo, Cipios Graseli, Abagaro Fiescovaldi dito Stefanelo Votarga, Jacobe Portalupi y Jullio Villanti. Esta escritura, como se dice en ella misma, sería la renovación de otra que se firmó en italiano el 28 de marzo de 1579 en Sevilla. La compañía renovada duraría hasta el Carnaval de 1581. </Documento>
+    <Noticia>En la escritura se dice que Vicenzo Botanelli recibirá como paga una parte y media de las ganacias de la compañía. Botanelli sería tanto representante como “procurador de la compañía en todos los negocios y casos que se les subcederá”. En cuanto actor, como todos los miembros de la compañía, se compromete a representar, siguiendo las órdenes de Alberto Naselli (Ganassa), todas las veces que fuere necesario: “de noche e de día, y en público y en secreto y en casas particulares”.  Se compromete, a su vez, a viajar donde diga la compañía (se establece un sisma según el cual Ganassa decide dónde ir pero necesita que estén de acuerdo por lo menos dos compañéros más, uno de los cuales debe ser necesariamente Vicenzo Botanelli o Giovan Pietro Pasquarello). </Noticia>
+    <Ciudad>Madrid</Ciudad>
+    <Año>1580</Año>
+    <Autores>Alberto Naselli (Ganassa)</Autores>
+    <Compañía>AN</Compañía>
+    <Data>X</Data>
+    <Cargo>1 parte y ½ de parte de las ganancias</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en el documento de concierto transcrito por García García (1993, pp. 361-165). DICAT también recoge datos de esta fuente. García García ofrece la ubicación del documento: Archivo Zabálburu, carpeta 212, doc. 68.</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 52]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-61</Indicador_de_registro>
+    <Transacción>Tra-61</Transacción>
+    <Documento>[Doc. 52] Escritura, fechada en Madrid el 13 de marzo de 1580, por la cual se conciertan en compañía: Alberto Naselli (Ganassa), Barbara Flaminia (esposa de Alberto Naselli), Vicenzo Botanelli (Curzio Romano), Cesare dei Nobili, Abagaro Fiescobaldi (Stefanello Bottarga), Giovan Pietro Pasquarello, Scipione Graselli, Giulio Vigilante y Giaccomo Portalupo. –Como se puede ver en DICAT, el nombre de los italianos varía mucho en la documentación española. Vicenzo Botanelli, según el documento, figura como Curtio Romano, Curcio Romano o Curzio Romano. Abagaro Fiescobaldi es más conocido como Abagaro Francesco Baldi y Taciano, pero su nombre presenta muchas variaciones, entre ellas: Agabaro Frescobaldi o Agabaro Francisco Valdés; de la misma manera, su nombre artístico a veces figura como Stefanelo Botarga y, a veces, como Stefanello Bottarga. En este documento, según la transcripción de García García, los nombres aparecen de la siguiente manera: Alverto Anaseli, Barvora Flaminia, Vicenzo de Tricurçio, Chesar de Nobili, Juan Pietro alias Trastulo, Cipios Graseli, Abagaro Fiescovaldi dito Stefanelo Votarga, Jacobe Portalupi y Jullio Villanti. Esta escritura, como se dice en ella misma, sería la renovación de otra que se firmó en italiano el 28 de marzo de 1579 en Sevilla. La compañía renovada duraría hasta el Carnaval de 1581. </Documento>
+    <Noticia>En la escritura se dice que Cesare dei Nobili recibirá como paga una parte de las ganacias de la compañía. En cuanto actor, como todos los miembros de la compañía, se compromete a representar, siguiendo las órdenes de Alberto Naselli (Ganassa), todas las veces que fuere necesario: “de noche e de día, y en público y en secreto y en casas particulares”.  Se compromete, a su vez, a viajar donde diga la compañía (se establece un sisma según el cual Ganassa decide dónde ir pero necesita que estén de acuerdo por lo menos dos compañéros más, uno de los cuales debe ser necesariamente Vicenzo Botanelli o Giovan Pietro Pasquarello).</Noticia>
+    <Ciudad>Madrid</Ciudad>
+    <Año>1580</Año>
+    <Autores>Alberto Naselli (Ganassa)</Autores>
+    <Compañía>AN</Compañía>
+    <Data>X</Data>
+    <Cargo>1 parte de las ganancias</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en el documento de concierto transcrito por García García (1993, pp. 361-165). DICAT también recoge datos de esta fuente. García García ofrece la ubicación del documento: Archivo Zabálburu, carpeta 212, doc. 68.</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 52]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-62</Indicador_de_registro>
+    <Transacción>Tra-62</Transacción>
+    <Documento>[Doc. 52] Escritura, fechada en Madrid el 13 de marzo de 1580, por la cual se conciertan en compañía: Alberto Naselli (Ganassa), Barbara Flaminia (esposa de Alberto Naselli), Vicenzo Botanelli (Curzio Romano), Cesare dei Nobili, Abagaro Fiescobaldi (Stefanello Bottarga), Giovan Pietro Pasquarello, Scipione Graselli, Giulio Vigilante y Giaccomo Portalupo. –Como se puede ver en DICAT, el nombre de los italianos varía mucho en la documentación española. Vicenzo Botanelli, según el documento, figura como Curtio Romano, Curcio Romano o Curzio Romano. Abagaro Fiescobaldi es más conocido como Abagaro Francesco Baldi y Taciano, pero su nombre presenta muchas variaciones, entre ellas: Agabaro Frescobaldi o Agabaro Francisco Valdés; de la misma manera, su nombre artístico a veces figura como Stefanelo Botarga y, a veces, como Stefanello Bottarga. En este documento, según la transcripción de García García, los nombres aparecen de la siguiente manera: Alverto Anaseli, Barvora Flaminia, Vicenzo de Tricurçio, Chesar de Nobili, Juan Pietro alias Trastulo, Cipios Graseli, Abagaro Fiescovaldi dito Stefanelo Votarga, Jacobe Portalupi y Jullio Villanti. Esta escritura, como se dice en ella misma, sería la renovación de otra que se firmó en italiano el 28 de marzo de 1579 en Sevilla. La compañía renovada duraría hasta el Carnaval de 1581. </Documento>
+    <Noticia>En la escritura se dice que Abagaro Fiescobaldi recibirá como paga una parte de las ganacias de la compañía. En cuanto actor, como todos los miembros de la compañía, se compromete a representar, siguiendo las órdenes de Alberto Naselli (Ganassa), todas las veces que fuere necesario: “de noche e de día, y en público y en secreto y en casas particulares”.  Se compromete, a su vez, a viajar donde diga la compañía (se establece un sisma según el cual Ganassa decide dónde ir pero necesita que estén de acuerdo por lo menos dos compañéros más, uno de los cuales debe ser necesariamente Vicenzo Botanelli o Giovan Pietro Pasquarello).</Noticia>
+    <Ciudad>Madrid</Ciudad>
+    <Año>1580</Año>
+    <Autores>Alberto Naselli (Ganassa)</Autores>
+    <Compañía>AN</Compañía>
+    <Data>X</Data>
+    <Cargo>1 parte de las ganancias</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en el documento de concierto transcrito por García García (1993, pp. 361-165). DICAT también recoge datos de esta fuente. García García ofrece la ubicación del documento: Archivo Zabálburu, carpeta 212, doc. 68.</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 52]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-63</Indicador_de_registro>
+    <Transacción>Tra-63</Transacción>
+    <Documento>[Doc. 52] Escritura, fechada en Madrid el 13 de marzo de 1580, por la cual se conciertan en compañía: Alberto Naselli (Ganassa), Barbara Flaminia (esposa de Alberto Naselli), Vicenzo Botanelli (Curzio Romano), Cesare dei Nobili, Abagaro Fiescobaldi (Stefanello Bottarga), Giovan Pietro Pasquarello, Scipione Graselli, Giulio Vigilante y Giaccomo Portalupo. –Como se puede ver en DICAT, el nombre de los italianos varía mucho en la documentación española. Vicenzo Botanelli, según el documento, figura como Curtio Romano, Curcio Romano o Curzio Romano. Abagaro Fiescobaldi es más conocido como Abagaro Francesco Baldi y Taciano, pero su nombre presenta muchas variaciones, entre ellas: Agabaro Frescobaldi o Agabaro Francisco Valdés; de la misma manera, su nombre artístico a veces figura como Stefanelo Botarga y, a veces, como Stefanello Bottarga. En este documento, según la transcripción de García García, los nombres aparecen de la siguiente manera: Alverto Anaseli, Barvora Flaminia, Vicenzo de Tricurçio, Chesar de Nobili, Juan Pietro alias Trastulo, Cipios Graseli, Abagaro Fiescovaldi dito Stefanelo Votarga, Jacobe Portalupi y Jullio Villanti. Esta escritura, como se dice en ella misma, sería la renovación de otra que se firmó en italiano el 28 de marzo de 1579 en Sevilla. La compañía renovada duraría hasta el Carnaval de 1581. </Documento>
+    <Noticia>En la escritura se dice que Giovan Pietro Pasquarello junto con Scipione Graselli recibirán como paga una parte “y un cuarto y medio” (es decir, una parte y tres octavos) de las ganacias de la compañía. Además de representar, Pasquarello y Graselli serían los encargados del hato de la compañía: de su custudia y limpieza. Para este fin, la compañía contraría un sirviente que ayude a los susodichos. En cuanto actores, como todos los miembros de la compañía, se comprometen a representar, siguiendo las órdenes de Alberto Naselli (Ganassa), todas las veces que fuere necesario: “de noche e de día, y en público y en secreto y en casas particulares”.  Se comprometen, a su vez, a viajar donde diga la compañía (se establece un sisma según el cual Ganassa decide dónde ir pero necesita que estén de acuerdo por lo menos dos compañéros más, uno de los cuales debe ser necesariamente Vicenzo Botanelli o Giovan Pietro Pasquarello). En la escritura se dice también que la compañía contratará un sirviente para que ayude a Giovan Pietro Pasquarello y Scipione Graselli a cuidar del hato. </Noticia>
+    <Ciudad>Madrid</Ciudad>
+    <Año>1580</Año>
+    <Autores>Alberto Naselli (Ganassa)</Autores>
+    <Compañía>AN</Compañía>
+    <Data>X</Data>
+    <Cargo>1 parte y ⅜ de parte de las ganancias </Cargo>
+    <Otros_bienes_de_la_compañía>Giovan Pietro Pasquarello y Scipione Graselli son los encargados del hato de la compañía. Para ayudarlos, la compañía se compromente también a contratar un sirviente solo para ellos. </Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en el documento de concierto transcrito por García García (1993, pp. 361-165). DICAT también recoge datos de esta fuente. García García ofrece la ubicación del documento: Archivo Zabálburu, carpeta 212, doc. 68.</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 52]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-64</Indicador_de_registro>
+    <Transacción>Tra-64</Transacción>
+    <Documento>[Doc. 52] Escritura, fechada en Madrid el 13 de marzo de 1580, por la cual se conciertan en compañía: Alberto Naselli (Ganassa), Barbara Flaminia (esposa de Alberto Naselli), Vicenzo Botanelli (Curzio Romano), Cesare dei Nobili, Abagaro Fiescobaldi (Stefanello Bottarga), Giovan Pietro Pasquarello, Scipione Graselli, Giulio Vigilante y Giaccomo Portalupo. –Como se puede ver en DICAT, el nombre de los italianos varía mucho en la documentación española. Vicenzo Botanelli, según el documento, figura como Curtio Romano, Curcio Romano o Curzio Romano. Abagaro Fiescobaldi es más conocido como Abagaro Francesco Baldi y Taciano, pero su nombre presenta muchas variaciones, entre ellas: Agabaro Frescobaldi o Agabaro Francisco Valdés; de la misma manera, su nombre artístico a veces figura como Stefanelo Botarga y, a veces, como Stefanello Bottarga. En este documento, según la transcripción de García García, los nombres aparecen de la siguiente manera: Alverto Anaseli, Barvora Flaminia, Vicenzo de Tricurçio, Chesar de Nobili, Juan Pietro alias Trastulo, Cipios Graseli, Abagaro Fiescovaldi dito Stefanelo Votarga, Jacobe Portalupi y Jullio Villanti. Esta escritura, como se dice en ella misma, sería la renovación de otra que se firmó en italiano el 28 de marzo de 1579 en Sevilla. La compañía renovada duraría hasta el Carnaval de 1581. </Documento>
+    <Noticia>En la escritura se dice que Giulio Vigilante recibirá como paga “media parte y medio cuarto” (es decir, cinco octavos de parte) de las ganacias de la compañía. En cuanto actor, como todos los miembros de la compañía, se compromete a representar, siguiendo las órdenes de Alberto Naselli (Ganassa), todas las veces que fuere necesario: “de noche e de día, y en público y en secreto y en casas particulares”.  Se compromete, a su vez, a viajar donde diga la compañía (se establece un sisma según el cual Ganassa decide dónde ir pero necesita que estén de acuerdo por lo menos dos compañéros más, uno de los cuales debe ser necesariamente Vicenzo Botanelli o Giovan Pietro Pasquarello).</Noticia>
+    <Ciudad>Madrid</Ciudad>
+    <Año>1580</Año>
+    <Autores>Alberto Naselli (Ganassa)</Autores>
+    <Compañía>AN</Compañía>
+    <Data>X</Data>
+    <Cargo>⅝ de parte de las ganancias</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en el documento de concierto transcrito por García García (1993, pp. 361-165). DICAT también recoge datos de esta fuente. García García ofrece la ubicación del documento: Archivo Zabálburu, carpeta 212, doc. 68.</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 52]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-65</Indicador_de_registro>
+    <Transacción>Tra-65</Transacción>
+    <Documento>[Doc. 52] Escritura, fechada en Madrid el 13 de marzo de 1580, por la cual se conciertan en compañía: Alberto Naselli (Ganassa), Barbara Flaminia (esposa de Alberto Naselli), Vicenzo Botanelli (Curzio Romano), Cesare dei Nobili, Abagaro Fiescobaldi (Stefanello Bottarga), Giovan Pietro Pasquarello, Scipione Graselli, Giulio Vigilante y Giaccomo Portalupo. –Como se puede ver en DICAT, el nombre de los italianos varía mucho en la documentación española. Vicenzo Botanelli, según el documento, figura como Curtio Romano, Curcio Romano o Curzio Romano. Abagaro Fiescobaldi es más conocido como Abagaro Francesco Baldi y Taciano, pero su nombre presenta muchas variaciones, entre ellas: Agabaro Frescobaldi o Agabaro Francisco Valdés; de la misma manera, su nombre artístico a veces figura como Stefanelo Botarga y, a veces, como Stefanello Bottarga. En este documento, según la transcripción de García García, los nombres aparecen de la siguiente manera: Alverto Anaseli, Barvora Flaminia, Vicenzo de Tricurçio, Chesar de Nobili, Juan Pietro alias Trastulo, Cipios Graseli, Abagaro Fiescovaldi dito Stefanelo Votarga, Jacobe Portalupi y Jullio Villanti. Esta escritura, como se dice en ella misma, sería la renovación de otra que se firmó en italiano el 28 de marzo de 1579 en Sevilla. La compañía renovada duraría hasta el Carnaval de 1581. </Documento>
+    <Noticia>En la escritura se dice que Giaccomo Portalupo (“alias Isabela”) recibirá como paga media parte de las ganacias de la compañía. Además de esto, la compañía deberá darle 12 escudos (192 reales) para hacerle “buena obra” como “ayuda de costa”. En cuanto actor, como todos los miembros de la compañía, se compromete a representar, siguiendo las órdenes de Alberto Naselli (Ganassa), todas las veces que fuere necesario: “de noche e de día, y en público y en secreto y en casas particulares”.  Se compromete, a su vez, a viajar donde diga la compañía (se establece un sisma según el cual Ganassa decide dónde ir pero necesita que estén de acuerdo por lo menos dos compañéros más, uno de los cuales debe ser necesariamente Vicenzo Botanelli o Giovan Pietro Pasquarello).</Noticia>
+    <Ciudad>Madrid</Ciudad>
+    <Año>1580</Año>
+    <Autores>Alberto Naselli (Ganassa)</Autores>
+    <Compañía>AN</Compañía>
+    <Data>192 reales [como buena obra y ayuda de costa para el actor]</Data>
+    <Cargo>½ de parte de las ganancias</Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>Sí</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en el documento de concierto transcrito por García García (1993, pp. 361-165). DICAT también recoge datos de esta fuente. García García ofrece la ubicación del documento: Archivo Zabálburu, carpeta 212, doc. 68.</Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 52]</Código_documento>
+  </row>
+  <row>
+    <Indicador_de_registro>CM-66</Indicador_de_registro>
+    <Transacción>Tra-66</Transacción>
+    <Documento>[Doc. 53] Escritura, fechada el 31 de marzo de 1581 en Madrid, por la cual Pedro de Salcedo y Antonio Laso se conciertan para trabajar en la compañía de Alberto Naselli y Vicenzo Botanelli (Curzio Romano), hasta el Carnaval de 1582. Los otros miembros de la compañía que firman el documento son: Cesare dei Nobili, Giovan Pietro Pasquarello, Scipione Graselli, Giulio Vigilante, Giaccomo Portalupo y Carlos de Masi. </Documento>
+    <Noticia>En la escritura, Pedro de Salcedo y Antonio Laso se comprometen a tañer guitarras y cantar tonadas cuando lo requiriera la compañía. Se especifica que se les pagará 2 reales diarios a cada uno, manutención, posada y cabalgaduras o carros durante los viajes. </Noticia>
+    <Ciudad>Madrid</Ciudad>
+    <Año>1581</Año>
+    <Autores>Alberto Naselli (Ganassa)</Autores>
+    <Compañía>AN2</Compañía>
+    <Data>X</Data>
+    <Cargo>4 reales diarios [2 reales a cada uno de los músico]; gastos de manutención, posada y cabalgaduras o carros durante los viajes. </Cargo>
+    <Otros_bienes_de_la_compañía>X</Otros_bienes_de_la_compañía>
+    <Datos_sobre_normativa_de_manejo_de_caja>X</Datos_sobre_normativa_de_manejo_de_caja>
+    <Fuentes_para_la_generación_del_dato>Información ubicada en DICAT; DICAT extrae el dato de Cotarelo y Mori (1908, pp. 51-53). En DICAT se hace referencia a más fuentes, pero Cotarelo y Mori es el primero en dar cuenta de este documento.  </Fuentes_para_la_generación_del_dato>
+    <Código_documento>[Doc. 53] </Código_documento>
+  </row>
+</dataset>

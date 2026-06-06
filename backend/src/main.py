@@ -3,6 +3,7 @@ import time
 from collections import defaultdict
 from threading import Lock
 
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -12,7 +13,13 @@ from fastapi.routing import APIRouter
 # Aplicación FastAPI
 # ---------------------------------------------------------------------------
 
-app = FastAPI(title="PRETSO Academic Platform API", version="0.1.0")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # No precargamos el modelo aquí para no bloquear el arranque en Cloud Run.
+    # El modelo sentence-transformers carga de forma lazy en la primera búsqueda.
+    yield
+
+app = FastAPI(title="PRETSO Academic Platform API", version="0.1.0", lifespan=lifespan)
 
 # CORS
 allowed_origins_raw = os.getenv("ALLOWED_ORIGINS", "*")
@@ -64,6 +71,7 @@ _PORTAL_EXEMPT_PREFIXES = (
     "/api/v1/health",
     "/api/v1/launch-status",
     "/api/v1/announcements",
+    "/api/v1/users/",
     "/docs",
     "/openapi.json",
     "/redoc",
@@ -96,6 +104,7 @@ async def readonly_api_middleware(request: Request, call_next):
     if (
         path.startswith("/api/v1/")
         and not path.startswith("/api/v1/admin/")
+        and not path.startswith("/api/v1/users/")
         and method not in ("GET", "OPTIONS")
     ):
         return JSONResponse(
@@ -105,16 +114,7 @@ async def readonly_api_middleware(request: Request, call_next):
     return await call_next(request)
 
 
-# ---------------------------------------------------------------------------
-# Startup: precargar modelo de embeddings
-# ---------------------------------------------------------------------------
 
-@app.on_event("startup")
-async def startup_event():
-    import asyncio
-    from backend.src.services.embedding_service import preload_model
-    loop = asyncio.get_event_loop()
-    await loop.run_in_executor(None, preload_model)
 
 
 # ---------------------------------------------------------------------------
@@ -136,6 +136,7 @@ from backend.src.api.public.companies import router as pub_companies_router
 from backend.src.api.public.search import router as pub_search_router
 from backend.src.api.public.announcements import router as pub_announcements_router
 from backend.src.api.public.launch import router as pub_launch_router
+from backend.src.api.public.users import router as pub_users_router
 
 api_router.include_router(pub_records_router)
 api_router.include_router(pub_transactions_router)
@@ -143,6 +144,7 @@ api_router.include_router(pub_companies_router)
 api_router.include_router(pub_search_router)
 api_router.include_router(pub_announcements_router)
 api_router.include_router(pub_launch_router)
+api_router.include_router(pub_users_router)
 
 # Privados (admin)
 from backend.src.api.private.records import router as priv_records_router

@@ -3,8 +3,9 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Query, Depends
 
+from backend.src.api.auth import get_current_user
 from backend.src.services.search_service import search as search_service
 
 router = APIRouter(tags=["public-search"])
@@ -12,7 +13,7 @@ router = APIRouter(tags=["public-search"])
 
 @router.get("/search")
 async def search(
-    q: str = Query(..., min_length=1, description="Texto de búsqueda (obligatorio)"),
+    q: Optional[str] = Query(None, description="Texto de búsqueda"),
     city: Optional[str] = Query(None),
     year_from: Optional[int] = Query(None),
     year_to: Optional[int] = Query(None),
@@ -20,10 +21,12 @@ async def search(
     company: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
     page_size: int = Query(25, ge=1, le=100),
+    user: dict = Depends(get_current_user),
 ):
     """Búsqueda semántica sobre el corpus publicado."""
+    active_q = q.strip() if q else None
     result = await search_service(
-        query=q,
+        query=active_q,
         city=city,
         year_from=year_from,
         year_to=year_to,

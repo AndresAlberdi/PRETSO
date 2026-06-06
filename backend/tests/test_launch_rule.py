@@ -15,7 +15,7 @@ _GET_RULE = "backend.src.services.launch_rule.get_launch_rule"
 _INC = "backend.src.services.launch_rule.increment_published_count"
 
 
-def _rule(published_count: int, threshold: int = 20) -> dict:
+def _rule(published_count: int, threshold: int = 10) -> dict:
     return {
         "published_count": published_count,
         "threshold": threshold,
@@ -32,7 +32,7 @@ async def test_is_portal_active_false_when_zero():
 
 @pytest.mark.asyncio
 async def test_is_portal_active_true_at_threshold():
-    with patch(_GET_RULE, return_value=_rule(20)):
+    with patch(_GET_RULE, return_value=_rule(10)):
         result = await is_portal_active()
     assert result is True
 
@@ -51,24 +51,24 @@ async def test_on_record_published_increments_count():
 
 @pytest.mark.asyncio
 async def test_on_record_unpublished_decrements_count():
-    mock_inc = MagicMock(return_value=19)
-    # Before: 20 (active), after: 19 (inactive)
-    rule_before = _rule(20)
-    rule_after = _rule(19)
+    mock_inc = MagicMock(return_value=9)
+    # Before: 10 (active), after: 9 (inactive)
+    rule_before = _rule(10)
+    rule_after = _rule(9)
     with (
         patch(_GET_RULE, side_effect=[rule_before, rule_after]),
         patch(_INC, mock_inc),
     ):
         result = await on_record_unpublished()
     mock_inc.assert_called_once_with(-1)
-    assert result["published_count"] == 19
+    assert result["published_count"] == 9
 
 
 @pytest.mark.asyncio
 async def test_on_record_unpublished_warns_when_portal_deactivates(capsys):
-    mock_inc = MagicMock(return_value=19)
-    rule_before = _rule(20)   # portal_active = True
-    rule_after = _rule(19)    # portal_active = False
+    mock_inc = MagicMock(return_value=9)
+    rule_before = _rule(10)   # portal_active = True
+    rule_after = _rule(9)    # portal_active = False
     with (
         patch(_GET_RULE, side_effect=[rule_before, rule_after]),
         patch(_INC, mock_inc),

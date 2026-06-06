@@ -94,8 +94,8 @@ def test_transaction_id_pattern():
 
 def test_launch_rule_is_active():
     """LaunchRule.is_active() es True cuando published_count >= threshold."""
-    assert LaunchRule(published_count=20, threshold=20).is_active() is True
-    assert LaunchRule(published_count=19, threshold=20).is_active() is False
+    assert LaunchRule(published_count=10, threshold=10).is_active() is True
+    assert LaunchRule(published_count=9, threshold=10).is_active() is False
 
 
 def test_record_serialization_round_trip():
@@ -223,7 +223,7 @@ async def test_transition_record_not_found():
 _GET_RULE = "backend.src.services.launch_rule.get_launch_rule"
 
 
-def _rule(published_count: int, threshold: int = 20) -> dict:
+def _rule(published_count: int, threshold: int = 10) -> dict:
     return {
         "published_count": published_count,
         "threshold": threshold,
@@ -233,24 +233,24 @@ def _rule(published_count: int, threshold: int = 20) -> dict:
 
 @pytest.mark.asyncio
 async def test_portal_inactive_below_threshold():
-    """published_count=15 → is_portal_active() devuelve False."""
-    with patch(_GET_RULE, return_value=_rule(15)):
+    """published_count=5 → is_portal_active() devuelve False."""
+    with patch(_GET_RULE, return_value=_rule(5)):
         result = await is_portal_active()
     assert result is False
 
 
 @pytest.mark.asyncio
 async def test_portal_active_at_threshold():
-    """published_count=20 → is_portal_active() devuelve True."""
-    with patch(_GET_RULE, return_value=_rule(20)):
+    """published_count=10 → is_portal_active() devuelve True."""
+    with patch(_GET_RULE, return_value=_rule(10)):
         result = await is_portal_active()
     assert result is True
 
 
 @pytest.mark.asyncio
 async def test_portal_active_above_threshold():
-    """published_count=25 → is_portal_active() devuelve True."""
-    with patch(_GET_RULE, return_value=_rule(25)):
+    """published_count=15 → is_portal_active() devuelve True."""
+    with patch(_GET_RULE, return_value=_rule(15)):
         result = await is_portal_active()
     assert result is True
 

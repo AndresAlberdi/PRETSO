@@ -10,7 +10,7 @@ from backend.src.db.repositories import (
     increment_published_count,
 )
 
-LAUNCH_THRESHOLD: int = int(os.environ.get("LAUNCH_THRESHOLD", 20))
+LAUNCH_THRESHOLD: int = int(os.environ.get("LAUNCH_THRESHOLD", 10))
 
 
 async def _run_sync(fn, *args, **kwargs):

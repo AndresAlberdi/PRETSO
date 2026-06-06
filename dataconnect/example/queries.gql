@@ -1,0 +1,44 @@
+query CurrentUserCollections @auth(level: USER) {
+  collections(where: {userId: {eq_expr: "auth.uid"}}) {
+    id
+    name
+    description
+    createdAt
+    updatedAt
+  }
+}
+
+mutation CreateCollection($name: String!, $description: String) @auth(level: USER) {
+  collection_insert(data: {
+    userId_expr: "auth.uid",
+    name: $name,
+    description: $description,
+    createdAt_expr: "request.time",
+    updatedAt_expr: "request.time"
+  }) {
+    id
+  }
+}
+
+query RecentEssays @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public") {
+  essays(orderBy: [{createdAt: DESC}], limit: 10) {
+    id
+    title
+    authorName
+    publicationYear
+    url
+  }
+}
+
+query PlayByTitle($title: String!) @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public") {
+  plays(where: {title: {eq: $title}}, limit: 1) {
+    id
+    title
+    author {
+      name
+    }
+    year
+    genre
+    summary
+  }
+}

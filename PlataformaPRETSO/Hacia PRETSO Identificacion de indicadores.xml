@@ -1,0 +1,783 @@
+<?xml version="1.0" ?>
+<dataset name="Identificacion_de_indicadores">
+  <row>
+    <Indicador_de_registro>IdI-1</Indicador_de_registro>
+    <Transacción>Tra-1</Transacción>
+    <Documento>[Doc. 1] Escritura, fechada en Toledo el 18 de enero de 1603, por la cual Pedro de Valdés y Antonio Granados conforman una compañía de dos años: del Carnaval de 1603 hasta el Carnaval de 1605.</Documento>
+    <Otros_datos_para_elaborar_indicadores>En el concierto se dice que el hato y las comedias de ambos autores pasarían a formar parte de los bienes de la compañía. Recientemente, Antonio Granados habría adquirido cinco comedias nuevas por 2450 reales; visto que estas comedias pasan a ser parte de la compañía, Valdés habría pagado a Granados la mitad: 1220 reales. Las cinco compañías son: El cuerdo loco, Los esclavos libres y El príncipe desdeñado de Lope de Vega; El español de más fuerzas de Damián Salustio del Poyo y Roldán Casado de Alonso Remón. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Toledo</Ciudad>
+    <Años>1603</Años>
+    <Categorías>Comedias (texto)</Categorías>
+    <Concepto>Cinco comedias nuevas. Las cinco compañías son: El cuerdo loco, Los esclavos libres y El príncipe desdeñado de Lope de Vega; El español de más fuerzas de Damián Salustio del Poyo y Roldán Casado de Alonso Remón</Concepto>
+    <Monto>2450 reales</Monto>
+    <Nota>X</Nota>
+    <Compañía>AG-PV</Compañía>
+    <Referencias_bibliográficas>Información ubicada en DICAT; DICAT extrae el dato de San Román (1935, pp. 71-76).</Referencias_bibliográficas>
+    <Código_documentos>[Doc. 1]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-2</Indicador_de_registro>
+    <Transacción>Tra-82</Transacción>
+    <Documento>[Doc. 48] Obligación, fechada en Toledo el 21 de marzo de 1603, en la cual Juan de Grajales y su mujer, Catalina de Peralta, vecinos de Madrid, declaran tener una deuda de 1000 reales con Pedro de Valdés. </Documento>
+    <Otros_datos_para_elaborar_indicadores>En la obligación se detalla que los 1000 reales serían por  &quot;una saya e ropa de cuerpos de terciopelo negro con tres franjones de oro y alamares y pasamanos todo de oro, e un jubón de tela negra de oro&quot;. La manera de pagar que tendrían sería representando en la compañía. No sabemos cuánto la compañía se obligó a pagarles por su trabajo, pero, por este documento, consta que luego de cada representación los cómicos pagaría a Valdés 10 reales de lo que le deben hasta saldar su deuda. Comenzarían a representar para la compañía en la Pascua Florida. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Toledo</Ciudad>
+    <Años>1603</Años>
+    <Categorías>Vestuario</Categorías>
+    <Concepto>Una saya e ropa de cuerpos de terciopelo negro con tres franjones de oro y alamares y pasamanos todo de oro, e un jubón de tela negra de oro</Concepto>
+    <Monto>1000 reales</Monto>
+    <Nota>X</Nota>
+    <Compañía>AG-PV</Compañía>
+    <Referencias_bibliográficas>Información ubicada en DICAT; DICAT extrae el dato de Marcos  Álvarez (1997, pp.113-114).</Referencias_bibliográficas>
+    <Código_documentos>[Doc. 48]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-3</Indicador_de_registro>
+    <Transacción>Tra-13</Transacción>
+    <Documento>[Doc. 11] Escritura, fechada en Toledo el 21 de marzo de 1603, por la cual Juan de Corcha, vecino de Madrid, se compromete a trabajar por dos años en la compañía de Antonio de Granados y Pedro de Valdés. </Documento>
+    <Otros_datos_para_elaborar_indicadores>En la escritura, Corcha se compromete a andar con la compañía “representando, y tañendo, y cantando y haciendo todo lo que se me ordenare en cualesquier representaciones, públicas o secretas, y en cualesquier partes&quot;. Se le pagaría: 7 reales por cada representación el primer año y 8 reales el segundo año, 3 reales de ración diaria, y por el Corpus Christi “lo acostumbrado”. La compañía cubriría sus gastos de viajes. En la escritura se especifica también que Juan de Corcha ha cobrado a cuenta 1230 reales en forma de &quot;partidas que por mí ha pagado [Pedro de Valdés] de vestidos que ha sacado y ha pagado por mí y dádome&quot;. Corcha se compromete a compensar el pago a cuenta con lo que le correspondería de las primeras representaciones de la compañía.    </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Toledo</Ciudad>
+    <Años>1603</Años>
+    <Categorías>Pagos a cuenta</Categorías>
+    <Concepto>Pago a cuenta que la compañía de Pedro de Valdés y Antonio Granados hace al actor Gabriel de Acevedo en forma de vestidos que compran para él</Concepto>
+    <Monto>1230 reales</Monto>
+    <Nota>Juan de Corcha se compromete a compensar paulatinamente el pago a cuenta que se le hace con el salario de las primeras representaciones. Cabe tener en cuenta que su salario por representación, durante el primer año de trabajo en la compañía, está fijado en 7 reales. </Nota>
+    <Compañía>AG-PV</Compañía>
+    <Referencias_bibliográficas>Información ubicada en DICAT; DICAT extrae el dato de San Román (1935, pp. 84-85).</Referencias_bibliográficas>
+    <Código_documentos>[Doc. 11]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-4</Indicador_de_registro>
+    <Transacción>Tra-14</Transacción>
+    <Documento>[Doc. 12] Escritura, fechada en Toledo el 21 de marzo de 1603, por la cual Gabriel de Acevedo, vecino de Lisboa, se compromete a trabajar por dos años en la compañía de Antonio de Granados y Pedro de Valdés. </Documento>
+    <Otros_datos_para_elaborar_indicadores>En la escritura, Corcha se compromete a andar con la compañía “tañendo y cantando en todas las comedias y representaciones que hicieren, públicas o secretas, en cualesquier partes, representando e haciendo todo lo que se me ordenare&quot;. Se le pagaría: 7 reales por cada representación el primer año y 8 reales el segundo año, 3 reales de ración diaria, y por el Corpus Christi “lo acostumbrado”. La compañía cubriría sus gastos de viajes. En la escritura se especifica también que Gabriel de Acevedo ha cobrado a cuenta 984 reales en forma de &quot;dos vestidos que [Pedro de Valdés] me ha pagado en dineros”. Es decir, Pedro de Valdés ha comprado vestidos para Acevedo. Este se compromete a compensar el pago a cuenta con lo que le correspondería de las primeras representaciones de la compañía.    </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Toledo</Ciudad>
+    <Años>1603</Años>
+    <Categorías>Pagos a cuenta</Categorías>
+    <Concepto>Pago a cuenta que la compañía de Pedro de Valdés y Antonio Granados hace al actor Juan de Corcha en forma de vestidos que compran para él</Concepto>
+    <Monto>934 reales</Monto>
+    <Nota>Gabriel de Acevedo se compromete a compensar paulatinamente el pago a cuenta que se le hace con el salario de las primeras representaciones. Cabe tener en cuenta que su salario por representación, durante el primer año de trabajo en la compañía, está fijado en 7 reales. </Nota>
+    <Compañía>AG-PV</Compañía>
+    <Referencias_bibliográficas>Información ubicada en DICAT; DICAT extrae el dato de San Román (1935, pp. 88-89).</Referencias_bibliográficas>
+    <Código_documentos>[Doc. 12]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-5</Indicador_de_registro>
+    <Transacción>Tra-83</Transacción>
+    <Documento>[Doc 31] Acta del cabildo de la ciudad de México del 18 de abril de 1608.</Documento>
+    <Otros_datos_para_elaborar_indicadores>En el acta se dice que, según el reporte del corregidor Garcí López de Espinar, resultaría que se podría costear las celebraciones del Corpus y de la Octava con 1200 pesos de oro común (9600 reales) si no se pagara nada de dinero a los comediantes para que sacaran sus comedias. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>México</Ciudad>
+    <Años>1608</Años>
+    <Categorías>Corpus Christi. Fiesta</Categorías>
+    <Concepto>Costo de las celebraciones del Corpus y la Octava sin dar dinero a los comediantes</Concepto>
+    <Monto>9600 reales</Monto>
+    <Nota>Este año las compañías en cuestión son por un lado la de Gonzalo de Riancho y Alonso Velázquez y, por otro, la de Fernando Ramírez</Nota>
+    <Compañía>GR-AV / FR</Compañía>
+    <Referencias_bibliográficas>Información ubicada en el Libro XVII de la Actas de Cabildo de México. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 31]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-6</Indicador_de_registro>
+    <Transacción>Tra-84</Transacción>
+    <Documento>[Doc 31] Acta del cabildo de la ciudad de México del 18 de abril de 1608.</Documento>
+    <Otros_datos_para_elaborar_indicadores>En el acta se dice que el virrey (Luis de Velasco II), considera que el cabildo de la ciudad de México puede utilizar de su fondo de rentas y propios 1700 pesos de oro común para las fiestas del Corpus y la Octava. 1200 pesos (9600 reales) serían para las celebraciones y 500 pesos (4000 reales) para ayudar a las compañías a pagar los vestuarios. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>México</Ciudad>
+    <Años>1608</Años>
+    <Categorías>Corpus Christi. Vestuario</Categorías>
+    <Concepto>Ayuda que el cabildo daría para que dos compañías puedan costear los vestuarios de los actores para dos comedias, la del Corpus y la de la Octava</Concepto>
+    <Monto>4000 reales</Monto>
+    <Nota>Este año las compañías en cuestión son por un lado la DE Gonzalo de Riancho y Alonso Velázquez y, por otro, la de Fernando Ramírez</Nota>
+    <Compañía>GR-AV / FR</Compañía>
+    <Referencias_bibliográficas>Información ubicada en el Libro XVII de la Actas de Cabildo de México. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 31]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-7</Indicador_de_registro>
+    <Transacción>Tra-32</Transacción>
+    <Documento>[Doc. 37] Escritura, fechada en Sevilla el 22 de noviembre de 1605, por la cual Andrés de Arce se compromente a representar por un año, del Carnaval de 1606 al Carnaval de 1607, en la compañía de Juan de Arteaga, Juan Osorio y Antonio Amoroso. –Juan de Arteaga tiene poder otorgado por los otros dos autores de comedias para contratar a los demás mimebros de la compañía.</Documento>
+    <Otros_datos_para_elaborar_indicadores>En la escritura se dice que se pagará a Andrés de Arce: 9 reales por representación y 3 reales de ración diaria. Además, Juan de Arteaga, en nombre de la compañía, asegura a Andrés de Arce que a lo largo del año se harán por lo menos 250 representaciones y se compromete a que, si se hicieran menos, le pagarían la diferencia. Esto significa que, mínimamente, a lo largo del año, se pagaría a Andrés de Arce 3000 reales (12 reales multiplicados por 250 representaciones).  </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1605</Años>
+    <Categorías>Salarios</Categorías>
+    <Concepto>Ganancia de un actor por los días de representación en un año en compañía</Concepto>
+    <Monto>3000 reales</Monto>
+    <Nota>X</Nota>
+    <Compañía>JA-JO-AA</Compañía>
+    <Referencias_bibliográficas>Información ubicada en DICAT; DICAT extrae el dato de Rodríguez Marín (1914, p.179).</Referencias_bibliográficas>
+    <Código_documentos>[Doc.37]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-8</Indicador_de_registro>
+    <Transacción>Tra-85</Transacción>
+    <Documento>[Doc. 40] Escritura, fechada en Sevilla el 23 de julio de 1575, en la cual Juan del Granado vende a Francisco Hurtado de Córdoba (caballero veinticuatro del Cabildo) un “esclavo de color de membrillo”.</Documento>
+    <Otros_datos_para_elaborar_indicadores> En la escritura se dice que la venta del esclavo se realiza por 50 ducados (550 reales).</Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1575</Años>
+    <Categorías>Esclavos</Categorías>
+    <Concepto>Un esclavo</Concepto>
+    <Monto>550 reales</Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en DICAT; DICAT extrae el dato de Bolaños Donoso (1995, p.134).</Referencias_bibliográficas>
+    <Código_documentos>[Doc. 40]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-9</Indicador_de_registro>
+    <Transacción/>
+    <Documento/>
+    <Otros_datos_para_elaborar_indicadores>En los libros de cuentas de las cofradías de la Pasión y la Soledad se registra que el 8 de febrero de 1580 Juan Granado entregó a estas instituciones 200 reales para ayudar con los gastos del corral en el cual él representa. Sabemos, por más información contenida en estos libros, que este corral es el corral de la Cruz. Los 200 reales serían “todo el aprovechamiento que él había de llevar de las entradas de la comedia deste días”. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Madrid</Ciudad>
+    <Años>1580</Años>
+    <Categorías>Ganancias</Categorías>
+    <Concepto>Ganancia de la venta de entradas para la representación de una comedia </Concepto>
+    <Monto>200 reales</Monto>
+    <Nota>X</Nota>
+    <Compañía>JG</Compañía>
+    <Referencias_bibliográficas>Información ubicada en DICAT; DICAT extrae el dato de Davis y Varey (1997, pp. 54, 77 y 204) y Pellicer (1804, pp. 60 y 71).</Referencias_bibliográficas>
+    <Código_documentos>[Doc. 41]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-10</Indicador_de_registro>
+    <Transacción/>
+    <Documento/>
+    <Otros_datos_para_elaborar_indicadores>En los libros de cuentas de las cofradías de la Pasión y la Soledad se registra que, entre el 29 de noviembre de 1579 y el 16 de febrero de 1580, la compañía de Juan de Granado y Jerónimo Gálvez realizó 48 representaciones. Por otro dato anterior [ver registro IdI-9], sabemos que la ganancia aproximada por la venta de entradas para un representación era de 200 reales. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Madrid</Ciudad>
+    <Años>1579-1580</Años>
+    <Categorías>Ganancias</Categorías>
+    <Concepto>Ganancia de la venta de entradas en, más o menos, dos meses y medio de representaciones en los corrales de Madrid</Concepto>
+    <Monto>9600 reales</Monto>
+    <Nota>Juan Granado había montado una compañía a principios de año para la temporada 1579-1580 en Sevilla. No se sabe todavía si la compañía que ahora está representando en Madrid es la misma o si aquella se deshizo y Granado fundó otra junto con Jerónimo de Gálvez. </Nota>
+    <Compañía>JG</Compañía>
+    <Referencias_bibliográficas>Información ubicada en DICAT; DICAT extrae el dato de Davis y Varey (1997, pp. 77 y 80). </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 42]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-11</Indicador_de_registro>
+    <Transacción>Tra-86</Transacción>
+    <Documento>[Doc. 47] Libro de cajas del Cabildo de Sevilla del año 1575</Documento>
+    <Otros_datos_para_elaborar_indicadores>El Cabildo registra que en 1575 pagó 31152 maravedís (916, 23 reales) por los “dos medios carros” de la representación que realiza Ganassa. Se trata del cuerpo de los carros, el cual posteriormente debe ser adornado.  </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1575</Años>
+    <Categorías>Corpus Christi. Escenografía</Categorías>
+    <Concepto>Costo del cuerpo de un carro de representación descrito como &quot;dos medios carros&quot;.</Concepto>
+    <Monto>916, 23 reales</Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Sentaurens (1984, pp. 218-219). Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), II, libro de caja, año 1575. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 47]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-12</Indicador_de_registro>
+    <Transacción>Tra-87</Transacción>
+    <Documento>[Doc. 47] Libro de cajas del Cabildo de Sevilla del año 1575</Documento>
+    <Otros_datos_para_elaborar_indicadores>El Cabildo registra que en 1575 pagó 952 maravedís (28 reales) a Pedro Aguirre y Diego Martín por el alquiler de las ruedas para los “dos medios carros” de la representación que realiza Ganassa. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1575</Años>
+    <Categorías>Corpus Christi. Escenografía</Categorías>
+    <Concepto>Alquiler de ruedas para carro de representación</Concepto>
+    <Monto>28 reales</Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Sentaurens (1984, pp. 218-219). Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), II, libro de caja, año 1575. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 47]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-13</Indicador_de_registro>
+    <Transacción>Tra-88</Transacción>
+    <Documento>[Doc. 47] Libro de cajas del Cabildo de Sevilla del año 1575</Documento>
+    <Otros_datos_para_elaborar_indicadores>El Cabildo registra que en 1575 pagó 1499 maravedís (44, 1 reales) por hacer y dehacer los “dos medios carros” de la representación que realiza Ganassa. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1575</Años>
+    <Categorías>Corpus Christi. Escenografía</Categorías>
+    <Concepto>Trabajo de montaje y desmotaje de un carro de representación</Concepto>
+    <Monto>44, 1 reales</Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Sentaurens (1984, pp. 218-219). Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), II, libro de caja, año 1575. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 47]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-14</Indicador_de_registro>
+    <Transacción>Tra-89</Transacción>
+    <Documento>[Doc. 47] Libro de cajas del Cabildo de Sevilla del año 1575</Documento>
+    <Otros_datos_para_elaborar_indicadores>El Cabildo registra que en 1575 pagó 6358 maravedís  (187 reales) a Juan Chacón por lo que pintó en los “dos medios carros” de la representación que realiza Ganassa. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1575</Años>
+    <Categorías>Corpus Christi. Escenografía</Categorías>
+    <Concepto>Trabajo de pintura de un carro de representación</Concepto>
+    <Monto>187 reales</Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Jean Sentaurens (1984, pp. 218-219). Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), II, libro de caja, año 1575. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 47]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-15</Indicador_de_registro>
+    <Transacción>Tra-90</Transacción>
+    <Documento>[Doc. 47] Libro de cajas del Cabildo de Sevilla del año 1575</Documento>
+    <Otros_datos_para_elaborar_indicadores>El Cabildo registra que en 1575 pagó 1500 maravedís (44,12 reales) por los lienzos para los “dos medios carros” de la representación que realiza Ganassa. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1575</Años>
+    <Categorías>Corpus Christi. Escenografía</Categorías>
+    <Concepto>Lienzos para carro de representación</Concepto>
+    <Monto>44,12 reales</Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Sentaurens (1984, pp. 218-219). Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), II, libro de caja, año 1575. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 47]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-16</Indicador_de_registro>
+    <Transacción>Tra-91</Transacción>
+    <Documento>[Doc. 47] Libro de cajas del Cabildo de Sevilla del año 1575</Documento>
+    <Otros_datos_para_elaborar_indicadores>El Cabildo registra que en 1575 pagó 3567 (104, 91) maravedís por las 87 varas de angeo para los “dos medios carros” de la representación que realiza Ganassa. 41 maravedís por vara.  </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1575</Años>
+    <Categorías>Corpus Christi. Escenografía</Categorías>
+    <Concepto>Ochenta y siente varas de angeo para carro de representación</Concepto>
+    <Monto>104, 91 reales</Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Sentaurens (1984, pp. 218-219). Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), II, libro de caja, año 1575. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 47]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-17</Indicador_de_registro>
+    <Transacción>Tra-92</Transacción>
+    <Documento>[Doc. 47] Libro de cajas del Cabildo de Sevilla del año 1575</Documento>
+    <Otros_datos_para_elaborar_indicadores>El Cabildo registra que en 1575 realizó distintos gastos para para los “dos medios carros” de la representación que realiza Ganassa. El total de estos gastos, como se puede ver en las entradas correspondientes, es de 45028 maravedís (1324,3 reales). </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1575</Años>
+    <Categorías>Corpus Christi. Escenografía</Categorías>
+    <Concepto>Costo total del montaje de un carro de representación</Concepto>
+    <Monto>1324, 3 reales</Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Sentaurens (1984, pp. 218-219). Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), II, libro de caja, año 1575. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 47]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-18</Indicador_de_registro>
+    <Transacción>Tra-93</Transacción>
+    <Documento>[Doc. 46] Registros de las deliberaciones de la comisión de Corpus del Cabildo de Sevilla del año 1575.</Documento>
+    <Otros_datos_para_elaborar_indicadores>Según la lectura de los documentos del Cabildo de Sevilla que realiza Jean Sentaurens y recoge DICAT, este año se habría contratado a Ganassa para que representara un auto en el Corpus Christi. Se contrata también a otros autores para que saquen más autos (en específico a Luis Díaz, Francisco de Segura y Pedro de Montiel). Ganassa habría cobrado por su participación 51000 maravedís (1500 reales). DICAT hace referencia también a que, según los estudios de Sentaurens, el dinero que el Cabildo paga a Ganassa es mucho mayor al que acostumbraba pagar a los autores españoles. –Sentaurens transcribe de los documentos originales los nombres de los autores como: Luys Días, Francisco de Sigura y Montiel. DICAT propone las modernizaciones que usamos también aquí.– El Cabildo también costea el carro de representación para el auto de Ganassa, el cual se describe como “dos medios carros”. Sentaurens da el dato de que se gastó en el carro un total de 45118 maravedís y así lo recoge DICAT. Creemos que es un error pues, el mismo investigador, muestra el desglose de los gastos para el carro que encuentra en el libro de caja y la suma real es de 45028 maravedís (1324,3 reales). </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1575</Años>
+    <Categorías>Corpus Christi. Representaciones</Categorías>
+    <Concepto>Costo total de contratar a Alberto Naselli (Ganassa) para el Corpus Christi: la suma de lo que se paga a él (1500 reales) y lo que cuesta el carro para que realice su representación (1324,35 reales). </Concepto>
+    <Monto>2824, 3 reales</Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en DICAT; DICAT extrae el dato de Sentaurens (1984, pp. 139, 171, 178, 180-181, 190, 198, 217, 1261). Se ha consultado el texto de Sentaures. Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), Papeles Importantes, siglo XVI, tomo 3, vol. 44: registros de las deliberaciones de la comisión de Corpus de 1575 (en el original: registre des délibérations de la comission du Corpus de 1575). </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 46]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-19</Indicador_de_registro>
+    <Transacción>Tra-94</Transacción>
+    <Documento>[Doc. 49] Libro de cajas del Cabildo de Sevilla del año 1575.</Documento>
+    <Otros_datos_para_elaborar_indicadores>Según la lectura de los documentos del Cabildo de Sevilla que realiza Jean Sentaurens y recoge DICAT, este año se premió a Alberto Naselli (Ganassa) con la primera joya de la corona porque sacó el mejor “carro de invención”. El premio fue de 20 ducados (220 reales). </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1575</Años>
+    <Categorías>Corpus Christi. Joya de la corona</Categorías>
+    <Concepto>Joya de la corona por el mejor carro del Corpus Christi</Concepto>
+    <Monto>220 relaes</Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en DICAT; DICAT extrae el dato de Sentaurens (1984, p. 217). Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), II, libro de caja, año 1575. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 49]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-20</Indicador_de_registro>
+    <Transacción>Tra-95</Transacción>
+    <Documento>[Doc. 50] Libro de cajas del Cabildo de Sevilla del año 1578</Documento>
+    <Otros_datos_para_elaborar_indicadores>El Cabildo registra que en 1578 pagó 32402 maravedís (953 reales) por las “demasías” de los carros para las representaciones a cargo de los autores Pedro de Saldaña y Juan Bautista. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1578</Años>
+    <Categorías>Corpus Christi. Escenografía</Categorías>
+    <Concepto>Parte del costo de los carros</Concepto>
+    <Monto>953 relaes</Monto>
+    <Nota>La ‘demasía’ es un resto de pago, por lo que asumimos que los carros costaron más de esto y que lo demás lo pagaron los mismos comediantes o el Cabildo en una partida que no nos consta. </Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Sentaurens (1984, p. 219). Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), II, libro de caja, año 1578. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 50]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-21</Indicador_de_registro>
+    <Transacción>Tra-96</Transacción>
+    <Documento>[Doc. 50] Libro de cajas del Cabildo de Sevilla del año 1578</Documento>
+    <Otros_datos_para_elaborar_indicadores>El Cabildo registra que en 1578 pagó 241120 maravedís (7091,76 reales) por los carros de las representaciones a cargo de un autor de comedias designado simplemente por su apellido, Sigüenza, y de “los italianos”, es decir, la compañía de Ganassa. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1578</Años>
+    <Categorías>Corpus Christi. Escenografía</Categorías>
+    <Concepto>Costo del cuerpo de dos o tres carros de representación</Concepto>
+    <Monto>7091,76 reales</Monto>
+    <Nota>Se habla de “la copia” de los carros. Entendemos la palabra ‘copia’ en su sentido de abundancia, conjunto. Sabemos que Ganassa saca dos autos este año, pero no sabemos cuántos saca Sigüenza, por lo que esta noticia puede tratar de tres o de cuatro carros en total. </Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Sentaurens (1984, p. 219). Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), II, libro de caja, año 1578. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 50]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-22</Indicador_de_registro>
+    <Transacción>Tra-97</Transacción>
+    <Documento>[Doc. 50] Libro de cajas del Cabildo de Sevilla del año 1578</Documento>
+    <Otros_datos_para_elaborar_indicadores>El Cabildo registra que en 1578 pagó 12750 maravedís (375 reales) por la pintura de los carros (probablemente dos) para las representaciones a cargo de un autor de comedias designado simplemente por su apellido: Sigüenza –. DICAT no contiene más datos sobre este autor que los que recogemos aquí. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1578</Años>
+    <Categorías>Corpus Christi. Escenografía</Categorías>
+    <Concepto>Costo de la pintura de dos carros</Concepto>
+    <Monto>375 reales</Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Sentaurens (1984, p. 219). Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), II, libro de caja, año 1578. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 50]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-23</Indicador_de_registro>
+    <Transacción>Tra-98</Transacción>
+    <Documento>[Doc. 50] Libro de cajas del Cabildo de Sevilla del año 1578</Documento>
+    <Otros_datos_para_elaborar_indicadores>El Cabildo registra que en 1578 pagó 15750 maravedís (463,23 reales) por la pintura de los carros para las representaciones de “los italianos”, es decir, la compañía de Ganassa. Sabemos que son dos carros porque este año Ganassa se compromete a realizar dos autos para el Corpus Christi sevillano. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1578</Años>
+    <Categorías>Corpus Christi. Escenografía</Categorías>
+    <Concepto>Costo de la pintura de dos carros</Concepto>
+    <Monto>463,23 reales</Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Sentaurens (1984, p. 219). Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), II, libro de caja, año 1578. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 50]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-24</Indicador_de_registro>
+    <Transacción>Tra-99</Transacción>
+    <Documento>[Doc. 50] Libro de cajas del Cabildo de Sevilla del año 1578</Documento>
+    <Otros_datos_para_elaborar_indicadores>El Cabildo registra que en 1578 pagó 27822 maravedís (818,29 reales) a un tal Juan Gómez de Aguirre por sedas para los vestidos. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1578</Años>
+    <Categorías>Corpus Christi. Vestuario</Categorías>
+    <Concepto>Costo de sedas para los vestidos</Concepto>
+    <Monto>818,29 reales</Monto>
+    <Nota>Entendemos que se trata del vestuario de los actores que figurarán en los carros, pues en esta sección de partidas se está hablando de estos. Sin embargo, podría tratarse de sedas para los vestidos de los regidores. </Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Sentaurens (1984, p. 219). Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), II, libro de caja, año 1578. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 50]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-25</Indicador_de_registro>
+    <Transacción>Tra-100</Transacción>
+    <Documento>[Doc. 50] Libro de cajas del Cabildo de Sevilla del año 1578</Documento>
+    <Otros_datos_para_elaborar_indicadores>El Cabildo registra que en 1578 pagó 4216 maravedís (124 reales) a Roque Pérez por 31 onzas de “flueco” de oro. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1578</Años>
+    <Categorías>Corpus Christi. Vestuario</Categorías>
+    <Concepto>31 onzas de “flueco” de oro</Concepto>
+    <Monto>124 reales</Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Sentaurens (1984, p. 219). Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), II, libro de caja, año 1578. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 50]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-26</Indicador_de_registro>
+    <Transacción>Tra-101</Transacción>
+    <Documento>[Doc. 50] Libro de cajas del Cabildo de Sevilla del año 1578</Documento>
+    <Otros_datos_para_elaborar_indicadores>El Cabildo registra que en 1578 pagó 3400 maravedís (100 reales) por la confección de vestidos al sastre Miguel Díaz. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1578</Años>
+    <Categorías>Corpus Christi. Vestuario</Categorías>
+    <Concepto>Costo de la confección de vestidos</Concepto>
+    <Monto>100 reales</Monto>
+    <Nota>Entendemos que se trata del vestuario de los actores que figurarán en los carros, pues en esta sección de partidas se está hablando de estos. Sin embargo, podría tratarse de los vestidos de los regidores. </Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Sentaurens (1984, p. 219). Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), II, libro de caja, año 1578. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 50]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-27</Indicador_de_registro>
+    <Transacción>Tra-102</Transacción>
+    <Documento>[Doc. 50] Libro de cajas del Cabildo de Sevilla del año 1578</Documento>
+    <Otros_datos_para_elaborar_indicadores>El Cabildo registra que en 1578 pagó 36339 maravedís (1068,79 reales) por los lienzos para forrar los carros de representación. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1578</Años>
+    <Categorías>Corpus Christi. Escenografía</Categorías>
+    <Concepto>Lienzos para forrar los carros de representación</Concepto>
+    <Monto>1068,79 reales</Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Sentaurens (1984, p. 219). Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), II, libro de caja, año 1578. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 50]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-28</Indicador_de_registro>
+    <Transacción>Tra-103</Transacción>
+    <Documento>[Doc. 50] Libro de cajas del Cabildo de Sevilla del año 1578</Documento>
+    <Otros_datos_para_elaborar_indicadores>El Cabildo registra que en 1578 pagó 17240 maravedís (507,05 reales) por al cerrajero Matías Rodríguez por el hierro y los herrajes para los carros. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1578</Años>
+    <Categorías>Corpus Christi. Escenografía</Categorías>
+    <Concepto>Hierro y los herrajes para los carros de representaciób</Concepto>
+    <Monto>507,05 reales</Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Sentaurens (1984, p. 219). Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), II, libro de caja, año 1578. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 50]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-29</Indicador_de_registro>
+    <Transacción>Tra-104</Transacción>
+    <Documento>[Doc. 50] Libro de cajas del Cabildo de Sevilla del año 1578</Documento>
+    <Otros_datos_para_elaborar_indicadores>El Cabildo registra que en 1578 pagó 5023 maravedís (147,73 reales) al mercader Tomás Martínez por mercancías varias. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1578</Años>
+    <Categorías>Corpus Christi. Otros</Categorías>
+    <Concepto>Mercancías varias</Concepto>
+    <Monto>147,73 reales</Monto>
+    <Nota>Entendemos que se trata de mercancías para los carros, pues en esta sección de partidas se está hablando de estos. Sin embargo, podría tratarse de mercancías varias para la fiesta. </Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Sentaurens (1984, p. 219). Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), II, libro de caja, año 1578. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 50]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-30</Indicador_de_registro>
+    <Transacción>Tra-105</Transacción>
+    <Documento>[Doc. 50] Libro de cajas del Cabildo de Sevilla del año 1578</Documento>
+    <Otros_datos_para_elaborar_indicadores>El Cabildo registra que en 1578 pagó 14960 maravedís (440 reales) a Jerónimo Hernández maravedís por las trazas que dio. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1578</Años>
+    <Categorías>Corpus Christi. Escenografía</Categorías>
+    <Concepto>Trazas para carros u otros elementos espectaculares</Concepto>
+    <Monto>440 reales</Monto>
+    <Nota>Entendemos que se trata del diseño de los carros. Sin embargo, podría referirse a otros diseños también, como el de tarascas, castillos, u otros elementos espectaculares típicos del Corpus Christi. </Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Sentaurens (1984, p. 219). Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), II, libro de caja, año 1578. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 50]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-31</Indicador_de_registro>
+    <Transacción>Tra-106</Transacción>
+    <Documento>[Doc. 50] Libro de cajas del Cabildo de Sevilla del año 1578</Documento>
+    <Otros_datos_para_elaborar_indicadores>El Cabildo registra que en 1578 pagó 8364 maravedís (246 reales) a seis músicos que debían tocar el día del Corpus Christi. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1578</Años>
+    <Categorías>Corpus Christi. Música</Categorías>
+    <Concepto>Pago a seis músicos</Concepto>
+    <Monto>246 reales</Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Sentaurens (1984, p. 219). Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), II, libro de caja, año 1578. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 50]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-32</Indicador_de_registro>
+    <Transacción>Tra-107</Transacción>
+    <Documento>[Doc. 54]  Libro de cajas del Cabildo de Sevilla del año 1583</Documento>
+    <Otros_datos_para_elaborar_indicadores>Según la lectura de los documentos del Cabildo de Sevilla que realiza Jean Sentaurens y recoge DICAT, este año se premió a Alberto Naselli (Ganassa) con la primera joya de la corona porque sacó el mejor “carro de invención”. El premio fue de 30 ducados (330 reales). </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1583</Años>
+    <Categorías>Corpus Christi. Joya de la corona</Categorías>
+    <Concepto>Joya de la corona por el mejor carro del Corpus Christi</Concepto>
+    <Monto>330 reales</Monto>
+    <Nota>X</Nota>
+    <Compañía>AN3</Compañía>
+    <Referencias_bibliográficas>Información ubicada en DICAT; DICAT extrae el dato de Sentaurens (1984, p. 217). Sentaurens ofrece la ubicación de los documentos que consulta: AMS (Archivo Municipal de Sevilla), II, libro de caja, año 1583. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 54]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-33</Indicador_de_registro>
+    <Transacción>Tra-108</Transacción>
+    <Documento>[Doc. 55] Documento sin referencia que contiene información sobre actividad teatral en Sevilla en 1583</Documento>
+    <Otros_datos_para_elaborar_indicadores>Falconieri, sin especificar la ubicación de los datos, afirma que en 1583 &quot;obtenido el permiso para actuar dos días de trabajo además de los festivos, Ganassa comenzó sus representaciones en el Corral de Don Juan. Cobraba medio real por entrada de a pie, un real por silla, y un cuarto de real por asiento en un banco”.</Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1583</Años>
+    <Categorías>Entradas a los corrales</Categorías>
+    <Concepto>Entrada al corral de Don Juan para ver una representación de Ganassa de pie</Concepto>
+    <Monto>½ de real</Monto>
+    <Nota>X</Nota>
+    <Compañía>AN3</Compañía>
+    <Referencias_bibliográficas>Información ubicada en DICAT; DICAT extrae el dato de Falconieri (1957, p.78). Se ha consultado el texto de Falconieri y no ofrece la referencia documental precisa para los datos en cuestión</Referencias_bibliográficas>
+    <Código_documentos>[Doc. 55]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-34</Indicador_de_registro>
+    <Transacción>Tra-109</Transacción>
+    <Documento>[Doc. 55] Documento sin referencia que contiene información sobre actividad teatral en Sevilla en 1583</Documento>
+    <Otros_datos_para_elaborar_indicadores>Falconieri, sin especificar la ubicación de los datos, afirma que en 1583 &quot;obtenido el permiso para actuar dos días de trabajo además de los festivos, Ganassa comenzó sus representaciones en el Corral de Don Juan. Cobraba medio real por entrada de a pie, un real por silla, y un cuarto de real por asiento en un banco”.</Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1584</Años>
+    <Categorías>Entradas a los corrales</Categorías>
+    <Concepto>Entrada al corral de Don Juan para ver una representación de Ganassa desde una silla</Concepto>
+    <Monto>1 real</Monto>
+    <Nota>X</Nota>
+    <Compañía>AN3</Compañía>
+    <Referencias_bibliográficas>Información ubicada en DICAT; DICAT extrae el dato de Falconieri (1957, p.78). Se ha consultado el texto de Falconieri y no ofrece la referencia documental precisa para los datos en cuestión</Referencias_bibliográficas>
+    <Código_documentos>[Doc. 55]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-35</Indicador_de_registro>
+    <Transacción>Tra-110</Transacción>
+    <Documento>[Doc. 55] Documento sin referencia que contiene información sobre actividad teatral en Sevilla en 1583</Documento>
+    <Otros_datos_para_elaborar_indicadores>Falconieri, sin especificar la ubicación de los datos, afirma que en 1583 &quot;obtenido el permiso para actuar dos días de trabajo además de los festivos, Ganassa comenzó sus representaciones en el Corral de Don Juan. Cobraba medio real por entrada de a pie, un real por silla, y un cuarto de real por asiento en un banco”.</Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Sevilla </Ciudad>
+    <Años>1585</Años>
+    <Categorías>Entradas a los corrales</Categorías>
+    <Concepto>Entrada al corral de Don Juan para ver una representación de Ganassa desde un asiento en un banco</Concepto>
+    <Monto>¼ de real</Monto>
+    <Nota>X</Nota>
+    <Compañía>AN3</Compañía>
+    <Referencias_bibliográficas>Información ubicada en DICAT; DICAT extrae el dato de Falconieri (1957, p.78). Se ha consultado el texto de Falconieri y no ofrece la referencia documental precisa para los datos en cuestión</Referencias_bibliográficas>
+    <Código_documentos>[Doc. 55]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-36</Indicador_de_registro>
+    <Transacción>Tra-111</Transacción>
+    <Documento>[Doc. 56] Auto, fechado el 24 de abril de 1584, que trata sobre la manera en la cual se debe hacer la recaudación en las representaciones en los corrales de Madrid. Según registran Davis y Varey, el documento que encuentran es un “auto original proveído por los señores Licenciado Ximénez Ortiz y don Pedro Puertocarrero del Consejo de Su Majestad en virtud de la comisión que les fue cometido por los señores del Consejo”. </Documento>
+    <Otros_datos_para_elaborar_indicadores>En este auto, entre otras cosas, se dice que antes de esta fecha los actores cobraban en la puerta 12 maravedís a todas las personas que entraban a ver la representación; ahora, se manda que se cobren 4 maravedís más destinados al Hospital General. Es decir, el precio para el espectador pasó a ser 16 maravedís. Por otro lado, se dice que anteriormente se cobraban 12 maravedís a cualquiera que se quisiera ocupar un asiento en los “tablados” del corral. Estos 12 maravedís, desde finales de 1583, se repartían: ½ a la Cofradía de la Pasión, ¼ a la Cofradía de la Soledad y ¼ al Hospital general. Se manda que, en adelante, se cobren 16 maravedís por asiento. Los 4 maravedís adicionales, al inicio se repartieron según la formula vigente desde finales de 1583, pero, según registran también Davis y Varey, a partir de abril de 1585, se reparten: ⅜  a la Pasión, ⅜ a la Soledad y ¼ al Hospital General. Así pues, a partir de 1585, la repartición final de los 16 maravedís que se cobraban por asiento habría sido de: 15/32 para la Pasión, 9/32 para la Soledad y ¼ para el Hospital General. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Madrid</Ciudad>
+    <Años>de 1574 a 1584</Años>
+    <Categorías>Entradas a los corrales</Categorías>
+    <Concepto>Entrada a los corrales de Madrid para ver una comedia de pie</Concepto>
+    <Monto>6/17 de real [12 maravedís] </Monto>
+    <Nota>Se señala 1574 como fecha inicial pues desde este año las cofradías de la Pasión y la Soledad empiezan a gestionar los corrales de manera conjunta y se realizan los acuerdos para la repartición de las recaudaciones de las comedias en Madrid. </Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Davis y Varey (1997, pp. 17-19, 121-123). Davis y Varey ofrecen la ubicación del docuemento en cuestión: ARCM (Archivo Regional de la Comunidad de Madrid)/FD, 5310/4.</Referencias_bibliográficas>
+    <Código_documentos>[Doc. 56]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-37</Indicador_de_registro>
+    <Transacción>Tra-112</Transacción>
+    <Documento>[Doc. 56] Auto, fechado el 24 de abril de 1584, que trata sobre la manera en la cual se debe hacer la recaudación en las representaciones en los corrales de Madrid. Según registran Davis y Varey, el documento que encuentran es un “auto original proveído por los señores Licenciado Ximénez Ortiz y don Pedro Puertocarrero del Consejo de Su Majestad en virtud de la comisión que les fue cometido por los señores del Consejo”. </Documento>
+    <Otros_datos_para_elaborar_indicadores>En este auto, entre otras cosas, se dice que antes de esta fecha los actores cobraban en la puerta 12 maravedís a todas las personas que entraban a ver la representación; ahora, se manda que se cobren 4 maravedís más destinados al Hospital General. Es decir, el precio para el espectador pasó a ser 16 maravedís. Por otro lado, se dice que anteriormente se cobraban 12 maravedís a cualquiera que se quisiera ocupar un asiento en los “tablados” del corral. Estos 12 maravedís, desde finales de 1583, se repartían: ½ a la Cofradía de la Pasión, ¼ a la Cofradía de la Soledad y ¼ al Hospital general. Se manda que, en adelante, se cobren 16 maravedís por asiento. Los 4 maravedís adicionales, al inicio se repartieron según la formula vigente desde finales de 1583, pero, según registran también Davis y Varey, a partir de abril de 1585, se reparten: ⅜  a la Pasión, ⅜ a la Soledad y ¼ al Hospital General. Así pues, a partir de 1585, la repartición final de los 16 maravedís que se cobraban por asiento habría sido de: 15/32 para la Pasión, 9/32 para la Soledad y ¼ para el Hospital General. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Madrid</Ciudad>
+    <Años>de 1584 a 1602</Años>
+    <Categorías>Entradas a los corrales</Categorías>
+    <Concepto>Entrada a los corrales de Madrid para ver una comedia de pie</Concepto>
+    <Monto>8/17 de real [16 maravedís] </Monto>
+    <Nota>Se señala 1602 como fecha final porque este año, con el traslado de la corte a Valladolid, se cambia el precio oficial de las entradas a los corrales y de los asientos. </Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Davis y Varey (1997, pp. 17-19, 121-123). Davis y Varey ofrecen la ubicación del docuemento en cuestión: ARCM (Archivo Regional de la Comunidad de Madrid)/FD, 5310/4.</Referencias_bibliográficas>
+    <Código_documentos>[Doc. 56]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-38</Indicador_de_registro>
+    <Transacción>Tra-113</Transacción>
+    <Documento>[Doc. 56] Auto, fechado el 24 de abril de 1584, que trata sobre la manera en la cual se debe hacer la recaudación en las representaciones en los corrales de Madrid. Según registran Davis y Varey, el documento que encuentran es un “auto original proveído por los señores Licenciado Ximénez Ortiz y don Pedro Puertocarrero del Consejo de Su Majestad en virtud de la comisión que les fue cometido por los señores del Consejo”. </Documento>
+    <Otros_datos_para_elaborar_indicadores>En este auto, entre otras cosas, se dice que antes de esta fecha los actores cobraban en la puerta 12 maravedís a todas las personas que entraban a ver la representación; ahora, se manda que se cobren 4 maravedís más destinados al Hospital General. Es decir, el precio para el espectador pasó a ser 16 maravedís. Por otro lado, se dice que anteriormente se cobraban 12 maravedís a cualquiera que se quisiera ocupar un asiento en los “tablados” del corral. Estos 12 maravedís, desde finales de 1583, se repartían: ½ a la Cofradía de la Pasión, ¼ a la Cofradía de la Soledad y ¼ al Hospital general. Se manda que, en adelante, se cobren 16 maravedís por asiento. Los 4 maravedís adicionales, al inicio se repartieron según la formula vigente desde finales de 1583, pero, según registran también Davis y Varey, a partir de abril de 1585, se reparten: ⅜  a la Pasión, ⅜ a la Soledad y ¼ al Hospital General. Así pues, a partir de 1585, la repartición final de los 16 maravedís que se cobraban por asiento habría sido de: 15/32 para la Pasión, 9/32 para la Soledad y ¼ para el Hospital General. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Madrid</Ciudad>
+    <Años>de 1574 a 1584</Años>
+    <Categorías>Entradas a los corrales</Categorías>
+    <Concepto>Entrada a los corrales de Madrid para ver una comedia desde un asiento</Concepto>
+    <Monto>12/17 de real [24 maravedís] </Monto>
+    <Nota>Se señala 1574 como fecha inicial pues desde este año las cofradías de la Pasión y la Soledad empiezan a gestionar los corrales de manera conjunta y se realizan los acuerdos para la repartición de las recaudaciones de las comedias en Madrid. </Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Davis y Varey (1997, pp. 17-19, 121-123). Davis y Varey ofrecen la ubicación del docuemento en cuestión: ARCM (Archivo Regional de la Comunidad de Madrid)/FD, 5310/4.</Referencias_bibliográficas>
+    <Código_documentos>[Doc. 56]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-39</Indicador_de_registro>
+    <Transacción>Tra-114</Transacción>
+    <Documento>[Doc. 56] Auto, fechado el 24 de abril de 1584, que trata sobre la manera en la cual se debe hacer la recaudación en las representaciones en los corrales de Madrid. Según registran Davis y Varey, el documento que encuentran es un “auto original proveído por los señores Licenciado Ximénez Ortiz y don Pedro Puertocarrero del Consejo de Su Majestad en virtud de la comisión que les fue cometido por los señores del Consejo”. </Documento>
+    <Otros_datos_para_elaborar_indicadores>En este auto, entre otras cosas, se dice que antes de esta fecha los actores cobraban en la puerta 12 maravedís a todas las personas que entraban a ver la representación; ahora, se manda que se cobren 4 maravedís más destinados al Hospital General. Es decir, el precio para el espectador pasó a ser 16 maravedís. Por otro lado, se dice que anteriormente se cobraban 12 maravedís a cualquiera que se quisiera ocupar un asiento en los “tablados” del corral. Estos 12 maravedís, desde finales de 1583, se repartían: ½ a la Cofradía de la Pasión, ¼ a la Cofradía de la Soledad y ¼ al Hospital general. Se manda que, en adelante, se cobren 16 maravedís por asiento. Los 4 maravedís adicionales, al inicio se repartieron según la formula vigente desde finales de 1583, pero, según registran también Davis y Varey, a partir de abril de 1585, se reparten: ⅜  a la Pasión, ⅜ a la Soledad y ¼ al Hospital General. Así pues, a partir de 1585, la repartición final de los 16 maravedís que se cobraban por asiento habría sido de: 15/32 para la Pasión, 9/32 para la Soledad y ¼ para el Hospital General. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Madrid</Ciudad>
+    <Años>de 1584 a 1602</Años>
+    <Categorías>Entradas a los corrales</Categorías>
+    <Concepto>Entrada a los corrales de Madrid para ver una comedia desde un asiento</Concepto>
+    <Monto>16/17 de real [32 maravedís] </Monto>
+    <Nota>Se señala 1602 como fecha final porque este año, con el traslado de la corte a Valladolid, se cambia el precio oficial de las entradas a los corrales y de los asientos. </Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Davis y Varey (1997, pp. 17-19, 121-123). Davis y Varey ofrecen la ubicación del docuemento en cuestión: ARCM (Archivo Regional de la Comunidad de Madrid)/FD, 5310/4.</Referencias_bibliográficas>
+    <Código_documentos>[Doc. 56]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-40</Indicador_de_registro>
+    <Transacción>Tra-115</Transacción>
+    <Documento>[Doc. 57] Acuerdo entre el Teniente de Corregidor de Madrid y los Hospitales de la ciudad realizado en 10 de abril de 1602.</Documento>
+    <Otros_datos_para_elaborar_indicadores>Según Davis y Varey “El 10 de abril de 1602 el Teniente de Corregidor de Madrid acordó con los Hospitales una reducción del precio del asiento a ocho maravedís y del cuarto adicional del Hospital General a dos maravedís”. Anteriormente, el precio de la entrada a los corrales para ver una comedia a pie era de 16 maravedís (12 para los comediantes y 4 para el Hospital General). Si uno deseaba sentarse, el precio del asiento era de 16 maravedís.  Por ende, ahora, el precio de una entrada para ver la comedia de pie sería de 14 maravedís. que, sumados a un asiento (ahora a 8 maravedís) llegarían a 22 maravedís.  </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Madrid</Ciudad>
+    <Años>de 1602 a 1606</Años>
+    <Categorías>Entradas a los corrales</Categorías>
+    <Concepto>Entrada a los corrales de Madrid para ver una comedia de pie</Concepto>
+    <Monto>7/17 de real [14 maravedís]</Monto>
+    <Nota>Se señala 1606 como fecha límite porque este año la corte regresa a Madrid y los precios cambian nuevamente</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Davis y Varey (1997, pp. 18-19). Davis y Varey no ofrecen la ubicación documental precisa de esta información, pero trabajan con la documentación sobre las cuentas de los corrales del ARCM. (Archivo Regional de la Comunidad de Madrid). </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 57]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-41</Indicador_de_registro>
+    <Transacción>Tra-116</Transacción>
+    <Documento>[Doc. 57] Acuerdo entre el Teniente de Corregidor de Madrid y los Hospitales de la ciudad realizado en 10 de abril de 1602.</Documento>
+    <Otros_datos_para_elaborar_indicadores>Según Davis y Varey “El 10 de abril de 1602 el Teniente de Corregidor de Madrid acordó con los Hospitales una reducción del precio del asiento a ocho maravedís y del cuarto adicional del Hospital General a dos maravedís”. Anteriormente, el precio de la entrada a los corrales para ver una comedia a pie era de 16 maravedís (12 para los comediantes y 4 para el Hospital General). Si uno deseaba sentarse, el precio del asiento era de 16 maravedís.  Por ende, ahora, el precio de una entrada para ver la comedia de pie sería de 14 maravedís. que, sumados a un asiento (ahora a 8 maravedís) llegarían a 22 maravedís.  </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Madrid</Ciudad>
+    <Años>de 1602 a 1606</Años>
+    <Categorías>Entradas a los corrales</Categorías>
+    <Concepto>Entrada a los corrales de Madrid para ver una comedia desde un asiento</Concepto>
+    <Monto>11/17 de real [22 maravedís]</Monto>
+    <Nota>Se señala 1606 como fecha límite porque este año la corte regresa a Madrid y los precios cambian nuevamente</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Davis y Varey (1997, pp. 18-19). Davis y Varey no ofrecen la ubicación documental precisa de esta información, pero trabajan con la documentación sobre las cuentas de los corrales del ARCM. (Archivo Regional de la Comunidad de Madrid). </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 57]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-42</Indicador_de_registro>
+    <Transacción>Tra-117</Transacción>
+    <Documento>[Doc. 58] Orden del Corregidor de Madrid sobre el precio de las entradas a los corrales dada el 21 de marzo de 1606.</Documento>
+    <Otros_datos_para_elaborar_indicadores>Según Davis y Varey “Cuando la Corte volvió a Madrid en 1606 el Corregidor mandó el 21 de marzo que se reestablecieran el precio anterior del asiento, 16 maravedís, y el cuarto del Hospital General”. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Madrid</Ciudad>
+    <Años>de 1606 (marzo) a 1606 (julio)</Años>
+    <Categorías>Entradas a los corrales</Categorías>
+    <Concepto>Entrada a los corrales de Madrid para ver una comedia de pie</Concepto>
+    <Monto>8/17 de real [16 maravedís] </Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Davis y Varey (1997, p. 20). Davis y Varey extraen el dato de Casiano Pellicer: Tratado histórico sobre el origen y progresos de la comedia y del histrionismo en España, tomo I, Madrid, Imprenta de la Administración del Real Arbitrio de Beneficencia, 1804, pp. 87-88. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 58]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-43</Indicador_de_registro>
+    <Transacción>Tra-118</Transacción>
+    <Documento>[Doc. 58] Orden del Corregidor de Madrid sobre el precio de las entradas a los corrales dada el 21 de marzo de 1606.</Documento>
+    <Otros_datos_para_elaborar_indicadores>Según Davis y Varey “Cuando la Corte volvió a Madrid en 1606 el Corregidor mandó el 21 de marzo que se reestablecieran el precio anterior del asiento, 16 maravedís, y el cuarto del Hospital General”. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Madrid</Ciudad>
+    <Años>de 1606 (marzo) a 1606 (julio)</Años>
+    <Categorías>Entradas a los corrales</Categorías>
+    <Concepto>Entrada a los corrales de Madrid para ver una comedia desde un asiento</Concepto>
+    <Monto>16/17 de real [32 maravedís] </Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Davis y Varey (1997, p. 20). Davis y Varey extraen el dato de Casiano Pellicer: Tratado histórico sobre el origen y progresos de la comedia y del histrionismo en España, tomo I, Madrid, Imprenta de la Administración del Real Arbitrio de Beneficencia, 1804, pp. 87-88. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 58]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-44</Indicador_de_registro>
+    <Transacción>Tra-119</Transacción>
+    <Documento>[Doc. 59] Orden del Consejo de Castilla sobre el precio que deben tener las entradas a los corrales de Madrid a partir de julio de 1606</Documento>
+    <Otros_datos_para_elaborar_indicadores>Según Davis y Varey “Poco después [del regreso de la Corte a Madrid], se extendieron los beneficios del comercio teatral a otros dos Hospitales, el de la Corte (llamado también Hospital del Buen Suceso) y el de Antón Martín (o de San Juan de Dios), con el pago de otro cuarto adicional en la puerta. El consejo mandó que, a partir de julio de 1606, ‘de lo que daba cada persona de los que entraban a oír las comedias en los corrales de esta villa se repartiesen entre los dichos dos Hospitales cuatro maravedís, dando dos maravedís a cada uno’”. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Madrid</Ciudad>
+    <Años>de 1606 (julio) a 1608 (octubre)</Años>
+    <Categorías>Entradas a los corrales</Categorías>
+    <Concepto>Entrada a los corrales de Madrid para ver una comedia de pie</Concepto>
+    <Monto>10/17 de real [20 maravedís]</Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Davis y Varey (1997, p. 20). Davis y Varey citan el libro de Varey y Norman Shergold: Teatros y comedias en Madrid: 1600-1650. Estudio y documentos, Londres, Tamesis Books, Fuentes para la Historia del Teatro en España III, 1971. Se trataría del documento referido en dicho libro como 34[c] en la página 85.  </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 59]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-45</Indicador_de_registro>
+    <Transacción>Tra-120</Transacción>
+    <Documento>[Doc. 59] Orden del Consejo de Castilla sobre el precio que deben tener las entradas a los corrales de Madrid a partir de julio de 1606</Documento>
+    <Otros_datos_para_elaborar_indicadores>Según Davis y Varey “Poco después [del regreso de la Corte a Madrid], se extendieron los beneficios del comercio teatral a otros dos Hospitales, el de la Corte (llamado también Hospital del Buen Suceso) y el de Antón Martín (o de San Juan de Dios), con el pago de otro cuarto adicional en la puerta. El consejo mandó que, a partir de julio de 1606, ‘de lo que daba cada persona de los que entraban a oír las comedias en los corrales de esta villa se repartiesen entre los dichos dos Hospitales cuatro maravedís, dando dos maravedís a cada uno’”. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Madrid</Ciudad>
+    <Años>de 1606 (julio) a 1608 (octubre)</Años>
+    <Categorías>Entradas a los corrales</Categorías>
+    <Concepto>Entrada a los corrales de Madrid para ver una comedia desde un asiento</Concepto>
+    <Monto>1 real y 1/17 de real [36 maravedís]</Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Davis y Varey (1997, p. 20). Davis y Varey citan el libro de Varey y Norman Shergold: Teatros y comedias en Madrid: 1600-1650. Estudio y documentos, Londres, Tamesis Books, Fuentes para la Historia del Teatro en España III, 1971. Se trataría del documento referido en dicho libro como 34[c] en la página 85.  </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 59]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-46</Indicador_de_registro>
+    <Transacción>Tra-121</Transacción>
+    <Documento>[Doc. 60] Real provisión del 21 de octubre de 1608 sobre un cuarto adicional que se tendría que cobrar en los corrales de Madrid para costear una vivienda en el real palacio para la reina Margarita de Austria. </Documento>
+    <Otros_datos_para_elaborar_indicadores>Según Davis y Varey “de acuerdo con una Real provisión del 21 de octubre de 1608, se empezó a cobrar otro cuarto adicional de cada persona, para costear una vivienda en el real palacio para la reina Margarita de Austria”. Hasta esta fecha se estaba cobrando a la entrada de los corrales 12 maravedís para los comediantes, 4 para el Hospital General y 4 para los hospitales del Buen Suceso y de San Juan de Dios. Es decir, se cobraba 20 maravedís la entrada para ver la comedia de pie. Esto ahora subiría a 24 maravedís. No cambia el precio del asiento, el cual en estas fechas estaba en 16 maravedís. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Madrid</Ciudad>
+    <Años>de 1608 (octubre) a 1615</Años>
+    <Categorías>Entradas a los corrales</Categorías>
+    <Concepto>Entrada a los corrales de Madrid para ver una comedia de pie</Concepto>
+    <Monto>12/17 de real [24 maravedís]</Monto>
+    <Nota>Se señala 1615 como fecha límite pues en este año cambia el sistema de gestión de los corrales. </Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Davis y Varey (1997, p. 20). Davis y Varey citan el libro de Varey y Norman Shergold (compuesto con la colaboración de Davis): Los arriendos de los corrales de comedias de Madrid: 1587-1719. Estudio y documentos, Londres, Tamesis Books, Fuentes para la Historia del Teatro en España XIII, 1987. El documento se encontraría en la página 16, número 9. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 60]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-47</Indicador_de_registro>
+    <Transacción>Tra-122</Transacción>
+    <Documento>[Doc. 60] Real provisión del 21 de octubre de 1608 sobre un cuarto adicional que se tendría que cobrar en los corrales de Madrid para costear una vivienda en el real palacio para la reina Margarita de Austria. </Documento>
+    <Otros_datos_para_elaborar_indicadores>Según Davis y Varey “de acuerdo con una Real provisión del 21 de octubre de 1608, se empezó a cobrar otro cuarto adicional de cada persona, para costear una vivienda en el real palacio para la reina Margarita de Austria”. Hasta esta fecha se estaba cobrando a la entrada de los corrales 12 maravedís para los comediantes, 4 para el Hospital General y 4 para los hospitales del Buen Suceso y de San Juan de Dios. Es decir, se cobraba 20 maravedís la entrada para ver la comedia de pie. Esto ahora subiría a 24 maravedís. No cambia el precio del asiento, el cual en estas fechas estaba en 16 maravedís. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Madrid</Ciudad>
+    <Años>de 1608 (octubre) a 1616</Años>
+    <Categorías>Entradas a los corrales</Categorías>
+    <Concepto>Entrada a los corrales de Madrid para ver una comedia desde un asiento</Concepto>
+    <Monto>1 real y 3/17 de real [40 maravedís]</Monto>
+    <Nota>Se señala 1615 como fecha límite pues en este año cambia el sistema de gestión de los corrales. </Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Davis y Varey (1997, p. 20). Davis y Varey citan el libro de Varey y Norman Shergold (compuesto con la colaboración de Davis): Los arriendos de los corrales de comedias de Madrid: 1587-1719. Estudio y documentos, Londres, Tamesis Books, Fuentes para la Historia del Teatro en España XIII, 1987. El documento se encontraría en la página 16, número 9. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 60]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-48</Indicador_de_registro>
+    <Transacción>Tra-123</Transacción>
+    <Documento>[Doc. 61] Documentación sobre el precio del uso de los corrales de Madrid para representar en 1568</Documento>
+    <Otros_datos_para_elaborar_indicadores>Según Davis y Varey “cuando [Jerónimo] Velázquez empieza una serie de representaciones en el corral del Hospital de la Pasión en mayo de 1568, consta que ‘ha de dar seis reales cada día de los que representara”.</Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Madrid</Ciudad>
+    <Años>1568</Años>
+    <Categorías>Uso de los corrales</Categorías>
+    <Concepto>Uso de corrales para representar</Concepto>
+    <Monto>6 reales</Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Davis y Varey (1997, pp. 32 y 351). Davis y Varey extraen el dato de Casiano Pellicer: Tratado histórico sobre el origen y progresos de la comedia y del histrionismo en España, tomo I, Madrid, Imprenta de la Administración del Real Arbitrio de Beneficencia, 1804, pp. 48-49. Se trataría de un documento hoy perdido. Davis y Varey copian una nota de Pellicer: “esta noticia se lee en la hoja penúltima del libro original que se custodia en la Contaduría de los Reales Hospitales, y que en el lomo tiene este título: Libro de las Demandas que se hacen en la cofradía de la Sagrada Pasión desde 5. de Octubre de 1567. hasta 2. de Febrero de 1582”. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 61]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-49</Indicador_de_registro>
+    <Transacción>Tra-124</Transacción>
+    <Documento>[Doc. 62] Documentación sobre el precio del uso de los corrales de Madrid para representar de la década de 1570  a 1602.</Documento>
+    <Otros_datos_para_elaborar_indicadores>Según Davis y Varey los comediantes para 1579 pagaban diez reales a las cofradías de Madrid por cada representación que hacían en sus corrales. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Madrid</Ciudad>
+    <Años>de la década de 1570  a 1602</Años>
+    <Categorías>Uso de los corrales</Categorías>
+    <Concepto>Uso de corrales para representar</Concepto>
+    <Monto>10 reales</Monto>
+    <Nota>Se señala 1602 como fecha final porque este año, con el traslado de la corte a Valladolid, se cambia el precio que deben pagar los comediantes para representar en los corrales</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Davis y Varey (1997, p. 32). David y Varey hacen referencia a su “Lista cronológica de representaciones en los corrales de comedias: 1579-1587”. Este documento, de cuya edición se ocupan, es el “Libro registro de los productos de comedias”. Producto de comedias para el Hospital de la Pasión del 30 de mayo de 1579 hasta el 27 de febrero de 1587. La ubicación del documento es, según señalan los mismos estudiosos: ARCM (Archivo Regional de la Comunidad de Madrid)/FD, 5084/2 [antes 34-E]. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 62]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-50</Indicador_de_registro>
+    <Transacción>Tra-125</Transacción>
+    <Documento>[Doc. 63] Documentación sobre el precio del uso de los corrales de Madrid para representar de la década de 1602 a 1608.</Documento>
+    <Otros_datos_para_elaborar_indicadores>Según Davis y Varey, en 1602, por el traslado de la corte a Valladolid, los comediantes pasaron de pagar diez reales a las cofradías de Madrid por cada representación que hacían en sus corrales a pagar solo cinco reales. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Madrid</Ciudad>
+    <Años>de 1602 a 1608</Años>
+    <Categorías>Uso de los corrales</Categorías>
+    <Concepto>Uso de corrales para representar</Concepto>
+    <Monto>5 reales </Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Davis y Varey (1997, p. 32). David y Varey citan el libro de Cristóbal Pérez Pastor: Nuevos datos acerca del histrionismo español en los siglos XVI y XVII. Primera Serie, Madrid, Imprenta de la Revista Española, 1901, p. 74. </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 63]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-51</Indicador_de_registro>
+    <Transacción>Tra-126</Transacción>
+    <Documento>[Doc. 64] Documentación sobre el precio del uso de los corrales de Madrid para representar en 1608.</Documento>
+    <Otros_datos_para_elaborar_indicadores>Según Davis y Varey, en 1608, cuando la corte regresa de Valladolid a Madrid, los comediantes pasaron de pagar cinco reales a las cofradías de Madrid por cada representación que hacían en sus corrales a pagar seis reales. Apartemente, no habrían nunca vuelto al precio de diez reales por representación característicos de las décadas de 1580 y 1590. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>Madrid</Ciudad>
+    <Años>1608</Años>
+    <Categorías>Uso de los corrales</Categorías>
+    <Concepto>Uso de corrales para representar</Concepto>
+    <Monto>6 reales</Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Davis y Varey (1997, p. 32). Davis y Varey citan el libro de Varey y Norman Shergold: Teatros y comedias en Madrid: 1600-1650. Estudio y documentos, Londres, Tamesis Books, Fuentes para la Historia del Teatro en España III, 1971. Se trataría del documento referido en dicho libro como 2 en la página 50.  </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 64]</Código_documentos>
+  </row>
+  <row>
+    <Indicador_de_registro>IdI-52</Indicador_de_registro>
+    <Transacción>Tra-127</Transacción>
+    <Documento>[Doc. 65] Referencia al costo del agua en los corrales en la obra de teatro Comedia de los náufragos de Leopoldo</Documento>
+    <Otros_datos_para_elaborar_indicadores>Davis y Varey hacen referencia a un artículo de Jean Canavaggio en el cual este estudioso recuerda que, en la Comedia de los náufragos de Leopoldo, cuando se describe la actividad en los corrales de comedias, se dice que el agua costaba dos maravedís: “dos maravedís para agua y anís”. La referencia sería de 1594. Davis y Varey creen que puede tratarse de Madrid, pero no es seguro. </Otros_datos_para_elaborar_indicadores>
+    <Ciudad>¿Madrid?</Ciudad>
+    <Años>1594</Años>
+    <Categorías>Venta de bebidas en los corrales</Categorías>
+    <Concepto>Agua con anís y especias</Concepto>
+    <Monto>2 maravedís </Monto>
+    <Nota>X</Nota>
+    <Compañía>X</Compañía>
+    <Referencias_bibliográficas>Información ubicada en Davis y Varey (1997, p. 32). Davis y Varey citan el artículo de Jean Canavaggio: “Teatro y comediantes en el Siglo de Oro: algunos datos inéditos”, Segismundo, 23-24 [XII, 1-2], 1976, 27-50, p. 50.  </Referencias_bibliográficas>
+    <Código_documentos>[Doc. 65]</Código_documentos>
+  </row>
+</dataset>

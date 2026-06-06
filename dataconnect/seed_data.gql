@@ -1,0 +1,129 @@
+mutation CreateDemoData @transaction {
+  user_insertMany(data: [
+    {
+      id: "550e8400-e29b-41d4-a716-446655440000",
+      displayName: "Alice Smith",
+      createdAt: "2023-01-01T10:00:00Z",
+      email: "alice@example.com",
+      affiliation: "University A",
+      photoUrl: "https://example.com/alice.jpg"
+    },
+    {
+      id: "550e8400-e29b-41d4-a716-446655440001",
+      displayName: "Bob Johnson",
+      createdAt: "2023-01-01T10:05:00Z",
+      email: "bob@example.com",
+      affiliation: "University B",
+      photoUrl: "https://example.com/bob.jpg"
+    }
+  ])
+  author_insertMany(data: [
+    {
+      id: "650e8400-e29b-41d4-a716-446655440000",
+      name: "William Shakespeare",
+      birthYear: 1564,
+      deathYear: 1616,
+      createdAt: "2023-01-01T10:10:00Z",
+      biography: "English playwright, poet, and actor, widely regarded as the greatest writer in the English language.",
+      bibliography: "List of works by Shakespeare."
+    },
+    {
+      id: "650e8400-e29b-41d4-a716-446655440001",
+      name: "Jane Austen",
+      birthYear: 1775,
+      deathYear: 1817,
+      createdAt: "2023-01-01T10:15:00Z",
+      biography: "English novelist known primarily for her six major novels, which interpret, critique, and comment upon the British landed gentry at the end of the 18th century.",
+      bibliography: "List of works by Austen."
+    }
+  ])
+  play_insertMany(data: [
+    {
+      id: "750e8400-e29b-41d4-a716-446655440000",
+      authorId: "650e8400-e29b-41d4-a716-446655440000",
+      title: "Hamlet",
+      year: 1603,
+      textUrl: "https://example.com/hamlet.txt",
+      createdAt: "2023-01-01T10:20:00Z",
+      genre: "Tragedy",
+      summary: "The story of Prince Hamlet and his quest for revenge against his uncle Claudius.",
+      setting: "Denmark"
+    },
+    {
+      id: "750e8400-e29b-41d4-a716-446655440001",
+      authorId: "650e8400-e29b-41d4-a716-446655440000",
+      title: "Romeo and Juliet",
+      year: 1597,
+      textUrl: "https://example.com/romeo_and_juliet.txt",
+      createdAt: "2023-01-01T10:25:00Z",
+      genre: "Tragedy",
+      summary: "The tragic love story of two young star-crossed lovers whose deaths ultimately reconcile their feuding families.",
+      setting: "Verona, Italy"
+    }
+  ])
+  essay_insertMany(data: [
+    {
+      id: "850e8400-e29b-41d4-a716-446655440000",
+      authorId: "650e8400-e29b-41d4-a716-446655440000",
+      playId: "750e8400-e29b-41d4-a716-446655440000",
+      title: "An Analysis of Hamlet's Soliloquies",
+      authorName: "John Doe",
+      publicationYear: 2005,
+      url: "https://example.com/hamlet_analysis.pdf",
+      createdAt: "2023-01-01T10:30:00Z",
+      journal: "Literary Studies Quarterly",
+      abstract: "A detailed examination of the philosophical implications and literary devices employed in Hamlet's soliloquies."
+    },
+    {
+      id: "850e8400-e29b-41d4-a716-446655440001",
+      authorId: "650e8400-e29b-41d4-a716-446655440001",
+      title: "Feminist Themes in Pride and Prejudice",
+      authorName: "Jane Scholar",
+      publicationYear: 2010,
+      url: "https://example.com/pride_and_prejudice_feminism.html",
+      createdAt: "2023-01-01T10:35:00Z",
+      journal: "Journal of Gender Studies",
+      abstract: "Exploring the portrayal of women and societal expectations in Jane Austen's Pride and Prejudice."
+    }
+  ])
+  collection_insertMany(data: [
+    {
+      id: "950e8400-e29b-41d4-a716-446655440000",
+      userId: "550e8400-e29b-41d4-a716-446655440000",
+      name: "Shakespearean Works",
+      createdAt: "2023-01-01T10:40:00Z",
+      updatedAt: "2023-01-01T10:40:00Z",
+      description: "A collection of plays and essays related to William Shakespeare."
+    },
+    {
+      id: "950e8400-e29b-41d4-a716-446655440001",
+      userId: "550e8400-e29b-41d4-a716-446655440001",
+      name: "Classical Literature",
+      createdAt: "2023-01-01T10:45:00Z",
+      updatedAt: "2023-01-01T10:45:00Z",
+      description: "A collection of various classical literary pieces."
+    }
+  ])
+  collectionItem_insertMany(data: [
+    {
+      collectionId: "950e8400-e29b-41d4-a716-446655440000",
+      playId: "750e8400-e29b-41d4-a716-446655440000",
+      createdAt: "2023-01-01T10:50:00Z"
+    },
+    {
+      collectionId: "950e8400-e29b-41d4-a716-446655440000",
+      essayId: "850e8400-e29b-41d4-a716-446655440000",
+      createdAt: "2023-01-01T10:55:00Z"
+    },
+    {
+      collectionId: "950e8400-e29b-41d4-a716-446655440001",
+      essayId: "850e8400-e29b-41d4-a716-446655440001",
+      createdAt: "2023-01-01T11:00:00Z"
+    },
+    {
+      collectionId: "950e8400-e29b-41d4-a716-446655440001",
+      authorId: "650e8400-e29b-41d4-a716-446655440001",
+      createdAt: "2023-01-01T11:05:00Z"
+    }
+  ])
+}

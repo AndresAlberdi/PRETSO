@@ -81,6 +81,13 @@ async def transition_status(
 
     if new_status == PublicationStatus.publicado:
         updates["published_at"] = now
+        noticia_text = record.get("noticia") or ""
+        if noticia_text:
+            from backend.src.services.search_service import index_record_embedding
+            try:
+                await index_record_embedding(record_id, noticia_text)
+            except Exception as e:
+                pass
 
     if new_status == PublicationStatus.borrador and rejection_comment:
         updates["rejection_comment"] = rejection_comment
