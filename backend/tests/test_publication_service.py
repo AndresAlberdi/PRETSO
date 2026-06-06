@@ -66,7 +66,7 @@ async def test_en_revision_to_publicado_increments_count():
 
 
 @pytest.mark.asyncio
-async def test_en_revision_to_borrador_with_comment():
+async def test_en_revision_to_rechazado_with_comment():
     record = _make_record("en_revision")
     with (
         patch(_GET, new=AsyncMock(return_value=record)),
@@ -75,10 +75,10 @@ async def test_en_revision_to_borrador_with_comment():
         patch(_LOG, new=AsyncMock()),
     ):
         result = await transition_status(
-            "CM-1", PublicationStatus.borrador, "user1",
+            "CM-1", PublicationStatus.rechazado, "user1",
             rejection_comment="Falta información importante"
         )
-    assert result["status"] == "borrador"
+    assert result["status"] == "rechazado"
 
 
 @pytest.mark.asyncio
@@ -97,7 +97,7 @@ async def test_invalid_transition_borrador_to_publicado():
 
 
 @pytest.mark.asyncio
-async def test_invalid_transition_publicado_to_borrador():
+async def test_invalid_transition_publicado_to_rechazado():
     record = _make_record("publicado")
     with (
         patch(_GET, new=AsyncMock(return_value=record)),
@@ -106,7 +106,7 @@ async def test_invalid_transition_publicado_to_borrador():
         patch(_LOG, new=AsyncMock()),
     ):
         with pytest.raises(HTTPException) as exc_info:
-            await transition_status("CM-1", PublicationStatus.borrador, "user1",
+            await transition_status("CM-1", PublicationStatus.rechazado, "user1",
                                     rejection_comment="Comentario suficientemente largo")
     assert exc_info.value.status_code == 422
     assert exc_info.value.detail["code"] == "INVALID_STATE_TRANSITION"
@@ -122,7 +122,7 @@ async def test_rejection_comment_too_short():
         patch(_LOG, new=AsyncMock()),
     ):
         with pytest.raises(HTTPException) as exc_info:
-            await transition_status("CM-1", PublicationStatus.borrador, "user1",
+            await transition_status("CM-1", PublicationStatus.rechazado, "user1",
                                     rejection_comment="corto")
     assert exc_info.value.status_code == 422
     assert exc_info.value.detail["code"] == "REJECTION_COMMENT_TOO_SHORT"

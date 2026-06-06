@@ -28,18 +28,22 @@ export default function NavBar() {
 
       <Link to="/">{t('nav.home')}</Link>
 
-      {portalActive && (
+      {user && (
+        <Link to="/user-home">{t('nav.user_home', 'Mi Inicio')}</Link>
+      )}
+
+      {portalActive && user && (
         <>
           <Link to="/search">{t('nav.search')}</Link>
           <Link to="/companies">{t('nav.companies')}</Link>
+          <Link to="/caja">Manejo de Caja</Link>
+          <Link to="/salarios">Salarios</Link>
+          <Link to="/corpus-christi">Corpus Christi</Link>
+          <Link to="/api-docs">{t('nav.api')}</Link>
         </>
       )}
 
       <Link to="/announcements">{t('nav.announcements')}</Link>
-
-      {portalActive && (
-        <Link to="/api-docs">{t('nav.api')}</Link>
-      )}
 
       {user && (
         <Link to="/admin" style={{ marginLeft: 'auto' }}>{t('nav.admin')}</Link>

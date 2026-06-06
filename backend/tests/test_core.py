@@ -167,17 +167,17 @@ class TestStateMachine:
     def test_en_revision_to_publicado_allowed(self):
         assert PublicationStatus.publicado in VALID_TRANSITIONS[PublicationStatus.en_revision]
 
-    def test_en_revision_to_borrador_allowed(self):
-        assert PublicationStatus.borrador in VALID_TRANSITIONS[PublicationStatus.en_revision]
+    def test_en_revision_to_rechazado_allowed(self):
+        assert PublicationStatus.rechazado in VALID_TRANSITIONS[PublicationStatus.en_revision]
 
     def test_borrador_to_publicado_not_allowed(self):
         assert PublicationStatus.publicado not in VALID_TRANSITIONS[PublicationStatus.borrador]
 
-    def test_publicado_to_borrador_not_allowed(self):
-        assert PublicationStatus.borrador not in VALID_TRANSITIONS[PublicationStatus.publicado]
+    def test_publicado_to_rechazado_not_allowed(self):
+        assert PublicationStatus.rechazado not in VALID_TRANSITIONS[PublicationStatus.publicado]
 
-    def test_publicado_has_no_transitions(self):
-        assert len(VALID_TRANSITIONS[PublicationStatus.publicado]) == 0
+    def test_publicado_can_transition_to_borrador(self):
+        assert PublicationStatus.borrador in VALID_TRANSITIONS[PublicationStatus.publicado]
 
 
 # ---------------------------------------------------------------------------
@@ -205,7 +205,7 @@ class TestRejectionComment:
         ):
             with pytest.raises(HTTPException) as exc_info:
                 await transition_status(
-                    "CM-1", PublicationStatus.borrador, "user1",
+                    "CM-1", PublicationStatus.rechazado, "user1",
                     rejection_comment="123456789"  # 9 chars
                 )
         assert exc_info.value.status_code == 422
@@ -223,7 +223,7 @@ class TestRejectionComment:
         ):
             with pytest.raises(HTTPException) as exc_info:
                 await transition_status(
-                    "CM-1", PublicationStatus.borrador, "user1",
+                    "CM-1", PublicationStatus.rechazado, "user1",
                     rejection_comment=""
                 )
         assert exc_info.value.detail["code"] == "REJECTION_COMMENT_TOO_SHORT"
@@ -239,10 +239,10 @@ class TestRejectionComment:
             patch(_LOG, new=AsyncMock()),
         ):
             result = await transition_status(
-                "CM-1", PublicationStatus.borrador, "user1",
+                "CM-1", PublicationStatus.rechazado, "user1",
                 rejection_comment="1234567890"  # 10 chars
             )
-        assert result["status"] == "borrador"
+        assert result["status"] == "rechazado"
 
     @pytest.mark.asyncio
     async def test_comment_longer_than_10_passes(self):
@@ -255,10 +255,10 @@ class TestRejectionComment:
             patch(_LOG, new=AsyncMock()),
         ):
             result = await transition_status(
-                "CM-1", PublicationStatus.borrador, "user1",
+                "CM-1", PublicationStatus.rechazado, "user1",
                 rejection_comment="Falta información importante aquí"
             )
-        assert result["status"] == "borrador"
+        assert result["status"] == "rechazado"
 
 
 # ---------------------------------------------------------------------------

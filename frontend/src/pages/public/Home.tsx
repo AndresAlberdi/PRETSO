@@ -1,7 +1,6 @@
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import LaunchProgress from '../../components/LaunchProgress'
-import Dashboard from '../../components/Dashboard'
 import { useLaunchStatus } from '../../hooks/useLaunchStatus'
 
 export default function Home() {
@@ -29,8 +28,6 @@ export default function Home() {
             <Link to="/search" style={btnStyle}>{t('nav.search')}</Link>
             <Link to="/companies" style={btnStyle}>{t('nav.companies')}</Link>
           </nav>
-          
-          <Dashboard />
         </>
       )}
     </main>

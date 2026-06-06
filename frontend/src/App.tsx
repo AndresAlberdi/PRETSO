@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 
 // Public pages
 import Home from './pages/public/Home'
+import UserHome from './pages/public/UserHome'
 import Search from './pages/public/Search'
 import Announcements from './pages/public/Announcements'
 import CompanyDetail from './pages/public/CompanyDetail'
@@ -13,6 +14,7 @@ import ApiDocs from './pages/public/ApiDocs'
 import Login from './pages/public/Login'
 import Register from './pages/public/Register'
 import ChangePassword from './pages/public/ChangePassword'
+import TableRecordsList from './pages/public/TableRecordsList'
 
 // Admin pages
 import Dashboard from './pages/admin/Dashboard'
@@ -38,6 +40,11 @@ export default function App() {
 
           {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
+            <Route path="/user-home" element={<UserHome />} />
+            <Route path="/caja" element={<TableRecordsList sourceTable="CM" title="Compañía — Manejo de Caja" />} />
+            <Route path="/salarios" element={<TableRecordsList sourceTable="CS" title="Compañía — Salarios" />} />
+            <Route path="/corpus-christi" element={<TableRecordsList sourceTable="CC" title="Corpus Christi" />} />
+            
             <Route path="/search" element={<Search />} />
             <Route path="/companies" element={<CompaniesList />} />
             <Route path="/companies/:id" element={<CompanyDetail />} />

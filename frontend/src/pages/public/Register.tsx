@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../../hooks/useAuth'
 
+
 export default function Register() {
   const { t } = useTranslation()
   const { register } = useAuth()

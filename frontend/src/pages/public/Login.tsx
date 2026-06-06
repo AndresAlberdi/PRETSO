@@ -20,7 +20,7 @@ export default function Login() {
     setSubmitting(true)
     try {
       await login(email, password)
-      const next = searchParams.get('next') ?? '/admin'
+      const next = searchParams.get('next') ?? '/user-home'
       navigate(next, { replace: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : t('errors.generic'))

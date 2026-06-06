@@ -152,7 +152,7 @@ async def test_transition_en_revision_to_publicado():
 
 
 @pytest.mark.asyncio
-async def test_transition_en_revision_to_borrador_with_comment():
+async def test_transition_en_revision_to_rechazado_with_comment():
     """Rechazo válido con comentario >= 10 chars."""
     record = _make_record_dict("en_revision")
     with (
@@ -162,11 +162,11 @@ async def test_transition_en_revision_to_borrador_with_comment():
         patch(_LOG, new=AsyncMock()),
     ):
         result = await transition_status(
-            "CM-1", PublicationStatus.borrador, "user1",
+            "CM-1", PublicationStatus.rechazado, "user1",
             rejection_comment="Falta información importante"
         )
 
-    assert result["status"] == "borrador"
+    assert result["status"] == "rechazado"
 
 
 @pytest.mark.asyncio
@@ -198,7 +198,7 @@ async def test_transition_rejection_comment_too_short():
     ):
         with pytest.raises(HTTPException) as exc_info:
             await transition_status(
-                "CM-1", PublicationStatus.borrador, "user1",
+                "CM-1", PublicationStatus.rechazado, "user1",
                 rejection_comment="corto"
             )
 

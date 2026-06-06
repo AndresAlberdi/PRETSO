@@ -307,7 +307,7 @@ async def test_p7_state_machine_transitions(old_status, new_status, comment):
         patch("backend.src.services.publication_service.log_operation", return_value=None)
     ):
         if is_allowed:
-            if new_status == PublicationStatus.borrador:
+            if new_status == PublicationStatus.rechazado:
                 res = await transition_status("CM-1", new_status, "user1", rejection_comment=comment)
                 assert res["status"] == new_status.value
             else:
@@ -343,12 +343,12 @@ async def test_p8_rejection_comment_length(comment):
     ):
         if len(comment) < 10:
             with pytest.raises(HTTPException) as exc_info:
-                await transition_status("CM-1", PublicationStatus.borrador, "user1", rejection_comment=comment)
+                await transition_status("CM-1", PublicationStatus.rechazado, "user1", rejection_comment=comment)
             assert exc_info.value.status_code == 422
             assert exc_info.value.detail["code"] == "REJECTION_COMMENT_TOO_SHORT"
         else:
-            res = await transition_status("CM-1", PublicationStatus.borrador, "user1", rejection_comment=comment)
-            assert res["status"] == PublicationStatus.borrador.value
+            res = await transition_status("CM-1", PublicationStatus.rechazado, "user1", rejection_comment=comment)
+            assert res["status"] == PublicationStatus.rechazado.value
             assert res["rejection_comment"] == comment
 
 
