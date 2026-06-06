@@ -54,7 +54,7 @@ async def export(
     company: Optional[str] = Query(None),
     user: dict = Depends(get_current_user),
 ):
-    """Exporta los resultados a CSV (limitado a 100 registros)."""
+    """Exporta los resultados a CSV (limitado a 1000 registros)."""
     active_q = q.strip() if q else None
     csv_iterator = await export_records(
         query=active_q,

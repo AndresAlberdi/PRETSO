@@ -195,8 +195,8 @@ async def export_records(
     source_table: str | None = None,
     company: str | None = None,
 ) -> Any:
-    """Genera un iterador CSV con los resultados filtrados, máximo 100."""
-    result = await search(query, city, year_from, year_to, source_table, company, page=1, page_size=100)
+    """Genera un iterador CSV con los resultados filtrados, máximo 1000."""
+    result = await search(query, city, year_from, year_to, source_table, company, page=1, page_size=1000)
     items = result.get("results", [])
     
     # We yield chunks as strings

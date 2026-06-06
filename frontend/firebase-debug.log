@@ -1,47 +1,36 @@
-[debug] [2026-06-06T00:20:55.856Z] ----------------------------------------------------------------------
-[debug] [2026-06-06T00:20:55.858Z] Command:       /home/andres-alberdi/.nvm/versions/node/v24.14.1/bin/node /home/andres-alberdi/.nvm/versions/node/v24.14.1/bin/firebase deploy --only hosting
-[debug] [2026-06-06T00:20:55.858Z] CLI Version:   15.19.0
-[debug] [2026-06-06T00:20:55.858Z] Platform:      linux
-[debug] [2026-06-06T00:20:55.858Z] Node Version:  v24.14.1
-[debug] [2026-06-06T00:20:55.858Z] Time:          Fri Jun 05 2026 20:20:55 GMT-0400 (hora de Bolivia)
-[debug] [2026-06-06T00:20:55.858Z] ----------------------------------------------------------------------
+[debug] [2026-06-06T00:23:13.444Z] ----------------------------------------------------------------------
+[debug] [2026-06-06T00:23:13.445Z] Command:       /home/andres-alberdi/.nvm/versions/node/v24.14.1/bin/node /home/andres-alberdi/.nvm/versions/node/v24.14.1/bin/firebase deploy --only hosting
+[debug] [2026-06-06T00:23:13.445Z] CLI Version:   15.19.0
+[debug] [2026-06-06T00:23:13.445Z] Platform:      linux
+[debug] [2026-06-06T00:23:13.445Z] Node Version:  v24.14.1
+[debug] [2026-06-06T00:23:13.446Z] Time:          Fri Jun 05 2026 20:23:13 GMT-0400 (hora de Bolivia)
+[debug] [2026-06-06T00:23:13.446Z] ----------------------------------------------------------------------
 [debug] 
-[debug] [2026-06-06T00:20:56.552Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
-[debug] [2026-06-06T00:20:56.552Z] > authorizing via signed-in user (alberdi.andres@gmail.com)
-[debug] [2026-06-06T00:20:56.553Z] [iam] checking project pretso-platform for permissions ["firebase.projects.get","firebasehosting.sites.update"]
-[debug] [2026-06-06T00:20:56.553Z] Checked if tokens are valid: true, expires at: 1780707709711
-[debug] [2026-06-06T00:20:56.553Z] Checked if tokens are valid: true, expires at: 1780707709711
-[debug] [2026-06-06T00:20:56.554Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/pretso-platform:testIamPermissions [none]
-[debug] [2026-06-06T00:20:56.554Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/pretso-platform:testIamPermissions  x-goog-user-project=pretso-platform
-[debug] [2026-06-06T00:20:56.554Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/pretso-platform:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
-[debug] [2026-06-06T00:20:57.644Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/pretso-platform:testIamPermissions 200
-[debug] [2026-06-06T00:20:57.644Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/pretso-platform:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
-[debug] [2026-06-06T00:20:57.645Z] Checked if tokens are valid: true, expires at: 1780707709711
-[debug] [2026-06-06T00:20:57.645Z] Checked if tokens are valid: true, expires at: 1780707709711
-[debug] [2026-06-06T00:20:57.645Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/pretso-platform [none]
-[debug] [2026-06-06T00:20:58.320Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/pretso-platform 200
-[debug] [2026-06-06T00:20:58.320Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/pretso-platform {"projectId":"pretso-platform","projectNumber":"1094869497134","displayName":"PRETSO Platform","name":"projects/pretso-platform","resources":{"hostingSite":"pretso-platform"},"state":"ACTIVE","etag":"1_7f6df2e9-bf39-416f-a819-f7923482ee5b"}
+[debug] [2026-06-06T00:23:14.144Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-06-06T00:23:14.144Z] > authorizing via signed-in user (alberdi.andres@gmail.com)
+[debug] [2026-06-06T00:23:14.144Z] [iam] checking project pretso-platform for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-06-06T00:23:14.145Z] Checked if tokens are valid: true, expires at: 1780707709711
+[debug] [2026-06-06T00:23:14.145Z] Checked if tokens are valid: true, expires at: 1780707709711
+[debug] [2026-06-06T00:23:14.146Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/pretso-platform:testIamPermissions [none]
+[debug] [2026-06-06T00:23:14.146Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/pretso-platform:testIamPermissions  x-goog-user-project=pretso-platform
+[debug] [2026-06-06T00:23:14.146Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/pretso-platform:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-06-06T00:23:14.584Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/pretso-platform:testIamPermissions 200
+[debug] [2026-06-06T00:23:14.584Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/pretso-platform:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-06-06T00:23:14.584Z] Checked if tokens are valid: true, expires at: 1780707709711
+[debug] [2026-06-06T00:23:14.584Z] Checked if tokens are valid: true, expires at: 1780707709711
+[debug] [2026-06-06T00:23:14.585Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/pretso-platform [none]
+[debug] [2026-06-06T00:23:15.139Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/pretso-platform 200
+[debug] [2026-06-06T00:23:15.139Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/pretso-platform {"projectId":"pretso-platform","projectNumber":"1094869497134","displayName":"PRETSO Platform","name":"projects/pretso-platform","resources":{"hostingSite":"pretso-platform"},"state":"ACTIVE","etag":"1_7f6df2e9-bf39-416f-a819-f7923482ee5b"}
 [info] 
 [info] === Deploying to 'pretso-platform'...
 [info] 
 [info] i  deploying hosting 
-[debug] [2026-06-06T00:20:58.323Z] Checked if tokens are valid: true, expires at: 1780707709711
-[debug] [2026-06-06T00:20:58.323Z] Checked if tokens are valid: true, expires at: 1780707709711
-[debug] [2026-06-06T00:20:58.323Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/pretso-platform/sites/pretso-platform [none]
-[debug] [2026-06-06T00:21:00.166Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/pretso-platform/sites/pretso-platform 200
-[debug] [2026-06-06T00:21:00.166Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/pretso-platform/sites/pretso-platform {"name":"projects/pretso-platform/sites/pretso-platform","defaultUrl":"https://pretso-platform.web.app","appId":"1:1094869497134:web:a3bd238e6eefebcca976bf","type":"DEFAULT_SITE"}
-[debug] [2026-06-06T00:21:00.168Z] Checked if tokens are valid: true, expires at: 1780707709711
-[debug] [2026-06-06T00:21:00.168Z] Checked if tokens are valid: true, expires at: 1780707709711
-[debug] [2026-06-06T00:21:00.168Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/pretso-platform/versions [none]
-[debug] [2026-06-06T00:21:00.168Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/pretso-platform/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}
-[debug] [2026-06-06T00:21:01.283Z] <<< [apiv2][status] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/pretso-platform/versions 200
-[debug] [2026-06-06T00:21:01.283Z] <<< [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/pretso-platform/versions {"name":"projects/1094869497134/sites/pretso-platform/versions/12f2bf2618a29e86","status":"CREATED","config":{},"labels":{"deployment-tool":"cli-firebase"}}
-[info] i  hosting[pretso-platform]: beginning deploy... 
-[info] i  hosting[pretso-platform]: found 3 files in frontend/dist 
-[debug] [2026-06-06T00:21:01.295Z] [hosting] uploading with 200 concurrency
-[debug] [2026-06-06T00:21:01.322Z] Checked if tokens are valid: true, expires at: 1780707709711
-[debug] [2026-06-06T00:21:01.322Z] Checked if tokens are valid: true, expires at: 1780707709711
-[debug] [2026-06-06T00:21:01.322Z] [hosting] hash cache [ZnJvbnRlbmQvZGlzdA] stored for 3 files
-[debug] [2026-06-06T00:21:01.322Z] [hosting][hash queue][FINAL] {"max":24,"min":2,"avg":9.333333333333334,"active":0,"complete":3,"success":3,"errored":0,"retried":0,"total":3,"elapsed":26}
-[debug] [2026-06-06T00:21:01.322Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/1094869497134/sites/pretso-platform/versions/12f2bf2618a29e86:populateFiles [none]
-[debug] [2026-06-06T00:21:01.322Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/1094869497134/sites/pretso-platform/versions/12f2bf2618a29e86:populateFiles {"files":{"/index.html":"20b5903e54f378beaa41dcabc323de074813585c3fb31873cee242bbf028bea4","/assets/index-B3ICYvS8.css":"6339d3d38fdb20df4c2835ec4e210d48a779a8d62f844d7b2a09cf964d80a15f","/assets/index-B6ofpZNm.js":"80f707142be6f6f00524e209a9b69c128cd7f867f42d8072f0af28bd7a771c04"}}
+[debug] [2026-06-06T00:23:15.142Z] Checked if tokens are valid: true, expires at: 1780707709711
+[debug] [2026-06-06T00:23:15.142Z] Checked if tokens are valid: true, expires at: 1780707709711
+[debug] [2026-06-06T00:23:15.143Z] >>> [apiv2][query] GET https://firebasehosting.googleapis.com/v1beta1/projects/pretso-platform/sites/pretso-platform [none]
+[debug] [2026-06-06T00:23:16.784Z] <<< [apiv2][status] GET https://firebasehosting.googleapis.com/v1beta1/projects/pretso-platform/sites/pretso-platform 200
+[debug] [2026-06-06T00:23:16.784Z] <<< [apiv2][body] GET https://firebasehosting.googleapis.com/v1beta1/projects/pretso-platform/sites/pretso-platform {"name":"projects/pretso-platform/sites/pretso-platform","defaultUrl":"https://pretso-platform.web.app","appId":"1:1094869497134:web:a3bd238e6eefebcca976bf","type":"DEFAULT_SITE"}
+[debug] [2026-06-06T00:23:16.786Z] Checked if tokens are valid: true, expires at: 1780707709711
+[debug] [2026-06-06T00:23:16.787Z] Checked if tokens are valid: true, expires at: 1780707709711
+[debug] [2026-06-06T00:23:16.787Z] >>> [apiv2][query] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/pretso-platform/versions [none]
+[debug] [2026-06-06T00:23:16.787Z] >>> [apiv2][body] POST https://firebasehosting.googleapis.com/v1beta1/projects/-/sites/pretso-platform/versions {"status":"CREATED","labels":{"deployment-tool":"cli-firebase"}}

@@ -104,8 +104,8 @@ export default function Search() {
   }
 
   function handleExportClick() {
-    if (total > 100) {
-      const confirmExport = window.confirm(`Su búsqueda arrojó ${total} registros. Para evitar sobrecargas, el sistema solo exportará los primeros 100 registros. ¿Desea continuar?`)
+    if (total > 1000) {
+      const confirmExport = window.confirm(`Su búsqueda arrojó ${total} registros. Para evitar sobrecargas, el sistema solo exportará los primeros 1000 registros. ¿Desea continuar?`)
       if (!confirmExport) return
     }
     handleExportCSV()
@@ -176,9 +176,9 @@ export default function Search() {
                       fontWeight: 600,
                     }}
                   >
-                    Exportar CSV (Máx 100)
+                    Exportar CSV (Máx 1000)
                   </button>
-                  {total > 100 && <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>Solo se incluirán los primeros 100.</span>}
+                  {total > 1000 && <span style={{ fontSize: '0.8rem', opacity: 0.7 }}>Solo se incluirán los primeros 1000.</span>}
                 </div>
               )}
             </div>
