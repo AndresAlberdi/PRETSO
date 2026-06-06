@@ -91,7 +91,7 @@ export default function TableRecordsList({ sourceTable, title }: Props) {
                       </div>
                     </td>
                     <td style={td}>
-                      <Link to={`/transactions/${r.id}`} style={{ fontWeight: 600, color: 'var(--primary-color, #ffaa00)', textDecoration: 'none' }}>
+                      <Link to={`/transactions/${r.transaction_id}`} style={{ fontWeight: 600, color: 'var(--primary-color, #ffaa00)', textDecoration: 'none' }}>
                         Ver detalle
                       </Link>
                     </td>

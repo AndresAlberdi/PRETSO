@@ -29,18 +29,28 @@ export default function NavBar() {
       <Link to="/">{t('nav.home')}</Link>
 
       {user && (
-        <Link to="/user-home">{t('nav.user_home', 'Mi Inicio')}</Link>
+        <Link to="/user-home">{t('nav.user_home', 'Dashboard')}</Link>
       )}
 
       {portalActive && user && (
-        <>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', background: 'rgba(255,255,255,0.05)', padding: '0.3rem 0.8rem', borderRadius: '8px' }}>
+            <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', opacity: 0.6, fontWeight: 'bold' }}>Corpus</span>
+            <Link to="/caja">Manejo de Caja</Link>
+            <Link to="/salarios">Salarios</Link>
+            <Link to="/corpus-christi">Corpus Christi</Link>
+          </div>
+
+          <div style={{ display: 'flex', gap: '0.8rem', alignItems: 'center', background: 'rgba(255,255,255,0.05)', padding: '0.3rem 0.8rem', borderRadius: '8px' }}>
+            <span style={{ fontSize: '0.75rem', textTransform: 'uppercase', opacity: 0.6, fontWeight: 'bold' }}>Complementaria</span>
+            <Link to="/companies">{t('nav.companies')}</Link>
+            <Link to="/bibliografia">Bibliografía</Link>
+            <Link to="/indicadores">Indicadores</Link>
+          </div>
+
           <Link to="/search">{t('nav.search')}</Link>
-          <Link to="/companies">{t('nav.companies')}</Link>
-          <Link to="/caja">Manejo de Caja</Link>
-          <Link to="/salarios">Salarios</Link>
-          <Link to="/corpus-christi">Corpus Christi</Link>
           <Link to="/api-docs">{t('nav.api')}</Link>
-        </>
+        </div>
       )}
 
       <Link to="/announcements">{t('nav.announcements')}</Link>

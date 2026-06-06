@@ -44,6 +44,8 @@ export default function App() {
             <Route path="/caja" element={<TableRecordsList sourceTable="CM" title="Compañía — Manejo de Caja" />} />
             <Route path="/salarios" element={<TableRecordsList sourceTable="CS" title="Compañía — Salarios" />} />
             <Route path="/corpus-christi" element={<TableRecordsList sourceTable="CC" title="Corpus Christi" />} />
+            <Route path="/bibliografia" element={<TableRecordsList sourceTable="B" title="Bibliografía" />} />
+            <Route path="/indicadores" element={<TableRecordsList sourceTable="I" title="Indicadores" />} />
             
             <Route path="/search" element={<Search />} />
             <Route path="/companies" element={<CompaniesList />} />
