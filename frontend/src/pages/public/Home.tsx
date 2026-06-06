@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
 import LaunchProgress from '../../components/LaunchProgress'
+import Dashboard from '../../components/Dashboard'
 import { useLaunchStatus } from '../../hooks/useLaunchStatus'
 
 export default function Home() {
@@ -23,11 +24,24 @@ export default function Home() {
       )}
 
       {data && data.portal_active && (
-        <nav style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
-          <Link to="/search">{t('nav.search')}</Link>
-          <Link to="/companies">{t('nav.companies')}</Link>
-        </nav>
+        <>
+          <nav style={{ display: 'flex', gap: '1rem', marginTop: '1rem', justifyContent: 'center' }}>
+            <Link to="/search" style={btnStyle}>{t('nav.search')}</Link>
+            <Link to="/companies" style={btnStyle}>{t('nav.companies')}</Link>
+          </nav>
+          
+          <Dashboard />
+        </>
       )}
     </main>
   )
+}
+
+const btnStyle = {
+  padding: '0.75rem 1.5rem',
+  background: 'var(--primary-color, #ffaa00)',
+  color: '#111',
+  textDecoration: 'none',
+  fontWeight: 'bold',
+  borderRadius: '8px',
 }

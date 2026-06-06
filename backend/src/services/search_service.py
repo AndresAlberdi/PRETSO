@@ -2,7 +2,10 @@
 from __future__ import annotations
 
 import math
+import io
+import csv
 import logging
+from collections import Counter
 from typing import Any
 
 from backend.src.db.repositories import async_query_collection, async_update_document, RECORDS
@@ -162,3 +165,59 @@ def _fragment(text: str, max_chars: int = 200) -> str:
     if len(text) <= max_chars:
         return text
     return text[:max_chars].rsplit(" ", 1)[0] + "…"
+
+
+async def get_stats() -> dict:
+    """Devuelve conteos agregados por ciudad y por año para los registros publicados."""
+    records = await async_query_collection(RECORDS, filters=[("status", "==", "publicado")])
+    cities = Counter()
+    years = Counter()
+    for r in records:
+        city = r.get("city")
+        if city:
+            cities[city] += 1
+        year = r.get("year")
+        if year:
+            years[year] += 1
+            
+    # Formatear para recharts
+    city_data = [{"name": c, "value": count} for c, count in cities.items()]
+    year_data = [{"name": str(y), "value": count} for y, count in sorted(years.items())]
+    
+    return {"cities": city_data, "years": year_data}
+
+
+async def export_records(
+    query: str | None = None,
+    city: str | None = None,
+    year_from: int | None = None,
+    year_to: int | None = None,
+    source_table: str | None = None,
+    company: str | None = None,
+) -> Any:
+    """Genera un iterador CSV con los resultados filtrados, máximo 1000."""
+    result = await search(query, city, year_from, year_to, source_table, company, page=1, page_size=1000)
+    items = result.get("results", [])
+    
+    # We yield chunks as strings
+    output = io.StringIO()
+    writer = csv.writer(output)
+    
+    # Header
+    writer.writerow(["ID", "Transaccion", "Ciudad", "Anio", "Fragmento Noticia", "Score"])
+    yield output.getvalue()
+    output.seek(0)
+    output.truncate(0)
+    
+    for item in items:
+        writer.writerow([
+            item.get("id"),
+            item.get("transaction_id"),
+            item.get("city"),
+            item.get("year"),
+            item.get("noticia_fragment", "").replace("\n", " "),
+            item.get("score")
+        ])
+        yield output.getvalue()
+        output.seek(0)
+        output.truncate(0)

@@ -90,6 +90,10 @@ export default function RecordEditor() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const [comments, setComments] = useState<any[]>([])
+  const [newComment, setNewComment] = useState('')
+  const [auditLogs, setAuditLogs] = useState<any[]>([])
+
   const isReviewer = user?.role === 'revisor' || user?.role === 'administrador'
 
   useEffect(() => {
@@ -113,6 +117,14 @@ export default function RecordEditor() {
           })
           setForm(newForm)
           setStatus(r.status ?? 'borrador')
+
+          // Load comments and audit logs
+          const [comRes, audRes] = await Promise.all([
+            api.get(`/admin/records/${id}/comments`, { headers: { Authorization: `Bearer ${token}` } }).catch(() => ({ data: [] })),
+            api.get(`/admin/records/${id}/audit`, { headers: { Authorization: `Bearer ${token}` } }).catch(() => ({ data: { results: [] } }))
+          ])
+          setComments(comRes.data)
+          setAuditLogs(audRes.data.results)
         }
       } catch {
         if (!cancelled) setError(t('errors.generic'))
@@ -201,6 +213,19 @@ export default function RecordEditor() {
     } catch {
       setError(t('errors.generic'))
       setSaving(false)
+    }
+  }
+
+  async function handleAddComment(e: React.FormEvent) {
+    e.preventDefault()
+    if (!newComment.trim() || !id) return
+    try {
+      const token = await getToken()
+      const res = await api.post(`/admin/records/${id}/comments`, { text: newComment }, { headers: { Authorization: `Bearer ${token}` } })
+      setComments([res.data, ...comments])
+      setNewComment('')
+    } catch {
+      alert('Error al añadir comentario')
     }
   }
 
@@ -379,6 +404,59 @@ export default function RecordEditor() {
           )}
         </div>
       </form>
+
+      {id && (
+        <div style={{ marginTop: '3rem', display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+          
+          {/* Comments Section */}
+          <div style={{ flex: '1 1 300px', background: 'rgba(255, 255, 255, 0.03)', padding: '1.5rem', borderRadius: '12px' }}>
+            <h3>Hilo de Comentarios</h3>
+            <form onSubmit={handleAddComment} style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+              <input
+                type="text"
+                value={newComment}
+                onChange={e => setNewComment(e.target.value)}
+                placeholder="Añade un comentario..."
+                style={{ flex: 1, padding: '0.5rem', borderRadius: '6px', border: '1px solid #ccc' }}
+              />
+              <button type="submit" style={{ padding: '0.5rem 1rem' }}>Enviar</button>
+            </form>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '300px', overflowY: 'auto' }}>
+              {comments.map(c => (
+                <div key={c.id} style={{ background: 'rgba(255, 255, 255, 0.05)', padding: '0.75rem', borderRadius: '8px' }}>
+                  <div style={{ fontSize: '0.8rem', opacity: 0.7, marginBottom: '0.25rem' }}>
+                    <strong>{c.user_email}</strong> • {new Date(c.timestamp).toLocaleString()}
+                  </div>
+                  <div>{c.text}</div>
+                </div>
+              ))}
+              {comments.length === 0 && <p style={{ fontSize: '0.9rem', opacity: 0.6 }}>No hay comentarios aún.</p>}
+            </div>
+          </div>
+
+          {/* Audit Log Section */}
+          <div style={{ flex: '1 1 300px', background: 'rgba(255, 255, 255, 0.03)', padding: '1.5rem', borderRadius: '12px' }}>
+            <h3>Historial de Cambios</h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', maxHeight: '300px', overflowY: 'auto' }}>
+              {auditLogs.map(log => (
+                <div key={log.id} style={{ background: 'rgba(255, 255, 255, 0.05)', padding: '0.75rem', borderRadius: '8px', fontSize: '0.9rem' }}>
+                  <div style={{ opacity: 0.7, marginBottom: '0.25rem' }}>
+                    {new Date(log.timestamp).toLocaleString()}
+                  </div>
+                  <div>Acción: <strong>{log.action}</strong></div>
+                  {log.details && (
+                    <pre style={{ fontSize: '0.8rem', background: 'rgba(0,0,0,0.2)', padding: '0.5rem', borderRadius: '4px', overflowX: 'auto', marginTop: '0.5rem' }}>
+                      {JSON.stringify(log.details, null, 2)}
+                    </pre>
+                  )}
+                </div>
+              ))}
+              {auditLogs.length === 0 && <p style={{ fontSize: '0.9rem', opacity: 0.6 }}>No hay historial.</p>}
+            </div>
+          </div>
+
+        </div>
+      )}
     </main>
   )
 }

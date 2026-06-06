@@ -148,13 +148,17 @@ api_router.include_router(pub_users_router)
 
 # Privados (admin)
 from backend.src.api.private.records import router as priv_records_router
-from backend.src.api.private.announcements import router as priv_announcements_router
+from backend.src.api.private.announcements import router as admin_announcements_router
+from backend.src.api.private.audit import router as audit_router
+from backend.src.api.private.comments import router as comments_router
 from backend.src.api.private.users import router as priv_users_router
 from backend.src.api.private.etl import router as priv_etl_router
 
 admin_router = APIRouter(prefix="/admin")
 admin_router.include_router(priv_records_router)
-admin_router.include_router(priv_announcements_router)
+admin_router.include_router(admin_announcements_router)
+admin_router.include_router(audit_router)
+admin_router.include_router(comments_router)
 admin_router.include_router(priv_users_router)
 admin_router.include_router(priv_etl_router)
 

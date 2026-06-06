@@ -79,6 +79,30 @@ export default function Search() {
     doSearch(1, qOverride, filtersOverride)
   }
 
+  function handleExportCSV() {
+    const params: Record<string, string | number> = {}
+    if (query) params.q = query
+    if (filters.city) params.city = filters.city
+    if (filters.year_from) params.year_from = filters.year_from
+    if (filters.year_to) params.year_to = filters.year_to
+    if (filters.source_table) params.source_table = filters.source_table
+    if (filters.company) params.company = filters.company
+
+    api.get('/search/export', { params, responseType: 'blob' })
+      .then((res) => {
+        const url = window.URL.createObjectURL(new Blob([res.data]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', 'pretso_export.csv')
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+      })
+      .catch(() => {
+        alert('Error al exportar CSV')
+      })
+  }
+
   return (
     <main style={{ maxWidth: 1200, margin: '2rem auto', padding: '0 1.5rem' }}>
       <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
@@ -126,8 +150,26 @@ export default function Search() {
           {loading && <p style={{ fontSize: '1.1rem', opacity: 0.8 }}>Buscando...</p>}
 
           {searched && !loading && (
-            <div style={{ marginBottom: '1.5rem', fontSize: '1.1rem', fontWeight: 500 }}>
-              Registros encontrados: <strong style={{ color: 'var(--primary-color)' }}>{total}</strong>
+            <div style={{ marginBottom: '1.5rem', fontSize: '1.1rem', fontWeight: 500, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                Registros encontrados: <strong style={{ color: 'var(--primary-color)' }}>{total}</strong>
+              </div>
+              {results.length > 0 && (
+                <button
+                  onClick={handleExportCSV}
+                  style={{
+                    padding: '0.5rem 1rem',
+                    borderRadius: '8px',
+                    border: '1px solid var(--primary-color, #ffaa00)',
+                    background: 'transparent',
+                    color: 'var(--primary-color, #ffaa00)',
+                    cursor: 'pointer',
+                    fontWeight: 600,
+                  }}
+                >
+                  Exportar CSV
+                </button>
+              )}
             </div>
           )}
 
