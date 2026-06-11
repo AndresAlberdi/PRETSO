@@ -9,9 +9,27 @@ export interface RecordMaestro {
   fuente_bibliografica: string
   monto_reales?: number | null
   autor_bib?: string | null
+  autores?: string | null
   titulo?: string | null
   concepto_caja?: string | null
   compania_id?: string | null
+  tipo_indicador?: string | null
+  notas?: string | null
+  documento?: string | null
+  documento_codigo?: string | null
+  otros_bienes?: string | null
+  normativa_caja?: string | null
+  pagador?: string | null
+  beneficiario?: string | null
+  dias_racion?: string | null
+  representaciones_ano?: string | null
+  representaciones_estimadas?: string | null
+  encargado?: string | null
+  fondos?: string | null
+  cargo?: string | null
+  valor_indicador?: string | null
+  salario_diario?: number | null
+  festividad?: string | null
   [key: string]: unknown
 }
 

@@ -15,6 +15,7 @@ import Login from './pages/public/Login'
 import Register from './pages/public/Register'
 import ChangePassword from './pages/public/ChangePassword'
 import TableRecordsList from './pages/public/TableRecordsList'
+import IndicadoresPage from './pages/public/IndicadoresPage'
 
 // Admin pages
 import Dashboard from './pages/admin/Dashboard'
@@ -45,7 +46,7 @@ export default function App() {
             <Route path="/salarios" element={<TableRecordsList sourceTable="CS" title="Compañía — Salarios" />} />
             <Route path="/corpus-christi" element={<TableRecordsList sourceTable="CC" title="Corpus Christi" />} />
             <Route path="/bibliografia" element={<TableRecordsList sourceTable="B" title="Bibliografía" />} />
-            <Route path="/indicadores" element={<TableRecordsList sourceTable="I" title="Indicadores" />} />
+            <Route path="/indicadores" element={<IndicadoresPage />} />
             
             <Route path="/search" element={<Search />} />
             <Route path="/companies" element={<CompaniesList />} />

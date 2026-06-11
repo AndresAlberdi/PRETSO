@@ -128,6 +128,9 @@ def _map_row(row: dict, source_table: str, row_num: int) -> tuple[dict | None, d
 
     compania_id = row.get("Compañía", "").strip() or None
 
+    notas = (row.get("Notas", "") or row.get("Nota", "")).strip() or None
+    documento = row.get("Documento", "").strip() or None
+
     record: dict[str, Any] = {
         "id": record_id,
         "source_table": source_table,
@@ -138,6 +141,8 @@ def _map_row(row: dict, source_table: str, row_num: int) -> tuple[dict | None, d
         "fuente_bibliografica": fuente,
         "documento_codigo": doc_codigo,
         "compania_id": compania_id,
+        "notas": notas,
+        "documento": documento,
         "created_by": None,  # se sobreescribe en run_etl
         "created_at": now.isoformat(),
         "updated_at": now.isoformat(),
@@ -150,16 +155,30 @@ def _map_row(row: dict, source_table: str, row_num: int) -> tuple[dict | None, d
     if source_table == "CM":
         record["concepto_caja"] = row.get("Data", "").strip() or None
         record["cargo"] = row.get("Cargo", "").strip() or None
+        record["otros_bienes"] = row.get("Otros bienes de la compañía", "").strip() or None
+        record["normativa_caja"] = row.get("Datos sobre normativa de manejo de caja", "").strip() or None
+        if not record.get("autor_bib"):
+            record["autor_bib"] = row.get("Autores", "").strip() or None
 
     elif source_table == "CS":
         record["valor_indicador"] = row.get("Monto a pagar", "").strip() or None
         record["salario_diario"] = _parse_float(row.get("Ración diaria", ""))
         record["monto_reales"] = _parse_float(row.get("Pago por representación", ""))
         record["cargo"] = row.get("Encargo", "").strip() or None
+        record["pagador"] = row.get("Pagador", "").strip() or None
+        record["beneficiario"] = row.get("Beneficiario", "").strip() or None
+        record["dias_racion"] = row.get("Días de ración en un año", "").strip() or None
+        
+        # Handling double spaces inside keys just in case
+        rep_ano = row.get("Número de representaciones  por año", "") or row.get("Número de representaciones por año", "")
+        record["representaciones_ano"] = rep_ano.strip() or None
+        record["representaciones_estimadas"] = row.get("Número estimado de representaciones por año", "").strip() or None
 
     elif source_table == "CC":
         record["festividad"] = row.get("Encargo", "").strip() or None
         record["monto_reales"] = _parse_float(row.get("Monto a pagar", ""))
+        record["encargado"] = row.get("Encargado", "").strip() or None
+        record["fondos"] = row.get("Fondos", "").strip() or None
 
     elif source_table == "IdI":
         record["tipo_indicador"] = row.get("Categorías", "").strip() or None

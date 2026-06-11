@@ -4,8 +4,6 @@ import { useTranslation } from 'react-i18next'
 import { api } from '../../api/client'
 import type { Transaction, RecordMaestro, Company, PaginatedResponse } from '../../api/types'
 
-const MARAVEDIS_PER_REAL = 34
-
 const TABLE_NAMES: Record<string, string> = {
   B: 'Bibliografía',
   CM: 'Compañías — Caja',
@@ -14,6 +12,96 @@ const TABLE_NAMES: Record<string, string> = {
   IdI: 'Identificación de indicadores',
   I: 'Indicadores',
   Com: 'Índice de compañías',
+}
+
+const FIELD_DEFINITIONS: Record<string, Array<{ key: keyof RecordMaestro, label: string, span?: number }>> = {
+  CM: [
+    { key: 'id', label: 'Indicador de registro' },
+    { key: 'transaction_id', label: 'Transacción' },
+    { key: 'documento', label: 'Documento', span: 4 },
+    { key: 'noticia', label: 'Noticia', span: 4 },
+    { key: 'city', label: 'Ciudad' },
+    { key: 'year', label: 'Año' },
+    { key: 'autor_bib', label: 'Autores' },
+    { key: 'compania_id', label: 'Compañía' },
+    { key: 'concepto_caja', label: 'Data', span: 2 },
+    { key: 'cargo', label: 'Cargo' },
+    { key: 'otros_bienes', label: 'Otros bienes de la compañía', span: 2 },
+    { key: 'normativa_caja', label: 'Datos sobre normativa de manejo de caja', span: 2 },
+    { key: 'fuente_bibliografica', label: 'Fuentes para la generación del dato', span: 2 },
+    { key: 'documento_codigo', label: 'Código documento' }
+  ],
+  CS: [
+    { key: 'id', label: 'Indicador de registro' },
+    { key: 'transaction_id', label: 'Transacción' },
+    { key: 'documento', label: 'Documento', span: 2 },
+    { key: 'noticia', label: 'Noticia', span: 3 },
+    { key: 'city', label: 'Ciudad' },
+    { key: 'cargo', label: 'Encargo' },
+    { key: 'year', label: 'Año' },
+    { key: 'valor_indicador', label: 'Monto a pagar' },
+    { key: 'pagador', label: 'Pagador' },
+    { key: 'beneficiario', label: 'Beneficiario' },
+    { key: 'compania_id', label: 'Compañía' },
+    { key: 'fuente_bibliografica', label: 'Fuentes para la generación del dato', span: 2 },
+    { key: 'documento_codigo', label: 'Códigos documentos' },
+    { key: 'salario_diario', label: 'Ración diaria' },
+    { key: 'dias_racion', label: 'Días de ración en un año' },
+    { key: 'monto_reales', label: 'Pago por representación' },
+    { key: 'representaciones_ano', label: 'Número de representaciones por año' },
+    { key: 'representaciones_estimadas', label: 'Número estimado de representaciones por año' }
+  ],
+  CC: [
+    { key: 'id', label: 'Indicador de registro' },
+    { key: 'transaction_id', label: 'Transacción' },
+    { key: 'documento', label: 'Documento', span: 2 },
+    { key: 'noticia', label: 'Noticia', span: 3 },
+    { key: 'city', label: 'Ciudad' },
+    { key: 'year', label: 'Año' },
+    { key: 'festividad', label: 'Encargo' },
+    { key: 'encargado', label: 'Encargado' },
+    { key: 'compania_id', label: 'Compañía' },
+    { key: 'monto_reales', label: 'Monto a pagar' },
+    { key: 'fondos', label: 'Fondos' },
+    { key: 'fuente_bibliografica', label: 'Fuentes para la generación del dato', span: 2 },
+    { key: 'documento_codigo', label: 'Códigos documentos' }
+  ],
+  IdI: [
+    { key: 'id', label: 'Indicador de registro' },
+    { key: 'transaction_id', label: 'Transacción' },
+    { key: 'documento', label: 'Documento', span: 2 },
+    { key: 'noticia', label: 'Otros datos para elaborar indicadores', span: 3 },
+    { key: 'city', label: 'Ciudad' },
+    { key: 'year', label: 'Años' },
+    { key: 'tipo_indicador', label: 'Categorías' },
+    { key: 'concepto_caja', label: 'Concepto', span: 2 },
+    { key: 'monto_reales', label: 'Monto' },
+    { key: 'notas', label: 'Nota', span: 2 },
+    { key: 'compania_id', label: 'Compañía' },
+    { key: 'fuente_bibliografica', label: 'Referencias bibliográficas', span: 2 },
+    { key: 'documento_codigo', label: 'Código documentos' }
+  ],
+  I: [
+    { key: 'id', label: 'Indicador de registro' },
+    { key: 'noticia', label: 'Indicador', span: 3 },
+    { key: 'city', label: 'Ciudad' },
+    { key: 'year', label: 'Años' },
+    { key: 'concepto_caja', label: 'Concepto' },
+    { key: 'monto_reales', label: 'Monto' },
+    { key: 'notas', label: 'Notas', span: 2 }
+  ],
+  B: [
+    { key: 'id', label: 'Indicador de registro' },
+    { key: 'autor_bib', label: 'Autores' },
+    { key: 'titulo', label: 'Referencias bibliográficas', span: 3 }
+  ],
+  Com: [
+    { key: 'id', label: 'Indicador de registro' },
+    { key: 'siglas', label: 'Siglas' },
+    { key: 'autor_principal', label: 'Autores' },
+    { key: 'ambito', label: 'España / América' },
+    { key: 'valor_indicador', label: 'Temporadas teatrales' }
+  ]
 }
 
 export default function TransactionDetail() {
@@ -120,35 +208,30 @@ export default function TransactionDetail() {
           <h2 style={{ marginTop: 0, marginBottom: '1.25rem', fontSize: '1.35rem', borderBottom: '1px solid rgba(255, 255, 255, 0.1)', paddingBottom: '0.5rem', color: '#fff' }}>
             Tabla: {TABLE_NAMES[table] || table}
           </h2>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '2px solid rgba(255, 255, 255, 0.15)' }}>
-                  <th style={th}>ID</th>
-                  <th style={th}>{t('record.city')}</th>
-                  <th style={th}>{t('record.year')}</th>
-                  <th style={th}>Noticia Completa</th>
-                  <th style={th}>{t('record.amount')}</th>
-                  <th style={th}>{t('record.amount_maravedis')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((r) => {
-                  const maravedis =
-                    r.monto_reales != null ? r.monto_reales * MARAVEDIS_PER_REAL : null
-                  return (
-                    <tr key={r.id} style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.05)' }}>
-                      <td style={td}>{r.id}</td>
-                      <td style={td}>{r.city}</td>
-                      <td style={td}>{r.year}</td>
-                      <td style={{ ...td, lineHeight: 1.5 }}>{r.noticia}</td>
-                      <td style={td}>{r.monto_reales ?? '—'}</td>
-                      <td style={td}>{maravedis != null ? maravedis : '—'}</td>
-                    </tr>
-                  )
-                })}
-              </tbody>
-            </table>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {rows.map((r) => {
+              const defs = FIELD_DEFINITIONS[table] || []
+              // Filter to fields that actually have a value
+              const validDefs = defs.filter(d => r[d.key] != null && r[d.key] !== '')
+
+              return (
+                <div key={r.id} style={{ padding: '1.5rem', background: 'rgba(0, 0, 0, 0.2)', borderRadius: '8px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                  <h4 style={{ margin: '0 0 1rem 0', color: 'var(--primary-color)', fontSize: '1.1rem' }}>Registro: {r.id}</h4>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem' }}>
+                    {validDefs.map((def) => (
+                      <div key={def.key} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem', gridColumn: def.span ? `span ${def.span}` : 'span 1' }}>
+                        <span style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)', fontWeight: 600 }}>
+                          {def.label}
+                        </span>
+                        <span style={{ fontSize: '1rem', wordBreak: 'break-word', whiteSpace: 'pre-wrap' }}>
+                          {String(r[def.key])}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </section>
       ))}
@@ -156,21 +239,4 @@ export default function TransactionDetail() {
   )
 }
 
-const th: React.CSSProperties = {
-  textAlign: 'left',
-  padding: '1rem',
-  fontWeight: 600,
-  opacity: 0.9,
-  fontSize: '0.9rem',
-  textTransform: 'uppercase',
-  letterSpacing: '0.05em',
-  color: 'var(--text-muted)',
-  borderBottom: '2px solid rgba(255, 255, 255, 0.15)',
-}
 
-const td: React.CSSProperties = {
-  padding: '1rem',
-  verticalAlign: 'top',
-  whiteSpace: 'normal',
-  wordBreak: 'break-word',
-}

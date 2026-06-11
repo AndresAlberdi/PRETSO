@@ -68,22 +68,18 @@ async def search(
         total = len(candidates)
         offset = (page - 1) * page_size
         page_items = candidates[offset: offset + page_size]
-        results = [
-            {
-                "id": doc.get("id"),
-                "transaction_id": doc.get("transaction_id"),
-                "city": doc.get("city"),
-                "year": doc.get("year"),
-                "noticia_fragment": _fragment(doc.get("noticia", "")),
-                "score": 1.0,
-            }
-            for doc in page_items
-        ]
+        results = []
+        for doc in page_items:
+            res_doc = dict(doc)
+            res_doc["noticia_fragment"] = _fragment(doc.get("noticia", ""))
+            res_doc["score"] = 1.0
+            results.append(res_doc)
         return {
             "results": results,
             "total": total,
             "page": page,
             "page_size": page_size,
+            "total_pages": math.ceil(total / page_size) if page_size > 0 else 0,
             "suggestions": [],
         }
 
@@ -109,17 +105,12 @@ async def search(
     offset = (page - 1) * page_size
     page_items = scored[offset: offset + page_size]
 
-    results = [
-        {
-            "id": doc.get("id"),
-            "transaction_id": doc.get("transaction_id"),
-            "city": doc.get("city"),
-            "year": doc.get("year"),
-            "noticia_fragment": _fragment(doc.get("noticia", "")),
-            "score": round(score, 6),
-        }
-        for score, doc in page_items
-    ]
+    results = []
+    for score, doc in page_items:
+        res_doc = dict(doc)
+        res_doc["noticia_fragment"] = _fragment(doc.get("noticia", ""))
+        res_doc["score"] = round(score, 6)
+        results.append(res_doc)
 
     # Sugerencias cuando no hay resultados
     suggestions: list[str] = []
@@ -131,6 +122,7 @@ async def search(
         "total": total,
         "page": page,
         "page_size": page_size,
+        "total_pages": math.ceil(total / page_size) if page_size > 0 else 0,
         "suggestions": suggestions,
     }
 

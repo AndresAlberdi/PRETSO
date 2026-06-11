@@ -8,6 +8,10 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1'
 export const api = axios.create({ baseURL: BASE_URL })
 
 api.interceptors.request.use(async (config) => {
+  // Disable caching for all API requests (fixes Firebase Hosting CDN / browser GET caching)
+  config.params = config.params || {}
+  config.params._t = new Date().getTime()
+
   const currentUser = auth.currentUser
   if (currentUser) {
     const token = await currentUser.getIdToken()
