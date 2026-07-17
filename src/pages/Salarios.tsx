@@ -6,9 +6,10 @@ import SearchBar from "../components/SearchBar";
 import { cleanFirebaseData } from "../utils";
 import { useAdmin } from "../context/AdminContext";
 import ConfirmModal from "../components/ConfirmModal";
-import { deleteDoc, doc } from "firebase/firestore";
+import { deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { logAction } from "../utils/audit";
 import GenericCreateModal from "../components/GenericCreateModal";
+import GenericEditModal from "../components/GenericEditModal";
 
 export default function Salarios() {
   const [data, setData] = useState<any[]>([]);
@@ -20,6 +21,7 @@ export default function Salarios() {
   const [brokenLinkAlert, setBrokenLinkAlert] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
 
   // States for Master-Detail
   const [selectedCompId, setSelectedCompId] = useState<string | null>(null);
@@ -47,12 +49,16 @@ export default function Salarios() {
     async function fetchData() {
       const qSal = query(collection(db, "salarios"));
       const snapSal = await getDocs(qSal);
-      const docsSal = snapSal.docs.map(cleanFirebaseData);
+      const docsSal = snapSal.docs.map(cleanFirebaseData).sort(
+        (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
+      );
       setData(docsSal);
 
       const qComp = query(collection(db, "companias"));
       const snapComp = await getDocs(qComp);
-      const docsComp = snapComp.docs.map(cleanFirebaseData);
+      const docsComp = snapComp.docs.map(cleanFirebaseData).sort(
+        (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
+      );
       setCompanias(docsComp);
       
       const qTrans = query(collection(db, "transacciones"));
@@ -82,6 +88,21 @@ export default function Salarios() {
       setRecordToDelete(null);
     } catch (error) {
       console.error("Error deleting document: ", error);
+    }
+  };
+
+  const handleSave = async (updatedRecord: any) => {
+    try {
+      const { id, ...dataToSave } = updatedRecord;
+      await updateDoc(doc(db, "salarios", id), dataToSave);
+      await logAction('EDIT', 'salarios', id, 'pretsodatabase@gmail.com', dataToSave);
+      setData(data.map(d => d.id === id ? updatedRecord : d).sort(
+        (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
+      ));
+      setRecordToEdit(null);
+    } catch (error) {
+      console.error("Error updating document: ", error);
+      alert("Error al actualizar el registro.");
     }
   };
 
@@ -158,7 +179,7 @@ export default function Salarios() {
                   </td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button onClick={() => alert("Edición en desarrollo")} style={{ background: 'var(--primary-color)' }}>Editar</button>
+                      <button onClick={() => setRecordToEdit(row)} style={{ background: 'var(--primary-color)' }}>Editar</button>
                       <button onClick={() => attemptDelete(row)} style={{ background: '#ff4d4f' }}>Borrar</button>
                     </td>
                   )}
@@ -224,7 +245,7 @@ export default function Salarios() {
                   </td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button onClick={() => alert("Edición en desarrollo")} style={{ background: 'var(--primary-color)' }}>Editar</button>
+                      <button onClick={() => setRecordToEdit(row)} style={{ background: 'var(--primary-color)' }}>Editar</button>
                       <button onClick={() => attemptDelete(row)} style={{ background: '#ff4d4f' }}>Borrar</button>
                     </td>
                   )}
@@ -241,8 +262,19 @@ export default function Salarios() {
           collectionName="salarios"
           onClose={() => setIsCreateOpen(false)}
           onCreated={(newRecord) => {
-            setData(prev => [newRecord, ...prev]);
+            setData(prev => [...prev, newRecord].sort(
+              (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
+            ));
           }}
+        />
+      )}
+
+      {recordToEdit && (
+        <GenericEditModal
+          collectionName="salarios"
+          record={recordToEdit}
+          onClose={() => setRecordToEdit(null)}
+          onSave={handleSave}
         />
       )}
 

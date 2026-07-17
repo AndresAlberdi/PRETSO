@@ -5,9 +5,10 @@ import { db } from "../firebase";
 import { cleanFirebaseData } from "../utils";
 import { useAdmin } from "../context/AdminContext";
 import ConfirmModal from "../components/ConfirmModal";
-import { deleteDoc, doc, where } from "firebase/firestore";
+import { deleteDoc, doc, where, updateDoc } from "firebase/firestore";
 import { logAction } from "../utils/audit";
 import GenericCreateModal from "../components/GenericCreateModal";
+import GenericEditModal from "../components/GenericEditModal";
 
 export default function IndiceCompanias() {
   const [data, setData] = useState<any[]>([]);
@@ -17,12 +18,16 @@ export default function IndiceCompanias() {
   const [deleteErrorAlert, setDeleteErrorAlert] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       const q = query(collection(db, "companias"));
       const snapshot = await getDocs(q);
-      setData(snapshot.docs.map(cleanFirebaseData));
+      const sorted = snapshot.docs.map(cleanFirebaseData).sort(
+        (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
+      );
+      setData(sorted);
       setLoading(false);
     }
     fetchData();
@@ -80,6 +85,21 @@ export default function IndiceCompanias() {
     }
   };
 
+  const handleSave = async (updatedRecord: any) => {
+    try {
+      const { id, ...dataToSave } = updatedRecord;
+      await updateDoc(doc(db, "companias", id), dataToSave);
+      await logAction('EDIT', 'companias', id, 'pretsodatabase@gmail.com', dataToSave);
+      setData(data.map(d => d.id === id ? updatedRecord : d).sort(
+        (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
+      ));
+      setRecordToEdit(null);
+    } catch (error) {
+      console.error("Error updating document: ", error);
+      alert("Error al actualizar la compañía.");
+    }
+  };
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
@@ -109,7 +129,7 @@ export default function IndiceCompanias() {
                   <td>{item["Ámbito"]}</td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button onClick={() => alert("Edición en desarrollo")} style={{ background: 'var(--primary-color)' }}>Editar</button>
+                      <button onClick={() => setRecordToEdit(item)} style={{ background: 'var(--primary-color)' }}>Editar</button>
                       <button onClick={() => attemptDelete(item)} style={{ background: '#ff4d4f' }}>Borrar</button>
                     </td>
                   )}
@@ -125,8 +145,19 @@ export default function IndiceCompanias() {
           collectionName="companias"
           onClose={() => setIsCreateOpen(false)}
           onCreated={(newRecord) => {
-            setData(prev => [newRecord, ...prev]);
+            setData(prev => [...prev, newRecord].sort(
+              (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
+            ));
           }}
+        />
+      )}
+
+      {recordToEdit && (
+        <GenericEditModal
+          collectionName="companias"
+          record={recordToEdit}
+          onClose={() => setRecordToEdit(null)}
+          onSave={handleSave}
         />
       )}
 

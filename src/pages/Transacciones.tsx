@@ -6,6 +6,9 @@ import { useAdmin } from "../context/AdminContext";
 import ConfirmModal from "../components/ConfirmModal";
 import { logAction } from "../utils/audit";
 import GenericCreateModal from "../components/GenericCreateModal";
+import GenericEditModal from "../components/GenericEditModal";
+import DocumentModal from "../components/DocumentModal";
+import { updateDoc } from "firebase/firestore";
 
 export default function Transacciones() {
   const [data, setData] = useState<any[]>([]);
@@ -15,12 +18,17 @@ export default function Transacciones() {
   const [deleteErrorAlert, setDeleteErrorAlert] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
+  const [activeDoc, setActiveDoc] = useState<string | number | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       const q = query(collection(db, "transacciones"));
       const snap = await getDocs(q);
-      setData(snap.docs.map(cleanFirebaseData));
+      const sorted = snap.docs.map(cleanFirebaseData).sort(
+        (a, b) => Number(a["Num"] || 0) - Number(b["Num"] || 0)
+      );
+      setData(sorted);
       setLoading(false);
     }
     fetchData();
@@ -70,6 +78,21 @@ export default function Transacciones() {
     }
   };
 
+  const handleSave = async (updatedRecord: any) => {
+    try {
+      const { id, ...dataToSave } = updatedRecord;
+      await updateDoc(doc(db, "transacciones", id), dataToSave);
+      await logAction('EDIT', 'transacciones', id, 'pretsodatabase@gmail.com', dataToSave);
+      setData(data.map(d => d.id === id ? updatedRecord : d).sort(
+        (a, b) => Number(a["Num"] || 0) - Number(b["Num"] || 0)
+      ));
+      setRecordToEdit(null);
+    } catch (error) {
+      console.error("Error updating transaction: ", error);
+      alert("Error al actualizar la transacción.");
+    }
+  };
+
   const getDocsForTransaction = (row: any) => {
     const docCodes = [];
     for (let i = 1; i <= 10; i++) {
@@ -79,6 +102,38 @@ export default function Transacciones() {
       }
     }
     return docCodes.length > 0 ? docCodes.join(', ') : 'Ninguno';
+  };
+
+  const renderDocsForTransaction = (row: any) => {
+    const docCodes = [];
+    for (let i = 1; i <= 10; i++) {
+      const val = row[`Doc${i}`];
+      if (val) {
+        docCodes.push(val);
+      }
+    }
+    if (docCodes.length === 0) return 'Ninguno';
+    return (
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+        {docCodes.map(val => (
+          <button
+            key={val}
+            onClick={() => setActiveDoc(val)}
+            style={{
+              padding: '0.2rem 0.5rem',
+              background: 'var(--accent-color)',
+              color: 'white',
+              borderRadius: '4px',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '0.9rem'
+            }}
+          >
+            Doc {val}
+          </button>
+        ))}
+      </div>
+    );
   };
 
   return (
@@ -100,21 +155,21 @@ export default function Transacciones() {
           <table>
             <thead>
               <tr>
-                <th>Documentos</th>
                 <th>Noticia</th>
                 <th>Fuentes</th>
+                <th>Documentos</th>
                 {isEditMode && <th>Admin</th>}
               </tr>
             </thead>
             <tbody>
               {data.map(row => (
                 <tr key={row.id}>
-                  <td>{getDocsForTransaction(row)}</td>
                   <td style={{ maxWidth: '400px' }}>{row["Noticia"]}</td>
                   <td style={{ maxWidth: '200px' }}>{row["Fuentes para la generación del dato"]}</td>
+                  <td>{renderDocsForTransaction(row)}</td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button onClick={() => alert("Edición en desarrollo")} style={{ background: 'var(--primary-color)' }}>Editar</button>
+                      <button onClick={() => setRecordToEdit(row)} style={{ background: 'var(--primary-color)' }}>Editar</button>
                       <button onClick={() => attemptDelete(row)} style={{ background: '#ff4d4f' }}>Borrar</button>
                     </td>
                   )}
@@ -130,8 +185,19 @@ export default function Transacciones() {
           collectionName="transacciones"
           onClose={() => setIsCreateOpen(false)}
           onCreated={(newRecord) => {
-            setData(prev => [newRecord, ...prev]);
+            setData(prev => [...prev, newRecord].sort(
+              (a, b) => Number(a["Num"] || 0) - Number(b["Num"] || 0)
+            ));
           }}
+        />
+      )}
+
+      {recordToEdit && (
+        <GenericEditModal
+          collectionName="transacciones"
+          record={recordToEdit}
+          onClose={() => setRecordToEdit(null)}
+          onSave={handleSave}
         />
       )}
 
@@ -176,6 +242,12 @@ export default function Transacciones() {
           message={deleteErrorAlert}
           onCancel={() => setDeleteErrorAlert(null)}
           isAlertOnly={true}
+        />
+      )}
+      {activeDoc && (
+        <DocumentModal 
+          docCode={activeDoc} 
+          onClose={() => setActiveDoc(null)} 
         />
       )}
     </div>

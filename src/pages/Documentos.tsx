@@ -6,6 +6,8 @@ import { useAdmin } from "../context/AdminContext";
 import ConfirmModal from "../components/ConfirmModal";
 import { logAction } from "../utils/audit";
 import GenericCreateModal from "../components/GenericCreateModal";
+import GenericEditModal from "../components/GenericEditModal";
+import { updateDoc } from "firebase/firestore";
 
 export default function Documentos() {
   const [data, setData] = useState<any[]>([]);
@@ -15,12 +17,16 @@ export default function Documentos() {
   const [deleteErrorAlert, setDeleteErrorAlert] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
 
   useEffect(() => {
     async function fetchData() {
       const q = query(collection(db, "documentos"));
       const snap = await getDocs(q);
-      setData(snap.docs.map(cleanFirebaseData));
+      const sorted = snap.docs.map(cleanFirebaseData).sort(
+        (a, b) => Number(a["Doc"] || 0) - Number(b["Doc"] || 0)
+      );
+      setData(sorted);
       setLoading(false);
     }
     fetchData();
@@ -73,6 +79,21 @@ export default function Documentos() {
     }
   };
 
+  const handleSave = async (updatedRecord: any) => {
+    try {
+      const { id, ...dataToSave } = updatedRecord;
+      await updateDoc(doc(db, "documentos", id), dataToSave);
+      await logAction('EDIT', 'documentos', id, 'pretsodatabase@gmail.com', dataToSave);
+      setData(data.map(d => d.id === id ? updatedRecord : d).sort(
+        (a, b) => Number(a["Doc"] || 0) - Number(b["Doc"] || 0)
+      ));
+      setRecordToEdit(null);
+    } catch (error) {
+      console.error("Error updating document: ", error);
+      alert("Error al actualizar el documento.");
+    }
+  };
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
@@ -92,7 +113,7 @@ export default function Documentos() {
           <table>
             <thead>
               <tr>
-                <th>Doc ID</th>
+                <th style={{ width: '80px', textAlign: 'center' }}>Doc ID</th>
                 <th>Documento</th>
                 {isEditMode && <th>Admin</th>}
               </tr>
@@ -100,11 +121,11 @@ export default function Documentos() {
             <tbody>
               {data.map(row => (
                 <tr key={row.id}>
-                  <td>{row["Doc"]}</td>
+                  <td style={{ textAlign: 'center' }}>{row["Doc"]}</td>
                   <td style={{ maxWidth: '600px' }}>{row["Documento"]}</td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button onClick={() => alert("Edición en desarrollo")} style={{ background: 'var(--primary-color)' }}>Editar</button>
+                      <button onClick={() => setRecordToEdit(row)} style={{ background: 'var(--primary-color)' }}>Editar</button>
                       <button onClick={() => attemptDelete(row)} style={{ background: '#ff4d4f' }}>Borrar</button>
                     </td>
                   )}
@@ -120,8 +141,19 @@ export default function Documentos() {
           collectionName="documentos"
           onClose={() => setIsCreateOpen(false)}
           onCreated={(newRecord) => {
-            setData(prev => [newRecord, ...prev]);
+            setData(prev => [...prev, newRecord].sort(
+              (a, b) => Number(a["Doc"] || 0) - Number(b["Doc"] || 0)
+            ));
           }}
+        />
+      )}
+
+      {recordToEdit && (
+        <GenericEditModal
+          collectionName="documentos"
+          record={recordToEdit}
+          onClose={() => setRecordToEdit(null)}
+          onSave={handleSave}
         />
       )}
 

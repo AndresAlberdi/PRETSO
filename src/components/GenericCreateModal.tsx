@@ -4,6 +4,17 @@ import { db } from '../firebase';
 import { cleanFirebaseData } from '../utils';
 import { logAction } from '../utils/audit';
 
+const COLLECTION_LABELS: Record<string, string> = {
+  documentos: 'Documentos',
+  companias: 'Compañías',
+  transacciones: 'Transacciones',
+  manejo_de_caja: 'Manejo de Caja',
+  salarios: 'Salarios',
+  corpus_christi: 'Corpus Christi',
+  indicadores: 'Indicadores',
+  bibliografia: 'Bibliografía'
+};
+
 interface GenericCreateModalProps {
   collectionName: string;
   onClose: () => void;
@@ -187,7 +198,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
           throw new Error("Debe asociar obligatoriamente una transacción existente.");
         }
         recordToSave['Transacción'] = Number(recordToSave['Transacción']);
-        recordToSave['Años'] = Number(recordToSave['Años']);
+        recordToSave['Años'] = recordToSave['Años'] ? String(recordToSave['Años']).trim() : '';
       }
 
       // Corpus Christi
@@ -280,7 +291,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
         boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
       }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
-          <h2 style={{ marginTop: 0, color: 'var(--primary-color)' }}>Nuevo Registro - {collectionName.toUpperCase().replace(/_/g, ' ')}</h2>
+          <h2 style={{ marginTop: 0, color: 'var(--primary-color)' }}>Nuevo Registro - {(COLLECTION_LABELS[collectionName] || collectionName).toUpperCase()}</h2>
           <button onClick={onClose} style={{ padding: '0.4rem 0.8rem', background: '#ccc', color: '#333', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Cerrar</button>
         </div>
 
@@ -807,7 +818,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                 <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <strong>Años</strong>
                   <input
-                    type="number"
+                    type="text"
                     value={formData['Años'] || ''}
                     onChange={e => handleChange('Años', e.target.value)}
                   />
@@ -837,7 +848,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   />
                 </label>
                 <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <strong>Sigla Compañía</strong>
+                  <strong>Compañía</strong>
                   <select
                     value={formData['Sigla Compañía'] || ''}
                     onChange={e => handleChange('Sigla Compañía', e.target.value || null)}

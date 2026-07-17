@@ -147,7 +147,31 @@ export async function generateDatabaseXml(): Promise<string> {
     const q = query(collection(db, collName));
     const snap = await getDocs(q);
 
-    snap.docs.forEach(doc => {
+    const docs = [...snap.docs];
+    docs.sort((docA, docB) => {
+      const a = docA.data();
+      const b = docB.data();
+      
+      let indexField = '';
+      if (collName === 'documentos') indexField = 'Doc';
+      else if (collName === 'transacciones') indexField = 'Num';
+      else if (collName === 'bibliografia') {
+        return String(a['Autores'] || '').localeCompare(String(b['Autores'] || ''));
+      }
+      else indexField = 'Indicador de registro';
+
+      const valA = a[indexField];
+      const valB = b[indexField];
+
+      const numA = Number(valA);
+      const numB = Number(valB);
+      if (!isNaN(numA) && !isNaN(numB)) {
+        return numA - numB;
+      }
+      return String(valA || '').localeCompare(String(valB || ''));
+    });
+
+    docs.forEach(doc => {
       xml += `    <${mapping.item}>\n`;
       const data = doc.data();
 

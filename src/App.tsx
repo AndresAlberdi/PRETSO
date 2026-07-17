@@ -17,6 +17,7 @@ import { AdminProvider, useAdmin } from './context/AdminContext';
 
 import { useState } from 'react';
 import { generateDatabaseXml, downloadXml, generateZipBlob, uploadToGoogleDrive } from './utils/backup';
+import { generateDatabaseXlsx, downloadXlsx } from './utils/xlsxExport';
 
 function Layout({ children }: { children: React.ReactNode }) {
   const { isAdmin, isEditMode, setIsEditMode, user } = useAdmin();
@@ -42,6 +43,25 @@ function Layout({ children }: { children: React.ReactNode }) {
       console.error(err);
       setBackupStatus('error');
       setStatusMessage(`Error al generar XML: ${err.message || err}`);
+    }
+  };
+
+  const handleDownloadXlsx = async () => {
+    try {
+      setBackupStatus('loading');
+      setStatusMessage('Generando volcado de base de datos XLSX...');
+      const blob = await generateDatabaseXlsx();
+      const now = new Date();
+      const pad = (n: number) => String(n).padStart(2, '0');
+      const formattedDate = `${now.getFullYear()}${pad(now.getMonth() + 1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+      downloadXlsx(blob, `pretso_database_${formattedDate}.xlsx`);
+      setBackupStatus('success');
+      setStatusMessage('¡Volcado XLSX descargado exitosamente!');
+      setTimeout(() => setBackupStatus('idle'), 3000);
+    } catch (err: any) {
+      console.error(err);
+      setBackupStatus('error');
+      setStatusMessage(`Error al generar XLSX: ${err.message || err}`);
     }
   };
 
@@ -178,6 +198,12 @@ function Layout({ children }: { children: React.ReactNode }) {
                     style={{ padding: '0.8rem 1rem', borderBottom: '1px solid var(--border-color)', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', color: 'var(--text-primary)', width: '100%', fontSize: '1rem', fontWeight: 'bold' }}
                   >
                     Descargar XML
+                  </button>
+                  <button 
+                    onClick={() => { setAdminMenuOpen(false); handleDownloadXlsx(); }}
+                    style={{ padding: '0.8rem 1rem', borderBottom: '1px solid var(--border-color)', background: 'none', border: 'none', textAlign: 'left', cursor: 'pointer', color: 'var(--text-primary)', width: '100%', fontSize: '1rem', fontWeight: 'bold' }}
+                  >
+                    Descargar XLSX
                   </button>
                   <button 
                     onClick={() => { setAdminMenuOpen(false); handleGoogleDriveBackup(); }}
