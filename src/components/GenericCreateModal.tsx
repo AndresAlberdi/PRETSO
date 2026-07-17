@@ -6,7 +6,7 @@ import { logAction } from '../utils/audit';
 
 const COLLECTION_LABELS: Record<string, string> = {
   documentos: 'Documentos',
-  companias: 'Compañías',
+  companias: 'Compañias',
   transacciones: 'Transacciones',
   manejo_de_caja: 'Manejo de Caja',
   salarios: 'Salarios',

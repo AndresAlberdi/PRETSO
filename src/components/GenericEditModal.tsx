@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { collection, query, getDocs } from 'firebase/firestore';
+import { db } from '../firebase';
+import { cleanFirebaseData } from '../utils';
 
 interface GenericEditModalProps {
   collectionName: string;
@@ -6,6 +9,17 @@ interface GenericEditModalProps {
   onSave: (updatedRecord: any) => Promise<void>;
   onClose: () => void;
 }
+
+const COLLECTION_LABELS: Record<string, string> = {
+  documentos: 'Documentos',
+  companias: 'Compañias',
+  transacciones: 'Transacciones',
+  manejo_de_caja: 'Manejo de Caja',
+  salarios: 'Salarios',
+  corpus_christi: 'Corpus Christi',
+  indicadores: 'Indicadores',
+  bibliografia: 'Bibliografía'
+};
 
 const FIELD_LABEL_MAP: Record<string, string> = {
   'Sigla Compañía': 'Compañía',
@@ -33,8 +47,25 @@ const READONLY_FIELDS = [
 export default function GenericEditModal({ collectionName, record, onSave, onClose }: GenericEditModalProps) {
   const [formData, setFormData] = useState<any>({ ...record });
   const [loading, setLoading] = useState(false);
+  const [documents, setDocuments] = useState<any[]>([]);
 
-  const handleChange = (key: string, value: string) => {
+  useEffect(() => {
+    async function loadDocuments() {
+      if (collectionName === 'transacciones') {
+        try {
+          const qDocs = query(collection(db, 'documentos'));
+          const snapDocs = await getDocs(qDocs);
+          const docList = snapDocs.docs.map(cleanFirebaseData).sort((a, b) => Number(a.Doc) - Number(b.Doc));
+          setDocuments(docList);
+        } catch (error) {
+          console.error("Error loading documents in GenericEditModal", error);
+        }
+      }
+    }
+    loadDocuments();
+  }, [collectionName]);
+
+  const handleChange = (key: string, value: any) => {
     setFormData((prev: any) => ({ ...prev, [key]: value }));
   };
 
@@ -62,6 +93,38 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
     setLoading(false);
   };
 
+  // Sort keys custom function to place primary keys first and Doc1..Doc10 last
+  const getSortedKeys = () => {
+    const keys = Object.keys(record).filter(k => k !== 'id');
+    
+    let indexField = '';
+    if (collectionName === 'documentos') indexField = 'Doc';
+    else if (collectionName === 'transacciones') indexField = 'Num';
+    else if (keys.includes('Indicador de registro')) indexField = 'Indicador de registro';
+
+    keys.sort((a, b) => {
+      // 1. Index field always goes first
+      if (a === indexField) return -1;
+      if (b === indexField) return 1;
+
+      // 2. Doc1..Doc10 go to the end for transacciones
+      const isDocA = /^Doc\d+$/.test(a);
+      const isDocB = /^Doc\d+$/.test(b);
+      if (isDocA && !isDocB) return 1;
+      if (!isDocA && isDocB) return -1;
+      if (isDocA && isDocB) {
+        const numA = Number(a.replace('Doc', ''));
+        const numB = Number(b.replace('Doc', ''));
+        return numA - numB;
+      }
+
+      // 3. Alphabetical sort for all other fields
+      return a.localeCompare(b);
+    });
+
+    return keys;
+  };
+
   return (
     <div style={{
       position: 'fixed',
@@ -84,58 +147,77 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
         boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
       }}>
         <h2 style={{ marginTop: 0, color: 'var(--primary-color)' }}>
-          Editar Registro - {collectionName.toUpperCase().replace(/_/g, ' ')}
+          Editar Registro - {(COLLECTION_LABELS[collectionName] || collectionName).toUpperCase()}
         </h2>
         <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', marginTop: '1.5rem' }}>
-          {Object.keys(record)
-            .filter(k => k !== 'id')
-            .sort()
-            .map(key => {
-              const isReadOnly = READONLY_FIELDS.includes(key);
-              const isTextarea = TEXTAREA_FIELDS.includes(key);
-              const displayLabel = FIELD_LABEL_MAP[key] || key;
+          {getSortedKeys().map(key => {
+            const isReadOnly = READONLY_FIELDS.includes(key);
+            const isTextarea = TEXTAREA_FIELDS.includes(key);
+            const isDocField = /^Doc\d+$/.test(key);
+            const displayLabel = FIELD_LABEL_MAP[key] || key;
 
-              return (
-                <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <label style={{ fontWeight: 'bold', fontSize: '0.95rem' }}>
-                    {displayLabel} {isReadOnly && <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>(No Editable)</span>}
-                  </label>
-                  
-                  {isTextarea ? (
-                    <textarea
-                      value={formData[key] || ''}
-                      onChange={e => handleChange(key, e.target.value)}
-                      disabled={isReadOnly || loading}
-                      rows={5}
-                      style={{
-                        padding: '0.6rem',
-                        borderRadius: '4px',
-                        border: '1px solid var(--border-color)',
-                        background: isReadOnly ? 'rgba(255,255,255,0.05)' : 'var(--bg-body)',
-                        color: 'var(--text-primary)',
-                        fontFamily: 'inherit',
-                        fontSize: '0.95rem'
-                      }}
-                    />
-                  ) : (
-                    <input
-                      type="text"
-                      value={formData[key] !== null && formData[key] !== undefined ? formData[key] : ''}
-                      onChange={e => handleChange(key, e.target.value)}
-                      disabled={isReadOnly || loading}
-                      style={{
-                        padding: '0.6rem',
-                        borderRadius: '4px',
-                        border: '1px solid var(--border-color)',
-                        background: isReadOnly ? 'rgba(255,255,255,0.05)' : 'var(--bg-body)',
-                        color: 'var(--text-primary)',
-                        fontSize: '0.95rem'
-                      }}
-                    />
-                  )}
-                </div>
-              );
-            })}
+            return (
+              <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label style={{ fontWeight: 'bold', fontSize: '0.95rem' }}>
+                  {displayLabel} {isReadOnly && <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>(No Editable)</span>}
+                </label>
+                
+                {isDocField ? (
+                  <select
+                    value={formData[key] !== null && formData[key] !== undefined ? formData[key] : ''}
+                    onChange={e => handleChange(key, e.target.value === '' ? null : Number(e.target.value))}
+                    disabled={isReadOnly || loading}
+                    style={{
+                      padding: '0.6rem',
+                      borderRadius: '4px',
+                      border: '1px solid var(--border-color)',
+                      background: 'var(--bg-body)',
+                      color: 'var(--text-primary)',
+                      fontSize: '0.95rem'
+                    }}
+                  >
+                    <option value="">Ninguno</option>
+                    {documents.map(d => (
+                      <option key={d.id} value={d.Doc}>
+                        Doc {d.Doc} - {d.Documento ? d.Documento.substring(0, 50) + '...' : ''}
+                      </option>
+                    ))}
+                  </select>
+                ) : isTextarea ? (
+                  <textarea
+                    value={formData[key] || ''}
+                    onChange={e => handleChange(key, e.target.value)}
+                    disabled={isReadOnly || loading}
+                    rows={5}
+                    style={{
+                      padding: '0.6rem',
+                      borderRadius: '4px',
+                      border: '1px solid var(--border-color)',
+                      background: isReadOnly ? 'rgba(255,255,255,0.05)' : 'var(--bg-body)',
+                      color: 'var(--text-primary)',
+                      fontFamily: 'inherit',
+                      fontSize: '0.95rem'
+                    }}
+                  />
+                ) : (
+                  <input
+                    type="text"
+                    value={formData[key] !== null && formData[key] !== undefined ? formData[key] : ''}
+                    onChange={e => handleChange(key, e.target.value)}
+                    disabled={isReadOnly || loading}
+                    style={{
+                      padding: '0.6rem',
+                      borderRadius: '4px',
+                      border: '1px solid var(--border-color)',
+                      background: isReadOnly ? 'rgba(255,255,255,0.05)' : 'var(--bg-body)',
+                      color: 'var(--text-primary)',
+                      fontSize: '0.95rem'
+                    }}
+                  />
+                )}
+              </div>
+            );
+          })}
           
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1.5rem' }}>
             <button 
