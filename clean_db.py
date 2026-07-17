@@ -2,7 +2,7 @@ import firebase_admin
 from firebase_admin import credentials, firestore
 
 cred = credentials.ApplicationDefault()
-firebase_admin.initialize_app(cred, {'projectId': 'pretso-v2-1784070362'})
+firebase_admin.initialize_app(cred, {'projectId': 'pretso-database'})
 db = firestore.client()
 
 collections = ["manejo_de_caja", "salarios", "corpus_christi", "indicadores", "companias", "transacciones", "documentos", "bibliografia"]

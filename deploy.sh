@@ -13,8 +13,9 @@ else
   # If you want to block on security issues, keep 'set -e' active.
 fi
 
-echo "=== [3/4] Publicando reglas de seguridad en Firestore ==="
-firebase deploy --only firestore:rules
+echo "=== [3/4] Compilando y publicando reglas de seguridad y archivos web en Firebase ==="
+npm run build
+firebase deploy --only firestore:rules,hosting
 
 echo "=== [4/4] Confirmando y subiendo cambios a GitHub ==="
 git add .

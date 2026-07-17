@@ -7,7 +7,7 @@ import numpy as np
 ODS_PATH = "/home/andres-alberdi/Descargas/Hacia PRETSO rev AA 1.ods"
 
 cred = credentials.ApplicationDefault()
-firebase_admin.initialize_app(cred, {'projectId': 'pretso-v2-1784070362'})
+firebase_admin.initialize_app(cred, {'projectId': 'pretso-database'})
 db = firestore.client()
 
 def clean_dict(d):
