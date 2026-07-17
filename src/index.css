@@ -133,17 +133,18 @@ table {
 th {
   font-family: var(--font-sans);
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 1rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--text-muted);
   border-bottom: 2px solid var(--border-color);
-  padding: 1rem;
+  padding: 0.5rem 1rem;
+  text-align: left;
 }
 
 td {
-  padding: 1rem;
-  font-size: 0.95rem;
+  padding: 0.5rem 1rem;
+  font-size: 1.05rem;
   border-bottom: 1px solid var(--border-color);
 }
 

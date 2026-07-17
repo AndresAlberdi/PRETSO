@@ -1,0 +1,183 @@
+import { useEffect, useState } from "react";
+import { collection, getDocs, query, deleteDoc, doc, where } from "firebase/firestore";
+import { db } from "../firebase";
+import { cleanFirebaseData } from "../utils";
+import { useAdmin } from "../context/AdminContext";
+import ConfirmModal from "../components/ConfirmModal";
+import { logAction } from "../utils/audit";
+import GenericCreateModal from "../components/GenericCreateModal";
+
+export default function Transacciones() {
+  const [data, setData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { isEditMode } = useAdmin();
+  const [recordToDelete, setRecordToDelete] = useState<any>(null);
+  const [deleteErrorAlert, setDeleteErrorAlert] = useState<string | null>(null);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
+  useEffect(() => {
+    async function fetchData() {
+      const q = query(collection(db, "transacciones"));
+      const snap = await getDocs(q);
+      setData(snap.docs.map(cleanFirebaseData));
+      setLoading(false);
+    }
+    fetchData();
+  }, []);
+
+  const checkReferentialIntegrity = async (transactionNum: number) => {
+    const collectionsToCheck = [
+      { name: 'manejo_de_caja', label: 'Caja' },
+      { name: 'salarios', label: 'Salarios' },
+      { name: 'corpus_christi', label: 'Corpus Christi' },
+      { name: 'indicadores', label: 'Indicadores' }
+    ];
+
+    for (const coll of collectionsToCheck) {
+      const q = query(collection(db, coll.name), where("Transacción", "==", transactionNum));
+      const snap = await getDocs(q);
+      if (!snap.empty) {
+        return `Esta transacción está vinculada a ${snap.size} registro(s) en ${coll.label}. No se puede borrar.`;
+      }
+    }
+    return null;
+  };
+
+  const attemptDelete = async (row: any) => {
+    setIsAnalyzing(true);
+    const [error] = await Promise.all([
+      checkReferentialIntegrity(Number(row["Num"])),
+      new Promise(resolve => setTimeout(resolve, 1000))
+    ]);
+    setIsAnalyzing(false);
+    if (error) {
+      setDeleteErrorAlert(error);
+    } else {
+      setRecordToDelete(row);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!recordToDelete) return;
+    try {
+      await deleteDoc(doc(db, "transacciones", recordToDelete.id));
+      await logAction('DELETE', 'transacciones', recordToDelete.id, 'pretsodatabase@gmail.com', recordToDelete);
+      setData(data.filter(d => d.id !== recordToDelete.id));
+      setRecordToDelete(null);
+    } catch (error) {
+      console.error("Error deleting document: ", error);
+    }
+  };
+
+  const getDocsForTransaction = (row: any) => {
+    const docCodes = [];
+    for (let i = 1; i <= 10; i++) {
+      const val = row[`Doc${i}`];
+      if (val) {
+        docCodes.push(`Doc ${val}`);
+      }
+    }
+    return docCodes.length > 0 ? docCodes.join(', ') : 'Ninguno';
+  };
+
+  return (
+    <div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
+        <h1>Transacciones</h1>
+        {isEditMode && (
+          <button 
+            onClick={() => setIsCreateOpen(true)}
+            style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+          >
+            Nuevo Registro
+          </button>
+        )}
+      </div>
+      
+      {loading ? <p>Cargando datos...</p> : (
+        <div style={{ overflowX: "auto" }}>
+          <table>
+            <thead>
+              <tr>
+                <th>Documentos</th>
+                <th>Noticia</th>
+                <th>Fuentes</th>
+                {isEditMode && <th>Admin</th>}
+              </tr>
+            </thead>
+            <tbody>
+              {data.map(row => (
+                <tr key={row.id}>
+                  <td>{getDocsForTransaction(row)}</td>
+                  <td style={{ maxWidth: '400px' }}>{row["Noticia"]}</td>
+                  <td style={{ maxWidth: '200px' }}>{row["Fuentes para la generación del dato"]}</td>
+                  {isEditMode && (
+                    <td style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button onClick={() => alert("Edición en desarrollo")} style={{ background: 'var(--primary-color)' }}>Editar</button>
+                      <button onClick={() => attemptDelete(row)} style={{ background: '#ff4d4f' }}>Borrar</button>
+                    </td>
+                  )}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      {isCreateOpen && (
+        <GenericCreateModal 
+          collectionName="transacciones"
+          onClose={() => setIsCreateOpen(false)}
+          onCreated={(newRecord) => {
+            setData(prev => [newRecord, ...prev]);
+          }}
+        />
+      )}
+
+      {isAnalyzing && (
+        <div style={{
+          position: 'fixed',
+          top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.5)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: 'var(--bg-card)',
+            padding: '2rem',
+            borderRadius: '8px',
+            maxWidth: '400px',
+            width: '90%',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+            textAlign: 'center'
+          }}>
+            <h2 style={{ marginTop: 0, color: 'var(--primary-color)' }}>Por favor espere</h2>
+            <div style={{ margin: '1.5rem 0', fontWeight: 'bold' }}>Analizando registros...</div>
+          </div>
+        </div>
+      )}
+
+      {recordToDelete && (
+        <ConfirmModal 
+          title="Confirmar Borrado"
+          message={`¿Está seguro de que desea eliminar la transacción asociada a los documentos: ${getDocsForTransaction(recordToDelete)}?`}
+          onConfirm={handleDelete}
+          onCancel={() => setRecordToDelete(null)}
+          confirmText="Borrar"
+        />
+      )}
+
+      {deleteErrorAlert && (
+        <ConfirmModal 
+          title="Error de Integridad"
+          message={deleteErrorAlert}
+          onCancel={() => setDeleteErrorAlert(null)}
+          isAlertOnly={true}
+        />
+      )}
+    </div>
+  );
+}
