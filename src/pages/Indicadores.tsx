@@ -137,7 +137,10 @@ export default function Indicadores() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
-        <h1>Identificación de Indicadores</h1>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          Identificación de Indicadores
+          <Tooltip content="Recoge transacciones y datos económicos clasificados por diversas categorías o conceptos. Provee información sobre precios y gastos habituales a lo largo de los años en distintas ciudades." />
+        </h1>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           {isEditMode && (
             <button 
@@ -209,7 +212,7 @@ export default function Indicadores() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => sortCat('Categoría')} style={{ cursor: 'pointer' }}>Categoría <Tooltip content="Categoría general del indicador" /><SortIndicator column="Categoría" sc={scCat} /></th>
+                <th onClick={() => sortCat('Categoría')} style={{ cursor: 'pointer' }}>Categoría <SortIndicator column="Categoría" sc={scCat} /></th>
                 <th>Acción</th>
               </tr>
             </thead>
@@ -229,12 +232,12 @@ export default function Indicadores() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => sortDetail('Ciudad')} style={{ cursor: 'pointer' }}>Ciudad <Tooltip content="Ciudad del indicador" /><SortIndicator column="Ciudad" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Años')} style={{ cursor: 'pointer' }}>Años <Tooltip content="Año de la transacción" /><SortIndicator column="Años" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Concepto')} style={{ cursor: 'pointer' }}>Concepto <Tooltip content="Concepto detallado" /><SortIndicator column="Concepto" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Monto')} style={{ cursor: 'pointer' }}>Monto <Tooltip content="Monto asociado" /><SortIndicator column="Monto" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Nota')} style={{ cursor: 'pointer' }}>Nota <Tooltip content="Información adicional" /><SortIndicator column="Nota" sc={scDetail} /></th>
-                <th>Compañía <Tooltip content="Compañía asociada" /></th>
+                <th onClick={() => sortDetail('Ciudad')} style={{ cursor: 'pointer' }}>Ciudad <SortIndicator column="Ciudad" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Años')} style={{ cursor: 'pointer' }}>Años <SortIndicator column="Años" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Concepto')} style={{ cursor: 'pointer' }}>Concepto <SortIndicator column="Concepto" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Monto')} style={{ cursor: 'pointer' }}>Monto <SortIndicator column="Monto" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Nota')} style={{ cursor: 'pointer' }}>Nota <SortIndicator column="Nota" sc={scDetail} /></th>
+                <th>Compañía</th>
                 <th>Vínculos</th>
                 {isEditMode && <th>Admin</th>}
               </tr>

@@ -9,6 +9,7 @@ import { logAction } from "../utils/audit";
 import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
 import { updateDoc } from "firebase/firestore";
+import { useSortableTable } from "../hooks/useSortableTable";
 
 export default function Bibliografia() {
   const [data, setData] = useState<any[]>([]);
@@ -18,6 +19,13 @@ export default function Bibliografia() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
+
+  const { items: sortedData, requestSort, sortConfig } = useSortableTable(data);
+
+  const SortIndicator = ({ column }: { column: string }) => {
+    if (!sortConfig || sortConfig.key !== column) return null;
+    return <span>{sortConfig.direction === 'asc' ? ' ▲' : ' ▼'}</span>;
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -83,16 +91,16 @@ export default function Bibliografia() {
       {!loading && <p style={{ color: 'var(--text-muted)' }}>Total registros: {data.length}</p>}
       {loading ? <p>Cargando datos...</p> : (
         <div style={{ overflowX: "auto" }}>
-          <table>
+          <table className="sortable">
             <thead>
               <tr>
-                <th>Autores</th>
-                <th>Referencias bibliográficas</th>
+                <th onClick={() => requestSort('Autores')} style={{ cursor: 'pointer' }}>Autores <SortIndicator column="Autores" /></th>
+                <th onClick={() => requestSort('Referencias bibliográficas')} style={{ cursor: 'pointer' }}>Referencias bibliográficas <SortIndicator column="Referencias bibliográficas" /></th>
                 {isEditMode && <th>Admin</th>}
               </tr>
             </thead>
             <tbody>
-              {data.map(item => (
+              {sortedData.map(item => (
                 <tr key={item.id}>
                   <td>{item["Autores"]}</td>
                   <td>{item["Referencias bibliográficas"]}</td>

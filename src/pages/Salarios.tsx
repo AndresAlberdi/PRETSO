@@ -172,7 +172,10 @@ export default function Salarios() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
-        <h1>Salarios</h1>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          Salarios
+          <Tooltip content="En esta sección se listan las remuneraciones y pagos específicos que la compañía efectuó a diversas personas (actores, músicos, tramoyistas, etc.) por su trabajo durante las diferentes temporadas." />
+        </h1>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           {isEditMode && (
             <button 
@@ -257,10 +260,10 @@ export default function Salarios() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => sortComp('Sigla Compañía')} style={{ cursor: 'pointer' }}>Compañía <Tooltip content="Sigla y nombre de la compañía." /><SortIndicator column="Sigla Compañía" sc={scComp} /></th>
-                <th onClick={() => sortComp('Autores')} style={{ cursor: 'pointer' }}>Autores <Tooltip content="Personas principales o representantes asociadas." /><SortIndicator column="Autores" sc={scComp} /></th>
-                <th onClick={() => sortComp('Temporadas teatrales')} style={{ cursor: 'pointer' }}>Temporadas <Tooltip content="Años de actividad principal." /><SortIndicator column="Temporadas teatrales" sc={scComp} /></th>
-                <th onClick={() => sortComp('Ámbito')} style={{ cursor: 'pointer' }}>Ámbito <Tooltip content="Ubicación general de operaciones." /><SortIndicator column="Ámbito" sc={scComp} /></th>
+                <th onClick={() => sortComp('Sigla Compañía')} style={{ cursor: 'pointer' }}>Compañía <SortIndicator column="Sigla Compañía" sc={scComp} /></th>
+                <th onClick={() => sortComp('Autores')} style={{ cursor: 'pointer' }}>Autores <SortIndicator column="Autores" sc={scComp} /></th>
+                <th onClick={() => sortComp('Temporadas teatrales')} style={{ cursor: 'pointer' }}>Temporadas <SortIndicator column="Temporadas teatrales" sc={scComp} /></th>
+                <th onClick={() => sortComp('Ámbito')} style={{ cursor: 'pointer' }}>Ámbito <SortIndicator column="Ámbito" sc={scComp} /></th>
                 <th>Acción</th>
               </tr>
             </thead>
@@ -285,12 +288,12 @@ export default function Salarios() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => sortDetail('Ciudad')} style={{ cursor: 'pointer' }}>Ciudad <Tooltip content="Ciudad donde ocurrió el salario" /><SortIndicator column="Ciudad" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Año')} style={{ cursor: 'pointer' }}>Año <Tooltip content="Año de la transacción" /><SortIndicator column="Año" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Beneficiario ')} style={{ cursor: 'pointer' }}>Personas <Tooltip content="Persona que recibe el salario" /><SortIndicator column="Beneficiario " sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Encargo')} style={{ cursor: 'pointer' }}>Ocupación <Tooltip content="Motivo o encargo" /><SortIndicator column="Encargo" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Monto a pagar')} style={{ cursor: 'pointer' }}>Salarios y raciones <Tooltip content="Monto pagado" /><SortIndicator column="Monto a pagar" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Moneda')} style={{ cursor: 'pointer' }}>Moneda <Tooltip content="Moneda" /><SortIndicator column="Moneda" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Ciudad')} style={{ cursor: 'pointer' }}>Ciudad <SortIndicator column="Ciudad" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Año')} style={{ cursor: 'pointer' }}>Año <SortIndicator column="Año" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Beneficiario ')} style={{ cursor: 'pointer' }}>Personas <SortIndicator column="Beneficiario " sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Encargo')} style={{ cursor: 'pointer' }}>Ocupación <SortIndicator column="Encargo" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Monto a pagar')} style={{ cursor: 'pointer' }}>Salarios y raciones <SortIndicator column="Monto a pagar" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Moneda')} style={{ cursor: 'pointer' }}>Moneda <SortIndicator column="Moneda" sc={scDetail} /></th>
                 <th>Vínculos</th>
                 {isEditMode && <th>Admin</th>}
               </tr>

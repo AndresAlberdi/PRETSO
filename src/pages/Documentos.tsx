@@ -8,6 +8,7 @@ import { logAction } from "../utils/audit";
 import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
 import { updateDoc } from "firebase/firestore";
+import { useSortableTable } from "../hooks/useSortableTable";
 
 export default function Documentos() {
   const [data, setData] = useState<any[]>([]);
@@ -18,6 +19,13 @@ export default function Documentos() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
+
+  const { items: sortedData, requestSort, sortConfig } = useSortableTable(data);
+
+  const SortIndicator = ({ column }: { column: string }) => {
+    if (!sortConfig || sortConfig.key !== column) return null;
+    return <span>{sortConfig.direction === 'asc' ? ' ▲' : ' ▼'}</span>;
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -110,16 +118,16 @@ export default function Documentos() {
       
       {loading ? <p>Cargando datos...</p> : (
         <div style={{ overflowX: "auto" }}>
-          <table>
+          <table className="sortable">
             <thead>
               <tr>
-                <th style={{ width: '80px', textAlign: 'center' }}>Doc ID</th>
-                <th>Documento</th>
+                <th onClick={() => requestSort('Doc')} style={{ width: '80px', textAlign: 'center', cursor: 'pointer' }}>Doc ID <SortIndicator column="Doc" /></th>
+                <th onClick={() => requestSort('Documento')} style={{ cursor: 'pointer' }}>Documento <SortIndicator column="Documento" /></th>
                 {isEditMode && <th>Admin</th>}
               </tr>
             </thead>
             <tbody>
-              {data.map(row => (
+              {sortedData.map(row => (
                 <tr key={row.id}>
                   <td style={{ textAlign: 'center' }}>{row["Doc"]}</td>
                   <td style={{ maxWidth: '600px' }}>{row["Documento"]}</td>

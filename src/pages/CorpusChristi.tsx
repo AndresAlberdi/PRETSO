@@ -151,7 +151,10 @@ export default function CorpusChristi() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
-        <h1>Corpus Christi</h1>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          Corpus Christi
+          <Tooltip content="Muestra los registros financieros y labores encargadas para la celebración del Corpus Christi por diversas ciudades en años específicos, detallando el pago y los fondos." />
+        </h1>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           {isEditMode && (
             <button 
@@ -232,8 +235,8 @@ export default function CorpusChristi() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => sortGroup('ciudad')} style={{ cursor: 'pointer' }}>Ciudad <Tooltip content="Ciudad del registro" /><SortIndicator column="ciudad" sc={scGroup} /></th>
-                <th onClick={() => sortGroup('año')} style={{ cursor: 'pointer' }}>Año <Tooltip content="Año del registro" /><SortIndicator column="año" sc={scGroup} /></th>
+                <th onClick={() => sortGroup('ciudad')} style={{ cursor: 'pointer' }}>Ciudad <SortIndicator column="ciudad" sc={scGroup} /></th>
+                <th onClick={() => sortGroup('año')} style={{ cursor: 'pointer' }}>Año <SortIndicator column="año" sc={scGroup} /></th>
                 <th>Acción</th>
               </tr>
             </thead>
@@ -254,11 +257,11 @@ export default function CorpusChristi() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => sortDetail('Encargo')} style={{ cursor: 'pointer' }}>Encargo <Tooltip content="Motivo o labor encargada" /><SortIndicator column="Encargo" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Encargado ')} style={{ cursor: 'pointer' }}>Encargado <Tooltip content="Persona responsable" /><SortIndicator column="Encargado " sc={scDetail} /></th>
-                <th>Compañías <Tooltip content="Compañías involucradas" /></th>
-                <th onClick={() => sortDetail('Monto a pagar')} style={{ cursor: 'pointer' }}>Monto a pagar <Tooltip content="Monto asignado" /><SortIndicator column="Monto a pagar" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Fondos')} style={{ cursor: 'pointer' }}>Fondos <Tooltip content="Origen de fondos" /><SortIndicator column="Fondos" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Encargo')} style={{ cursor: 'pointer' }}>Encargo <SortIndicator column="Encargo" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Encargado ')} style={{ cursor: 'pointer' }}>Encargado <SortIndicator column="Encargado " sc={scDetail} /></th>
+                <th>Compañías</th>
+                <th onClick={() => sortDetail('Monto a pagar')} style={{ cursor: 'pointer' }}>Monto a pagar <SortIndicator column="Monto a pagar" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Fondos')} style={{ cursor: 'pointer' }}>Fondos <SortIndicator column="Fondos" sc={scDetail} /></th>
                 <th>Vínculos</th>
                 {isEditMode && <th>Admin</th>}
               </tr>

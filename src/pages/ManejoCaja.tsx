@@ -171,7 +171,10 @@ export default function ManejoCaja() {
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
-        <h1>Manejo de Caja</h1>
+        <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+          Manejo de Caja 
+          <Tooltip content="Esta sección muestra información detallada sobre los ingresos, egresos y otros bienes monetarios gestionados por las diversas compañías durante sus temporadas teatrales. Sirve para entender los flujos de dinero y la salud financiera." />
+        </h1>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           {isEditMode && (
             <button 
@@ -256,10 +259,10 @@ export default function ManejoCaja() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => sortComp('Sigla Compañía')} style={{ cursor: 'pointer' }}>Compañía <Tooltip content="Sigla y nombre de la compañía." /><SortIndicator column="Sigla Compañía" sc={scComp} /></th>
-                <th onClick={() => sortComp('Autores')} style={{ cursor: 'pointer' }}>Autores <Tooltip content="Personas principales o representantes asociadas." /><SortIndicator column="Autores" sc={scComp} /></th>
-                <th onClick={() => sortComp('Temporadas teatrales')} style={{ cursor: 'pointer' }}>Temporadas <Tooltip content="Años de actividad principal." /><SortIndicator column="Temporadas teatrales" sc={scComp} /></th>
-                <th onClick={() => sortComp('Ámbito')} style={{ cursor: 'pointer' }}>Ámbito <Tooltip content="Ubicación general de operaciones." /><SortIndicator column="Ámbito" sc={scComp} /></th>
+                <th onClick={() => sortComp('Sigla Compañía')} style={{ cursor: 'pointer' }}>Compañía <SortIndicator column="Sigla Compañía" sc={scComp} /></th>
+                <th onClick={() => sortComp('Autores')} style={{ cursor: 'pointer' }}>Autores <SortIndicator column="Autores" sc={scComp} /></th>
+                <th onClick={() => sortComp('Temporadas teatrales')} style={{ cursor: 'pointer' }}>Temporadas <SortIndicator column="Temporadas teatrales" sc={scComp} /></th>
+                <th onClick={() => sortComp('Ámbito')} style={{ cursor: 'pointer' }}>Ámbito <SortIndicator column="Ámbito" sc={scComp} /></th>
                 <th>Acción</th>
               </tr>
             </thead>
@@ -284,11 +287,11 @@ export default function ManejoCaja() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => sortDetail('Ciudad')} style={{ cursor: 'pointer' }}>Ciudad <Tooltip content="Ciudad donde se realizó el manejo de caja" /><SortIndicator column="Ciudad" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Año')} style={{ cursor: 'pointer' }}>Año <Tooltip content="Año de la transacción" /><SortIndicator column="Año" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Ingresos')} style={{ cursor: 'pointer' }}>Ingresos <Tooltip content="Valor monetario ingresado" /><SortIndicator column="Ingresos" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Egresos')} style={{ cursor: 'pointer' }}>Egresos <Tooltip content="Valor monetario gastado" /><SortIndicator column="Egresos" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Otros bienes de la compañía')} style={{ cursor: 'pointer' }}>Otros bienes <Tooltip content="Bienes registrados adicionalmente" /><SortIndicator column="Otros bienes de la compañía" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Ciudad')} style={{ cursor: 'pointer' }}>Ciudad <SortIndicator column="Ciudad" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Año')} style={{ cursor: 'pointer' }}>Año <SortIndicator column="Año" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Ingresos')} style={{ cursor: 'pointer' }}>Ingresos <SortIndicator column="Ingresos" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Egresos')} style={{ cursor: 'pointer' }}>Egresos <SortIndicator column="Egresos" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Otros bienes de la compañía')} style={{ cursor: 'pointer' }}>Otros bienes <SortIndicator column="Otros bienes de la compañía" sc={scDetail} /></th>
                 <th>Vínculos</th>
                 {isEditMode && <th>Admin</th>}
               </tr>

@@ -16,7 +16,7 @@ fi
 echo "=== [3/4] Compilando y publicando reglas de seguridad, Cloud Functions y archivos web en Firebase ==="
 npm run build
 cd functions && npm run build && cd ..
-firebase deploy --only firestore:rules,hosting,functions
+firebase deploy --only firestore:rules,hosting,functions --non-interactive
 
 echo "=== [4/4] Confirmando y subiendo cambios a GitHub ==="
 git add .

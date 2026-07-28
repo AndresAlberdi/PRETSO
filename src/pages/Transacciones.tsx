@@ -9,6 +9,7 @@ import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
 import DocumentModal from "../components/DocumentModal";
 import { updateDoc } from "firebase/firestore";
+import { useSortableTable } from "../hooks/useSortableTable";
 
 export default function Transacciones() {
   const [data, setData] = useState<any[]>([]);
@@ -20,6 +21,13 @@ export default function Transacciones() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
   const [activeDoc, setActiveDoc] = useState<string | number | null>(null);
+
+  const { items: sortedData, requestSort, sortConfig } = useSortableTable(data);
+
+  const SortIndicator = ({ column }: { column: string }) => {
+    if (!sortConfig || sortConfig.key !== column) return null;
+    return <span>{sortConfig.direction === 'asc' ? ' ▲' : ' ▼'}</span>;
+  };
 
   useEffect(() => {
     async function fetchData() {
@@ -141,17 +149,17 @@ export default function Transacciones() {
       
       {loading ? <p>Cargando datos...</p> : (
         <div style={{ overflowX: "auto" }}>
-          <table>
+          <table className="sortable">
             <thead>
               <tr>
-                <th>Noticia</th>
-                <th>Fuentes</th>
+                <th onClick={() => requestSort('Noticia')} style={{ cursor: 'pointer' }}>Noticia <SortIndicator column="Noticia" /></th>
+                <th onClick={() => requestSort('Fuentes para la generación del dato')} style={{ cursor: 'pointer' }}>Fuentes <SortIndicator column="Fuentes para la generación del dato" /></th>
                 <th>Documentos</th>
                 {isEditMode && <th>Admin</th>}
               </tr>
             </thead>
             <tbody>
-              {data.map(row => (
+              {sortedData.map(row => (
                 <tr key={row.id}>
                   <td style={{ maxWidth: '400px' }}>{row["Noticia"]}</td>
                   <td style={{ maxWidth: '200px' }}>{row["Fuentes para la generación del dato"]}</td>
