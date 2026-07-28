@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
 import ManejoCaja from './pages/ManejoCaja';

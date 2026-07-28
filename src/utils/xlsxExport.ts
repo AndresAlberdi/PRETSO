@@ -1,6 +1,6 @@
 import { collection, getDocs, query } from "firebase/firestore";
 import { db } from "../firebase";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
 
 // Sheet names in Spanish for the tabs
 const SHEET_NAMES: Record<string, string> = {
@@ -34,7 +34,7 @@ const HEADER_CLEANUPS: Record<string, string> = {
 };
 
 export async function generateDatabaseXlsx(): Promise<Blob> {
-  const wb = XLSX.utils.book_new();
+  const wb = new ExcelJS.Workbook();
   const collections = Object.keys(SHEET_NAMES);
 
   for (const collName of collections) {
@@ -70,7 +70,7 @@ export async function generateDatabaseXlsx(): Promise<Blob> {
     // 2. Format row objects preserving column ordering
     const formattedRows = docs.map(doc => {
       const rowData = doc.data();
-      const newRow: any = {};
+      const newRow: Record<string, any> = {};
       const columns = COLUMN_ORDERS[collName] || Object.keys(rowData).sort();
 
       columns.forEach(col => {
@@ -81,13 +81,26 @@ export async function generateDatabaseXlsx(): Promise<Blob> {
     });
 
     // 3. Create worksheet and append to workbook
-    const ws = XLSX.utils.json_to_sheet(formattedRows);
-    XLSX.utils.book_append_sheet(wb, ws, SHEET_NAMES[collName]);
+    const ws = wb.addWorksheet(SHEET_NAMES[collName]);
+    
+    let columns = COLUMN_ORDERS[collName] || [];
+    if (columns.length === 0 && formattedRows.length > 0) {
+      columns = Object.keys(formattedRows[0]);
+    }
+    
+    ws.columns = columns.map(c => {
+       const header = HEADER_CLEANUPS[c] || c;
+       return { header, key: header, width: 20 };
+    });
+    
+    formattedRows.forEach(row => {
+      ws.addRow(row);
+    });
   }
 
   // 4. Generate XLSX binary buffer
-  const excelBuffer = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-  return new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  const buffer = await wb.xlsx.writeBuffer();
+  return new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 }
 
 export function downloadXlsx(blob: Blob, filename: string) {
