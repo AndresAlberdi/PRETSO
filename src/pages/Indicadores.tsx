@@ -1,40 +1,39 @@
-import { useEffect, useState } from "react";
-import { collection, getDocs, query } from "firebase/firestore";
+import { useEffect, useState, useMemo } from "react";
+import { collection, getDocs, query, deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { useLocation, useNavigate } from "react-router";
 import { db } from "../firebase";
 import TransactionModal from "../components/TransactionModal";
-import SearchBar from "../components/SearchBar";
+import SearchBar, { type SearchFilter } from "../components/SearchBar";
 import { cleanFirebaseData } from "../utils";
 import CompaniaModal from "../components/CompaniaModal";
 import { useAdmin } from "../context/AdminContext";
 import ConfirmModal from "../components/ConfirmModal";
-import { deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { logAction } from "../utils/audit";
 import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
+import { useSortableTable } from "../hooks/useSortableTable";
+import Tooltip from "../components/Tooltip";
 
 export default function Indicadores() {
   const [data, setData] = useState<any[]>([]);
   const [transaccionesSet, setTransaccionesSet] = useState<Set<number>>(new Set());
   const [loading, setLoading] = useState(true);
   const { isEditMode } = useAdmin();
+  
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [recordToDelete, setRecordToDelete] = useState<any>(null);
   const [brokenLinkAlert, setBrokenLinkAlert] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
   const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
 
-  // Master-Detail State
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
-  
-  // Transaction Modal State
   const [activeTransaction, setActiveTransaction] = useState<string | number | null>(null);
-
-  // Compania Modal State
   const [activeCompania, setActiveCompania] = useState<string | null>(null);
 
-  // Search state
-  const [searchCategory, setSearchCategory] = useState<string>('');
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [filters, setFilters] = useState<SearchFilter[]>([]);
 
   const searchCategories = [
     { id: 'Ciudad', label: 'Ciudad' },
@@ -42,8 +41,15 @@ export default function Indicadores() {
     { id: 'all', label: 'Texto libre' }
   ];
 
-  // Filters
   const [filterCategoria, setFilterCategoria] = useState('');
+
+  useEffect(() => {
+    if (location.state?.reset) {
+      setSelectedCategoria(null);
+      setFilters([]);
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.state?.reset, location.pathname, navigate]);
 
   useEffect(() => {
     async function fetchData() {
@@ -66,9 +72,6 @@ export default function Indicadores() {
   }, []);
 
   const attemptDelete = async (row: any) => {
-    setIsAnalyzing(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsAnalyzing(false);
     setRecordToDelete(row);
   };
 
@@ -104,19 +107,32 @@ export default function Indicadores() {
   const filteredCategorias = uniqueCategorias.filter(c => {
     if (filterCategoria && c !== filterCategoria) return false;
     return true;
-  });
+  }).map(c => ({ Categoría: String(c) }));
 
-  const searchResults = data.filter(d => {
-    if (!searchQuery) return false;
-    const q = searchQuery.toLowerCase();
-    if (searchCategory === 'all') {
-      return Object.values(d).some(v => String(v).toLowerCase().includes(q));
-    }
-    return d[searchCategory] && String(d[searchCategory]).toLowerCase().includes(q);
-  });
+  const searchResults = useMemo(() => {
+    if (filters.length === 0) return [];
+    return data.filter(d => {
+      return filters.every(f => {
+        const q = f.query.toLowerCase();
+        if (f.category === 'all') {
+          return Object.values(d).some(v => String(v).toLowerCase().includes(q));
+        }
+        return d[f.category] && String(d[f.category]).toLowerCase().includes(q);
+      });
+    });
+  }, [data, filters]);
 
-  const isSearching = searchQuery.length > 0;
+  const isSearching = filters.length > 0;
   const detailData = data.filter(d => d["Categorías"] === selectedCategoria);
+
+  const { items: sortedFilteredCategorias, requestSort: sortCat, sortConfig: scCat } = useSortableTable(filteredCategorias);
+  const { items: sortedSearchResults, requestSort: sortSearch, sortConfig: scSearch } = useSortableTable(searchResults);
+  const { items: sortedDetailData, requestSort: sortDetail, sortConfig: scDetail } = useSortableTable(detailData);
+
+  const SortIndicator = ({ column, sc }: { column: string, sc: any }) => {
+    if (!sc || sc.key !== column) return null;
+    return <span>{sc.direction === 'asc' ? ' ▲' : ' ▼'}</span>;
+  };
 
   return (
     <div>
@@ -131,21 +147,32 @@ export default function Indicadores() {
               Nuevo Registro
             </button>
           )}
-          <SearchBar onSearch={(c, q) => { setSearchCategory(c); setSearchQuery(q); setSelectedCategoria(null); }} categories={searchCategories} />
+          <SearchBar onSearch={(f) => { setFilters(f); setSelectedCategoria(null); }} categories={searchCategories} />
         </div>
-        {(selectedCategoria || isSearching) && (
-          <button onClick={() => { setSelectedCategoria(null); setSearchQuery(''); }} style={{ padding: '0.5rem 1rem' }}>Volver</button>
-        )}
       </div>
-      {!loading && !selectedCategoria && !isSearching && <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Mostrando {filteredCategorias.length} categorías</p>}
+      
+      {(selectedCategoria || isSearching) && (
+        <button onClick={() => { setSelectedCategoria(null); setFilters([]); navigate(location.pathname, { replace: true }); }} style={{ padding: '0.5rem 1rem', marginBottom: '1rem' }}>Volver a listado inicial</button>
+      )}
+
+      {!loading && !selectedCategoria && !isSearching && <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Mostrando {sortedFilteredCategorias.length} categorías</p>}
 
       {loading ? <p>Cargando datos...</p> : isSearching ? (
         <div>
-          <h2>Resultados de Búsqueda ({searchResults.length} registros)</h2>
-          <table>
-            <thead><tr><th>Ciudad</th><th>Año</th><th>Concepto</th><th>Monto</th><th></th>{isEditMode && <th>Admin</th>}</tr></thead>
+          <h2>Resultados de Búsqueda ({sortedSearchResults.length} registros)</h2>
+          <table className="sortable">
+            <thead>
+              <tr>
+                <th onClick={() => sortSearch('Ciudad')} style={{ cursor: 'pointer' }}>Ciudad <SortIndicator column="Ciudad" sc={scSearch} /></th>
+                <th onClick={() => sortSearch('Años')} style={{ cursor: 'pointer' }}>Año <SortIndicator column="Años" sc={scSearch} /></th>
+                <th onClick={() => sortSearch('Concepto')} style={{ cursor: 'pointer' }}>Concepto <SortIndicator column="Concepto" sc={scSearch} /></th>
+                <th onClick={() => sortSearch('Monto')} style={{ cursor: 'pointer' }}>Monto <SortIndicator column="Monto" sc={scSearch} /></th>
+                <th>Vínculos</th>
+                {isEditMode && <th>Admin</th>}
+              </tr>
+            </thead>
             <tbody>
-              {searchResults.map(row => {
+              {sortedSearchResults.map(row => {
                 const isBroken = row["Transacción"] && !transaccionesSet.has(Number(row["Transacción"]));
                 return (
                 <tr key={row.id}>
@@ -156,7 +183,7 @@ export default function Indicadores() {
                   <td>
                     {row["Transacción"] && (
                       isBroken ? 
-                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto. El registro no existe en la base de datos, por favor haga la corrección.`)}>Enlace Roto</button>
+                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
                       : <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
                     )}
                   </td>
@@ -179,13 +206,18 @@ export default function Indicadores() {
               {uniqueCategorias.map(opt => <option key={String(opt)} value={String(opt)}>{String(opt)}</option>)}
             </select>
           </div>
-          <table>
-            <thead><tr><th>Categoría</th><th></th></tr></thead>
+          <table className="sortable">
+            <thead>
+              <tr>
+                <th onClick={() => sortCat('Categoría')} style={{ cursor: 'pointer' }}>Categoría <Tooltip content="Categoría general del indicador" /><SortIndicator column="Categoría" sc={scCat} /></th>
+                <th>Acción</th>
+              </tr>
+            </thead>
             <tbody>
-              {filteredCategorias.map((c, i) => (
+              {sortedFilteredCategorias.map((c, i) => (
                 <tr key={i}>
-                  <td>{String(c)}</td>
-                  <td><button onClick={() => setSelectedCategoria(String(c))}>LISTA</button></td>
+                  <td>{c.Categoría}</td>
+                  <td><button onClick={() => setSelectedCategoria(c.Categoría)}>LISTA</button></td>
                 </tr>
               ))}
             </tbody>
@@ -193,13 +225,22 @@ export default function Indicadores() {
         </div>
       ) : (
         <div style={{ overflowX: "auto" }}>
-          <div style={{ marginBottom: '1rem' }}><p style={{ color: 'var(--text-muted)' }}>{detailData.length} transacciones registradas</p></div>
-          <table>
+          <div style={{ marginBottom: '1rem' }}><p style={{ color: 'var(--text-muted)' }}>{sortedDetailData.length} transacciones registradas</p></div>
+          <table className="sortable">
             <thead>
-              <tr><th>Ciudad</th><th>Años</th><th>Concepto</th><th>Monto</th><th>Nota</th><th>Compañía</th><th></th>{isEditMode && <th>Admin</th>}</tr>
+              <tr>
+                <th onClick={() => sortDetail('Ciudad')} style={{ cursor: 'pointer' }}>Ciudad <Tooltip content="Ciudad del indicador" /><SortIndicator column="Ciudad" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Años')} style={{ cursor: 'pointer' }}>Años <Tooltip content="Año de la transacción" /><SortIndicator column="Años" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Concepto')} style={{ cursor: 'pointer' }}>Concepto <Tooltip content="Concepto detallado" /><SortIndicator column="Concepto" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Monto')} style={{ cursor: 'pointer' }}>Monto <Tooltip content="Monto asociado" /><SortIndicator column="Monto" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Nota')} style={{ cursor: 'pointer' }}>Nota <Tooltip content="Información adicional" /><SortIndicator column="Nota" sc={scDetail} /></th>
+                <th>Compañía <Tooltip content="Compañía asociada" /></th>
+                <th>Vínculos</th>
+                {isEditMode && <th>Admin</th>}
+              </tr>
             </thead>
             <tbody>
-              {detailData.map(row => {
+              {sortedDetailData.map(row => {
                 const isBroken = row["Transacción"] && !transaccionesSet.has(Number(row["Transacción"]));
                 return (
                 <tr key={row.id}>
@@ -216,7 +257,7 @@ export default function Indicadores() {
                   <td>
                     {row["Transacción"] && (
                       isBroken ? 
-                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto. El registro no existe en la base de datos, por favor haga la corrección.`)}>Enlace Roto</button>
+                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
                       : <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
                     )}
                   </td>
@@ -255,48 +296,22 @@ export default function Indicadores() {
         />
       )}
 
-      {isAnalyzing && (
-        <div style={{
-          position: 'fixed',
-          top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
-            background: 'var(--bg-card)',
-            padding: '2rem',
-            borderRadius: '8px',
-            maxWidth: '400px',
-            width: '90%',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-            textAlign: 'center'
-          }}>
-            <h2 style={{ marginTop: 0, color: 'var(--primary-color)' }}>Por favor espere</h2>
-            <div style={{ margin: '1.5rem 0', fontWeight: 'bold' }}>Analizando registros...</div>
-          </div>
-        </div>
-      )}
-
       {activeCompania && <CompaniaModal sigla={activeCompania} onClose={() => setActiveCompania(null)} />}
+      
       {recordToDelete && (
         <ConfirmModal 
-          title="Confirmar Borrado"
-          message={<>¿Está seguro de que desea eliminar el registro de Indicadores para <strong>{recordToDelete["Concepto"]}</strong> ({recordToDelete["Años"]})? Esta acción no se puede deshacer.</>}
+          title="Confirmar Eliminación"
+          message={`¿Estás seguro de que deseas eliminar este registro de Indicadores para ${recordToDelete["Concepto"]} (${recordToDelete["Años"]})?`}
           onConfirm={handleDelete}
           onCancel={() => setRecordToDelete(null)}
-          confirmText="Borrar"
         />
       )}
+
       {brokenLinkAlert && (
-        <ConfirmModal 
-          title="Enlace Roto Encontrado"
-          message={brokenLinkAlert}
-          onCancel={() => setBrokenLinkAlert(null)}
-          isAlertOnly={true}
-        />
+        <div style={{ position: 'fixed', bottom: '2rem', right: '2rem', background: '#ff4d4f', color: 'white', padding: '1rem', borderRadius: '8px', zIndex: 1000, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+          <p style={{ margin: 0 }}>{brokenLinkAlert}</p>
+          <button onClick={() => setBrokenLinkAlert(null)} style={{ marginTop: '0.5rem', background: 'white', color: '#ff4d4f', border: 'none', padding: '0.2rem 0.5rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Cerrar</button>
+        </div>
       )}
     </div>
   );

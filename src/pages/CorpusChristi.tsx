@@ -1,40 +1,41 @@
-import { useEffect, useState } from "react";
-import { collection, getDocs, query } from "firebase/firestore";
+import { useEffect, useState, useMemo } from "react";
+import { collection, getDocs, query, deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { useLocation, useNavigate } from "react-router";
 import { db } from "../firebase";
 import TransactionModal from "../components/TransactionModal";
-import SearchBar from "../components/SearchBar";
+import DocumentModal from "../components/DocumentModal";
+import SearchBar, { type SearchFilter } from "../components/SearchBar";
 import { cleanFirebaseData } from "../utils";
 import CompaniaModal from "../components/CompaniaModal";
 import { useAdmin } from "../context/AdminContext";
 import ConfirmModal from "../components/ConfirmModal";
-import { deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { logAction } from "../utils/audit";
 import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
+import { useSortableTable } from "../hooks/useSortableTable";
+import Tooltip from "../components/Tooltip";
 
 export default function CorpusChristi() {
   const [data, setData] = useState<any[]>([]);
   const [transaccionesSet, setTransaccionesSet] = useState<Set<number>>(new Set());
   const [loading, setLoading] = useState(true);
   const { isEditMode } = useAdmin();
+  
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [recordToDelete, setRecordToDelete] = useState<any>(null);
   const [brokenLinkAlert, setBrokenLinkAlert] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
   const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
 
-  // Master-Detail State
   const [selectedCityYear, setSelectedCityYear] = useState<{ ciudad: string, año: string } | null>(null);
-  
-  // Transaction Modal State
   const [activeTransaction, setActiveTransaction] = useState<string | number | null>(null);
-
-  // Compania Modal State
+  const [activeDocuments, setActiveDocuments] = useState<string | number | null>(null);
   const [activeCompania, setActiveCompania] = useState<string | null>(null);
 
-  // Search state
-  const [searchCategory, setSearchCategory] = useState<string>('');
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [filters, setFilters] = useState<SearchFilter[]>([]);
 
   const searchCategories = [
     { id: 'Ciudad', label: 'Ciudad' },
@@ -42,9 +43,16 @@ export default function CorpusChristi() {
     { id: 'all', label: 'Texto libre' }
   ];
 
-  // Filters
   const [filterCiudad, setFilterCiudad] = useState('');
   const [filterAno, setFilterAno] = useState('');
+
+  useEffect(() => {
+    if (location.state?.reset) {
+      setSelectedCityYear(null);
+      setFilters([]);
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.state?.reset, location.pathname, navigate]);
 
   useEffect(() => {
     async function fetchData() {
@@ -67,9 +75,6 @@ export default function CorpusChristi() {
   }, []);
 
   const attemptDelete = async (row: any) => {
-    setIsAnalyzing(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsAnalyzing(false);
     setRecordToDelete(row);
   };
 
@@ -103,11 +108,12 @@ export default function CorpusChristi() {
   const uniqueCiudades = Array.from(new Set(data.map(d => d["Ciudad"]))).filter(Boolean).sort();
   const uniqueAnos = Array.from(new Set(data.map(d => d["Año"]))).filter(Boolean).sort();
 
-  // Create unique pairs of Ciudad+Año for the Master view
-  const masterGroups = Array.from(new Set(data.map(d => `${d["Ciudad"]}|${d["Año"]}`))).map(group => {
-    const [c, a] = group.split('|');
-    return { ciudad: c, año: a };
-  });
+  const masterGroups = useMemo(() => {
+    return Array.from(new Set(data.map(d => `${d["Ciudad"]}|${d["Año"]}`))).map(group => {
+      const [c, a] = group.split('|');
+      return { ciudad: c, año: a };
+    });
+  }, [data]);
 
   const filteredGroups = masterGroups.filter(g => {
     if (filterCiudad && g.ciudad !== filterCiudad) return false;
@@ -115,19 +121,32 @@ export default function CorpusChristi() {
     return true;
   });
 
-  const searchResults = data.filter(d => {
-    if (!searchQuery) return false;
-    const q = searchQuery.toLowerCase();
-    if (searchCategory === 'all') {
-      return Object.values(d).some(v => String(v).toLowerCase().includes(q));
-    }
-    return d[searchCategory] && String(d[searchCategory]).toLowerCase().includes(q);
-  });
+  const searchResults = useMemo(() => {
+    if (filters.length === 0) return [];
+    return data.filter(d => {
+      return filters.every(f => {
+        const q = f.query.toLowerCase();
+        if (f.category === 'all') {
+          return Object.values(d).some(v => String(v).toLowerCase().includes(q));
+        }
+        return d[f.category] && String(d[f.category]).toLowerCase().includes(q);
+      });
+    });
+  }, [data, filters]);
 
-  const isSearching = searchQuery.length > 0;
+  const isSearching = filters.length > 0;
   const detailData = data.filter(d => 
     selectedCityYear && d["Ciudad"] === selectedCityYear.ciudad && String(d["Año"]) === String(selectedCityYear.año)
   );
+
+  const { items: sortedFilteredGroups, requestSort: sortGroup, sortConfig: scGroup } = useSortableTable(filteredGroups);
+  const { items: sortedSearchResults, requestSort: sortSearch, sortConfig: scSearch } = useSortableTable(searchResults);
+  const { items: sortedDetailData, requestSort: sortDetail, sortConfig: scDetail } = useSortableTable(detailData);
+
+  const SortIndicator = ({ column, sc }: { column: string, sc: any }) => {
+    if (!sc || sc.key !== column) return null;
+    return <span>{sc.direction === 'asc' ? ' ▲' : ' ▼'}</span>;
+  };
 
   return (
     <div>
@@ -142,21 +161,32 @@ export default function CorpusChristi() {
               Nuevo Registro
             </button>
           )}
-          <SearchBar onSearch={(c, q) => { setSearchCategory(c); setSearchQuery(q); setSelectedCityYear(null); }} categories={searchCategories} />
+          <SearchBar onSearch={(f) => { setFilters(f); setSelectedCityYear(null); }} categories={searchCategories} />
         </div>
-        {(selectedCityYear || isSearching) && (
-          <button onClick={() => { setSelectedCityYear(null); setSearchQuery(''); }} style={{ padding: '0.5rem 1rem' }}>Volver</button>
-        )}
       </div>
-      {!loading && !selectedCityYear && !isSearching && <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Mostrando {filteredGroups.length} registros</p>}
+      
+      {(selectedCityYear || isSearching) && (
+        <button onClick={() => { setSelectedCityYear(null); setFilters([]); navigate(location.pathname, { replace: true }); }} style={{ padding: '0.5rem 1rem', marginBottom: '1rem' }}>Volver a listado inicial</button>
+      )}
+
+      {!loading && !selectedCityYear && !isSearching && <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Mostrando {sortedFilteredGroups.length} registros</p>}
 
       {loading ? <p>Cargando datos...</p> : isSearching ? (
         <div>
-          <h2>Resultados de Búsqueda ({searchResults.length} registros)</h2>
-          <table>
-            <thead><tr><th>Ciudad</th><th>Año</th><th>Encargado</th><th>Monto a pagar</th><th></th>{isEditMode && <th>Admin</th>}</tr></thead>
+          <h2>Resultados de Búsqueda ({sortedSearchResults.length} registros)</h2>
+          <table className="sortable">
+            <thead>
+              <tr>
+                <th onClick={() => sortSearch('Ciudad')} style={{ cursor: 'pointer' }}>Ciudad <SortIndicator column="Ciudad" sc={scSearch} /></th>
+                <th onClick={() => sortSearch('Año')} style={{ cursor: 'pointer' }}>Año <SortIndicator column="Año" sc={scSearch} /></th>
+                <th onClick={() => sortSearch('Encargado ')} style={{ cursor: 'pointer' }}>Encargado <SortIndicator column="Encargado " sc={scSearch} /></th>
+                <th onClick={() => sortSearch('Monto a pagar')} style={{ cursor: 'pointer' }}>Monto a pagar <SortIndicator column="Monto a pagar" sc={scSearch} /></th>
+                <th>Vínculos</th>
+                {isEditMode && <th>Admin</th>}
+              </tr>
+            </thead>
             <tbody>
-              {searchResults.map(row => {
+              {sortedSearchResults.map(row => {
                 const isBroken = row["Transacción"] && !transaccionesSet.has(Number(row["Transacción"]));
                 return (
                 <tr key={row.id}>
@@ -164,11 +194,16 @@ export default function CorpusChristi() {
                   <td>{row["Año"]}</td>
                   <td>{row["Encargado "]}</td>
                   <td>{row["Monto a pagar"]}</td>
-                  <td>
+                  <td style={{ display: 'flex', gap: '0.5rem' }}>
                     {row["Transacción"] && (
                       isBroken ? 
-                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto. El registro no existe en la base de datos, por favor haga la corrección.`)}>Enlace Roto</button>
-                      : <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
+                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
+                      : (
+                        <>
+                          <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
+                          <button onClick={() => setActiveDocuments(row["Transacción"])}>Documentos</button>
+                        </>
+                      )
                     )}
                   </td>
                   {isEditMode && (
@@ -194,10 +229,16 @@ export default function CorpusChristi() {
               {uniqueAnos.map(opt => <option key={String(opt)} value={String(opt)}>{String(opt)}</option>)}
             </select>
           </div>
-          <table>
-            <thead><tr><th>Ciudad</th><th>Año</th><th></th></tr></thead>
+          <table className="sortable">
+            <thead>
+              <tr>
+                <th onClick={() => sortGroup('ciudad')} style={{ cursor: 'pointer' }}>Ciudad <Tooltip content="Ciudad del registro" /><SortIndicator column="ciudad" sc={scGroup} /></th>
+                <th onClick={() => sortGroup('año')} style={{ cursor: 'pointer' }}>Año <Tooltip content="Año del registro" /><SortIndicator column="año" sc={scGroup} /></th>
+                <th>Acción</th>
+              </tr>
+            </thead>
             <tbody>
-              {filteredGroups.map((g, i) => (
+              {sortedFilteredGroups.map((g, i) => (
                 <tr key={i}>
                   <td>{g.ciudad}</td>
                   <td>{g.año}</td>
@@ -209,13 +250,21 @@ export default function CorpusChristi() {
         </div>
       ) : (
         <div style={{ overflowX: "auto" }}>
-          <div style={{ marginBottom: '1rem' }}><p style={{ color: 'var(--text-muted)' }}>{detailData.length} transacciones registradas</p></div>
-          <table>
+          <div style={{ marginBottom: '1rem' }}><p style={{ color: 'var(--text-muted)' }}>{sortedDetailData.length} transacciones registradas</p></div>
+          <table className="sortable">
             <thead>
-              <tr><th>Encargo</th><th>Encargado</th><th>Compañías</th><th>Monto a pagar</th><th>Fondos</th><th></th>{isEditMode && <th>Admin</th>}</tr>
+              <tr>
+                <th onClick={() => sortDetail('Encargo')} style={{ cursor: 'pointer' }}>Encargo <Tooltip content="Motivo o labor encargada" /><SortIndicator column="Encargo" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Encargado ')} style={{ cursor: 'pointer' }}>Encargado <Tooltip content="Persona responsable" /><SortIndicator column="Encargado " sc={scDetail} /></th>
+                <th>Compañías <Tooltip content="Compañías involucradas" /></th>
+                <th onClick={() => sortDetail('Monto a pagar')} style={{ cursor: 'pointer' }}>Monto a pagar <Tooltip content="Monto asignado" /><SortIndicator column="Monto a pagar" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Fondos')} style={{ cursor: 'pointer' }}>Fondos <Tooltip content="Origen de fondos" /><SortIndicator column="Fondos" sc={scDetail} /></th>
+                <th>Vínculos</th>
+                {isEditMode && <th>Admin</th>}
+              </tr>
             </thead>
             <tbody>
-              {detailData.map(row => {
+              {sortedDetailData.map(row => {
                 const isBroken = row["Transacción"] && !transaccionesSet.has(Number(row["Transacción"]));
                 const companiasList = [];
                 if (row["Compañía"]) companiasList.push(row["Compañía"]);
@@ -238,11 +287,16 @@ export default function CorpusChristi() {
                   </td>
                   <td>{row["Monto a pagar"]}</td>
                   <td>{row["Fondos"]}</td>
-                  <td>
+                  <td style={{ display: 'flex', gap: '0.5rem' }}>
                     {row["Transacción"] && (
                       isBroken ? 
-                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto. El registro no existe en la base de datos, por favor haga la corrección.`)}>Enlace Roto</button>
-                      : <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
+                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
+                      : (
+                        <>
+                          <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
+                          <button onClick={() => setActiveDocuments(row["Transacción"])}>Documentos</button>
+                        </>
+                      )
                     )}
                   </td>
                   {isEditMode && (
@@ -258,6 +312,7 @@ export default function CorpusChristi() {
         </div>
       )}
       {activeTransaction && <TransactionModal transactionCode={activeTransaction} onClose={() => setActiveTransaction(null)} />}
+      {activeDocuments && <DocumentModal transactionCode={activeDocuments} onClose={() => setActiveDocuments(null)} />}
       
       {isCreateOpen && (
         <GenericCreateModal 
@@ -280,48 +335,22 @@ export default function CorpusChristi() {
         />
       )}
 
-      {isAnalyzing && (
-        <div style={{
-          position: 'fixed',
-          top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
-            background: 'var(--bg-card)',
-            padding: '2rem',
-            borderRadius: '8px',
-            maxWidth: '400px',
-            width: '90%',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-            textAlign: 'center'
-          }}>
-            <h2 style={{ marginTop: 0, color: 'var(--primary-color)' }}>Por favor espere</h2>
-            <div style={{ margin: '1.5rem 0', fontWeight: 'bold' }}>Analizando registros...</div>
-          </div>
-        </div>
-      )}
-
       {activeCompania && <CompaniaModal sigla={activeCompania} onClose={() => setActiveCompania(null)} />}
+      
       {recordToDelete && (
         <ConfirmModal 
-          title="Confirmar Borrado"
-          message={<>¿Está seguro de que desea eliminar el registro de Corpus Christi para <strong>{recordToDelete["Ciudad"]}</strong> ({recordToDelete["Año"]})? Esta acción no se puede deshacer.</>}
+          title="Confirmar Eliminación"
+          message={`¿Estás seguro de que deseas eliminar este registro para ${recordToDelete["Encargado "]}?`}
           onConfirm={handleDelete}
           onCancel={() => setRecordToDelete(null)}
-          confirmText="Borrar"
         />
       )}
+
       {brokenLinkAlert && (
-        <ConfirmModal 
-          title="Enlace Roto Encontrado"
-          message={brokenLinkAlert}
-          onCancel={() => setBrokenLinkAlert(null)}
-          isAlertOnly={true}
-        />
+        <div style={{ position: 'fixed', bottom: '2rem', right: '2rem', background: '#ff4d4f', color: 'white', padding: '1rem', borderRadius: '8px', zIndex: 1000, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+          <p style={{ margin: 0 }}>{brokenLinkAlert}</p>
+          <button onClick={() => setBrokenLinkAlert(null)} style={{ marginTop: '0.5rem', background: 'white', color: '#ff4d4f', border: 'none', padding: '0.2rem 0.5rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Cerrar</button>
+        </div>
       )}
     </div>
   );

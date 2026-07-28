@@ -1,15 +1,18 @@
-import { useEffect, useState } from "react";
-import { collection, getDocs, query } from "firebase/firestore";
+import { useEffect, useState, useMemo } from "react";
+import { collection, getDocs, query, deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { useLocation, useNavigate } from "react-router";
 import { db } from "../firebase";
 import TransactionModal from "../components/TransactionModal";
-import SearchBar from "../components/SearchBar";
+import DocumentModal from "../components/DocumentModal";
+import SearchBar, { type SearchFilter } from "../components/SearchBar";
 import { cleanFirebaseData } from "../utils";
 import { useAdmin } from "../context/AdminContext";
 import ConfirmModal from "../components/ConfirmModal";
-import { deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { logAction } from "../utils/audit";
 import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
+import { useSortableTable } from "../hooks/useSortableTable";
+import Tooltip from "../components/Tooltip";
 
 export default function Salarios() {
   const [data, setData] = useState<any[]>([]);
@@ -17,21 +20,21 @@ export default function Salarios() {
   const [transaccionesSet, setTransaccionesSet] = useState<Set<number>>(new Set());
   const [loading, setLoading] = useState(true);
   const { isEditMode } = useAdmin();
+  
+  const location = useLocation();
+  const navigate = useNavigate();
+
   const [recordToDelete, setRecordToDelete] = useState<any>(null);
   const [brokenLinkAlert, setBrokenLinkAlert] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
+
   const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
 
-  // States for Master-Detail
   const [selectedCompId, setSelectedCompId] = useState<string | null>(null);
-  
-  // State for Transaction Modal
   const [activeTransaction, setActiveTransaction] = useState<string | number | null>(null);
+  const [activeDocuments, setActiveDocuments] = useState<string | number | null>(null);
 
-  // Search state
-  const [searchCategory, setSearchCategory] = useState<string>('');
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [filters, setFilters] = useState<SearchFilter[]>([]);
 
   const searchCategories = [
     { id: 'Autores', label: 'Persona' },
@@ -40,10 +43,25 @@ export default function Salarios() {
     { id: 'all', label: 'Texto libre' }
   ];
 
-  // Filters
   const [filterCompania, setFilterCompania] = useState('');
   const [filterTemporada, setFilterTemporada] = useState('');
   const [filterAmbito, setFilterAmbito] = useState('');
+
+  useEffect(() => {
+    if (location.state?.reset) {
+      setSelectedCompId(null);
+      setFilters([]);
+      navigate(location.pathname, { replace: true });
+    }
+  }, [location.state?.reset, location.pathname, navigate]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const compania = params.get("compania");
+    if (compania) {
+      setSelectedCompId(compania);
+    }
+  }, [location.search]);
 
   useEffect(() => {
     async function fetchData() {
@@ -73,9 +91,6 @@ export default function Salarios() {
   }, []);
 
   const attemptDelete = async (row: any) => {
-    setIsAnalyzing(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setIsAnalyzing(false);
     setRecordToDelete(row);
   };
 
@@ -106,8 +121,13 @@ export default function Salarios() {
     }
   };
 
-  const companiasInData = companias.filter(c => data.some(d => d["Sigla Compañía"] === c["Sigla Compañía"]));
+  const companiasMap = useMemo(() => {
+    const map = new Map();
+    companias.forEach(c => map.set(c["Sigla Compañía"], c));
+    return map;
+  }, [companias]);
 
+  const companiasInData = companias.filter(c => data.some(d => d["Sigla Compañía"] === c["Sigla Compañía"]));
   const uniqueCompanias = Array.from(new Set(companiasInData.map(c => c["Sigla Compañía"]))).filter(Boolean).sort();
   const uniqueTemporadas = Array.from(new Set(companiasInData.map(c => c["Temporadas teatrales"]))).filter(Boolean).sort();
   const uniqueAmbitos = Array.from(new Set(companiasInData.map(c => c["Ámbito"]))).filter(Boolean).sort();
@@ -119,22 +139,35 @@ export default function Salarios() {
     return true;
   });
 
-  const searchResults = data.filter(d => {
-    if (!searchQuery) return false;
-    const q = searchQuery.toLowerCase();
-    if (searchCategory === 'all') {
-      return Object.values(d).some(v => String(v).toLowerCase().includes(q));
-    }
-    if (searchCategory === 'Autores') {
-      const comp = companias.find(c => c["Sigla Compañía"] === d["Sigla Compañía"]);
-      return (comp && comp["Autores"] && String(comp["Autores"]).toLowerCase().includes(q)) || 
-             (d["Beneficiario "] && String(d["Beneficiario "]).toLowerCase().includes(q));
-    }
-    return d[searchCategory] && String(d[searchCategory]).toLowerCase().includes(q);
-  });
+  const searchResults = useMemo(() => {
+    if (filters.length === 0) return [];
+    return data.filter(d => {
+      return filters.every(f => {
+        const q = f.query.toLowerCase();
+        if (f.category === 'all') {
+          return Object.values(d).some(v => String(v).toLowerCase().includes(q));
+        }
+        if (f.category === 'Autores') {
+          const comp = companiasMap.get(d["Sigla Compañía"]);
+          return (comp && comp["Autores"] && String(comp["Autores"]).toLowerCase().includes(q)) || 
+                 (d["Beneficiario "] && String(d["Beneficiario "]).toLowerCase().includes(q));
+        }
+        return d[f.category] && String(d[f.category]).toLowerCase().includes(q);
+      });
+    });
+  }, [data, filters, companiasMap]);
 
-  const isSearching = searchQuery.length > 0;
+  const isSearching = filters.length > 0;
   const detailData = data.filter(d => d["Sigla Compañía"] === selectedCompId);
+
+  const { items: sortedFilteredCompanias, requestSort: sortComp, sortConfig: scComp } = useSortableTable(filteredCompanias);
+  const { items: sortedSearchResults, requestSort: sortSearch, sortConfig: scSearch } = useSortableTable(searchResults);
+  const { items: sortedDetailData, requestSort: sortDetail, sortConfig: scDetail } = useSortableTable(detailData);
+
+  const SortIndicator = ({ column, sc }: { column: string, sc: any }) => {
+    if (!sc || sc.key !== column) return null;
+    return <span>{sc.direction === 'asc' ? ' ▲' : ' ▼'}</span>;
+  };
 
   return (
     <div>
@@ -149,32 +182,49 @@ export default function Salarios() {
               Nuevo Registro
             </button>
           )}
-          <SearchBar onSearch={(c, q) => { setSearchCategory(c); setSearchQuery(q); setSelectedCompId(null); }} categories={searchCategories} />
+          <SearchBar onSearch={(f) => { setFilters(f); setSelectedCompId(null); }} categories={searchCategories} />
         </div>
-        {(selectedCompId || isSearching) && (
-          <button onClick={() => { setSelectedCompId(null); setSearchQuery(''); }} style={{ padding: '0.5rem 1rem' }}>Volver</button>
-        )}
       </div>
-      {!loading && !selectedCompId && !isSearching && <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Mostrando {filteredCompanias.length} registros</p>}
+      
+      {(selectedCompId || isSearching) && (
+        <button onClick={() => { setSelectedCompId(null); setFilters([]); navigate(location.pathname, { replace: true }); }} style={{ padding: '0.5rem 1rem', marginBottom: '1rem' }}>Volver a listado inicial</button>
+      )}
+
+      {!loading && !selectedCompId && !isSearching && <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Mostrando {sortedFilteredCompanias.length} registros</p>}
 
       {loading ? <p>Cargando datos...</p> : isSearching ? (
         <div>
-          <h2>Resultados de Búsqueda ({searchResults.length} registros)</h2>
-          <table>
-            <thead><tr><th>Compañía o empleador</th><th>Ciudad</th><th>Año</th><th></th>{isEditMode && <th>Admin</th>}</tr></thead>
+          <h2>Resultados de Búsqueda ({sortedSearchResults.length} registros)</h2>
+          <table className="sortable">
+            <thead>
+              <tr>
+                <th onClick={() => sortSearch('Sigla Compañía')} style={{ cursor: 'pointer' }}>Compañía <SortIndicator column="Sigla Compañía" sc={scSearch} /></th>
+                <th onClick={() => sortSearch('Ciudad')} style={{ cursor: 'pointer' }}>Ciudad <SortIndicator column="Ciudad" sc={scSearch} /></th>
+                <th onClick={() => sortSearch('Año')} style={{ cursor: 'pointer' }}>Año <SortIndicator column="Año" sc={scSearch} /></th>
+                <th>Vínculos</th>
+                {isEditMode && <th>Admin</th>}
+              </tr>
+            </thead>
             <tbody>
-              {searchResults.map(row => {
+              {sortedSearchResults.map(row => {
+                const comp = companiasMap.get(row["Sigla Compañía"]);
+                const fullName = comp && comp["Nombre Compañía"] ? `${row["Sigla Compañía"]} - ${comp["Nombre Compañía"]}` : row["Sigla Compañía"];
                 const isBroken = row["Transacción"] && !transaccionesSet.has(Number(row["Transacción"]));
                 return (
                 <tr key={row.id}>
-                  <td>{row["Sigla Compañía"]}</td>
+                  <td>{fullName}</td>
                   <td>{row["Ciudad"]}</td>
                   <td>{row["Año"]}</td>
-                  <td>
+                  <td style={{ display: 'flex', gap: '0.5rem' }}>
                     {row["Transacción"] && (
                       isBroken ? 
-                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto. El registro no existe en la base de datos, por favor haga la corrección.`)}>Enlace Roto</button>
-                      : <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
+                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
+                      : (
+                        <>
+                          <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
+                          <button onClick={() => setActiveDocuments(row["Transacción"])}>Documentos</button>
+                        </>
+                      )
                     )}
                   </td>
                   {isEditMode && (
@@ -192,7 +242,7 @@ export default function Salarios() {
         <div>
           <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
             <select value={filterCompania} onChange={e => setFilterCompania(e.target.value)}>
-              <option value="">Todos los Empleadores</option>
+              <option value="">Todas las Compañías</option>
               {uniqueCompanias.map(opt => <option key={opt} value={opt}>{opt}</option>)}
             </select>
             <select value={filterTemporada} onChange={e => setFilterTemporada(e.target.value)}>
@@ -204,30 +254,49 @@ export default function Salarios() {
               {uniqueAmbitos.map(opt => <option key={opt} value={opt}>{opt}</option>)}
             </select>
           </div>
-          <table>
-            <thead><tr><th>Compañía o empleador</th><th>Autores</th><th>Temporadas</th><th>Ámbito</th><th></th></tr></thead>
+          <table className="sortable">
+            <thead>
+              <tr>
+                <th onClick={() => sortComp('Sigla Compañía')} style={{ cursor: 'pointer' }}>Compañía <Tooltip content="Sigla y nombre de la compañía." /><SortIndicator column="Sigla Compañía" sc={scComp} /></th>
+                <th onClick={() => sortComp('Autores')} style={{ cursor: 'pointer' }}>Autores <Tooltip content="Personas principales o representantes asociadas." /><SortIndicator column="Autores" sc={scComp} /></th>
+                <th onClick={() => sortComp('Temporadas teatrales')} style={{ cursor: 'pointer' }}>Temporadas <Tooltip content="Años de actividad principal." /><SortIndicator column="Temporadas teatrales" sc={scComp} /></th>
+                <th onClick={() => sortComp('Ámbito')} style={{ cursor: 'pointer' }}>Ámbito <Tooltip content="Ubicación general de operaciones." /><SortIndicator column="Ámbito" sc={scComp} /></th>
+                <th>Acción</th>
+              </tr>
+            </thead>
             <tbody>
-              {filteredCompanias.map((c, i) => (
+              {sortedFilteredCompanias.map((c, i) => {
+                const fullName = c["Nombre Compañía"] ? `${c["Sigla Compañía"]} - ${c["Nombre Compañía"]}` : c["Sigla Compañía"];
+                return (
                 <tr key={i}>
-                  <td>{c["Sigla Compañía"]}</td>
+                  <td>{fullName}</td>
                   <td>{c["Autores"]}</td>
                   <td>{c["Temporadas teatrales"]}</td>
                   <td>{c["Ámbito"]}</td>
                   <td><button onClick={() => setSelectedCompId(c["Sigla Compañía"])}>TRATO</button></td>
                 </tr>
-              ))}
+              )})}
             </tbody>
           </table>
         </div>
       ) : (
         <div style={{ overflowX: "auto" }}>
-          <div style={{ marginBottom: '1rem' }}><p style={{ color: 'var(--text-muted)' }}>{detailData.length} transacciones registradas</p></div>
-          <table>
+          <div style={{ marginBottom: '1rem' }}><p style={{ color: 'var(--text-muted)' }}>{sortedDetailData.length} registros para {selectedCompId}</p></div>
+          <table className="sortable">
             <thead>
-              <tr><th>Ciudad</th><th>Año</th><th>Personas</th><th>Ocupación</th><th>Salarios y raciones</th><th>Moneda</th><th></th>{isEditMode && <th>Admin</th>}</tr>
+              <tr>
+                <th onClick={() => sortDetail('Ciudad')} style={{ cursor: 'pointer' }}>Ciudad <Tooltip content="Ciudad donde ocurrió el salario" /><SortIndicator column="Ciudad" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Año')} style={{ cursor: 'pointer' }}>Año <Tooltip content="Año de la transacción" /><SortIndicator column="Año" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Beneficiario ')} style={{ cursor: 'pointer' }}>Personas <Tooltip content="Persona que recibe el salario" /><SortIndicator column="Beneficiario " sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Encargo')} style={{ cursor: 'pointer' }}>Ocupación <Tooltip content="Motivo o encargo" /><SortIndicator column="Encargo" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Monto a pagar')} style={{ cursor: 'pointer' }}>Salarios y raciones <Tooltip content="Monto pagado" /><SortIndicator column="Monto a pagar" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Moneda')} style={{ cursor: 'pointer' }}>Moneda <Tooltip content="Moneda" /><SortIndicator column="Moneda" sc={scDetail} /></th>
+                <th>Vínculos</th>
+                {isEditMode && <th>Admin</th>}
+              </tr>
             </thead>
             <tbody>
-              {detailData.map(row => {
+              {sortedDetailData.map(row => {
                 const isBroken = row["Transacción"] && !transaccionesSet.has(Number(row["Transacción"]));
                 return (
                 <tr key={row.id}>
@@ -236,11 +305,17 @@ export default function Salarios() {
                   <td>{row["Beneficiario "]}</td>
                   <td>{row["Encargo"]}</td>
                   <td>{row["Monto a pagar"]}</td>
-                  <td>
+                  <td>{row["Moneda"]}</td>
+                  <td style={{ display: 'flex', gap: '0.5rem' }}>
                     {row["Transacción"] && (
                       isBroken ? 
-                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto. El registro no existe en la base de datos, por favor haga la corrección.`)}>Enlace Roto</button>
-                      : <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
+                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
+                      : (
+                        <>
+                          <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
+                          <button onClick={() => setActiveDocuments(row["Transacción"])}>Documentos</button>
+                        </>
+                      )
                     )}
                   </td>
                   {isEditMode && (
@@ -256,6 +331,7 @@ export default function Salarios() {
         </div>
       )}
       {activeTransaction && <TransactionModal transactionCode={activeTransaction} onClose={() => setActiveTransaction(null)} />}
+      {activeDocuments && <DocumentModal transactionCode={activeDocuments} onClose={() => setActiveDocuments(null)} />}
       
       {isCreateOpen && (
         <GenericCreateModal 
@@ -278,47 +354,20 @@ export default function Salarios() {
         />
       )}
 
-      {isAnalyzing && (
-        <div style={{
-          position: 'fixed',
-          top: 0, left: 0, right: 0, bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.5)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000
-        }}>
-          <div style={{
-            background: 'var(--bg-card)',
-            padding: '2rem',
-            borderRadius: '8px',
-            maxWidth: '400px',
-            width: '90%',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-            textAlign: 'center'
-          }}>
-            <h2 style={{ marginTop: 0, color: 'var(--primary-color)' }}>Por favor espere</h2>
-            <div style={{ margin: '1.5rem 0', fontWeight: 'bold' }}>Analizando registros...</div>
-          </div>
-        </div>
-      )}
-
       {recordToDelete && (
         <ConfirmModal 
-          title="Confirmar Borrado"
-          message={<>¿Está seguro de que desea eliminar el registro de Salario para <strong>{recordToDelete["Beneficiario "]}</strong>? Esta acción no se puede deshacer.</>}
+          title="Confirmar Eliminación"
+          message={`¿Estás seguro de que deseas eliminar este registro de salario para ${recordToDelete["Beneficiario "]}?`}
           onConfirm={handleDelete}
           onCancel={() => setRecordToDelete(null)}
-          confirmText="Borrar"
         />
       )}
+
       {brokenLinkAlert && (
-        <ConfirmModal 
-          title="Enlace Roto Encontrado"
-          message={brokenLinkAlert}
-          onCancel={() => setBrokenLinkAlert(null)}
-          isAlertOnly={true}
-        />
+        <div style={{ position: 'fixed', bottom: '2rem', right: '2rem', background: '#ff4d4f', color: 'white', padding: '1rem', borderRadius: '8px', zIndex: 1000, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+          <p style={{ margin: 0 }}>{brokenLinkAlert}</p>
+          <button onClick={() => setBrokenLinkAlert(null)} style={{ marginTop: '0.5rem', background: 'white', color: '#ff4d4f', border: 'none', padding: '0.2rem 0.5rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Cerrar</button>
+        </div>
       )}
     </div>
   );

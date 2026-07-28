@@ -105,34 +105,23 @@ export default function Transacciones() {
   };
 
   const renderDocsForTransaction = (row: any) => {
-    const docCodes = [];
-    for (let i = 1; i <= 10; i++) {
-      const val = row[`Doc${i}`];
-      if (val) {
-        docCodes.push(val);
-      }
-    }
-    if (docCodes.length === 0) return 'Ninguno';
+    const hasDocs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].some(i => row[`Doc${i}`]);
+    if (!hasDocs) return 'Ninguno';
     return (
-      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-        {docCodes.map(val => (
-          <button
-            key={val}
-            onClick={() => setActiveDoc(val)}
-            style={{
-              padding: '0.2rem 0.5rem',
-              background: 'var(--accent-color)',
-              color: 'white',
-              borderRadius: '4px',
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: '0.9rem'
-            }}
-          >
-            Doc {val}
-          </button>
-        ))}
-      </div>
+      <button
+        onClick={() => setActiveDoc(row["Num"])}
+        style={{
+          padding: '0.2rem 0.5rem',
+          background: 'var(--accent-color)',
+          color: 'white',
+          borderRadius: '4px',
+          border: 'none',
+          cursor: 'pointer',
+          fontSize: '0.9rem'
+        }}
+      >
+        Ver Documentos
+      </button>
     );
   };
 
@@ -246,7 +235,7 @@ export default function Transacciones() {
       )}
       {activeDoc && (
         <DocumentModal 
-          docCode={activeDoc} 
+          transactionCode={activeDoc} 
           onClose={() => setActiveDoc(null)} 
         />
       )}

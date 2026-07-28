@@ -1,5 +1,4 @@
-
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { collection, getDocs, query } from "firebase/firestore";
 import { db } from "../firebase";
 import { cleanFirebaseData } from "../utils";
@@ -9,6 +8,9 @@ import { deleteDoc, doc, where, updateDoc } from "firebase/firestore";
 import { logAction } from "../utils/audit";
 import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
+import { useNavigate } from "react-router";
+import { useSortableTable } from "../hooks/useSortableTable";
+import Tooltip from "../components/Tooltip";
 
 export default function IndiceCompanias() {
   const [data, setData] = useState<any[]>([]);
@@ -19,6 +21,10 @@ export default function IndiceCompanias() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
+
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     async function fetchData() {
@@ -100,33 +106,75 @@ export default function IndiceCompanias() {
     }
   };
 
+  const filteredData = useMemo(() => {
+    if (!searchQuery.trim()) return data;
+    const q = searchQuery.toLowerCase();
+    return data.filter(d => 
+      (d["Sigla Compañía"] && String(d["Sigla Compañía"]).toLowerCase().includes(q)) ||
+      (d["Nombre Compañía"] && String(d["Nombre Compañía"]).toLowerCase().includes(q)) ||
+      (d["Autores"] && String(d["Autores"]).toLowerCase().includes(q))
+    );
+  }, [data, searchQuery]);
+
+  const { items: sortedData, requestSort, sortConfig } = useSortableTable(filteredData);
+
+  const SortIndicator = ({ column }: { column: string }) => {
+    if (!sortConfig || sortConfig.key !== column) return null;
+    return <span>{sortConfig.direction === 'asc' ? ' ▲' : ' ▼'}</span>;
+  };
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
         <h1>Índice de Compañías</h1>
-        {isEditMode && (
-          <button 
-            onClick={() => setIsCreateOpen(true)}
-            style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-          >
-            Nuevo Registro
-          </button>
-        )}
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          {isEditMode && (
+            <button 
+              onClick={() => setIsCreateOpen(true)}
+              style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+            >
+              Nuevo Registro
+            </button>
+          )}
+          <input 
+            type="text" 
+            placeholder="Buscar por nombre o autores..." 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'rgba(255,255,255,0.05)', color: 'white', minWidth: '250px' }}
+          />
+        </div>
       </div>
-      {!loading && <p style={{ color: 'var(--text-muted)' }}>Total registros: {data.length}</p>}
+      
+      {!loading && <p style={{ color: 'var(--text-muted)' }}>Total registros: {sortedData.length}</p>}
+      
       {loading ? <p>Cargando datos...</p> : (
         <div style={{ overflowX: "auto" }}>
-          <table>
+          <table className="sortable">
             <thead>
-              <tr><th>Sigla (Compañías)</th><th>Autores</th><th>Temporadas Teatrales</th><th>Ámbito</th>{isEditMode && <th>Admin</th>}</tr>
+              <tr>
+                <th onClick={() => requestSort('Sigla Compañía')} style={{ cursor: 'pointer' }}>Sigla (Compañías) <Tooltip content="Sigla única de la compañía" /><SortIndicator column="Sigla Compañía" /></th>
+                <th onClick={() => requestSort('Nombre Compañía')} style={{ cursor: 'pointer' }}>Nombre <Tooltip content="Nombre completo de la compañía" /><SortIndicator column="Nombre Compañía" /></th>
+                <th onClick={() => requestSort('Autores')} style={{ cursor: 'pointer' }}>Autores <Tooltip content="Personas asociadas" /><SortIndicator column="Autores" /></th>
+                <th onClick={() => requestSort('Temporadas teatrales')} style={{ cursor: 'pointer' }}>Temporadas Teatrales <SortIndicator column="Temporadas teatrales" /></th>
+                <th onClick={() => requestSort('Ámbito')} style={{ cursor: 'pointer' }}>Ámbito <SortIndicator column="Ámbito" /></th>
+                <th>Vínculos Rápidos</th>
+                {isEditMode && <th>Admin</th>}
+              </tr>
             </thead>
             <tbody>
-              {data.map(item => (
+              {sortedData.map(item => (
                 <tr key={item.id}>
-                  <td>{item["Sigla Compañía"]}</td>
+                  <td style={{ fontWeight: 'bold' }}>{item["Sigla Compañía"]}</td>
+                  <td>{item["Nombre Compañía"]}</td>
                   <td>{item["Autores"]}</td>
                   <td>{item["Temporadas teatrales"]}</td>
                   <td>{item["Ámbito"]}</td>
+                  <td style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <button onClick={() => navigate(`/?compania=${item["Sigla Compañía"]}`)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Caja</button>
+                    <button onClick={() => navigate(`/salarios?compania=${item["Sigla Compañía"]}`)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Salarios</button>
+                    <button onClick={() => navigate(`/corpus?compania=${item["Sigla Compañía"]}`)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Corpus Christi</button>
+                  </td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>
                       <button onClick={() => setRecordToEdit(item)} style={{ background: 'var(--primary-color)' }}>Editar</button>

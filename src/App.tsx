@@ -10,18 +10,32 @@ import Bibliografia from './pages/Bibliografia';
 import Transacciones from './pages/Transacciones';
 import Documentos from './pages/Documentos';
 import Auditoria from './pages/Auditoria';
+import UserManagement from './pages/UserManagement';
 import './index.css';
 import { auth } from './firebase';
 import { signOut } from 'firebase/auth';
 import { AdminProvider, useAdmin } from './context/AdminContext';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { generateDatabaseXml, downloadXml, generateZipBlob, uploadToGoogleDrive } from './utils/backup';
 import { generateDatabaseXlsx, downloadXlsx } from './utils/xlsxExport';
 
 function Layout({ children }: { children: React.ReactNode }) {
   const { isAdmin, isEditMode, setIsEditMode, user } = useAdmin();
   const [adminMenuOpen, setAdminMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
+        setAdminMenuOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
   const [configuringClientId, setConfiguringClientId] = useState(false);
   const [clientId, setClientId] = useState(() => localStorage.getItem('google_client_id') || '');
   const [backupStatus, setBackupStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
@@ -144,12 +158,12 @@ function Layout({ children }: { children: React.ReactNode }) {
             </span>
           )}
         </h2>
-        <Link to="/">Manejo de Caja</Link>
-        <Link to="/salarios">Salarios</Link>
-        <Link to="/corpus">Corpus Christi</Link>
-        <Link to="/indicadores">Identificación de Indicadores</Link>
-        <Link to="/companias">Compañías</Link>
-        <Link to="/bibliografia">Bibliografía</Link>
+        <Link to="/" state={{ reset: Date.now() }}>Manejo de Caja</Link>
+        <Link to="/salarios" state={{ reset: Date.now() }}>Salarios</Link>
+        <Link to="/corpus" state={{ reset: Date.now() }}>Corpus Christi</Link>
+        <Link to="/indicadores" state={{ reset: Date.now() }}>Identificación de Indicadores</Link>
+        <Link to="/companias" state={{ reset: Date.now() }}>Compañías</Link>
+        <Link to="/bibliografia" state={{ reset: Date.now() }}>Bibliografía</Link>
         
         {isAdmin && (
           <>
@@ -157,7 +171,7 @@ function Layout({ children }: { children: React.ReactNode }) {
             <Link to="/transacciones" style={{ color: 'var(--primary-color)', fontWeight: 'bold' }}>Transacciones</Link>
             <Link to="/documentos" style={{ color: 'var(--primary-color)', fontWeight: 'bold' }}>Documentos</Link>
             
-            <div style={{ position: 'relative' }}>
+            <div style={{ position: 'relative' }} ref={menuRef}>
               <button 
                 onClick={() => setAdminMenuOpen(!adminMenuOpen)} 
                 style={{ 
@@ -192,6 +206,13 @@ function Layout({ children }: { children: React.ReactNode }) {
                     style={{ padding: '0.8rem 1rem', borderBottom: '1px solid var(--border-color)', textDecoration: 'none', color: 'var(--text-primary)', fontWeight: 'bold' }}
                   >
                     Auditoría (Logs)
+                  </Link>
+                  <Link 
+                    to="/usuarios" 
+                    onClick={() => setAdminMenuOpen(false)}
+                    style={{ padding: '0.8rem 1rem', borderBottom: '1px solid var(--border-color)', textDecoration: 'none', color: 'var(--text-primary)', fontWeight: 'bold' }}
+                  >
+                    Gestión de Usuarios
                   </Link>
                   <button 
                     onClick={() => { setAdminMenuOpen(false); handleDownloadXml(); }}
@@ -323,6 +344,7 @@ export default function App() {
           <Route path="/transacciones" element={<ProtectedRoute><Layout><Transacciones /></Layout></ProtectedRoute>} />
           <Route path="/documentos" element={<ProtectedRoute><Layout><Documentos /></Layout></ProtectedRoute>} />
           <Route path="/auditoria" element={<ProtectedRoute><Layout><Auditoria /></Layout></ProtectedRoute>} />
+          <Route path="/usuarios" element={<ProtectedRoute><Layout><UserManagement /></Layout></ProtectedRoute>} />
           
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
