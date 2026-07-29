@@ -62,8 +62,11 @@ export default function SearchBar({ onSearch, categories }: SearchBarProps) {
           placeholder="Añadir filtro..."
           style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'rgba(255,255,255,0.05)', color: 'white' }}
         />
-        <button type="submit" style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: '#111', border: 'none', borderRadius: '4px', fontWeight: 'bold' }}>
+        <button type="submit" style={{ padding: '0.5rem 1rem', background: 'transparent', color: 'var(--primary-color)', border: '1px solid var(--primary-color)', borderRadius: '4px', fontWeight: 'bold' }}>
           Agregar
+        </button>
+        <button type="submit" style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: '#111', border: 'none', borderRadius: '4px', fontWeight: 'bold' }}>
+          Buscar
         </button>
         {filters.length > 0 && (
           <button type="button" onClick={handleClearAll} style={{ padding: '0.5rem 1rem', background: 'transparent', color: 'white', border: '1px solid var(--border-color)', borderRadius: '4px' }}>
