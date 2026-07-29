@@ -229,7 +229,7 @@ export default function Salarios() {
                       return (
                         <div style={{ display: 'flex', gap: '0.2rem', flexWrap: 'wrap' }}>
                           {docs.map((docCode, idx) => (
-                            <button key={idx} onClick={() => setActiveDocuments(row["Transacción"])} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem', background: 'var(--bg-body)' }}>{docCode}</button>
+                            <button key={idx} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem', background: 'var(--bg-body)' }}>Doc {docCode}</button>
                           ))}
                         </div>
                       );
@@ -240,7 +240,7 @@ export default function Salarios() {
                       isBroken ? 
                         <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
                       : (
-                        <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
+                        <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
                       )
                     )}
                   </td>
@@ -281,7 +281,7 @@ export default function Salarios() {
                 <th onClick={() => sortComp('Autores')} style={{ cursor: 'pointer' }}>Autores <SortIndicator column="Autores" sc={scComp} /></th>
                 <th onClick={() => sortComp('Temporadas teatrales')} style={{ cursor: 'pointer' }}>Temporadas <SortIndicator column="Temporadas teatrales" sc={scComp} /></th>
                 <th onClick={() => sortComp('Ámbito')} style={{ cursor: 'pointer' }}>Ámbito <SortIndicator column="Ámbito" sc={scComp} /></th>
-                <th>Acción</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -333,7 +333,7 @@ export default function Salarios() {
                       return (
                         <div style={{ display: 'flex', gap: '0.2rem', flexWrap: 'wrap' }}>
                           {docs.map((docCode, idx) => (
-                            <button key={idx} onClick={() => setActiveDocuments(row["Transacción"])} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem', background: 'var(--bg-body)' }}>{docCode}</button>
+                            <button key={idx} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem', background: 'var(--bg-body)' }}>Doc {docCode}</button>
                           ))}
                         </div>
                       );
@@ -344,7 +344,7 @@ export default function Salarios() {
                       isBroken ? 
                         <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
                       : (
-                        <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
+                        <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
                       )
                     )}
                   </td>
@@ -361,7 +361,7 @@ export default function Salarios() {
         </div>
       )}
       {activeTransaction && <TransactionModal transactionCode={activeTransaction} onClose={() => setActiveTransaction(null)} />}
-      {activeDocuments && <DocumentModal transactionCode={activeDocuments} onClose={() => setActiveDocuments(null)} />}
+      {activeDocuments && <DocumentModal documentCode={activeDocuments} onClose={() => setActiveDocuments(null)} />}
       {recordToView && <DetailsModal record={recordToView} onClose={() => setRecordToView(null)} />}
       
       {isCreateOpen && (

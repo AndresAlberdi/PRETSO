@@ -208,7 +208,7 @@ export default function CorpusChristi() {
                       return (
                         <div style={{ display: 'flex', gap: '0.2rem', flexWrap: 'wrap' }}>
                           {docs.map((docCode, idx) => (
-                            <button key={idx} onClick={() => setActiveDocuments(row["Transacción"])} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem', background: 'var(--bg-body)' }}>{docCode}</button>
+                            <button key={idx} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem', background: 'var(--bg-body)' }}>Doc {docCode}</button>
                           ))}
                         </div>
                       );
@@ -219,7 +219,7 @@ export default function CorpusChristi() {
                       isBroken ? 
                         <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
                       : (
-                        <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
+                        <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
                       )
                     )}
                   </td>
@@ -251,7 +251,7 @@ export default function CorpusChristi() {
               <tr>
                 <th onClick={() => sortGroup('ciudad')} style={{ cursor: 'pointer' }}>Ciudad <SortIndicator column="ciudad" sc={scGroup} /></th>
                 <th onClick={() => sortGroup('año')} style={{ cursor: 'pointer' }}>Año <SortIndicator column="año" sc={scGroup} /></th>
-                <th>Acción</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -313,7 +313,7 @@ export default function CorpusChristi() {
                       return (
                         <div style={{ display: 'flex', gap: '0.2rem', flexWrap: 'wrap' }}>
                           {docs.map((docCode, idx) => (
-                            <button key={idx} onClick={() => setActiveDocuments(row["Transacción"])} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem', background: 'var(--bg-body)' }}>{docCode}</button>
+                            <button key={idx} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem', background: 'var(--bg-body)' }}>Doc {docCode}</button>
                           ))}
                         </div>
                       );
@@ -324,7 +324,7 @@ export default function CorpusChristi() {
                       isBroken ? 
                         <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
                       : (
-                        <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
+                        <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
                       )
                     )}
                   </td>
@@ -341,7 +341,7 @@ export default function CorpusChristi() {
         </div>
       )}
       {activeTransaction && <TransactionModal transactionCode={activeTransaction} onClose={() => setActiveTransaction(null)} />}
-      {activeDocuments && <DocumentModal transactionCode={activeDocuments} onClose={() => setActiveDocuments(null)} />}
+      {activeDocuments && <DocumentModal documentCode={activeDocuments} onClose={() => setActiveDocuments(null)} />}
       {recordToView && <DetailsModal record={recordToView} onClose={() => setRecordToView(null)} />}
       
       {isCreateOpen && (

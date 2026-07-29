@@ -245,7 +245,7 @@ export default function Transacciones() {
       )}
       {activeDoc && (
         <DocumentModal 
-          transactionCode={activeDoc} 
+          documentCode={activeDoc} 
           onClose={() => setActiveDoc(null)} 
         />
       )}
