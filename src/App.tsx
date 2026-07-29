@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router';
 import ProtectedRoute from './components/ProtectedRoute';
 import Login from './pages/Login';
+import Inicio from './pages/Inicio';
 import ManejoCaja from './pages/ManejoCaja';
 import Salarios from './pages/Salarios';
 import CorpusChristi from './pages/CorpusChristi';
@@ -158,7 +159,8 @@ function Layout({ children }: { children: React.ReactNode }) {
             </span>
           )}
         </h2>
-        <Link to="/" state={{ reset: Date.now() }}>Manejo de Caja</Link>
+        <Link to="/" state={{ reset: Date.now() }}>Inicio</Link>
+        <Link to="/caja" state={{ reset: Date.now() }}>Manejo de Caja</Link>
         <Link to="/salarios" state={{ reset: Date.now() }}>Salarios</Link>
         <Link to="/corpus" state={{ reset: Date.now() }}>Corpus Christi</Link>
         <Link to="/indicadores" state={{ reset: Date.now() }}>Identificación de Indicadores</Link>
@@ -335,7 +337,8 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           
-          <Route path="/" element={<ProtectedRoute><Layout><ManejoCaja /></Layout></ProtectedRoute>} />
+          <Route path="/" element={<ProtectedRoute><Layout><Inicio /></Layout></ProtectedRoute>} />
+          <Route path="/caja" element={<ProtectedRoute><Layout><ManejoCaja /></Layout></ProtectedRoute>} />
           <Route path="/salarios" element={<ProtectedRoute><Layout><Salarios /></Layout></ProtectedRoute>} />
           <Route path="/corpus" element={<ProtectedRoute><Layout><CorpusChristi /></Layout></ProtectedRoute>} />
           <Route path="/indicadores" element={<ProtectedRoute><Layout><Indicadores /></Layout></ProtectedRoute>} />

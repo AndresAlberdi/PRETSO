@@ -3,6 +3,7 @@ import { collection, getDocs, query, deleteDoc, doc, updateDoc } from "firebase/
 import { useLocation, useNavigate } from "react-router";
 import { db } from "../firebase";
 import TransactionModal from "../components/TransactionModal";
+import DocumentModal from "../components/DocumentModal";
 import SearchBar, { type SearchFilter } from "../components/SearchBar";
 import { cleanFirebaseData } from "../utils";
 import CompaniaModal from "../components/CompaniaModal";
@@ -16,7 +17,7 @@ import Tooltip from "../components/Tooltip";
 
 export default function Indicadores() {
   const [data, setData] = useState<any[]>([]);
-  const [transaccionesSet, setTransaccionesSet] = useState<Set<number>>(new Set());
+  const [transaccionesMap, setTransaccionesMap] = useState<Map<number, any>>(new Map());
   const [loading, setLoading] = useState(true);
   const { isEditMode } = useAdmin();
   
@@ -31,6 +32,7 @@ export default function Indicadores() {
 
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
   const [activeTransaction, setActiveTransaction] = useState<string | number | null>(null);
+  const [activeDocuments, setActiveDocuments] = useState<string | number | null>(null);
   const [activeCompania, setActiveCompania] = useState<string | null>(null);
 
   const [filters, setFilters] = useState<SearchFilter[]>([]);
@@ -62,9 +64,9 @@ export default function Indicadores() {
 
       const qTrans = query(collection(db, "transacciones"));
       const snapTrans = await getDocs(qTrans);
-      const tSet = new Set<number>();
-      snapTrans.docs.forEach(d => tSet.add(Number(d.data().Num)));
-      setTransaccionesSet(tSet);
+      const tMap = new Map<number, any>();
+      snapTrans.docs.forEach(d => tMap.set(Number(d.data().Num), d.data()));
+      setTransaccionesMap(tMap);
 
       setLoading(false);
     }
@@ -170,25 +172,40 @@ export default function Indicadores() {
                 <th onClick={() => sortSearch('Años')} style={{ cursor: 'pointer' }}>Año <SortIndicator column="Años" sc={scSearch} /></th>
                 <th onClick={() => sortSearch('Concepto')} style={{ cursor: 'pointer' }}>Concepto <SortIndicator column="Concepto" sc={scSearch} /></th>
                 <th onClick={() => sortSearch('Monto')} style={{ cursor: 'pointer' }}>Monto <SortIndicator column="Monto" sc={scSearch} /></th>
-                <th>Vínculos</th>
+                <th>Transacción</th>
+                <th>Documentos</th>
                 {isEditMode && <th>Admin</th>}
               </tr>
             </thead>
             <tbody>
               {sortedSearchResults.map(row => {
-                const isBroken = row["Transacción"] && !transaccionesSet.has(Number(row["Transacción"]));
+                const isBroken = row["Transacción"] && !transaccionesMap.has(Number(row["Transacción"]));
                 return (
                 <tr key={row.id}>
                   <td>{row["Ciudad"]}</td>
                   <td>{row["Años"]}</td>
                   <td>{row["Concepto"]}</td>
                   <td>{row["Monto"]}</td>
-                  <td>
+                  <td style={{ display: 'flex', gap: '0.5rem' }}>
                     {row["Transacción"] && (
                       isBroken ? 
                         <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
-                      : <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
+                      : <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
                     )}
+                  </td>
+                  <td>
+                    {row["Transacción"] && !isBroken && (() => {
+                      const trans = transaccionesMap.get(Number(row["Transacción"]));
+                      if (!trans) return null;
+                      const docs = [1,2,3,4,5,6,7,8,9,10].map(i => trans[`Doc${i}`]).filter(Boolean);
+                      return (
+                        <div style={{ display: 'flex', gap: '0.2rem', flexWrap: 'wrap' }}>
+                          {docs.map((docCode, idx) => (
+                            <button key={idx} onClick={() => setActiveDocuments(row["Transacción"])} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem', background: 'var(--bg-body)' }}>{docCode}</button>
+                          ))}
+                        </div>
+                      );
+                    })()}
                   </td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>
@@ -238,13 +255,14 @@ export default function Indicadores() {
                 <th onClick={() => sortDetail('Monto')} style={{ cursor: 'pointer' }}>Monto <SortIndicator column="Monto" sc={scDetail} /></th>
                 <th onClick={() => sortDetail('Nota')} style={{ cursor: 'pointer' }}>Nota <SortIndicator column="Nota" sc={scDetail} /></th>
                 <th>Compañía</th>
-                <th>Vínculos</th>
+                <th>Transacción</th>
+                <th>Documentos</th>
                 {isEditMode && <th>Admin</th>}
               </tr>
             </thead>
             <tbody>
               {sortedDetailData.map(row => {
-                const isBroken = row["Transacción"] && !transaccionesSet.has(Number(row["Transacción"]));
+                const isBroken = row["Transacción"] && !transaccionesMap.has(Number(row["Transacción"]));
                 return (
                 <tr key={row.id}>
                   <td>{row["Ciudad"]}</td>
@@ -257,12 +275,26 @@ export default function Indicadores() {
                       <button onClick={() => setActiveCompania(row["Sigla Compañía"])} style={{ padding: '0.2rem 0.5rem', background: 'var(--accent-color)', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}>{row["Sigla Compañía"]}</button>
                     )}
                   </td>
-                  <td>
+                  <td style={{ display: 'flex', gap: '0.5rem' }}>
                     {row["Transacción"] && (
                       isBroken ? 
                         <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
-                      : <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
+                      : <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
                     )}
+                  </td>
+                  <td>
+                    {row["Transacción"] && !isBroken && (() => {
+                      const trans = transaccionesMap.get(Number(row["Transacción"]));
+                      if (!trans) return null;
+                      const docs = [1,2,3,4,5,6,7,8,9,10].map(i => trans[`Doc${i}`]).filter(Boolean);
+                      return (
+                        <div style={{ display: 'flex', gap: '0.2rem', flexWrap: 'wrap' }}>
+                          {docs.map((docCode, idx) => (
+                            <button key={idx} onClick={() => setActiveDocuments(row["Transacción"])} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem', background: 'var(--bg-body)' }}>{docCode}</button>
+                          ))}
+                        </div>
+                      );
+                    })()}
                   </td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>
@@ -277,6 +309,7 @@ export default function Indicadores() {
         </div>
       )}
       {activeTransaction && <TransactionModal transactionCode={activeTransaction} onClose={() => setActiveTransaction(null)} />}
+      {activeDocuments && <DocumentModal transactionCode={activeDocuments} onClose={() => setActiveDocuments(null)} />}
       
       {isCreateOpen && (
         <GenericCreateModal 

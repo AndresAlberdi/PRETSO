@@ -67,7 +67,7 @@ export default function IndiceCompanias() {
   const attemptDelete = async (row: any) => {
     setIsAnalyzing(true);
     const [error] = await Promise.all([
-      checkReferentialIntegrity(row["Sigla Compañía"]),
+      checkReferentialIntegrity(row["Indicador de registro"] || row["Sigla Compañía"]),
       new Promise(resolve => setTimeout(resolve, 1000))
     ]);
     setIsAnalyzing(false);
@@ -153,26 +153,24 @@ export default function IndiceCompanias() {
             <thead>
               <tr>
                 <th onClick={() => requestSort('Sigla Compañía')} style={{ cursor: 'pointer' }}>Sigla (Compañías) <SortIndicator column="Sigla Compañía" /></th>
-                <th onClick={() => requestSort('Nombre Compañía')} style={{ cursor: 'pointer' }}>Nombre <SortIndicator column="Nombre Compañía" /></th>
                 <th onClick={() => requestSort('Autores')} style={{ cursor: 'pointer' }}>Autores <SortIndicator column="Autores" /></th>
                 <th onClick={() => requestSort('Temporadas teatrales')} style={{ cursor: 'pointer' }}>Temporadas Teatrales <SortIndicator column="Temporadas teatrales" /></th>
                 <th onClick={() => requestSort('Ámbito')} style={{ cursor: 'pointer' }}>Ámbito <SortIndicator column="Ámbito" /></th>
                 <th>Vínculos Rápidos</th>
-                {isEditMode && <th>Admin</th>}
+                {isEditMode && <th></th>}
               </tr>
             </thead>
             <tbody>
               {sortedData.map(item => (
                 <tr key={item.id}>
                   <td style={{ fontWeight: 'bold' }}>{item["Sigla Compañía"]}</td>
-                  <td>{item["Nombre Compañía"]}</td>
                   <td>{item["Autores"]}</td>
                   <td>{item["Temporadas teatrales"]}</td>
                   <td>{item["Ámbito"]}</td>
                   <td style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    <button onClick={() => navigate(`/?compania=${item["Sigla Compañía"]}`)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Caja</button>
-                    <button onClick={() => navigate(`/salarios?compania=${item["Sigla Compañía"]}`)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Salarios</button>
-                    <button onClick={() => navigate(`/corpus?compania=${item["Sigla Compañía"]}`)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Corpus Christi</button>
+                    <button onClick={() => navigate(`/?compania=${item["Indicador de registro"]}`)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Caja</button>
+                    <button onClick={() => navigate(`/salarios?compania=${item["Indicador de registro"]}`)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Salarios</button>
+                    <button onClick={() => navigate(`/corpus?compania=${item["Indicador de registro"]}`)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Corpus Christi</button>
                   </td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>

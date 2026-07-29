@@ -18,7 +18,7 @@ import DetailsModal from "../components/DetailsModal";
 
 export default function CorpusChristi() {
   const [data, setData] = useState<any[]>([]);
-  const [transaccionesSet, setTransaccionesSet] = useState<Set<number>>(new Set());
+  const [transaccionesMap, setTransaccionesMap] = useState<Map<number, any>>(new Map());
   const [loading, setLoading] = useState(true);
   const { isEditMode } = useAdmin();
   
@@ -67,9 +67,9 @@ export default function CorpusChristi() {
 
       const qTrans = query(collection(db, "transacciones"));
       const snapTrans = await getDocs(qTrans);
-      const tSet = new Set<number>();
-      snapTrans.docs.forEach(d => tSet.add(Number(d.data().Num)));
-      setTransaccionesSet(tSet);
+      const tMap = new Map<number, any>();
+      snapTrans.docs.forEach(d => tMap.set(Number(d.data().Num), d.data()));
+      setTransaccionesMap(tMap);
 
       setLoading(false);
     }
@@ -186,13 +186,14 @@ export default function CorpusChristi() {
                 <th onClick={() => sortSearch('Año')} style={{ cursor: 'pointer' }}>Año <SortIndicator column="Año" sc={scSearch} /></th>
                 <th onClick={() => sortSearch('Encargado ')} style={{ cursor: 'pointer' }}>Encargado <SortIndicator column="Encargado " sc={scSearch} /></th>
                 <th onClick={() => sortSearch('Monto a pagar')} style={{ cursor: 'pointer' }}>Monto a pagar <SortIndicator column="Monto a pagar" sc={scSearch} /></th>
-                <th>Vínculos</th>
+                <th>Transacción</th>
+                <th>Documentos</th>
                 {isEditMode && <th>Admin</th>}
               </tr>
             </thead>
             <tbody>
               {sortedSearchResults.map(row => {
-                const isBroken = row["Transacción"] && !transaccionesSet.has(Number(row["Transacción"]));
+                const isBroken = row["Transacción"] && !transaccionesMap.has(Number(row["Transacción"]));
                 return (
                 <tr key={row.id}>
                   <td>{row["Ciudad"]}</td>
@@ -204,13 +205,23 @@ export default function CorpusChristi() {
                       isBroken ? 
                         <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
                       : (
-                        <>
-                          <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
-                          <button onClick={() => setActiveDocuments(row["Transacción"])}>Documentos</button>
-                        </>
+                        <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
                       )
                     )}
-                    <button onClick={() => setRecordToView(row)} style={{ background: 'var(--primary-color)' }}>Detalles</button>
+                  </td>
+                  <td>
+                    {row["Transacción"] && !isBroken && (() => {
+                      const trans = transaccionesMap.get(Number(row["Transacción"]));
+                      if (!trans) return null;
+                      const docs = [1,2,3,4,5,6,7,8,9,10].map(i => trans[`Doc${i}`]).filter(Boolean);
+                      return (
+                        <div style={{ display: 'flex', gap: '0.2rem', flexWrap: 'wrap' }}>
+                          {docs.map((docCode, idx) => (
+                            <button key={idx} onClick={() => setActiveDocuments(row["Transacción"])} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem', background: 'var(--bg-body)' }}>{docCode}</button>
+                          ))}
+                        </div>
+                      );
+                    })()}
                   </td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>
@@ -265,13 +276,14 @@ export default function CorpusChristi() {
                 <th>Compañías</th>
                 <th onClick={() => sortDetail('Monto a pagar')} style={{ cursor: 'pointer' }}>Monto a pagar <SortIndicator column="Monto a pagar" sc={scDetail} /></th>
                 <th onClick={() => sortDetail('Fondos')} style={{ cursor: 'pointer' }}>Fondos <SortIndicator column="Fondos" sc={scDetail} /></th>
-                <th>Vínculos</th>
+                <th>Transacción</th>
+                <th>Documentos</th>
                 {isEditMode && <th>Admin</th>}
               </tr>
             </thead>
             <tbody>
               {sortedDetailData.map(row => {
-                const isBroken = row["Transacción"] && !transaccionesSet.has(Number(row["Transacción"]));
+                const isBroken = row["Transacción"] && !transaccionesMap.has(Number(row["Transacción"]));
                 const companiasList = [];
                 if (row["Compañía"]) companiasList.push(row["Compañía"]);
                 for (let i = 2; i <= 10; i++) {
@@ -298,13 +310,23 @@ export default function CorpusChristi() {
                       isBroken ? 
                         <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
                       : (
-                        <>
-                          <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
-                          <button onClick={() => setActiveDocuments(row["Transacción"])}>Documentos</button>
-                        </>
+                        <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
                       )
                     )}
-                    <button onClick={() => setRecordToView(row)} style={{ background: 'var(--primary-color)' }}>Detalles</button>
+                  </td>
+                  <td>
+                    {row["Transacción"] && !isBroken && (() => {
+                      const trans = transaccionesMap.get(Number(row["Transacción"]));
+                      if (!trans) return null;
+                      const docs = [1,2,3,4,5,6,7,8,9,10].map(i => trans[`Doc${i}`]).filter(Boolean);
+                      return (
+                        <div style={{ display: 'flex', gap: '0.2rem', flexWrap: 'wrap' }}>
+                          {docs.map((docCode, idx) => (
+                            <button key={idx} onClick={() => setActiveDocuments(row["Transacción"])} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem', background: 'var(--bg-body)' }}>{docCode}</button>
+                          ))}
+                        </div>
+                      );
+                    })()}
                   </td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>

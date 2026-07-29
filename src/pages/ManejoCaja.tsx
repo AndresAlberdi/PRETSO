@@ -18,7 +18,7 @@ import DetailsModal from "../components/DetailsModal";
 export default function ManejoCaja() {
   const [data, setData] = useState<any[]>([]);
   const [companias, setCompanias] = useState<any[]>([]);
-  const [transaccionesSet, setTransaccionesSet] = useState<Set<number>>(new Set());
+  const [transaccionesMap, setTransaccionesMap] = useState<Map<number, any>>(new Map());
   const [loading, setLoading] = useState(true);
   const { isEditMode } = useAdmin();
   
@@ -83,9 +83,9 @@ export default function ManejoCaja() {
       
       const qTrans = query(collection(db, "transacciones"));
       const snapTrans = await getDocs(qTrans);
-      const tSet = new Set<number>();
-      snapTrans.docs.forEach(d => tSet.add(Number(d.data().Num)));
-      setTransaccionesSet(tSet);
+      const tMap = new Map<number, any>();
+      snapTrans.docs.forEach(d => tMap.set(Number(d.data().Num), d.data()));
+      setTransaccionesMap(tMap);
       
       setLoading(false);
     }
@@ -125,17 +125,17 @@ export default function ManejoCaja() {
 
   const companiasMap = useMemo(() => {
     const map = new Map();
-    companias.forEach(c => map.set(c["Sigla Compañía"], c));
+    companias.forEach(c => map.set(String(c["Indicador de registro"]), c));
     return map;
   }, [companias]);
 
-  const companiasInData = companias.filter(c => data.some(d => d["Sigla Compañía"] === c["Sigla Compañía"]));
-  const uniqueCompanias = Array.from(new Set(companiasInData.map(c => c["Sigla Compañía"]))).filter(Boolean).sort();
+  const companiasInData = companias.filter(c => data.some(d => String(d["Sigla Compañía"]) === String(c["Indicador de registro"])));
+  const uniqueCompanias = Array.from(new Set(companiasInData.map(c => String(c["Indicador de registro"])))).filter(Boolean).sort();
   const uniqueTemporadas = Array.from(new Set(companiasInData.map(c => c["Temporadas teatrales"]))).filter(Boolean).sort();
   const uniqueAmbitos = Array.from(new Set(companiasInData.map(c => c["Ámbito"]))).filter(Boolean).sort();
 
   const filteredCompanias = companiasInData.filter(c => {
-    if (filterCompania && c["Sigla Compañía"] !== filterCompania) return false;
+    if (filterCompania && String(c["Indicador de registro"]) !== filterCompania) return false;
     if (filterTemporada && c["Temporadas teatrales"] !== filterTemporada) return false;
     if (filterAmbito && c["Ámbito"] !== filterAmbito) return false;
     return true;
@@ -159,7 +159,7 @@ export default function ManejoCaja() {
   }, [data, filters, companiasMap]);
 
   const isSearching = filters.length > 0;
-  const detailData = data.filter(d => d["Sigla Compañía"] === selectedCompId);
+  const detailData = data.filter(d => String(d["Sigla Compañía"]) === selectedCompId);
 
   const { items: sortedFilteredCompanias, requestSort: sortComp, sortConfig: scComp } = useSortableTable(filteredCompanias);
   const { items: sortedSearchResults, requestSort: sortSearch, sortConfig: scSearch } = useSortableTable(searchResults);
@@ -205,7 +205,8 @@ export default function ManejoCaja() {
                 <th onClick={() => sortSearch('Sigla Compañía')} style={{ cursor: 'pointer' }}>Compañía <SortIndicator column="Sigla Compañía" sc={scSearch} /></th>
                 <th onClick={() => sortSearch('Ciudad')} style={{ cursor: 'pointer' }}>Ciudad <SortIndicator column="Ciudad" sc={scSearch} /></th>
                 <th onClick={() => sortSearch('Año')} style={{ cursor: 'pointer' }}>Año <SortIndicator column="Año" sc={scSearch} /></th>
-                <th>Vínculos</th>
+                <th>Transacción</th>
+                <th>Documentos</th>
                 {isEditMode && <th>Admin</th>}
               </tr>
             </thead>
@@ -213,7 +214,7 @@ export default function ManejoCaja() {
               {sortedSearchResults.map(row => {
                 const comp = companiasMap.get(row["Sigla Compañía"]);
                 const fullName = comp && comp["Nombre Compañía"] ? `${row["Sigla Compañía"]} - ${comp["Nombre Compañía"]}` : row["Sigla Compañía"];
-                const isBroken = row["Transacción"] && !transaccionesSet.has(Number(row["Transacción"]));
+                const isBroken = row["Transacción"] && !transaccionesMap.has(Number(row["Transacción"]));
                 return (
                 <tr key={row.id}>
                   <td>{fullName}</td>
@@ -224,13 +225,23 @@ export default function ManejoCaja() {
                       isBroken ? 
                         <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
                       : (
-                        <>
-                          <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
-                          <button onClick={() => setActiveDocuments(row["Transacción"])}>Documentos</button>
-                        </>
+                        <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
                       )
                     )}
-                    <button onClick={() => setRecordToView(row)} style={{ background: 'var(--primary-color)' }}>Detalles</button>
+                  </td>
+                  <td>
+                    {row["Transacción"] && !isBroken && (() => {
+                      const trans = transaccionesMap.get(Number(row["Transacción"]));
+                      if (!trans) return null;
+                      const docs = [1,2,3,4,5,6,7,8,9,10].map(i => trans[`Doc${i}`]).filter(Boolean);
+                      return (
+                        <div style={{ display: 'flex', gap: '0.2rem', flexWrap: 'wrap' }}>
+                          {docs.map((docCode, idx) => (
+                            <button key={idx} onClick={() => setActiveDocuments(row["Transacción"])} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem', background: 'var(--bg-body)' }}>{docCode}</button>
+                          ))}
+                        </div>
+                      );
+                    })()}
                   </td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>
@@ -248,7 +259,10 @@ export default function ManejoCaja() {
           <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
             <select value={filterCompania} onChange={e => setFilterCompania(e.target.value)}>
               <option value="">Todas las Compañías</option>
-              {uniqueCompanias.map(opt => <option key={opt} value={opt}>{opt}</option>)}
+              {uniqueCompanias.map(opt => {
+                const c = companiasMap.get(opt);
+                return <option key={opt} value={opt}>{c ? c["Sigla Compañía"] : opt}</option>;
+              })}
             </select>
             <select value={filterTemporada} onChange={e => setFilterTemporada(e.target.value)}>
               <option value="">Todas las Temporadas</option>
@@ -278,7 +292,7 @@ export default function ManejoCaja() {
                   <td>{c["Autores"]}</td>
                   <td>{c["Temporadas teatrales"]}</td>
                   <td>{c["Ámbito"]}</td>
-                  <td><button onClick={() => setSelectedCompId(c["Sigla Compañía"])}>CAJA</button></td>
+                  <td><button onClick={() => setSelectedCompId(String(c["Indicador de registro"]))}>CAJA</button></td>
                 </tr>
               )})}
             </tbody>
@@ -295,13 +309,14 @@ export default function ManejoCaja() {
                 <th onClick={() => sortDetail('Ingresos')} style={{ cursor: 'pointer' }}>Ingresos <SortIndicator column="Ingresos" sc={scDetail} /></th>
                 <th onClick={() => sortDetail('Egresos')} style={{ cursor: 'pointer' }}>Egresos <SortIndicator column="Egresos" sc={scDetail} /></th>
                 <th onClick={() => sortDetail('Otros bienes de la compañía')} style={{ cursor: 'pointer' }}>Otros bienes <SortIndicator column="Otros bienes de la compañía" sc={scDetail} /></th>
-                <th>Vínculos</th>
+                <th>Transacción</th>
+                <th>Documentos</th>
                 {isEditMode && <th>Admin</th>}
               </tr>
             </thead>
             <tbody>
               {sortedDetailData.map(row => {
-                const isBroken = row["Transacción"] && !transaccionesSet.has(Number(row["Transacción"]));
+                const isBroken = row["Transacción"] && !transaccionesMap.has(Number(row["Transacción"]));
                 return (
                 <tr key={row.id}>
                   <td>{row["Ciudad"]}</td>
@@ -314,13 +329,23 @@ export default function ManejoCaja() {
                       isBroken ? 
                         <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
                       : (
-                        <>
-                          <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
-                          <button onClick={() => setActiveDocuments(row["Transacción"])}>Documentos</button>
-                        </>
+                        <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
                       )
                     )}
-                    <button onClick={() => setRecordToView(row)} style={{ background: 'var(--primary-color)' }}>Detalles</button>
+                  </td>
+                  <td>
+                    {row["Transacción"] && !isBroken && (() => {
+                      const trans = transaccionesMap.get(Number(row["Transacción"]));
+                      if (!trans) return null;
+                      const docs = [1,2,3,4,5,6,7,8,9,10].map(i => trans[`Doc${i}`]).filter(Boolean);
+                      return (
+                        <div style={{ display: 'flex', gap: '0.2rem', flexWrap: 'wrap' }}>
+                          {docs.map((docCode, idx) => (
+                            <button key={idx} onClick={() => setActiveDocuments(row["Transacción"])} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem', background: 'var(--bg-body)' }}>{docCode}</button>
+                          ))}
+                        </div>
+                      );
+                    })()}
                   </td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>
