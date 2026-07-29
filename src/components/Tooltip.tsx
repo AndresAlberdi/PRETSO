@@ -1,12 +1,8 @@
-import { useState } from 'react';
+import type { ReactNode } from 'react';
 
-export default function Tooltip({ content, children }: { content: string, children?: React.ReactNode }) {
-  const [show, setShow] = useState(false);
-
+export default function Tooltip({ content, children }: { content: string, children?: ReactNode }) {
   return (
-    <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', marginLeft: '0.5rem', cursor: 'help' }} 
-         onMouseEnter={() => setShow(true)} 
-         onMouseLeave={() => setShow(false)}>
+    <span title={content} style={{ cursor: 'help', marginLeft: '0.5rem', display: 'inline-flex', alignItems: 'center' }}>
       {children || (
         <span style={{ 
           background: 'rgba(255,255,255,0.2)', 
@@ -18,38 +14,6 @@ export default function Tooltip({ content, children }: { content: string, childr
           ?
         </span>
       )}
-      {show && (
-        <div style={{
-          position: 'absolute',
-          bottom: '120%',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          background: '#333',
-          color: '#fff',
-          padding: '0.5rem',
-          borderRadius: '4px',
-          fontSize: '0.85rem',
-          whiteSpace: 'normal',
-          maxWidth: '300px',
-          width: 'max-content',
-          textAlign: 'left',
-          zIndex: 100,
-          boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-          pointerEvents: 'none',
-          lineHeight: '1.4'
-        }}>
-          {content}
-          <div style={{
-            position: 'absolute',
-            top: '100%',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            borderWidth: '5px',
-            borderStyle: 'solid',
-            borderColor: '#333 transparent transparent transparent'
-          }}></div>
-        </div>
-      )}
-    </div>
+    </span>
   );
 }

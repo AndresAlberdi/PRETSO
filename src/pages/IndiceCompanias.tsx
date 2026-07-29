@@ -10,7 +10,6 @@ import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
 import { useNavigate } from "react-router";
 import { useSortableTable } from "../hooks/useSortableTable";
-import Tooltip from "../components/Tooltip";
 
 export default function IndiceCompanias() {
   const [data, setData] = useState<any[]>([]);
@@ -153,9 +152,9 @@ export default function IndiceCompanias() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => requestSort('Sigla Compañía')} style={{ cursor: 'pointer' }}>Sigla (Compañías) <Tooltip content="Sigla única de la compañía" /><SortIndicator column="Sigla Compañía" /></th>
-                <th onClick={() => requestSort('Nombre Compañía')} style={{ cursor: 'pointer' }}>Nombre <Tooltip content="Nombre completo de la compañía" /><SortIndicator column="Nombre Compañía" /></th>
-                <th onClick={() => requestSort('Autores')} style={{ cursor: 'pointer' }}>Autores <Tooltip content="Personas asociadas" /><SortIndicator column="Autores" /></th>
+                <th onClick={() => requestSort('Sigla Compañía')} style={{ cursor: 'pointer' }}>Sigla (Compañías) <SortIndicator column="Sigla Compañía" /></th>
+                <th onClick={() => requestSort('Nombre Compañía')} style={{ cursor: 'pointer' }}>Nombre <SortIndicator column="Nombre Compañía" /></th>
+                <th onClick={() => requestSort('Autores')} style={{ cursor: 'pointer' }}>Autores <SortIndicator column="Autores" /></th>
                 <th onClick={() => requestSort('Temporadas teatrales')} style={{ cursor: 'pointer' }}>Temporadas Teatrales <SortIndicator column="Temporadas teatrales" /></th>
                 <th onClick={() => requestSort('Ámbito')} style={{ cursor: 'pointer' }}>Ámbito <SortIndicator column="Ámbito" /></th>
                 <th>Vínculos Rápidos</th>
