@@ -205,8 +205,8 @@ export default function ManejoCaja() {
                 <th onClick={() => sortSearch('Sigla Compañía')} style={{ cursor: 'pointer' }}>Compañía <SortIndicator column="Sigla Compañía" sc={scSearch} /></th>
                 <th onClick={() => sortSearch('Ciudad')} style={{ cursor: 'pointer' }}>Ciudad <SortIndicator column="Ciudad" sc={scSearch} /></th>
                 <th onClick={() => sortSearch('Año')} style={{ cursor: 'pointer' }}>Año <SortIndicator column="Año" sc={scSearch} /></th>
-                <th>Transacción</th>
                 <th>Documentos</th>
+                <th></th>
                 {isEditMode && <th>Admin</th>}
               </tr>
             </thead>
@@ -220,15 +220,6 @@ export default function ManejoCaja() {
                   <td>{fullName}</td>
                   <td>{row["Ciudad"]}</td>
                   <td>{row["Año"]}</td>
-                  <td style={{ display: 'flex', gap: '0.5rem' }}>
-                    {row["Transacción"] && (
-                      isBroken ? 
-                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
-                      : (
-                        <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
-                      )
-                    )}
-                  </td>
                   <td>
                     {row["Transacción"] && !isBroken && (() => {
                       const trans = transaccionesMap.get(Number(row["Transacción"]));
@@ -242,6 +233,15 @@ export default function ManejoCaja() {
                         </div>
                       );
                     })()}
+                  </td>
+                  <td style={{ display: 'flex', gap: '0.5rem' }}>
+                    {row["Transacción"] && (
+                      isBroken ? 
+                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
+                      : (
+                        <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
+                      )
+                    )}
                   </td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>
@@ -309,8 +309,8 @@ export default function ManejoCaja() {
                 <th onClick={() => sortDetail('Ingresos')} style={{ cursor: 'pointer' }}>Ingresos <SortIndicator column="Ingresos" sc={scDetail} /></th>
                 <th onClick={() => sortDetail('Egresos')} style={{ cursor: 'pointer' }}>Egresos <SortIndicator column="Egresos" sc={scDetail} /></th>
                 <th onClick={() => sortDetail('Otros bienes de la compañía')} style={{ cursor: 'pointer' }}>Otros bienes <SortIndicator column="Otros bienes de la compañía" sc={scDetail} /></th>
-                <th>Transacción</th>
                 <th>Documentos</th>
+                <th></th>
                 {isEditMode && <th>Admin</th>}
               </tr>
             </thead>
@@ -324,15 +324,6 @@ export default function ManejoCaja() {
                   <td>{row["Ingresos"]}</td>
                   <td>{row["Egresos"]}</td>
                   <td>{row["Otros bienes de la compañía"]}</td>
-                  <td style={{ display: 'flex', gap: '0.5rem' }}>
-                    {row["Transacción"] && (
-                      isBroken ? 
-                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
-                      : (
-                        <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
-                      )
-                    )}
-                  </td>
                   <td>
                     {row["Transacción"] && !isBroken && (() => {
                       const trans = transaccionesMap.get(Number(row["Transacción"]));
@@ -346,6 +337,15 @@ export default function ManejoCaja() {
                         </div>
                       );
                     })()}
+                  </td>
+                  <td style={{ display: 'flex', gap: '0.5rem' }}>
+                    {row["Transacción"] && (
+                      isBroken ? 
+                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
+                      : (
+                        <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
+                      )
+                    )}
                   </td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>

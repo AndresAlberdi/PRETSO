@@ -16,7 +16,7 @@ export default function IndiceCompanias() {
   const [loading, setLoading] = useState(true);
   const { isEditMode } = useAdmin();
   const [recordToDelete, setRecordToDelete] = useState<any>(null);
-  const [deleteErrorAlert, setDeleteErrorAlert] = useState<string | null>(null);
+  const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
@@ -64,6 +64,18 @@ export default function IndiceCompanias() {
     return null;
   };
 
+  const checkRecordsAndNavigate = async (collectionName: string, path: string, item: any) => {
+    setIsAnalyzing(true);
+    const q = query(collection(db, collectionName), where("Sigla Compañía", "==", item["Indicador de registro"]));
+    const snap = await getDocs(q);
+    setIsAnalyzing(false);
+    if (snap.empty) {
+      setAlertMessage(`No existen registros en esta sección para la compañía seleccionada.`);
+    } else {
+      navigate(`${path}?compania=${item["Indicador de registro"]}`);
+    }
+  };
+
   const attemptDelete = async (row: any) => {
     setIsAnalyzing(true);
     const [error] = await Promise.all([
@@ -72,7 +84,7 @@ export default function IndiceCompanias() {
     ]);
     setIsAnalyzing(false);
     if (error) {
-      setDeleteErrorAlert(error);
+      setAlertMessage(error);
     } else {
       setRecordToDelete(row);
     }
@@ -168,9 +180,9 @@ export default function IndiceCompanias() {
                   <td>{item["Temporadas teatrales"]}</td>
                   <td>{item["Ámbito"]}</td>
                   <td style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                    <button onClick={() => navigate(`/?compania=${item["Indicador de registro"]}`)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Caja</button>
-                    <button onClick={() => navigate(`/salarios?compania=${item["Indicador de registro"]}`)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Salarios</button>
-                    <button onClick={() => navigate(`/corpus?compania=${item["Indicador de registro"]}`)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Corpus Christi</button>
+                    <button onClick={() => checkRecordsAndNavigate('manejo_de_caja', '/caja', item)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Caja</button>
+                    <button onClick={() => checkRecordsAndNavigate('salarios', '/salarios', item)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Salarios</button>
+                    <button onClick={() => checkRecordsAndNavigate('corpus_christi', '/corpus', item)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Corpus Christi</button>
                   </td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>
@@ -241,11 +253,11 @@ export default function IndiceCompanias() {
         />
       )}
 
-      {deleteErrorAlert && (
+      {alertMessage && (
         <ConfirmModal 
-          title="Error de Integridad"
-          message={deleteErrorAlert}
-          onCancel={() => setDeleteErrorAlert(null)}
+          title="Aviso"
+          message={alertMessage}
+          onCancel={() => setAlertMessage(null)}
           isAlertOnly={true}
         />
       )}

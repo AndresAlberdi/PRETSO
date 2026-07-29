@@ -152,6 +152,7 @@ export default function Transacciones() {
           <table className="sortable">
             <thead>
               <tr>
+                <th onClick={() => requestSort('Num')} style={{ cursor: 'pointer', width: '50px' }}>Num <SortIndicator column="Num" /></th>
                 <th onClick={() => requestSort('Noticia')} style={{ cursor: 'pointer' }}>Noticia <SortIndicator column="Noticia" /></th>
                 <th onClick={() => requestSort('Fuentes para la generación del dato')} style={{ cursor: 'pointer' }}>Fuentes <SortIndicator column="Fuentes para la generación del dato" /></th>
                 <th>Documentos</th>
@@ -161,6 +162,7 @@ export default function Transacciones() {
             <tbody>
               {sortedData.map(row => (
                 <tr key={row.id}>
+                  <td>{row["Num"]}</td>
                   <td style={{ maxWidth: '400px' }}>{row["Noticia"]}</td>
                   <td style={{ maxWidth: '200px' }}>{row["Fuentes para la generación del dato"]}</td>
                   <td>{renderDocsForTransaction(row)}</td>

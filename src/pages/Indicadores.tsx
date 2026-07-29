@@ -172,8 +172,8 @@ export default function Indicadores() {
                 <th onClick={() => sortSearch('Años')} style={{ cursor: 'pointer' }}>Año <SortIndicator column="Años" sc={scSearch} /></th>
                 <th onClick={() => sortSearch('Concepto')} style={{ cursor: 'pointer' }}>Concepto <SortIndicator column="Concepto" sc={scSearch} /></th>
                 <th onClick={() => sortSearch('Monto')} style={{ cursor: 'pointer' }}>Monto <SortIndicator column="Monto" sc={scSearch} /></th>
-                <th>Transacción</th>
                 <th>Documentos</th>
+                <th></th>
                 {isEditMode && <th>Admin</th>}
               </tr>
             </thead>
@@ -186,13 +186,6 @@ export default function Indicadores() {
                   <td>{row["Años"]}</td>
                   <td>{row["Concepto"]}</td>
                   <td>{row["Monto"]}</td>
-                  <td style={{ display: 'flex', gap: '0.5rem' }}>
-                    {row["Transacción"] && (
-                      isBroken ? 
-                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
-                      : <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
-                    )}
-                  </td>
                   <td>
                     {row["Transacción"] && !isBroken && (() => {
                       const trans = transaccionesMap.get(Number(row["Transacción"]));
@@ -206,6 +199,13 @@ export default function Indicadores() {
                         </div>
                       );
                     })()}
+                  </td>
+                  <td style={{ display: 'flex', gap: '0.5rem' }}>
+                    {row["Transacción"] && (
+                      isBroken ? 
+                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
+                      : <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
+                    )}
                   </td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>
@@ -255,8 +255,8 @@ export default function Indicadores() {
                 <th onClick={() => sortDetail('Monto')} style={{ cursor: 'pointer' }}>Monto <SortIndicator column="Monto" sc={scDetail} /></th>
                 <th onClick={() => sortDetail('Nota')} style={{ cursor: 'pointer' }}>Nota <SortIndicator column="Nota" sc={scDetail} /></th>
                 <th>Compañía</th>
-                <th>Transacción</th>
                 <th>Documentos</th>
+                <th></th>
                 {isEditMode && <th>Admin</th>}
               </tr>
             </thead>
@@ -275,13 +275,6 @@ export default function Indicadores() {
                       <button onClick={() => setActiveCompania(row["Sigla Compañía"])} style={{ padding: '0.2rem 0.5rem', background: 'var(--accent-color)', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}>{row["Sigla Compañía"]}</button>
                     )}
                   </td>
-                  <td style={{ display: 'flex', gap: '0.5rem' }}>
-                    {row["Transacción"] && (
-                      isBroken ? 
-                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
-                      : <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
-                    )}
-                  </td>
                   <td>
                     {row["Transacción"] && !isBroken && (() => {
                       const trans = transaccionesMap.get(Number(row["Transacción"]));
@@ -295,6 +288,13 @@ export default function Indicadores() {
                         </div>
                       );
                     })()}
+                  </td>
+                  <td style={{ display: 'flex', gap: '0.5rem' }}>
+                    {row["Transacción"] && (
+                      isBroken ? 
+                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
+                      : <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
+                    )}
                   </td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>

@@ -186,8 +186,8 @@ export default function CorpusChristi() {
                 <th onClick={() => sortSearch('Año')} style={{ cursor: 'pointer' }}>Año <SortIndicator column="Año" sc={scSearch} /></th>
                 <th onClick={() => sortSearch('Encargado ')} style={{ cursor: 'pointer' }}>Encargado <SortIndicator column="Encargado " sc={scSearch} /></th>
                 <th onClick={() => sortSearch('Monto a pagar')} style={{ cursor: 'pointer' }}>Monto a pagar <SortIndicator column="Monto a pagar" sc={scSearch} /></th>
-                <th>Transacción</th>
                 <th>Documentos</th>
+                <th></th>
                 {isEditMode && <th>Admin</th>}
               </tr>
             </thead>
@@ -200,15 +200,6 @@ export default function CorpusChristi() {
                   <td>{row["Año"]}</td>
                   <td>{row["Encargado "]}</td>
                   <td>{row["Monto a pagar"]}</td>
-                  <td style={{ display: 'flex', gap: '0.5rem' }}>
-                    {row["Transacción"] && (
-                      isBroken ? 
-                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
-                      : (
-                        <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
-                      )
-                    )}
-                  </td>
                   <td>
                     {row["Transacción"] && !isBroken && (() => {
                       const trans = transaccionesMap.get(Number(row["Transacción"]));
@@ -222,6 +213,15 @@ export default function CorpusChristi() {
                         </div>
                       );
                     })()}
+                  </td>
+                  <td style={{ display: 'flex', gap: '0.5rem' }}>
+                    {row["Transacción"] && (
+                      isBroken ? 
+                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
+                      : (
+                        <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
+                      )
+                    )}
                   </td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>
@@ -276,8 +276,8 @@ export default function CorpusChristi() {
                 <th>Compañías</th>
                 <th onClick={() => sortDetail('Monto a pagar')} style={{ cursor: 'pointer' }}>Monto a pagar <SortIndicator column="Monto a pagar" sc={scDetail} /></th>
                 <th onClick={() => sortDetail('Fondos')} style={{ cursor: 'pointer' }}>Fondos <SortIndicator column="Fondos" sc={scDetail} /></th>
-                <th>Transacción</th>
                 <th>Documentos</th>
+                <th></th>
                 {isEditMode && <th>Admin</th>}
               </tr>
             </thead>
@@ -305,15 +305,6 @@ export default function CorpusChristi() {
                   </td>
                   <td>{row["Monto a pagar"]}</td>
                   <td>{row["Fondos"]}</td>
-                  <td style={{ display: 'flex', gap: '0.5rem' }}>
-                    {row["Transacción"] && (
-                      isBroken ? 
-                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
-                      : (
-                        <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
-                      )
-                    )}
-                  </td>
                   <td>
                     {row["Transacción"] && !isBroken && (() => {
                       const trans = transaccionesMap.get(Number(row["Transacción"]));
@@ -327,6 +318,15 @@ export default function CorpusChristi() {
                         </div>
                       );
                     })()}
+                  </td>
+                  <td style={{ display: 'flex', gap: '0.5rem' }}>
+                    {row["Transacción"] && (
+                      isBroken ? 
+                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
+                      : (
+                        <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
+                      )
+                    )}
                   </td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>

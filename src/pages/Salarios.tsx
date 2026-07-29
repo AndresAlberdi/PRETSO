@@ -206,8 +206,8 @@ export default function Salarios() {
                 <th onClick={() => sortSearch('Sigla Compañía')} style={{ cursor: 'pointer' }}>Compañía <SortIndicator column="Sigla Compañía" sc={scSearch} /></th>
                 <th onClick={() => sortSearch('Ciudad')} style={{ cursor: 'pointer' }}>Ciudad <SortIndicator column="Ciudad" sc={scSearch} /></th>
                 <th onClick={() => sortSearch('Año')} style={{ cursor: 'pointer' }}>Año <SortIndicator column="Año" sc={scSearch} /></th>
-                <th>Transacción</th>
                 <th>Documentos</th>
+                <th></th>
                 {isEditMode && <th>Admin</th>}
               </tr>
             </thead>
@@ -221,15 +221,6 @@ export default function Salarios() {
                   <td>{fullName}</td>
                   <td>{row["Ciudad"]}</td>
                   <td>{row["Año"]}</td>
-                  <td style={{ display: 'flex', gap: '0.5rem' }}>
-                    {row["Transacción"] && (
-                      isBroken ? 
-                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
-                      : (
-                        <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
-                      )
-                    )}
-                  </td>
                   <td>
                     {row["Transacción"] && !isBroken && (() => {
                       const trans = transaccionesMap.get(Number(row["Transacción"]));
@@ -243,6 +234,15 @@ export default function Salarios() {
                         </div>
                       );
                     })()}
+                  </td>
+                  <td style={{ display: 'flex', gap: '0.5rem' }}>
+                    {row["Transacción"] && (
+                      isBroken ? 
+                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
+                      : (
+                        <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
+                      )
+                    )}
                   </td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>
@@ -310,8 +310,8 @@ export default function Salarios() {
                 <th onClick={() => sortDetail('Beneficiario ')} style={{ cursor: 'pointer' }}>Personas <SortIndicator column="Beneficiario " sc={scDetail} /></th>
                 <th onClick={() => sortDetail('Encargo')} style={{ cursor: 'pointer' }}>Ocupación <SortIndicator column="Encargo" sc={scDetail} /></th>
                 <th onClick={() => sortDetail('Monto a pagar')} style={{ cursor: 'pointer' }}>Salarios y raciones <SortIndicator column="Monto a pagar" sc={scDetail} /></th>
-                <th>Transacción</th>
                 <th>Documentos</th>
+                <th></th>
                 {isEditMode && <th>Admin</th>}
               </tr>
             </thead>
@@ -325,15 +325,6 @@ export default function Salarios() {
                   <td>{row["Beneficiario "]}</td>
                   <td>{row["Encargo"]}</td>
                   <td>{row["Monto a pagar"]}</td>
-                  <td style={{ display: 'flex', gap: '0.5rem' }}>
-                    {row["Transacción"] && (
-                      isBroken ? 
-                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
-                      : (
-                        <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
-                      )
-                    )}
-                  </td>
                   <td>
                     {row["Transacción"] && !isBroken && (() => {
                       const trans = transaccionesMap.get(Number(row["Transacción"]));
@@ -347,6 +338,15 @@ export default function Salarios() {
                         </div>
                       );
                     })()}
+                  </td>
+                  <td style={{ display: 'flex', gap: '0.5rem' }}>
+                    {row["Transacción"] && (
+                      isBroken ? 
+                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
+                      : (
+                        <button onClick={() => setActiveTransaction(row["Transacción"])}>{row["Transacción"]}</button>
+                      )
+                    )}
                   </td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>
