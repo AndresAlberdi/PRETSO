@@ -227,9 +227,9 @@ export default function Salarios() {
                       if (!trans) return null;
                       const docs = [1,2,3,4,5,6,7,8,9,10].map(i => trans[`Doc${i}`]).filter(Boolean);
                       return (
-                        <div style={{ display: 'flex', gap: '0.2rem', flexWrap: 'wrap' }}>
+                        <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
                           {docs.map((docCode, idx) => (
-                            <button key={idx} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem', background: 'var(--bg-body)' }}>Doc {docCode}</button>
+                            <button key={idx} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.85rem', padding: '0.3rem 0.6rem', background: 'rgba(241, 176, 76, 0.1)', border: '1px solid var(--primary-color)', color: 'var(--primary-color)', borderRadius: '4px' }}>Doc {docCode}</button>
                           ))}
                         </div>
                       );
@@ -331,9 +331,9 @@ export default function Salarios() {
                       if (!trans) return null;
                       const docs = [1,2,3,4,5,6,7,8,9,10].map(i => trans[`Doc${i}`]).filter(Boolean);
                       return (
-                        <div style={{ display: 'flex', gap: '0.2rem', flexWrap: 'wrap' }}>
+                        <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
                           {docs.map((docCode, idx) => (
-                            <button key={idx} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem', background: 'var(--bg-body)' }}>Doc {docCode}</button>
+                            <button key={idx} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.85rem', padding: '0.3rem 0.6rem', background: 'rgba(241, 176, 76, 0.1)', border: '1px solid var(--primary-color)', color: 'var(--primary-color)', borderRadius: '4px' }}>Doc {docCode}</button>
                           ))}
                         </div>
                       );
