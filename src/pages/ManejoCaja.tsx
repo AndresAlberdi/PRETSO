@@ -13,6 +13,7 @@ import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
 import { useSortableTable } from "../hooks/useSortableTable";
 import Tooltip from "../components/Tooltip";
+import DetailsModal from "../components/DetailsModal";
 
 export default function ManejoCaja() {
   const [data, setData] = useState<any[]>([]);
@@ -33,6 +34,7 @@ export default function ManejoCaja() {
   const [selectedCompId, setSelectedCompId] = useState<string | null>(null);
   const [activeTransaction, setActiveTransaction] = useState<string | number | null>(null);
   const [activeDocuments, setActiveDocuments] = useState<string | number | null>(null);
+  const [recordToView, setRecordToView] = useState<any | null>(null);
 
   const [filters, setFilters] = useState<SearchFilter[]>([]);
 
@@ -228,6 +230,7 @@ export default function ManejoCaja() {
                         </>
                       )
                     )}
+                    <button onClick={() => setRecordToView(row)} style={{ background: 'var(--primary-color)' }}>Detalles</button>
                   </td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>
@@ -317,6 +320,7 @@ export default function ManejoCaja() {
                         </>
                       )
                     )}
+                    <button onClick={() => setRecordToView(row)} style={{ background: 'var(--primary-color)' }}>Detalles</button>
                   </td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>
@@ -332,6 +336,7 @@ export default function ManejoCaja() {
       )}
       {activeTransaction && <TransactionModal transactionCode={activeTransaction} onClose={() => setActiveTransaction(null)} />}
       {activeDocuments && <DocumentModal transactionCode={activeDocuments} onClose={() => setActiveDocuments(null)} />}
+      {recordToView && <DetailsModal record={recordToView} onClose={() => setRecordToView(null)} />}
       
       {isCreateOpen && (
         <GenericCreateModal 
