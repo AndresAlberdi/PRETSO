@@ -29,10 +29,14 @@ export default function Tooltip({ content, children }: { content: string, childr
           padding: '0.5rem',
           borderRadius: '4px',
           fontSize: '0.85rem',
-          whiteSpace: 'nowrap',
+          whiteSpace: 'normal',
+          maxWidth: '300px',
+          width: 'max-content',
+          textAlign: 'left',
           zIndex: 100,
           boxShadow: '0 2px 4px rgba(0,0,0,0.3)',
-          pointerEvents: 'none'
+          pointerEvents: 'none',
+          lineHeight: '1.4'
         }}>
           {content}
           <div style={{
