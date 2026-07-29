@@ -9,8 +9,13 @@ export default function CompaniaModal({ sigla, onClose }: { sigla: string, onClo
   useEffect(() => {
     async function fetchCompania() {
       if (!sigla) return;
-      const q = query(collection(db, 'companias'), where('Sigla Compañía', '==', sigla));
-      const snap = await getDocs(q);
+      let snap = await getDocs(query(collection(db, 'companias'), where('Indicador de registro', '==', Number(sigla))));
+      if (snap.empty) {
+        snap = await getDocs(query(collection(db, 'companias'), where('Indicador de registro', '==', sigla)));
+      }
+      if (snap.empty) {
+        snap = await getDocs(query(collection(db, 'companias'), where('Sigla Compañía', '==', sigla)));
+      }
       if (!snap.empty) {
         setCompania(snap.docs[0].data());
       }

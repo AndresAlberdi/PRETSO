@@ -228,7 +228,7 @@ export default function ManejoCaja() {
                       return (
                         <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
                           {docs.map((docCode, idx) => (
-                            <button key={idx} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.85rem', padding: '0.3rem 0.6rem', background: 'rgba(241, 176, 76, 0.1)', border: '1px solid var(--primary-color)', color: 'var(--primary-color)', borderRadius: '4px' }}>Doc {docCode}</button>
+                            <span key={idx} style={{ fontSize: '0.85rem', padding: '0.1rem 0' }}>Doc. {docCode}</span>
                           ))}
                         </div>
                       );
@@ -332,7 +332,7 @@ export default function ManejoCaja() {
                       return (
                         <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
                           {docs.map((docCode, idx) => (
-                            <button key={idx} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.85rem', padding: '0.3rem 0.6rem', background: 'rgba(241, 176, 76, 0.1)', border: '1px solid var(--primary-color)', color: 'var(--primary-color)', borderRadius: '4px' }}>Doc {docCode}</button>
+                            <span key={idx} style={{ fontSize: '0.85rem', padding: '0.1rem 0' }}>Doc. {docCode}</span>
                           ))}
                         </div>
                       );
