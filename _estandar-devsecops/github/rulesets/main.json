@@ -1,0 +1,38 @@
+{
+  "_comentario": "Ruleset de la rama por defecto (main). Aplicar con: gh api repos/OWNER/REPO/rulesets --input main.json (actualizar: gh api -X PUT repos/OWNER/REPO/rulesets/ID --input main.json). Sin bypass_actors: nadie (ni release.yml) escribe directo en main (D2). El único status check requerido es 'compuerta-pr' (D1): cada ci-*.yml lo publica agregando calidad y seguridad-estatica, con o sin matriz. Ajustes por modo: en Modo A/B puede añadir la regla required_signatures y, con CODEOWNERS y plan Team, 'require_code_owner_review': true dentro de pull_request; en Modo B0 (privado Free) los rulesets básicos existen pero GitHub NO exige las revisiones de PR ni Code Owners: la compuerta real de B0 es el workflow_dispatch con confirmar=DESPLEGAR y el step 'Verificar aprobación' (D3).",
+  "name": "proteccion-main",
+  "target": "branch",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "include": ["~DEFAULT_BRANCH"],
+      "exclude": []
+    }
+  },
+  "rules": [
+    { "type": "deletion" },
+    { "type": "non_fast_forward" },
+    { "type": "required_linear_history" },
+    {
+      "type": "pull_request",
+      "parameters": {
+        "required_approving_review_count": 1,
+        "dismiss_stale_reviews_on_push": true,
+        "require_code_owner_review": false,
+        "require_last_push_approval": false,
+        "required_review_thread_resolution": true,
+        "allowed_merge_methods": ["squash"]
+      }
+    },
+    {
+      "type": "required_status_checks",
+      "parameters": {
+        "strict_required_status_checks_policy": true,
+        "do_not_enforce_on_create": false,
+        "required_status_checks": [
+          { "context": "compuerta-pr" }
+        ]
+      }
+    }
+  ]
+}

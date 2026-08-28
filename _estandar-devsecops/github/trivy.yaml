@@ -1,0 +1,82 @@
+# =============================================================================
+# trivy.yaml — Configuración base de Trivy (fs, image, config)
+# Versión: 2.0 | Fecha: 2026-08-24 | Destino: .github/trivy.yaml
+# -----------------------------------------------------------------------------
+# Los workflows pasan `trivy-config: .github/trivy.yaml`. Los parámetros
+# explícitos del workflow (severity, exit-code, format, scanners) tienen
+# prioridad sobre este archivo; aquí van los valores comunes y las exclusiones.
+# Referencia: https://trivy.dev/latest/docs/references/configuration/config-file/
+# =============================================================================
+
+# Tiempo máximo por escaneo (imágenes grandes o monorepos)
+timeout: 10m
+
+# Severidades reportadas por defecto (los workflows bloquean en CRITICAL,HIGH;
+# MEDIUM se reporta en el informe para planificar su corrección)
+severity:
+  - CRITICAL
+  - HIGH
+  - MEDIUM
+
+# Código de salida cuando hay hallazgos de las severidades indicadas
+exit-code: 1
+
+# Escáneres por defecto para `trivy fs` (los workflows los acotan con --scanners)
+scan:
+  scanners:
+    - vuln
+    - misconfig
+    - secret
+  skip-dirs:
+    - node_modules
+    - .git
+    - dist
+    - build
+    - coverage
+    - .venv
+    - venv
+    - .terraform
+  skip-files:
+    - "**/*.min.js"
+    - "**/*.map"
+
+vulnerability:
+  # No bloquear por CVEs sin parche disponible: no hay acción posible salvo
+  # cambiar la imagen base. Se registran en el informe.
+  ignore-unfixed: true
+  # Tipos: os (paquetes del SO de la imagen) y library (dependencias de la app)
+  type:
+    - os
+    - library
+
+misconfiguration:
+  # Analiza también .tf.json, Dockerfile, Kubernetes, Helm y Compose
+  include-non-failures: false
+  # Revisa las políticas embebidas de Trivy (Docker CIS, Terraform, K8s)
+  scanners:
+    - terraform
+    - dockerfile
+    - kubernetes
+    - helm
+    - dockercompose
+    - github-actions
+
+secret:
+  # Gitleaks es el escáner principal de secretos; Trivy actúa como red de
+  # seguridad en imágenes (capas con .env, claves, tokens).
+  config: .github/trivy-secret.yaml # opcional; si no existe se ignora
+
+db:
+  # Se descarga la base de vulnerabilidades en cada run (caché en el runner).
+  # Para reducir descargas en repos con muchos runs, considere un mirror OCI.
+  skip-update: false
+
+cache:
+  # Recuerde ignorar este directorio en git (.gitignore: .trivy-cache/)
+  dir: .trivy-cache
+
+# Excepciones (D5): la ÚNICA fuente es `seguridad.excepciones[]` del manifiesto
+# .devsecops.yml. El archivo .trivyignore.yaml se GENERA en runtime desde el
+# manifiesto (_reusable-security.yml y security-local.sh); NO se edita a mano
+# ni se versiona.
+ignorefile: .trivyignore.yaml # generado desde .devsecops.yml

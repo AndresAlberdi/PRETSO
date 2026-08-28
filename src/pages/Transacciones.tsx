@@ -113,23 +113,28 @@ export default function Transacciones() {
   };
 
   const renderDocsForTransaction = (row: any) => {
-    const hasDocs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].some(i => row[`Doc${i}`]);
-    if (!hasDocs) return 'Ninguno';
+    const docs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(i => row[`Doc${i}`]).filter(Boolean);
+    if (docs.length === 0) return 'Ninguno';
     return (
-      <button
-        onClick={() => setActiveDoc(row["Num"])}
-        style={{
-          padding: '0.2rem 0.5rem',
-          background: 'var(--accent-color)',
-          color: 'white',
-          borderRadius: '4px',
-          border: 'none',
-          cursor: 'pointer',
-          fontSize: '0.9rem'
-        }}
-      >
-        Ver Documentos
-      </button>
+      <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
+        {docs.map((docCode, idx) => (
+          <button
+            key={idx}
+            onClick={() => setActiveDoc(docCode)}
+            style={{
+              padding: '0.1rem 0.5rem',
+              background: 'var(--accent-color)',
+              color: 'white',
+              borderRadius: '4px',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '0.85rem'
+            }}
+          >
+            Doc. {docCode}
+          </button>
+        ))}
+      </div>
     );
   };
 

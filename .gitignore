@@ -26,3 +26,18 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# --- Estándar DevSecOps v2.0 ---
+.security-reports/
+.deploy-log/
+.trivy-cache/
+.trivyignore.yaml
+.gitleaksignore
+*.auto.tfvars
+secrets.tfvars
+*.tfstate*
+.terraform/
+coverage/
+.firebase/
+venv/
+__pycache__/

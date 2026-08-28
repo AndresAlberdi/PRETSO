@@ -1,0 +1,48 @@
+rules_version = '2';
+// ============================================================================
+// PROPUESTA de reglas endurecidas para PRETSO (estándar DevSecOps v2.0)
+// Documento de referencia: SeguridadGeneral/01-seguridad/03-hardening-por-nube.md
+//
+// NO reemplaza a firestore.rules automáticamente: revísela, ejecute el paso 7
+// de PILOTO.md (asignar el custom claim `admin` al usuario administrador) y
+// recién entonces renombre este archivo a firestore.rules y despliegue.
+//
+// Qué corrige respecto de las reglas actuales:
+// 1. El privilegio de escritura deja de depender de un correo escrito de forma
+//    fija ('pretsodatabase@gmail.com') y pasa a un custom claim `admin` que se
+//    administra desde el backend sin editar ni redesplegar reglas.
+// 2. La lectura deja de ser global para usuarios autenticados: se declara
+//    colección por colección (principio de menor privilegio); `{document=**}`
+//    global desaparece.
+// 3. Se limita el tamaño de los documentos escritos para contener abuso.
+// ============================================================================
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function autenticado() {
+      return request.auth != null;
+    }
+
+    function esAdmin() {
+      // El claim se asigna una sola vez con el Admin SDK (PILOTO.md, paso 7):
+      //   admin.auth().setCustomUserClaims(uid, { admin: true })
+      return autenticado() && request.auth.token.admin == true;
+    }
+
+    function tamanoRazonable() {
+      // Rechaza documentos desproporcionados (defensa ante abuso).
+      return request.resource.size() < 200;
+    }
+
+    // ------------------------------------------------------------------
+    // Declare aquí las colecciones reales del proyecto (ver
+    // estructura_datos.md) y elimine este bloque genérico cuando lo haga.
+    // Mientras tanto conserva el comportamiento actual (lectura autenticada,
+    // escritura solo administrador) pero con claim en lugar de correo fijo.
+    // ------------------------------------------------------------------
+    match /{document=**} {
+      allow read: if autenticado();
+      allow write: if esAdmin() && tamanoRazonable();
+    }
+  }
+}

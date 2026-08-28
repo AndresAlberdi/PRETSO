@@ -1,0 +1,114 @@
+# =============================================================================
+# semgrep.yml — Reglas propias de Semgrep CE del estándar
+# Versión: 2.0 | Fecha: 2026-08-24 | Destino: .github/semgrep.yml
+# -----------------------------------------------------------------------------
+# _reusable-security.yml las carga automáticamente si el archivo existe
+# (--config .github/semgrep.yml) además de p/ci, p/owasp-top-ten y p/secrets.
+# Severidad ERROR bloquea el pipeline; WARNING solo se reporta.
+# Probar localmente: semgrep scan --config .github/semgrep.yml --metrics=off .
+# =============================================================================
+rules:
+  # ---------------------------------------------------------------------------
+  # 1. Reglas de Firestore abiertas: `allow read, write: if true` (o variantes)
+  #    expone toda la base de datos. Aplica a archivos *.rules (lenguaje
+  #    "generic" porque Semgrep no analiza el DSL de reglas de Firebase).
+  # ---------------------------------------------------------------------------
+  - id: devsecops.firestore-reglas-abiertas
+    message: >-
+      Regla de Firestore/Storage abierta a cualquier usuario: `allow ... if true`.
+      Restrinja por autenticación (request.auth != null) y por propietario
+      (request.auth.uid == resource.data.uid) según 01-seguridad/03-hardening-por-nube.md.
+    severity: ERROR
+    languages: [generic]
+    paths:
+      include:
+        - "*.rules"
+        - "firestore.rules"
+        - "storage.rules"
+    pattern-either:
+      - pattern: "allow read, write: if true"
+      - pattern: "allow write: if true"
+      - pattern: "allow read, write;"
+      - pattern: "allow write;"
+      - pattern: "allow create, update, delete: if true"
+    metadata:
+      category: security
+      cwe: "CWE-284: Improper Access Control"
+      referencia: https://firebase.google.com/docs/rules/insecure-rules
+
+  # ---------------------------------------------------------------------------
+  # 2. `eval` y equivalentes en JavaScript/TypeScript: ejecución de código
+  #    arbitrario, casi siempre innecesario en una SPA.
+  # ---------------------------------------------------------------------------
+  - id: devsecops.js-eval-prohibido
+    message: >-
+      Uso de eval()/new Function()/setTimeout con cadena: ejecución dinámica de
+      código (riesgo de XSS/inyección). Use funciones normales o JSON.parse.
+    severity: ERROR
+    languages: [javascript, typescript]
+    pattern-either:
+      - pattern: eval(...)
+      - pattern: new Function(...)
+      - pattern: setTimeout("...", ...)
+      - pattern: setInterval("...", ...)
+    metadata:
+      category: security
+      cwe: "CWE-95: Eval Injection"
+
+  # ---------------------------------------------------------------------------
+  # 3. subprocess con shell=True en Python: inyección de comandos si cualquier
+  #    parte del comando proviene de entrada externa.
+  # ---------------------------------------------------------------------------
+  - id: devsecops.python-subprocess-shell-true
+    message: >-
+      subprocess con shell=True permite inyección de comandos. Pase el comando
+      como lista de argumentos sin shell (subprocess.run([...])) y valide la entrada.
+    severity: ERROR
+    languages: [python]
+    pattern-either:
+      - pattern: subprocess.$FUNC(..., shell=True, ...)
+      - pattern: os.system(...)
+      - pattern: os.popen(...)
+    metadata:
+      category: security
+      cwe: "CWE-78: OS Command Injection"
+
+  # ---------------------------------------------------------------------------
+  # 4. (WARNING) innerHTML con datos dinámicos en JS/TS: vector clásico de XSS.
+  # ---------------------------------------------------------------------------
+  - id: devsecops.js-innerhtml-dinamico
+    message: >-
+      Asignación a innerHTML con un valor no literal. Use textContent o un
+      sanitizador (DOMPurify) si el HTML es necesario.
+    severity: WARNING
+    languages: [javascript, typescript]
+    patterns:
+      - pattern: $EL.innerHTML = $VAL
+      - pattern-not: $EL.innerHTML = "..."
+    metadata:
+      category: security
+      cwe: "CWE-79: Cross-site Scripting"
+
+  # ---------------------------------------------------------------------------
+  # 5. (ERROR, bloquea) Credenciales por variables de entorno prohibidas por el
+  #    estándar en workflows: JSON de SA o FIREBASE_TOKEN. Se usa lenguaje
+  #    `generic` con pattern-regex porque el patrón sobre el AST de YAML no es
+  #    fiable para expresiones ${{ }} de GitHub Actions.
+  # ---------------------------------------------------------------------------
+  - id: devsecops.workflow-credenciales-prohibidas
+    message: >-
+      El estándar prohíbe JSON de service account, FIREBASE_TOKEN y claves
+      estáticas de AWS en workflows. Use OIDC/WIF (01-seguridad/02-identidad-federada-oidc.md).
+    severity: ERROR
+    languages: [generic]
+    paths:
+      include:
+        - ".github/workflows/*.yml"
+        - ".github/workflows/*.yaml"
+    patterns:
+      - pattern-either:
+          - pattern-regex: secrets\.(FIREBASE_TOKEN|FIREBASE_SERVICE_ACCOUNT|AWS_ACCESS_KEY_ID|AWS_SECRET_ACCESS_KEY|GCP_SA_KEY)\b
+          - pattern-regex: 'credentials_json\s*:'
+    metadata:
+      category: security
+      cwe: "CWE-798: Use of Hard-coded Credentials"

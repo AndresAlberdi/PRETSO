@@ -1,0 +1,51 @@
+# =============================================================================
+# CODEOWNERS — Revisores obligatorios por ruta
+# Versión: 2.0 | Fecha: 2026-08-24 | Destino: .github/CODEOWNERS
+# -----------------------------------------------------------------------------
+# Con la rama main protegida y "Require review from Code Owners" activo
+# (ruleset), ningún cambio en estas rutas se fusiona sin la aprobación del
+# equipo dueño. En Modo B0 (privado Free) los rulesets básicos existen pero la
+# revisión de Code Owners NO se exige: el archivo sigue siendo útil para
+# asignar revisores automáticamente.
+# Reemplace @AndresAlberdi por equipos reales (o @AndresAlberdi en cuentas personales).
+# La última regla que coincide gana; el orden importa.
+# =============================================================================
+
+# Propietario por defecto de todo el repositorio
+*                                   @ORG/desarrollo
+
+# Pipeline, seguridad y configuración de CI: exige al equipo de plataforma
+/.github/                           @ORG/plataforma @ORG/seguridad
+/.github/workflows/                 @ORG/plataforma @ORG/seguridad
+/.github/CODEOWNERS                 @ORG/seguridad
+/.github/dependabot.yml             @ORG/plataforma
+/.github/gitleaks.toml              @ORG/seguridad
+/.pre-commit-config.yaml            @ORG/plataforma
+/.devsecops.yml                     @ORG/plataforma @ORG/seguridad
+
+# Reglas de acceso a datos: cualquier cambio requiere seguridad
+/firestore.rules                    @ORG/seguridad
+/storage.rules                      @ORG/seguridad
+/firebase.json                      @ORG/plataforma
+
+# Infraestructura como código y contenedores
+/infra/                             @ORG/plataforma
+/Dockerfile                         @ORG/plataforma
+/.aws/                              @ORG/plataforma
+/docker-compose*.yml                @ORG/plataforma
+
+# Dependencias (revisar cambios de lockfile en PRs no generados por Dependabot)
+/package.json                       @ORG/desarrollo @ORG/plataforma
+/package-lock.json                  @ORG/desarrollo
+/pnpm-lock.yaml                     @ORG/desarrollo
+/requirements*.txt                  @ORG/desarrollo @ORG/plataforma
+/pyproject.toml                     @ORG/desarrollo @ORG/plataforma
+
+# Autenticación, autorización y manejo de secretos en la aplicación
+/src/auth/                          @ORG/seguridad @ORG/desarrollo
+/src/**/seguridad/                  @ORG/seguridad
+/api/auth/                          @ORG/seguridad @ORG/desarrollo
+
+# Documentación del estándar y runbooks
+/docs/                              @ORG/desarrollo
+/CHANGELOG.md                       @ORG/plataforma

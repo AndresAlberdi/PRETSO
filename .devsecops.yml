@@ -1,0 +1,29 @@
+# Manifiesto del estándar DevSecOps v2.0 — proyecto PRETSO
+# Esquema: .github/devsecops.schema.json
+# Validar con: check-jsonschema --schemafile .github/devsecops.schema.json .devsecops.yml
+#
+# Decisión del piloto: el proyecto Firebase existente (pretso-database) actúa
+# como STAGING mientras la aplicación no esté en producción. El proyecto de
+# producción (pretso-prod) se creará al preparar el pase a producción; hasta
+# entonces la URL y el identificador de production son marcadores.
+version: 1
+proyecto: pretso
+modo: A
+cobertura_minima: 0   # subir a 70 al instalar @vitest/coverage-v8 (ver PILOTO.md, paso 6)
+componentes:
+  - nombre: web
+    ruta: ./
+    stack: node
+    proveedor: firebase
+    ambientes:
+      staging:
+        proyecto: pretso-database
+        url: https://pretso-database.web.app
+      production:
+        proyecto: pretso-prod            # crear al pasar a producción (PILOTO.md, fase 3)
+        url: https://pretso-prod.web.app # ajustar cuando exista dominio propio
+seguridad:
+  dast: true
+  zap_reglas: .github/zap-rules.tsv
+  bloquear_en: [CRITICAL, HIGH]
+  excepciones: []

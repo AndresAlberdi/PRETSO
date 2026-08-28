@@ -1,0 +1,106 @@
+# =============================================================================
+# dependabot.yml — Actualización automática de dependencias y de pines por SHA
+# Versión: 2.0 | Fecha: 2026-08-24 | Destino: .github/dependabot.yml
+# -----------------------------------------------------------------------------
+# Dependabot es gratuito en todos los planes y visibilidades. Aquí se configura:
+#   - Un ecosistema por stack (elimine los que no apliquen al proyecto).
+#   - Frecuencia semanal (lunes temprano, zona horaria de La Paz/CDMX).
+#   - Agrupación de minor+patch en un solo PR para reducir ruido; los major
+#     llegan en PR individuales para revisarlos con cuidado.
+#   - Límite de PRs abiertos por ecosistema.
+#   - `github-actions`: mantiene los pines por SHA de los workflows y actualiza
+#     el comentario `# vX` automáticamente (Dependabot entiende el formato
+#     `uses: owner/repo@SHA # vX.Y.Z`).
+# Las actualizaciones de seguridad (security updates) se activan aparte en
+# Settings → Code security → Dependabot security updates.
+# =============================================================================
+version: 2
+
+updates:
+  # ---- GitHub Actions: pines por SHA de todos los workflows -------------------
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/La_Paz
+    open-pull-requests-limit: 5
+    labels: [dependencias, github-actions, seguridad]
+    commit-message:
+      prefix: "chore(ci)"
+    groups:
+      actions-minor-patch:
+        update-types: [minor, patch]
+
+  # ---- npm (Node / React / Vite) ---------------------------------------------
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/La_Paz
+    open-pull-requests-limit: 10
+    labels: [dependencias, npm]
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+    versioning-strategy: increase
+    groups:
+      npm-produccion-minor-patch:
+        dependency-type: production
+        update-types: [minor, patch]
+      npm-desarrollo:
+        dependency-type: development
+        update-types: [minor, patch]
+    ignore:
+      # Ejemplo de excepción con justificación (revisar cada trimestre):
+      # - dependency-name: "firebase"
+      #   update-types: ["version-update:semver-major"]
+      []
+
+  # ---- pip (Python / FastAPI) --------------------------------------------------
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/La_Paz
+    open-pull-requests-limit: 10
+    labels: [dependencias, python]
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      pip-minor-patch:
+        update-types: [minor, patch]
+
+  # ---- Docker (imágenes base del Dockerfile) -----------------------------------
+  - package-ecosystem: docker
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/La_Paz
+    open-pull-requests-limit: 3
+    labels: [dependencias, docker, seguridad]
+    commit-message:
+      prefix: "chore(docker)"
+
+  # ---- Terraform (providers y módulos) -----------------------------------------
+  - package-ecosystem: terraform
+    directory: /infra
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/La_Paz
+    open-pull-requests-limit: 3
+    labels: [dependencias, terraform]
+    commit-message:
+      prefix: "chore(infra)"
+    groups:
+      terraform-minor-patch:
+        update-types: [minor, patch]

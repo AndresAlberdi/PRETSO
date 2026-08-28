@@ -1,0 +1,17 @@
+{
+  "_comentario": "Ruleset de tags de versión (refs/tags/v*). Aplicar con: gh api repos/OWNER/REPO/rulesets --input tags.json. Impide borrar, mover (update) y reescribir (non_fast_forward) los tags desde los que se despliega producción: un tag publicado es inmutable. Ajustes por modo: si vars.TAG_FIRMADO_REQUERIDO == 'true' (recomendado en Modo B0) añada la regla { \"type\": \"required_signatures\" } y cree los tags con 'git tag -s' desde la estación del responsable (release.yml no firma). Opcionalmente restrinja la creación de tags a un equipo con la regla creation + bypass_actors del equipo de release.",
+  "name": "proteccion-tags",
+  "target": "tag",
+  "enforcement": "active",
+  "conditions": {
+    "ref_name": {
+      "include": ["refs/tags/v*"],
+      "exclude": []
+    }
+  },
+  "rules": [
+    { "type": "deletion" },
+    { "type": "non_fast_forward" },
+    { "type": "update" }
+  ]
+}
