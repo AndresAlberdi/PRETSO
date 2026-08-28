@@ -20,8 +20,8 @@ componentes:
         proyecto: pretso-database
         url: https://pretso-database.web.app
       production:
-        proyecto: pretso-prod            # crear al pasar a producción (PILOTO.md, fase 3)
-        url: https://pretso-prod.web.app # ajustar cuando exista dominio propio
+        proyecto: pretso-database            # Ajustado según solicitud del usuario
+        url: https://pretso-database.web.app # Ajustado según solicitud del usuario
 seguridad:
   dast: true
   zap_reglas: .github/zap-rules.tsv
