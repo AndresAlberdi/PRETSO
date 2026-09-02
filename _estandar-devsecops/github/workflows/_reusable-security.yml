@@ -184,7 +184,11 @@ jobs:
               elif h == "pip-audit":
                   pip.append(f"--ignore-vuln {i}")
               elif h == "gitleaks":
-                  gitleaks.append(f"{i}  # vence {vence}: {e['justificacion']}")
+                  # El comentario va en su PROPIA linea: gitleaks compara la
+                  # linea entera contra la huella, asi que un comentario al
+                  # final la invalida en silencio.
+                  gitleaks.append(f"# vence {vence}: {e['justificacion']}")
+                  gitleaks.append(i)
           d = pathlib.Path("excepciones-generadas")
           (d / "trivyignore.yaml").write_text(
               "# Generado por _reusable-security.yml desde .devsecops.yml. NO editar ni versionar.\n"

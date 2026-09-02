@@ -201,7 +201,11 @@ for e in (m.get("seguridad", {}) or {}).get("excepciones", []) or []:
     elif h == "pip-audit":
         pip.append(f"--ignore-vuln {i}")
     elif h == "gitleaks":
-        gitleaks.append(f"{i}  # vence {vence}: {e.get('justificacion', '')}")
+        # El comentario va en su PROPIA linea: gitleaks compara la linea
+        # entera contra la huella, asi que un comentario al final la
+        # invalida en silencio.
+        gitleaks.append(f"# vence {vence}: {e.get('justificacion', '')}")
+        gitleaks.append(i)
 pathlib.Path(".trivyignore.yaml").write_text(
     "# Generado por security-local.sh desde .devsecops.yml. NO editar ni versionar.\n"
     + "vulnerabilities:\n" + ("\n".join(trivy_vuln) + "\n" if trivy_vuln else "  []\n")
