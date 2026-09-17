@@ -9,7 +9,7 @@ const COLLECTION_LABELS: Record<string, string> = {
   companias: 'Compañias',
   transacciones: 'Transacciones',
   manejo_de_caja: 'Manejo de Caja',
-  salarios: 'Salarios',
+  salarios: 'Remuneraciones',
   corpus_christi: 'Corpus Christi',
   indicadores: 'Indicadores',
   bibliografia: 'Bibliografía'
@@ -573,7 +573,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   />
                 </label>
                 <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <strong>Monto a pagar (Salario y ración)</strong>
+                  <strong>Monto a pagar (Remuneración)</strong>
                   <input
                     type="text"
                     value={formData['Monto a pagar'] || ''}

@@ -45,7 +45,7 @@ export default function Transacciones() {
   const checkReferentialIntegrity = async (transactionNum: number) => {
     const collectionsToCheck = [
       { name: 'manejo_de_caja', label: 'Caja' },
-      { name: 'salarios', label: 'Salarios' },
+      { name: 'salarios', label: 'Remuneraciones' },
       { name: 'corpus_christi', label: 'Corpus Christi' },
       { name: 'indicadores', label: 'Indicadores' }
     ];

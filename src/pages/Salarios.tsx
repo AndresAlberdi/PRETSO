@@ -175,7 +175,7 @@ export default function Salarios() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
         <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          Salarios
+          Remuneraciones
           <Tooltip content="En esta sección se listan las remuneraciones y pagos específicos que la compañía efectuó a diversas personas (actores, músicos, tramoyistas, etc.) por su trabajo durante las diferentes temporadas." />
         </h1>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
@@ -309,7 +309,7 @@ export default function Salarios() {
                 <th onClick={() => sortDetail('Año')} style={{ cursor: 'pointer' }}>Año <SortIndicator column="Año" sc={scDetail} /></th>
                 <th onClick={() => sortDetail('Beneficiario ')} style={{ cursor: 'pointer' }}>Personas <SortIndicator column="Beneficiario " sc={scDetail} /></th>
                 <th onClick={() => sortDetail('Encargo')} style={{ cursor: 'pointer' }}>Ocupación <SortIndicator column="Encargo" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Monto a pagar')} style={{ cursor: 'pointer' }}>Salarios y raciones <SortIndicator column="Monto a pagar" sc={scDetail} /></th>
+                <th onClick={() => sortDetail('Monto a pagar')} style={{ cursor: 'pointer' }}>Remuneración <SortIndicator column="Monto a pagar" sc={scDetail} /></th>
                 <th>Documentos</th>
                 <th></th>
                 {isEditMode && <th>Admin</th>}
@@ -388,7 +388,7 @@ export default function Salarios() {
       {recordToDelete && (
         <ConfirmModal 
           title="Confirmar Eliminación"
-          message={`¿Estás seguro de que deseas eliminar este registro de salario para ${recordToDelete["Beneficiario "]}?`}
+          message={`¿Estás seguro de que deseas eliminar este registro de remuneración para ${recordToDelete["Beneficiario "]}?`}
           onConfirm={handleDelete}
           onCancel={() => setRecordToDelete(null)}
         />

@@ -8,7 +8,7 @@ const SHEET_NAMES: Record<string, string> = {
   companias: 'Compañías',
   transacciones: 'Transacciones',
   manejo_de_caja: 'Manejo de Caja',
-  salarios: 'Salarios',
+  salarios: 'Remuneraciones',
   corpus_christi: 'Corpus Christi',
   indicadores: 'Indicadores',
   bibliografia: 'Bibliografía'

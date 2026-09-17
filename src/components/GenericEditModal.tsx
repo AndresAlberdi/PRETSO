@@ -15,7 +15,7 @@ const COLLECTION_LABELS: Record<string, string> = {
   companias: 'Compañias',
   transacciones: 'Transacciones',
   manejo_de_caja: 'Manejo de Caja',
-  salarios: 'Salarios',
+  salarios: 'Remuneraciones',
   corpus_christi: 'Corpus Christi',
   indicadores: 'Indicadores',
   bibliografia: 'Bibliografía'

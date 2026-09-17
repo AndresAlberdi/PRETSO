@@ -41,7 +41,7 @@ export default function IndiceCompanias() {
   const checkReferentialIntegrity = async (sigla: string) => {
     const collectionsToCheck = [
       { name: 'manejo_de_caja', label: 'Caja' },
-      { name: 'salarios', label: 'Salarios' },
+      { name: 'salarios', label: 'Remuneraciones' },
       { name: 'corpus_christi', label: 'Corpus Christi' },
       { name: 'indicadores', label: 'Indicadores' }
     ];
@@ -181,7 +181,7 @@ export default function IndiceCompanias() {
                   <td>{item["Ámbito"]}</td>
                   <td style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
                     <button onClick={() => checkRecordsAndNavigate('manejo_de_caja', '/caja', item)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Caja</button>
-                    <button onClick={() => checkRecordsAndNavigate('salarios', '/salarios', item)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Salarios</button>
+                    <button onClick={() => checkRecordsAndNavigate('salarios', '/salarios', item)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Remuneraciones</button>
                     <button onClick={() => checkRecordsAndNavigate('corpus_christi', '/corpus', item)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Corpus Christi</button>
                   </td>
                   {isEditMode && (

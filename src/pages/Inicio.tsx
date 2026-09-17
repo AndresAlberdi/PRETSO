@@ -81,7 +81,7 @@ export default function Inicio() {
     const getLabel = (coll: string) => {
       const labels: Record<string, string> = {
         manejo_de_caja: 'Manejo de Caja',
-        salarios: 'Salarios',
+        salarios: 'Remuneraciones',
         corpus_christi: 'Corpus Christi',
         indicadores: 'Indicadores',
         companias: 'Compañías',

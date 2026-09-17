@@ -35,7 +35,7 @@ function Layout({ children }: { children: React.ReactNode }) {
         </h2>
         <Link to="/" state={{ reset: Date.now() }}>Inicio</Link>
         <Link to="/caja" state={{ reset: Date.now() }}>Manejo de Caja</Link>
-        <Link to="/salarios" state={{ reset: Date.now() }}>Salarios</Link>
+        <Link to="/salarios" state={{ reset: Date.now() }}>Remuneraciones</Link>
         <Link to="/corpus" state={{ reset: Date.now() }}>Corpus Christi</Link>
         <Link to="/indicadores" state={{ reset: Date.now() }}>Identificación de Indicadores</Link>
         <Link to="/companias" state={{ reset: Date.now() }}>Compañías</Link>
