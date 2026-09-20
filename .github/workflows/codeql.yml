@@ -4,8 +4,10 @@
 # -----------------------------------------------------------------------------
 # Por qué está separado de ci-*.yml: CodeQL solo funciona gratis en repositorios
 # públicos o con licencia "GitHub Code Security" (Modo B). En Modo B0 (privado
-# Free) este workflow se salta solo (condición `if` del job) y la cobertura SAST
-# la da Semgrep CE en _reusable-security.yml (regla de paridad).
+# Free) este workflow se salta solo (condición `if` del job) y el SAST queda en
+# Semgrep CE (_reusable-security.yml). No es equivalente: Semgrep CE sigue los
+# datos solo dentro de cada archivo; CodeQL, también entre archivos y funciones.
+# Qué se pierde y cómo se compensa: 00-gobernanza/01-politica-cicd-devsecops.md §3.5.
 #
 # Variables usadas:
 #   vars.GHAS_ENABLED     'true' cuando se compró Code Security (Modo B)
@@ -80,7 +82,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Inicializar CodeQL
-        uses: github/codeql-action/init@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28 # v4
+        uses: github/codeql-action/init@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4
         with:
           languages: ${{ matrix.lenguaje }}
           build-mode: none
@@ -89,7 +91,7 @@ jobs:
           queries: security-extended
 
       - name: Analizar
-        uses: github/codeql-action/analyze@db488ddef3bf6cb639b32c2e9a7c0a7ea8271d28 # v4
+        uses: github/codeql-action/analyze@cdf488f595d80d6e07e03d4674febd5ab45fa938 # v4
         with:
           category: /language:${{ matrix.lenguaje }}
 
@@ -98,7 +100,7 @@ jobs:
   # que el PR añade/actualiza contra la base de vulnerabilidades y falla si
   # introduce una con severidad high o critical. Solo existe en pull_request y
   # solo funciona en Modo A (público) o Modo B (GHAS); en B0 la cobertura SCA
-  # la dan Trivy fs + npm audit / pip-audit del reusable (OSV-Scanner es
+  # la dan Trivy fs + npm audit / pnpm audit / pip-audit del reusable (OSV-Scanner es
   # informativo).
   # ---------------------------------------------------------------------------
   revision-dependencias:

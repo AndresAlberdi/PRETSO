@@ -48,7 +48,7 @@ Cierra #
 - [ ] Endpoints nuevos exigen autenticación y autorización explícitas
 
 ### Dependencias y cadena de suministro
-- [ ] Dependencias nuevas justificadas (mantenidas, licencia compatible, sin CRITICAL/HIGH en `npm audit` / `pip-audit`)
+- [ ] Dependencias nuevas justificadas (mantenidas, licencia compatible, sin CRITICAL/HIGH en `npm audit` / `pnpm audit` / `pip-audit`)
 - [ ] Acciones de GitHub nuevas fijadas por SHA con comentario `# vX`
 - [ ] Imágenes base de Docker fijadas por digest (obligatorio; el tag solo como comentario)
 

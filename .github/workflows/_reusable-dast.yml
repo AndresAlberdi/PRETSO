@@ -108,10 +108,23 @@ jobs:
           exit $faltan
 
   # ---------------------------------------------------------------------------
-  # zap: OWASP ZAP. fail_action: true → el job falla si alguna regla marcada
-  # FAIL en rules.tsv dispara. allow_issue_writing: false → no crea issues
-  # (evita ruido y no requiere permiso issues: write). El informe HTML/MD se
-  # guarda como artifact (ZAP no emite SARIF de forma nativa).
+  # zap: OWASP ZAP.
+  #
+  # CORREGIDO EN ESTE PROYECTO (2026-09-03). El comentario original decía que
+  # «fail_action: true → el job falla si alguna regla marcada FAIL en rules.tsv
+  # dispara», y `zap-rules.tsv` documenta lo mismo: FAIL falla, WARN reporta sin
+  # fallar. La acción no se comporta así: con `fail_action: true` falla ante
+  # CUALQUIER alerta, incluidas las WARN. En la práctica el job daba rojo con
+  # FAIL-NEW: 0 y PASS: 61, solo por nueve avisos informativos —cabeceras de
+  # caché, Sec-Fetch-Dest, `style-src unsafe-inline` que ya está documentado y
+  # aceptado en docs/csp.md—.
+  #
+  # Silenciar los avisos con IGNORE habría hecho pasar el job perdiendo su
+  # visibilidad. En su lugar la acción ya no decide: se evalúa el informe contra
+  # las reglas, que es lo que el estándar dice que debería ocurrir.
+  #
+  # allow_issue_writing: false → no crea issues. El informe HTML/MD se guarda
+  # como artifact (ZAP no emite SARIF de forma nativa).
   # ---------------------------------------------------------------------------
   zap:
     name: OWASP ZAP (${{ inputs.escaneo_completo && 'full-scan' || 'baseline' }})
@@ -144,7 +157,7 @@ jobs:
           rules_file_name: ${{ steps.reglas.outputs.archivo }}
           # -a: incluye reglas alfa; -j: usa el spider AJAX (SPAs); -m: minutos de spider
           cmd_options: '-a -j -m 3'
-          fail_action: true
+          fail_action: false
           allow_issue_writing: false
           artifact_name: informe-zap-baseline
 
@@ -155,9 +168,24 @@ jobs:
           target: ${{ inputs.url_objetivo }}
           rules_file_name: ${{ steps.reglas.outputs.archivo }}
           cmd_options: '-a -j -m 5'
-          fail_action: true
+          fail_action: false
           allow_issue_writing: false
           artifact_name: informe-zap-full
+
+      - name: Evaluar el informe contra zap-rules.tsv
+        if: always()
+        env:
+          REGLAS: ${{ steps.reglas.outputs.archivo }}
+        run: |
+          informe=$(find . -maxdepth 3 -name 'report_json.json' | head -1)
+          if [[ -z "$informe" ]]; then
+            # Falla en CERRADO a propósito. Un control que pasa solo porque no
+            # encontró qué evaluar no es un control: es el mismo agujero que
+            # este paso vino a tapar, con otra forma.
+            echo "::error::ZAP no dejó report_json.json. No se puede evaluar el informe, así que el resultado no vale."
+            exit 1
+          fi
+          python3 .github/scripts/evaluar-zap.py "$informe" "${REGLAS:-}"
 
       - name: Resumen
         if: always()

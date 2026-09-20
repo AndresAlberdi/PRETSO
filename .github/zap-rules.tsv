@@ -6,7 +6,17 @@
 #   ID<TAB>ACCION<TAB>(nota)
 #   ACCION: IGNORE = no reportar | WARN = reportar sin fallar | FAIL = falla el job
 # Las líneas que empiezan con # se ignoran. Cualquier regla no listada se trata
-# como WARN por ZAP (fail_action: true solo falla con FAIL).
+# como WARN.
+#
+# CÓMO SE APLICA. La acción de ZAP no respeta este contrato: con
+# fail_action: true falla ante CUALQUIER alerta, WARN incluidas, y con false no
+# falla nunca — o sea que las reglas FAIL de aquí abajo no hacían nada. Por eso
+# el workflow la deja en fail_action: false y el veredicto lo da
+# .github/scripts/evaluar-zap.py, que cruza los pluginid del informe con los IDs
+# marcados FAIL. Los WARN se siguen imprimiendo en el registro.
+#
+# Detectado en novuchat-site (2026-09-03): job en rojo con FAIL-NEW: 0 y
+# PASS: 61, tumbado por nueve avisos informativos.
 # Regla de oro: FAIL para inyecciones y exposición de secretos; WARN para
 # cabeceras/informativas mientras se corrigen; IGNORE solo con justificación y
 # fecha de revisión en la nota (ver README → "Cómo añadir una excepción").

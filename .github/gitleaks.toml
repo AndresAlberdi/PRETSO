@@ -108,21 +108,3 @@ regexes = [
   '''wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY''',
 ]
 stopwords = ["ejemplo", "example", "placeholder", "sample"]
-
-# ------------------------------------------------------------------------------
-# Excepción específica de PRETSO (piloto): la apiKey web de Firebase es un
-# identificador PÚBLICO por diseño (viaja en el bundle del navegador); la
-# protección real son las reglas de Firestore, App Check y las restricciones de
-# la clave en la consola de GCP (ver PILOTO.md, Fase 4.5, y el estándar
-# 01-seguridad/01-gestion-de-secretos.md, sección Firebase). Se acota a los
-# archivos de configuración del cliente para no ocultar claves GCP reales
-# (de servidor) que pudieran aparecer en otro lugar.
-# ------------------------------------------------------------------------------
-[[allowlists]]
-description = "PRETSO: apiKey web de Firebase (pública por diseño), solo en la config del cliente"
-paths = [
-  '''^src/firebase\.ts$''',
-  '''^src/firebase-config\.json$''',
-  '''^src/pages/UserManagement\.tsx$''',
-]
-regexes = ['''AIzaSyCxEhBnq_4vA3DzVwxy6MdC89l94yncfNM''']

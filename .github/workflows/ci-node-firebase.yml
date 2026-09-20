@@ -140,17 +140,7 @@ jobs:
       - name: Verificación de tipos (si existe el script)
         run: npm run typecheck --if-present
 
-      # ADAPTACIÓN PILOTO PRETSO: mientras el proyecto no tenga instalado
-      # @vitest/coverage-v8, fije la variable de repositorio COVERAGE_MIN=0 y
-      # las pruebas corren sin cobertura. Al instalar el proveedor de cobertura
-      # (npm i -D @vitest/coverage-v8), suba COVERAGE_MIN (meta: 70) y estos
-      # pasos vuelven a exigir el umbral.
-      - name: Pruebas unitarias (sin cobertura, COVERAGE_MIN=0)
-        if: env.COVERAGE_MIN == '0'
-        run: npm test -- --run
-
       - name: Pruebas unitarias con cobertura (Vitest)
-        if: env.COVERAGE_MIN != '0'
         # json-summary es lo que lee el umbral; text es para el log.
         run: >-
           npm test --
@@ -158,7 +148,6 @@ jobs:
           --coverage.reporter=text --coverage.reporter=json-summary
 
       - name: Umbral de cobertura (COVERAGE_MIN=${{ env.COVERAGE_MIN }} %)
-        if: env.COVERAGE_MIN != '0'
         run: |
           set -euo pipefail
           archivo=coverage/coverage-summary.json
@@ -174,17 +163,6 @@ jobs:
             exit 1
           fi
 
-      # ADAPTACIÓN PILOTO PRETSO: compilar las Cloud Functions en calidad para
-      # detectar errores de TypeScript aunque su despliegue siga siendo manual
-      # (FIREBASE_DEPLOY_ONLY no incluye 'functions' en la fase inicial).
-      - name: Compilar Cloud Functions (tsc)
-        run: |
-          if [[ -f functions/package.json ]]; then
-            cd functions && npm ci && npm run build
-          else
-            echo "Sin directorio functions/; se omite."
-          fi
-
       - name: Pruebas de reglas de Firestore (emulador)
         if: needs.preparar.outputs.hay_test_rules == 'true'
         # El emulador necesita Java (preinstalado en ubuntu-latest).
@@ -197,7 +175,7 @@ jobs:
   # Fase 2 — seguridad-estatica: reusable OSS (todos los modos).
   # NOTA: en el repositorio del proyecto la ruta es local
   # (./.github/workflows/_reusable-security.yml); bootstrap-repo.sh copia el
-  # archivo. `secrets: inherit` pasa GITLEAKS_LICENSE y SNYK_TOKEN si existen.
+  # archivo. se mapean GITLEAKS_LICENSE y SNYK_TOKEN si existen.
   # subir_sarif: solo cuando Code Scanning está disponible (público o GHAS).
   # ---------------------------------------------------------------------------
   seguridad-estatica:
@@ -217,7 +195,12 @@ jobs:
       bloquear_en: ${{ vars.BLOQUEAR_EN || 'CRITICAL,HIGH' }}
       subir_sarif: ${{ github.event.repository.visibility == 'public' || vars.GHAS_ENABLED == 'true' }}
       ref: ${{ inputs.tag || '' }}
-    secrets: inherit
+    # Mínimo privilegio: solo los dos secretos que el reusable declara en
+    # `on.workflow_call.secrets` (ambos opcionales). `secrets: inherit`
+    # pasaba también los de despliegue, que ningún escáner necesita.
+    secrets:
+      GITLEAKS_LICENSE: ${{ secrets.GITLEAKS_LICENSE }}
+      SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
   # ---------------------------------------------------------------------------
   # Fase 3 — construir: build de producción (Vite). APP_ENV selecciona el
@@ -276,9 +259,22 @@ jobs:
   previsualizar:
     name: previsualizar (canal de PR)
     needs: [calidad, construir]
+    # `github.actor != 'dependabot[bot]'`: las PR de Dependabot corren con un
+    # almacén de secretos APARTE y no reciben los del repositorio, así que la
+    # autenticación federada se queda sin `workload_identity_provider` y el job
+    # falla siempre («Secret source: Dependabot»). No es un defecto que
+    # corregir: es lo que impide que una PR de actualización de dependencias
+    # alcance la nube. Concederle esos secretos abriría justo el vector de
+    # cadena de suministro que el `cooldown` de dependabot.yml viene a cerrar.
+    #
+    # La compuerta no se debilita: `compuerta-pr` solo exige `calidad` y
+    # `seguridad-estatica`, y ambas corren igual, como Semgrep, Trivy, Gitleaks
+    # y CodeQL. Aplique el mismo `if` a cualquier job de PR que use
+    # credenciales de nube en los demás pipelines.
     if: >-
       github.event_name == 'pull_request'
       && github.event.pull_request.head.repo.full_name == github.repository
+      && github.actor != 'dependabot[bot]'
       && vars.FIREBASE_PREVIEW == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -373,6 +369,31 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      - name: Preparar el gestor de paquetes para el hook `predeploy`
+        # `firebase deploy` ejecuta los hooks `predeploy` de firebase.json. En
+        # cuanto FIREBASE_DEPLOY_ONLY incluye `functions` —lo normal en un
+        # proyecto Firebase— ese hook compila las Functions con el gestor del
+        # proyecto, y estos jobs solo preparaban Node:
+        #
+        #   /bin/sh: 1: pnpm: not found
+        #   Error: functions predeploy error: exit code 127
+        #
+        # Lo grave es CUÁNDO falla: en producción, después de la compuerta de
+        # aprobación del Environment. Se aprueba el pase y solo entonces se
+        # descubre que el despliegue no puede ni empezar.
+        # Detectado en novuchat-site (2026-09-03).
+        run: |
+          set -euo pipefail
+          corepack enable
+          corepack prepare --activate
+          # `functions/` suele traer su propio lockfile: no es del workspace.
+          if [[ -f functions/package.json ]]; then
+            if   [[ -f functions/pnpm-lock.yaml ]];    then pnpm --dir functions install --frozen-lockfile
+            elif [[ -f functions/yarn.lock ]];         then (cd functions && yarn install --frozen-lockfile)
+            elif [[ -f functions/package-lock.json ]]; then npm ci --prefix functions
+            fi
+          fi
+
       - name: Conservar copia de la versión actual (canal "previa" para rollback)
         # D7: antes de CADA deploy a live (staging y producción) se clona el
         # contenido en vivo a un canal "previa". El rollback es clonar de vuelta.
@@ -393,8 +414,22 @@ jobs:
           URL_STAGING: ${{ vars.STAGING_URL }}
         run: |
           set -euo pipefail
+          # `firebase deploy` PUEDE SALIR CON CÓDIGO 0 HABIENDO FALLADO: rotula
+          # los fallos de Functions como avisos y continúa, y la versión de
+          # hosting se queda en CREATED sin pasar nunca a FINALIZED. En
+          # novuchat-site (2026-09-03) este paso dio VERDE con las dos Functions
+          # sin desplegar y el sitio en 404, diciendo «Producción desplegada».
+          # Lo destapó el health check posterior. Un despliegue que miente es
+          # peor que uno que falla: el acta de producción se firma con lo que
+          # dice el pipeline.
           firebase deploy --only "$SOLO" --project "$PROYECTO" --non-interactive \
-            --message "staging ${GITHUB_SHA::7} (run ${GITHUB_RUN_ID})"
+            --message "staging ${GITHUB_SHA::7} (run ${GITHUB_RUN_ID})" 2>&1 \
+            | tee /tmp/despliegue.log
+          if grep -qiE 'failed to create function|failed to update function|Build failed with status|Deploy failed|had HTTP Error' /tmp/despliegue.log; then
+            echo "::error::firebase deploy terminó con código 0 pero su registro contiene fallos: el despliegue NO está completo."
+            exit 1
+          fi
+
           echo "### Staging desplegado: $URL_STAGING" >> "$GITHUB_STEP_SUMMARY"
 
   # ---------------------------------------------------------------------------
@@ -500,6 +535,31 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
+      - name: Preparar el gestor de paquetes para el hook `predeploy`
+        # `firebase deploy` ejecuta los hooks `predeploy` de firebase.json. En
+        # cuanto FIREBASE_DEPLOY_ONLY incluye `functions` —lo normal en un
+        # proyecto Firebase— ese hook compila las Functions con el gestor del
+        # proyecto, y estos jobs solo preparaban Node:
+        #
+        #   /bin/sh: 1: pnpm: not found
+        #   Error: functions predeploy error: exit code 127
+        #
+        # Lo grave es CUÁNDO falla: en producción, después de la compuerta de
+        # aprobación del Environment. Se aprueba el pase y solo entonces se
+        # descubre que el despliegue no puede ni empezar.
+        # Detectado en novuchat-site (2026-09-03).
+        run: |
+          set -euo pipefail
+          corepack enable
+          corepack prepare --activate
+          # `functions/` suele traer su propio lockfile: no es del workspace.
+          if [[ -f functions/package.json ]]; then
+            if   [[ -f functions/pnpm-lock.yaml ]];    then pnpm --dir functions install --frozen-lockfile
+            elif [[ -f functions/yarn.lock ]];         then (cd functions && yarn install --frozen-lockfile)
+            elif [[ -f functions/package-lock.json ]]; then npm ci --prefix functions
+            fi
+          fi
+
       - name: Conservar copia de la versión actual (canal "previa" para rollback)
         # Clona el contenido en vivo a un canal de vista previa de larga
         # duración. Si el health check posterior falla, post-despliegue lo
@@ -521,8 +581,22 @@ jobs:
           URL_PROD: ${{ vars.PROD_URL }}
         run: |
           set -euo pipefail
+          # `firebase deploy` PUEDE SALIR CON CÓDIGO 0 HABIENDO FALLADO: rotula
+          # los fallos de Functions como avisos y continúa, y la versión de
+          # hosting se queda en CREATED sin pasar nunca a FINALIZED. En
+          # novuchat-site (2026-09-03) este paso dio VERDE con las dos Functions
+          # sin desplegar y el sitio en 404, diciendo «Producción desplegada».
+          # Lo destapó el health check posterior. Un despliegue que miente es
+          # peor que uno que falla: el acta de producción se firma con lo que
+          # dice el pipeline.
           firebase deploy --only "$SOLO" --project "$PROYECTO" --non-interactive \
-            --message "producción ${GITHUB_REF_NAME} (run ${GITHUB_RUN_ID})"
+            --message "producción ${GITHUB_REF_NAME} (run ${GITHUB_RUN_ID})" 2>&1 \
+            | tee /tmp/despliegue.log
+          if grep -qiE 'failed to create function|failed to update function|Build failed with status|Deploy failed|had HTTP Error' /tmp/despliegue.log; then
+            echo "::error::firebase deploy terminó con código 0 pero su registro contiene fallos: el despliegue NO está completo."
+            exit 1
+          fi
+
           echo "### Producción desplegada: $URL_PROD (${GITHUB_REF_NAME})" >> "$GITHUB_STEP_SUMMARY"
 
   # ---------------------------------------------------------------------------

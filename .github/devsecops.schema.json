@@ -81,7 +81,7 @@
             "required": ["id", "herramienta", "justificacion", "aprobado_por", "creado", "vence"],
             "properties": {
               "id": { "type": "string", "description": "CVE, GHSA o identificador de regla (p. ej. CVE-2026-1234, CKV_GCP_62)." },
-              "herramienta": { "type": "string", "enum": ["gitleaks", "semgrep", "trivy", "osv-scanner", "checkov", "npm-audit", "pip-audit", "snyk", "zap", "codeql"] },
+              "herramienta": { "type": "string", "enum": ["gitleaks", "semgrep", "trivy", "osv-scanner", "checkov", "npm-audit", "pip-audit", "snyk", "zap", "codeql", "pnpm"] },
               "componente": { "type": "string" },
               "justificacion": { "type": "string", "minLength": 20 },
               "aprobado_por": { "type": "string" },
