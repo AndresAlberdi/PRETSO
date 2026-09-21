@@ -52,7 +52,7 @@ Open
 GitHub detected a secret • Jun 5
 Publicly leaked secret
 Secret	
-AIzaSyDKBLJvyBQANNvuRLrHcy2dka8lxfoUG68
+AIzaSy…[CLAVE RETIRADA]
 Validity	
 Unknown
 Remediation steps
@@ -63,7 +63,7 @@ Follow the steps below before you close this alert.
 4 (4)Close the alert as revoked.
 Detected in 3 locations
 frontend/env.production.bk
-VITE_FIREBASE_API_KEY=AIzaSyDKBLJvyBQANNvuRLrHcy2dka8lxfoUG68
+VITE_FIREBASE_API_KEY=AIzaSy…[CLAVE RETIRADA]
 VITE_FIREBASE_AUTH_DOMAIN=pretso-platform.firebaseapp.com
 VITE_FIREBASE_PROJECT_ID=pretso-platform
 VITE_API_BASE_URL=https://pretso-backend-xxxx-uc.a.run.app
@@ -960,3 +960,7 @@ Applications can avoid sending untrusted FormData through axios as JSON unless J
 
 Applications should catch errors around formToJSON() or axios requests that transform untrusted FormData.
 
+> **Nota (2026-09-20).** La clave que este aviso citaba se retiró de este archivo. Pertenecía a un proyecto PRETSO
+> anterior (`pretso-platform` / `pretso-v2`), hoy en borrado, y se comprobó contra la API de Google que ya no es
+> válida. Sigue en el historial de git: el archivo republicaba en un repositorio público una clave que GitHub ya
+> había marcado como filtrada. No pegar secretos en archivos versionados, ni siquiera dentro de un aviso.
