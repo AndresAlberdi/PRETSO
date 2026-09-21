@@ -41,3 +41,9 @@ coverage/
 .firebase/
 venv/
 __pycache__/
+!.env.example
+*.pem
+*.key
+serviceAccountKey*.json
+*-sa-key.json
+tfplan*
