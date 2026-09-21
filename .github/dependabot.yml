@@ -1,0 +1,145 @@
+# =============================================================================
+# dependabot.yml — Actualización automática de dependencias y de pines por SHA
+# Versión: 2.1 | Fecha: 2026-09-12 | Destino: .github/dependabot.yml
+# -----------------------------------------------------------------------------
+# Dependabot es gratuito en todos los planes y visibilidades. Aquí se configura:
+#   - Un ecosistema por stack (elimine los que no apliquen al proyecto).
+#   - Frecuencia semanal (lunes temprano, zona horaria de La Paz/CDMX).
+#   - Agrupación de minor+patch en un solo PR para reducir ruido.
+#   - Versiones mayores: en npm y pip quedan EXCLUIDAS (`ignore`) y se revisan
+#     una vez al mes, a mano, con notas de cambio, como fija la política
+#     (01-seguridad/04 §7.2). En github-actions, docker y terraform siguen
+#     llegando en PR individuales para revisarlos con cuidado.
+#     Hasta la 2.0 este encabezado decía que las mayores llegaban siempre en
+#     PR individuales, lo contrario de la política; se corrigió el 2026-09-12.
+#   - OJO: el `ignore` también frena las actualizaciones de SEGURIDAD que
+#     exijan una versión mayor. La alerta sigue apareciendo, pero el PR no se
+#     abre solo: se abre a mano dentro de las 72 h de la política.
+#   - Límite de PRs abiertos por ecosistema.
+#   - `github-actions`: mantiene los pines por SHA de los workflows y actualiza
+#     el comentario `# vX` automáticamente (Dependabot entiende el formato
+#     `uses: owner/repo@SHA # vX.Y.Z`).
+# Las actualizaciones de seguridad (security updates) se activan aparte en
+# Settings → Code security → Dependabot security updates.
+# =============================================================================
+version: 2
+
+updates:
+  # Adaptado a PRETSO (2026-09-20): npm en la raíz y en functions/, que tiene
+  # su propio package-lock.json. Se quitaron pip, docker y terraform: no hay
+  # requirements.txt, Dockerfile ni infra/, y un `directory` que no existe no
+  # es inofensivo, Dependabot lo reporta como error de configuración.
+  # ---- GitHub Actions: pines por SHA de todos los workflows -------------------
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/La_Paz
+    # Cooldown: no adoptar una versión el día que sale. Una release
+    # comprometida se detecta casi siempre en las primeras horas, que es justo
+    # cuando Dependabot la propondría. El SAST del propio estándar lo marca
+    # (`dependabot-missing-cooldown`), y con
+    # `required_review_thread_resolution` en el ruleset esos hilos BLOQUEAN la
+    # fusión: sin esto, el estándar se marca a sí mismo y se bloquea solo.
+    #
+    # `semver-*-days` solo vale en ecosistemas que versionan con semver.
+    # Pasárselos a github-actions, docker o terraform hace que Dependabot
+    # rechace el archivo entero.
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 5
+    labels: [dependencias, github-actions, seguridad]
+    commit-message:
+      prefix: "chore(ci)"
+    groups:
+      actions-minor-patch:
+        update-types: [minor, patch]
+
+  # ---- npm (Node / React / Vite) ---------------------------------------------
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/La_Paz
+    # Cooldown: no adoptar una versión el día que sale. Una release
+    # comprometida se detecta casi siempre en las primeras horas, que es justo
+    # cuando Dependabot la propondría. El SAST del propio estándar lo marca
+    # (`dependabot-missing-cooldown`), y con
+    # `required_review_thread_resolution` en el ruleset esos hilos BLOQUEAN la
+    # fusión: sin esto, el estándar se marca a sí mismo y se bloquea solo.
+    #
+    # `semver-*-days` solo vale en ecosistemas que versionan con semver.
+    # Pasárselos a github-actions, docker o terraform hace que Dependabot
+    # rechace el archivo entero.
+    cooldown:
+      default-days: 7
+      semver-major-days: 30
+      semver-minor-days: 7
+      semver-patch-days: 3
+    open-pull-requests-limit: 10
+    labels: [dependencias, npm]
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+    versioning-strategy: increase
+    groups:
+      npm-produccion-minor-patch:
+        dependency-type: production
+        update-types: [minor, patch]
+      npm-desarrollo:
+        dependency-type: development
+        update-types: [minor, patch]
+    # `ignore` NO PUEDE QUEDAR COMO LISTA VACÍA. Dependabot exige al menos un
+    # elemento y, ante el error, RECHAZA EL ARCHIVO COMPLETO: las
+    # actualizaciones de VERSIÓN no corren en ningún ecosistema.
+    #
+    # Las de SEGURIDAD sí siguen corriendo: Dependabot las dispara desde sus
+    # alertas, sin leer este archivo. Por eso el defecto es difícil de ver — un
+    # repositorio puede enseñar PR de Dependabot recientes y parecer sano
+    # mientras las de versión llevan meses paradas—. No pone nada en rojo: solo
+    # deja las PR en UNSTABLE, que se confunde con «checks todavía corriendo».
+    #
+    # Detectado en novuchat-site (2026-09-03) y confirmado en
+    # AndresAlberdi/FirmasNoCualificadas (2026-09-05).
+    #
+    # Las mayores quedan fuera de la automatización (ver encabezado). Para una
+    # excepción puntual, agregue otra entrada y justifíquela (revisar cada
+    # trimestre).
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # ---- npm de las Cloud Functions (functions/, con su propio lockfile) -------
+  - package-ecosystem: npm
+    directory: /functions
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/La_Paz
+    # Cooldown e ignore: mismos criterios que la entrada npm de la raíz.
+    cooldown:
+      default-days: 7
+      semver-major-days: 30
+      semver-minor-days: 7
+      semver-patch-days: 3
+    open-pull-requests-limit: 10
+    labels: [dependencias, npm, functions]
+    commit-message:
+      prefix: "chore(deps)"
+      prefix-development: "chore(deps-dev)"
+    versioning-strategy: increase
+    groups:
+      functions-produccion-minor-patch:
+        dependency-type: production
+        update-types: [minor, patch]
+      functions-desarrollo:
+        dependency-type: development
+        update-types: [minor, patch]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]

@@ -1,0 +1,7 @@
+# Dependencias de los scripts de mantenimiento de Firestore de la raíz
+# (check_db.py, migrate_*.py, …). Hasta el 2026-09-20 vivían solo en un venv/
+# versionado por error, que además no incluía pandas ni numpy.
+# pandas y numpy van sin fijar: fíjelos a las versiones con que se usan.
+firebase-admin==7.5.0
+pandas
+numpy

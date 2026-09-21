@@ -342,7 +342,9 @@ cargar_manifiesto() {
     rc=1
   fi
   if [[ $rc -ne 0 ]]; then
-    if command -v yq >/dev/null 2>&1 && yq --version 2>&1 | grep -qi mikefarah; then
+    # Sin tubería: con pipefail, `yq --version | grep -q` da falso si yq sigue
+    # escribiendo después de que grep salga (SIGPIPE).
+    if command -v yq >/dev/null 2>&1 && grep -qi mikefarah <<< "$(yq --version 2>&1)"; then
       salida="$(leer_manifiesto_yq)" || die 3 "No se pudo leer $MANIFIESTO con yq"
     else
       die 3 "Se requiere python3 con PyYAML (pip install pyyaml) o yq (mikefarah) para leer $MANIFIESTO"
@@ -934,10 +936,13 @@ fase_registro() {
   # Solo archivos ya rastreados: un despliegue no debe introducir archivos
   # nuevos (y menos secretos o artefactos) sin revisión humana.
   local no_rastreados
-  no_rastreados="$(git ls-files --others --exclude-standard | head -n 20)"
+  # Sin `| head`: con pipefail y cientos de no rastreados, git recibía SIGPIPE,
+  # la asignación salía con 141 y set -e cortaba el script después de desplegar
+  # (medido: con 300 archivos, 19 de 20 veces). Se listan los 20 primeros.
+  no_rastreados="$(git ls-files --others --exclude-standard)"
   if [[ -n "$no_rastreados" ]]; then
     log_warn "Hay archivos no rastreados que NO se agregarán al commit (revíselos manualmente):"
-    sed 's/^/  /' <<< "$no_rastreados" >&2
+    sed -n '1,20s/^/  /p' <<< "$no_rastreados" >&2
   fi
   if [[ "$DRY_RUN" -eq 1 ]]; then
     printf '%s[DRY-RUN]%s git switch -c %s && git add -u && git commit -m "chore(deploy): despliegue %s %s %s" && git push -u origin %s && gh pr create\n' \
