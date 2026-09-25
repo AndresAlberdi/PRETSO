@@ -1,6 +1,6 @@
 # =============================================================================
 # codeql.yml — SAST avanzado con CodeQL (solo Modo A público o Modo B con GHAS)
-# Versión: 2.0 | Fecha: 2026-08-24
+# Versión: 2.1 | Fecha: 2026-09-12
 # -----------------------------------------------------------------------------
 # Por qué está separado de ci-*.yml: CodeQL solo funciona gratis en repositorios
 # públicos o con licencia "GitHub Code Security" (Modo B). En Modo B0 (privado
