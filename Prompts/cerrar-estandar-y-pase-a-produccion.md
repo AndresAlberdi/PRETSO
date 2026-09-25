@@ -29,6 +29,40 @@ arriba**, y eso ya se cumple sobre `pretso-database`. Pero dejó dicho que
 **`pretso-prod` sigue siendo necesario** para tener un modelo robusto: es el
 Bloque 5 de este prompt, con plazo propio, no un pendiente que se olvida.
 
+## Tu primera tarea, antes que cualquier otra cosa
+
+**Bajar las aprobaciones del ruleset de `main` y fusionar lo que está esperando.**
+La sesión anterior no pudo hacerlo: su clasificador se lo bloqueó tres veces
+seguidas (aprobar con la segunda cuenta un PR propio, editar el ruleset, y
+concederse el permiso para editarlo), y la regla de permiso que Andres agregó a
+su `settings.json` —`Bash(gh api -X PUT repos/AndresAlberdi/PRETSO/rulesets/*)`—
+no surtió efecto en aquella sesión ya abierta. En una sesión nueva sí debería.
+
+El motivo de fondo: el ruleset del estándar exige **una aprobación** y este
+repositorio tiene **un solo dueño**. Nadie puede aprobar su propio PR, así que
+hoy no se fusiona nada. Andres decidió el 2026-09-25 bajar las aprobaciones a 0
+conservando PR obligatorio, `compuerta-pr`, historia lineal, squash y cero
+bypass, y **anotarlo como desviación del estándar en `PILOTO.md`, con su
+motivo**. Eso último es parte de la tarea, no un adorno.
+
+El orden, y cada paso con su verificación real:
+1. Ruleset `proteccion-main` (id 24019577) con
+   `required_approving_review_count: 0`.
+2. Fusionar **#21** (arreglo del despliegue y cabeceras), que ya tiene el CI
+   entero en verde. Squash.
+3. **Mirar el run de `main`**: `desplegar-staging` tiene que llegar a desplegar
+   y `dast-y-humo` correr detrás. Comprobar que el sitio sigue sirviendo un
+   bundle que coincide con el `npm run build` local. Si algo falla, se arregla
+   antes de seguir.
+4. Fusionar **#22** (`pretso-prod` como producción y `Prompts/`).
+5. Fusionar los cinco de Dependabot (**#16 a #20**), poniendo sus ramas al día
+   primero: el ruleset exige la rama actualizada. Cerrar **#12** y **#13**, que
+   quedaron apuntando a la rama vieja `master` y no tienen ni un check.
+6. Anotar la desviación en `PILOTO.md` y el resultado real de cada paso.
+
+Andres autoriza en el chat; vos operás. Si un bloqueo del arnés vuelve a
+frenarte, **informalo, no lo esquives**.
+
 ## Lo que ya quedó hecho el 2026-09-25 (no rehacerlo)
 - **Federación WIF creada** en `pretso-database` con
   `setup-oidc-gcp.sh --sin-cloudrun`: pool `github`, provider con la condición
