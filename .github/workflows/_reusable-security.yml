@@ -1,6 +1,6 @@
 # =============================================================================
 # _reusable-security.yml — Fase 2 "seguridad-estatica" (workflow reutilizable)
-# Versión: 2.3 | Fecha: 2026-09-14
+# Versión: 2.4 | Fecha: 2026-09-20
 # -----------------------------------------------------------------------------
 # Propósito: concentrar en un solo lugar todas las comprobaciones de seguridad
 # estática que corren en TODOS los modos (A público, B privado con licencias,

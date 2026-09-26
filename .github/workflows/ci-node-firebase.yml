@@ -1,7 +1,7 @@
 # =============================================================================
 # ci-node-firebase.yml — Pipeline completo SPA Node/React (Vite/Vitest)
 #                        → Firebase Hosting + reglas de Firestore
-# Versión: 2.0 | Fecha: 2026-08-24
+# Versión: 2.2 | Fecha: 2026-09-25
 # -----------------------------------------------------------------------------
 # Flujo (ver 00-gobernanza/02-flujo-git-y-versionado.md):
 #   PR → main ............ preparar, calidad, seguridad-estatica, construir
@@ -385,7 +385,14 @@ jobs:
         run: |
           set -euo pipefail
           corepack enable
-          corepack prepare --activate
+          # `corepack prepare --activate` aborta con "The local project doesn't
+          # feature a 'packageManager' field" cuando el proyecto no declara ese
+          # campo, y tumba el despliegue entero aunque no haya hook `predeploy`
+          # que preparar. Si no está declarado, alcanza con el gestor que trae
+          # Node. Detectado en PRETSO (2026-09-25).
+          if grep -q '"packageManager"' package.json 2>/dev/null; then
+            corepack prepare --activate
+          fi
           # `functions/` suele traer su propio lockfile: no es del workspace.
           if [[ -f functions/package.json ]]; then
             if   [[ -f functions/pnpm-lock.yaml ]];    then pnpm --dir functions install --frozen-lockfile
@@ -551,7 +558,14 @@ jobs:
         run: |
           set -euo pipefail
           corepack enable
-          corepack prepare --activate
+          # `corepack prepare --activate` aborta con "The local project doesn't
+          # feature a 'packageManager' field" cuando el proyecto no declara ese
+          # campo, y tumba el despliegue entero aunque no haya hook `predeploy`
+          # que preparar. Si no está declarado, alcanza con el gestor que trae
+          # Node. Detectado en PRETSO (2026-09-25).
+          if grep -q '"packageManager"' package.json 2>/dev/null; then
+            corepack prepare --activate
+          fi
           # `functions/` suele traer su propio lockfile: no es del workspace.
           if [[ -f functions/package.json ]]; then
             if   [[ -f functions/pnpm-lock.yaml ]];    then pnpm --dir functions install --frozen-lockfile

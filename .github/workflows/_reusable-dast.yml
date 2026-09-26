@@ -1,6 +1,6 @@
 # =============================================================================
 # _reusable-dast.yml — Fase 5 "dast-y-humo" (workflow reutilizable)
-# Versión: 2.0 | Fecha: 2026-08-24
+# Versión: 2.1 | Fecha: 2026-09-04
 # -----------------------------------------------------------------------------
 # Propósito: verificar la aplicación YA DESPLEGADA (normalmente staging):
 #   1. humo: la URL responde 200 con reintentos y expone cabeceras de seguridad
