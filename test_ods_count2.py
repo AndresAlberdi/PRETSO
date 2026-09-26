@@ -1,7 +1,11 @@
+import os
 import pandas as pd
 import numpy as np
 
-ODS_PATH = "/home/andres-alberdi/Descargas/Hacia PRETSO rev AA 1.ods"
+ODS_PATH = os.environ.get(
+    "PRETSO_ODS_PATH",
+    os.path.expanduser("~/Documentos/PRETSO/Hacia PRETSO rev AA 1.ods"),
+)
 sheets = {
     'Compañías-Manejo de Caja': 66,
     'Compañías-Salarios': 44,
