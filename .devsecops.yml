@@ -46,3 +46,24 @@ seguridad:
       aprobado_por: AndresAlberdi
       creado: "2026-09-26"
       vence: "2026-12-25"
+    - id: 61d4121fb4d5a2bbd8fe881c6b700fd9223bc5dc:src/firebase.ts:generic-api-key:9
+      herramienta: gitleaks
+      justificacion: >-
+        apiKey web de Firebase del proyecto pretso-database: identificador público por diseño, que el navegador recibe en cada carga del sitio; no da acceso por sí sola (los datos los protegen firestore.rules y Firebase Auth). El hallazgo está en el historial; su control real es restringir la clave por referente HTTP y API y encender App Check (Fase 4.5 de PILOTO.md, pendiente): esta excepción vence para obligar a revisarlo.
+      aprobado_por: AndresAlberdi
+      creado: "2026-09-26"
+      vence: "2026-12-25"
+    - id: 61d4121fb4d5a2bbd8fe881c6b700fd9223bc5dc:src/firebase-config.json:generic-api-key:5
+      herramienta: gitleaks
+      justificacion: >-
+        apiKey web de Firebase del proyecto pretso-database: identificador público por diseño, que el navegador recibe en cada carga del sitio; no da acceso por sí sola (los datos los protegen firestore.rules y Firebase Auth). El hallazgo está en el historial; su control real es restringir la clave por referente HTTP y API y encender App Check (Fase 4.5 de PILOTO.md, pendiente): esta excepción vence para obligar a revisarlo.
+      aprobado_por: AndresAlberdi
+      creado: "2026-09-26"
+      vence: "2026-12-25"
+    - id: b36587db14d14afeef41dd63375999836cf4fba9:src/pages/UserManagement.tsx:gcp-api-key:9
+      herramienta: gitleaks
+      justificacion: >-
+        apiKey web de Firebase del proyecto pretso-database: identificador público por diseño, que el navegador recibe en cada carga del sitio; no da acceso por sí sola (los datos los protegen firestore.rules y Firebase Auth). El hallazgo está en el historial; su control real es restringir la clave por referente HTTP y API y encender App Check (Fase 4.5 de PILOTO.md, pendiente): esta excepción vence para obligar a revisarlo.
+      aprobado_por: AndresAlberdi
+      creado: "2026-09-26"
+      vence: "2026-12-25"
