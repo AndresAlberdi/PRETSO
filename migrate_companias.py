@@ -1,10 +1,14 @@
+import os
 import pandas as pd
 import firebase_admin
 from firebase_admin import credentials, firestore
 import math
 import numpy as np
 
-ODS_PATH = "/home/andres-alberdi/Descargas/Hacia PRETSO rev AA 1.ods"
+ODS_PATH = os.environ.get(
+    "PRETSO_ODS_PATH",
+    os.path.expanduser("~/Documentos/PRETSO/Hacia PRETSO rev AA 1.ods"),
+)
 
 cred = credentials.ApplicationDefault()
 firebase_admin.initialize_app(cred, {'projectId': 'pretso-database'})

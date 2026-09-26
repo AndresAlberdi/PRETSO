@@ -1,6 +1,10 @@
+import os
 import pandas as pd
 import numpy as np
-ODS_PATH = "/home/andres-alberdi/Descargas/Hacia PRETSO rev AA 1.ods"
+ODS_PATH = os.environ.get(
+    "PRETSO_ODS_PATH",
+    os.path.expanduser("~/Documentos/PRETSO/Hacia PRETSO rev AA 1.ods"),
+)
 df = pd.read_excel(ODS_PATH, sheet_name='Compañías-Manejo de Caja', engine='odf')
 col = df.columns[0]
 print(df[col].unique()[:20])

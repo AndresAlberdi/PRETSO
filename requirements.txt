@@ -1,7 +1,22 @@
 # Dependencias de los scripts de mantenimiento de Firestore de la raíz
-# (check_db.py, migrate_*.py, …). Hasta el 2026-09-20 vivían solo en un venv/
-# versionado por error, que además no incluía pandas ni numpy.
-# pandas y numpy van sin fijar: fíjelos a las versiones con que se usan.
+# (check_db.py, migrate_*.py, print_*.py, test_ods_*.py, scripts/migrate_ods.py).
+# Hasta el 2026-09-20 vivían solo en un venv/ versionado por error.
+#
+# Versiones fijadas el 2026-09-25, probadas en un venv limpio (Python 3.12)
+# leyendo el .ods real. pandas 3 y numpy 2 funcionan con lo que usan los
+# scripts (dropna, rename, replace con regex y drop con inplace=True).
+#
+# El .ods se lee de la variable PRETSO_ODS_PATH; por omisión,
+# ~/Documentos/PRETSO/Hacia PRETSO rev AA 1.ods.
 firebase-admin==7.5.0
-pandas
-numpy
+pandas==3.0.6
+numpy==2.5.3
+# Motor de pandas para leer .ods (pd.read_excel(..., engine='odf')).
+odfpy==1.4.1
+
+# Transitivas de firebase-admin (vía httpx) fijadas por seguridad: sin fijar,
+# osv-scanner resuelve anyio 4.9.0 (GHSA-82r6-8w77-94w6, corregido en 4.14.2)
+# e idna 3.9.0 (PYSEC-2026-215, corregido en 3.15). Son las versiones que ya
+# instala un venv limpio.
+anyio==4.15.1
+idna==3.20
