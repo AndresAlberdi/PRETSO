@@ -192,3 +192,27 @@ cd functions && npm audit fix && npm run build && cd ..
 | Functions se compilan en CI pero se despliegan manualmente | El despliegue por CI requiere roles adicionales; se activa en la Fase 4.4 |
 | `firestore.rules` intacto + propuesta separada | Un cambio de reglas sin asignar antes el custom claim dejaría sin escritura al administrador |
 | `HEALTH_PATH=/` | SPA sin endpoint de salud; la raíz sirve como verificación de vida |
+| **Desviación del estándar:** `proteccion-main` con `required_approving_review_count: 0` (el estándar pide 1) | El repositorio tiene un solo colaborador y nadie puede aprobar su propio PR: con 1 aprobación ningún PR se fusionaba (medido: #20 en `REVIEW_REQUIRED`). Se conservan PR obligatorio, `compuerta-pr` con rama al día, historia lineal, solo squash y cero bypass. Decidido por Andres el 2026-09-25; el cambio lo hizo él en la interfaz de GitHub porque el clasificador de la sesión lo bloqueó. Se revierte a 1 si se suma un segundo colaborador con escritura |
+| `roles/serviceusage.serviceUsageViewer` en `deploy-staging@pretso-database` y `deploy-production@pretso-prod` | Al desplegar `firestore:rules`, firebase-tools consulta si la API de Firestore está habilitada (`serviceusage.services.get`) y la SA respondía 403. Es el rol mínimo que lo resuelve: solo lectura, no habilita ni deshabilita APIs (se descartó `serviceUsageConsumer`, que añade `services.use`). Aprobado por Andres el 2026-09-25 y asignado por él en la consola de GCP. El script del estándar no lo otorga: defecto a llevar a SeguridadGeneral en su sesión |
+
+## Jornada del 2026-09-25 — resultado real
+
+Cierra la **Fase 3**: el despliegue automático a staging funciona de punta a punta por tubería, sin credenciales en ninguna máquina.
+
+| Paso | Resultado medido |
+|---|---|
+| Ruleset `proteccion-main` a 0 aprobaciones | Verificado por API: `required_approving_review_count: 0`, el resto intacto, `bypass_actors: []` |
+| #21 `fix(ci)` corepack + cabeceras | Fusionado `2cbe875`. El paso de corepack pasó; `desplegar-staging` murió después con 403 en `serviceusage.services.get` |
+| Rol `serviceUsageViewer` en ambas SA | Verificado leyendo el IAM de `pretso-database` y `pretso-prod` |
+| Relanzar el job de `2cbe875` | `desplegar-staging`, prueba de humo y ZAP baseline en verde |
+| Bundle publicado vs. `npm run build` local | Idénticos por sha256 (`index-C68C218d.js`, `index-Cz5ny_2p.css`) |
+| #22 `pretso-prod` como producción | Fusionado `82c4fb0` (no despliega a `pretso-prod`: eso exige un tag) |
+| #12 y #13 (sin checks) | Cerrados con comentario |
+| Dependabot #20, #19, #18, #17, #16 | Fusionados en serie, cada uno con su rama al día y CI en verde: `c40a7ce`, `3bad401`, `8dabece`, `e25e7ae`, `d298da6`. #16 tuvo conflicto en `package-lock.json` tras #17 y se regeneró con `@dependabot rebase` |
+| Run de `main` en `d298da6` | Verde, con `desplegar-staging` y `dast-y-humo` |
+| Sitio tras las dependencias nuevas | Sirve `index-DOscilnX.js` + `index-Cz5ny_2p.css`, idénticos por sha256 al build local de `d298da6`; `npm test`: 15 pruebas en 4 archivos, en verde |
+| Alertas de Dependabot abiertas | De 30 (17 altas, 12 medias, 1 baja) a **4 medias** |
+
+Costo de la jornada: 13 runs del pipeline (6 en PR y 7 en `main`, uno de ellos con el job de despliegue relanzado; ~10 min c/u) y 7 despliegues a `pretso-database` (uno por fusión a `main`).
+
+Sigue pendiente: `production` apunta a `pretso-prod`, **que está vacío** (sin datos de Firestore ni usuarios). Un tag `vX.Y.Z` hoy publicaría la aplicación sin datos; lo único que lo impide es el revisor del Environment. No se crea ningún tag hasta migrar datos y usuarios (Bloque 5 de `Prompts/cerrar-estandar-y-pase-a-produccion.md`).
