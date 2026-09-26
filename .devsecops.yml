@@ -31,4 +31,18 @@ seguridad:
   dast: true
   zap_reglas: .github/zap-rules.tsv
   bloquear_en: [CRITICAL, HIGH]
-  excepciones: []
+  excepciones:
+    - id: afb0c3d5042a2fee75b0cba0e0a84a95aacf31ea:Pretso_Dependabot_28062026.md:gcp-api-key:55
+      herramienta: gitleaks
+      justificacion: >-
+        Clave de API del proyecto GCP pretso-platform (primera versión de PRETSO, sin uso), pegada en un aviso de Dependabot. Quitada del árbol en #15; queda solo en el historial. El proyecto está en DELETE_REQUESTED (verificado el 2026-09-26): sus APIs no responden y la clave se elimina con el borrado definitivo. Reescribir el historial público no reduce el riesgo.
+      aprobado_por: AndresAlberdi
+      creado: "2026-09-26"
+      vence: "2026-12-25"
+    - id: afb0c3d5042a2fee75b0cba0e0a84a95aacf31ea:Pretso_Dependabot_28062026.md:gcp-api-key:66
+      herramienta: gitleaks
+      justificacion: >-
+        Clave de API del proyecto GCP pretso-platform (primera versión de PRETSO, sin uso), pegada en un aviso de Dependabot. Quitada del árbol en #15; queda solo en el historial. El proyecto está en DELETE_REQUESTED (verificado el 2026-09-26): sus APIs no responden y la clave se elimina con el borrado definitivo. Reescribir el historial público no reduce el riesgo.
+      aprobado_por: AndresAlberdi
+      creado: "2026-09-26"
+      vence: "2026-12-25"
