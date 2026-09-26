@@ -212,7 +212,13 @@ Cierra la **Fase 3**: el despliegue automático a staging funciona de punta a pu
 | Run de `main` en `d298da6` | Verde, con `desplegar-staging` y `dast-y-humo` |
 | Sitio tras las dependencias nuevas | Sirve `index-DOscilnX.js` + `index-Cz5ny_2p.css`, idénticos por sha256 al build local de `d298da6`; `npm test`: 15 pruebas en 4 archivos, en verde |
 | Alertas de Dependabot abiertas | De 30 (17 altas, 12 medias, 1 baja) a **4 medias** |
+| #23 `docs(piloto)` este registro | Fusionado `b3e538c`; run de `main` en verde |
+| **Copia a Google Drive rota** (Administración) | Causa medida en la consola del sitio: la CSP (`script-src 'self'`, vigente desde `37ec90e`, 2026-08-27) bloqueaba `https://accounts.google.com/gsi/client`; `window.google` quedaba sin definir y la aplicación decía «La API de Google no se cargó correctamente». No la causaron los despliegues de la jornada: `firebase.json` no cambió. El Client ID pertenece a `pretso-database` (número 48942361199) y la Drive API está habilitada |
+| #24 `fix(hosting)` CSP para Google Identity Services | Fusionado `4008a94`: `https://accounts.google.com` en `script-src` y `frame-src`, nada más. Despliegue, humo y ZAP en verde; CSP nueva publicada; `google.accounts.oauth2` presente. **Andres probó la copia a Drive y funcionó** |
+| #25 `feat(admin)` Client ID de Google fijo | Fusionado `9227bfb`: la aplicación trae el cliente OAuth web de `pretso-database`; un valor guardado en el navegador tiene prioridad y el cuadro vacío vuelve al fijo. `npm test`: 19 pruebas en 5 archivos (4 nuevas). Despliegue, humo y ZAP en verde; el sitio sirve `index-DBlYaXUt.js`, el mismo bundle del build local, con el Client ID dentro; en un navegador sin valor guardado la API de Google carga. La copia de punta a punta exige la sesión del administrador |
 
-Costo de la jornada: 13 runs del pipeline (6 en PR y 7 en `main`, uno de ellos con el job de despliegue relanzado; ~10 min c/u) y 7 despliegues a `pretso-database` (uno por fusión a `main`).
+Costo de la jornada: 21 runs del pipeline (10 en PR y 11 en `main`, uno de ellos con el job de despliegue relanzado; ~10 min c/u) y 11 despliegues a `pretso-database` (uno por fusión a `main`, incluido este registro).
+
+Pendiente de #25: cuando `pretso-prod` tenga su propio cliente OAuth, el Client ID tendrá que salir por ambiente junto con la configuración de Firebase, que hoy también está fija en `src/firebase.ts`.
 
 Sigue pendiente: `production` apunta a `pretso-prod`, **que está vacío** (sin datos de Firestore ni usuarios). Un tag `vX.Y.Z` hoy publicaría la aplicación sin datos; lo único que lo impide es el revisor del Environment. No se crea ningún tag hasta migrar datos y usuarios (Bloque 5 de `Prompts/cerrar-estandar-y-pase-a-produccion.md`).
