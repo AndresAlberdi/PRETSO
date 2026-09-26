@@ -1,20 +1,12 @@
 import { useState } from 'react';
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-
-const secondaryFirebaseConfig = {
-  projectId: "pretso-database",
-  appId: "1:48942361199:web:4295a16d5dbe400b653b9a",
-  storageBucket: "pretso-database.firebasestorage.app",
-  apiKey: "AIzaSyCxEhBnq_4vA3DzVwxy6MdC89l94yncfNM",
-  authDomain: "pretso-database.firebaseapp.com",
-  messagingSenderId: "48942361199"
-};
+import { firebaseConfig } from "../firebase";
 
 let secondaryApp: any;
 let secondaryAuth: any;
 try {
-  secondaryApp = initializeApp(secondaryFirebaseConfig, "SecondaryApp");
+  secondaryApp = initializeApp(firebaseConfig, "SecondaryApp");
   secondaryAuth = getAuth(secondaryApp);
 } catch (e) {
   // Ignorar errores de app ya inicializada
@@ -33,7 +25,7 @@ export default function UserManagement() {
     
     try {
       if (!secondaryAuth) {
-        secondaryApp = initializeApp(secondaryFirebaseConfig, `SecondaryApp_${Date.now()}`);
+        secondaryApp = initializeApp(firebaseConfig, `SecondaryApp_${Date.now()}`);
         secondaryAuth = getAuth(secondaryApp);
       }
       
