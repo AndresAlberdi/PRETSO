@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 
-const firebaseConfig = {
+export const firebaseConfig = {
   projectId: "pretso-database",
   appId: "1:48942361199:web:4295a16d5dbe400b653b9a",
   storageBucket: "pretso-database.firebasestorage.app",
