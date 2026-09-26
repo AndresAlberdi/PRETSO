@@ -1,18 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router';
 import { generateDatabaseXml, downloadXml, generateZipBlob, uploadToGoogleDrive } from '../utils/backup';
 import { generateDatabaseXlsx, downloadXlsx } from '../utils/xlsxExport';
+import { GOOGLE_CLIENT_ID_STORAGE_KEY, resolveGoogleClientId } from '../utils/googleClientId';
 
 export default function Administracion() {
   const [configuringClientId, setConfiguringClientId] = useState(false);
-  const [clientId, setClientId] = useState('');
+  const [clientId, setClientId] = useState(() => resolveGoogleClientId(localStorage.getItem(GOOGLE_CLIENT_ID_STORAGE_KEY)));
   const [backupStatus, setBackupStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [statusMessage, setStatusMessage] = useState('');
-
-  useEffect(() => {
-    const saved = localStorage.getItem('google_client_id');
-    if (saved) setClientId(saved);
-  }, []);
 
   const handleDownloadXml = async () => {
     try {
@@ -115,8 +111,10 @@ export default function Administracion() {
   };
 
   const saveClientId = (id: string) => {
-    localStorage.setItem('google_client_id', id);
-    setClientId(id);
+    const trimmed = id.trim();
+    if (trimmed) localStorage.setItem(GOOGLE_CLIENT_ID_STORAGE_KEY, trimmed);
+    else localStorage.removeItem(GOOGLE_CLIENT_ID_STORAGE_KEY);
+    setClientId(resolveGoogleClientId(trimmed));
     setConfiguringClientId(false);
   };
 
