@@ -1,7 +1,7 @@
 # =============================================================================
 # ci-node-firebase.yml — Pipeline completo SPA Node/React (Vite/Vitest)
 #                        → Firebase Hosting + reglas de Firestore
-# Versión: 2.0 | Fecha: 2026-08-24
+# Versión: 2.2 | Fecha: 2026-09-25
 # -----------------------------------------------------------------------------
 # Flujo (ver 00-gobernanza/02-flujo-git-y-versionado.md):
 #   PR → main ............ preparar, calidad, seguridad-estatica, construir
@@ -290,7 +290,7 @@ jobs:
           ref: ${{ inputs.tag || github.ref }}
 
       - name: Descargar dist/
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: dist-staging
           path: dist
@@ -315,7 +315,7 @@ jobs:
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
       - name: Comentar URL en el PR
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           URL_CANAL: ${{ steps.canal.outputs.url }}
         with:
@@ -353,7 +353,7 @@ jobs:
           ref: ${{ inputs.tag || github.ref }}
 
       - name: Descargar dist/
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: dist-staging
           path: dist
@@ -385,7 +385,14 @@ jobs:
         run: |
           set -euo pipefail
           corepack enable
-          corepack prepare --activate
+          # `corepack prepare --activate` aborta con "The local project doesn't
+          # feature a 'packageManager' field" cuando el proyecto no declara ese
+          # campo, y tumba el despliegue entero aunque no haya hook `predeploy`
+          # que preparar. Si no está declarado, alcanza con el gestor que trae
+          # Node. Detectado en PRETSO (2026-09-25).
+          if grep -q '"packageManager"' package.json 2>/dev/null; then
+            corepack prepare --activate
+          fi
           # `functions/` suele traer su propio lockfile: no es del workspace.
           if [[ -f functions/package.json ]]; then
             if   [[ -f functions/pnpm-lock.yaml ]];    then pnpm --dir functions install --frozen-lockfile
@@ -519,7 +526,7 @@ jobs:
           echo "Aprobación verificada: $TAG por $ACTOR ($EVENTO)"
 
       - name: Descargar dist/
-        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: dist-production
           path: dist
@@ -551,7 +558,14 @@ jobs:
         run: |
           set -euo pipefail
           corepack enable
-          corepack prepare --activate
+          # `corepack prepare --activate` aborta con "The local project doesn't
+          # feature a 'packageManager' field" cuando el proyecto no declara ese
+          # campo, y tumba el despliegue entero aunque no haya hook `predeploy`
+          # que preparar. Si no está declarado, alcanza con el gestor que trae
+          # Node. Detectado en PRETSO (2026-09-25).
+          if grep -q '"packageManager"' package.json 2>/dev/null; then
+            corepack prepare --activate
+          fi
           # `functions/` suele traer su propio lockfile: no es del workspace.
           if [[ -f functions/package.json ]]; then
             if   [[ -f functions/pnpm-lock.yaml ]];    then pnpm --dir functions install --frozen-lockfile
@@ -662,7 +676,7 @@ jobs:
 
       - name: Registrar resultado del despliegue
         if: always()
-        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
           SALUD_OK: ${{ steps.salud.outputs.ok }}
           URL_PROD: ${{ vars.PROD_URL }}
