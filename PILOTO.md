@@ -155,9 +155,9 @@ Corrí las herramientas del estándar sobre el código real antes de tocar el pi
 |---|---|---|---|
 | 1 | `npm audit`: `brace-expansion` y `nanoid` (transitivas) con severidad **HIGH**; `exceljs`, `postcss`, `uuid` moderate | Bloqueante en CI | Ejecutar `npm audit fix` ANTES del primer PR (paso 3.0 abajo). `exceljs` no tiene fix publicado: si persiste como moderate no bloquea; vigilarlo vía Dependabot |
 | 2 | `functions/`: 9 vulnerabilidades moderate | No bloqueante | `cd functions && npm audit fix`; se resolverán mejor al subir firebase-admin/functions en la Fase 4.4 |
-| 3 | Gitleaks: la `apiKey` web de Firebase aparece en `src/firebase.ts`, `src/firebase-config.json` y `src/pages/UserManagement.tsx` | Falso positivo documentado | Es un identificador público por diseño; quedó una allowlist acotada y justificada en `.github/gitleaks.toml`. El control real es la Fase 4.5 |
+| 3 | Gitleaks: la `apiKey` web de Firebase aparece en `src/firebase.ts`, `src/firebase-config.json` y `src/pages/UserManagement.tsx` | Falso positivo documentado | Es un identificador público por diseño; quedó una allowlist acotada y justificada en `.github/gitleaks.toml`. El control real es la Fase 4.5. Los hallazgos del historial quedaron como excepciones con vencimiento en #30 |
 | 4 | El privilegio de administrador depende del correo fijo en **tres** lugares: `firestore.rules`, `src/context/AdminContext.tsx` y `functions/src/index.ts` | Deuda de diseño | La migración al custom claim (Fase 4.3) debe cubrir los tres: reglas → `request.auth.token.admin == true`; AdminContext → `getIdTokenResult().claims.admin`; función → `context.auth.token.admin === true` |
-| 5 | `src/pages/UserManagement.tsx` duplica la configuración de Firebase para crear usuarios con una app secundaria | Observación | Importar la config desde `src/firebase-config.json` en lugar de duplicarla |
+| 5 | `src/pages/UserManagement.tsx` duplica la configuración de Firebase para crear usuarios con una app secundaria | Observación | Importar la config desde `src/firebase-config.json` en lugar de duplicarla. **Cerrado en #29** (importa `firebaseConfig` de `src/firebase.ts`) |
 | 6 | Semgrep (reglas propias del estándar): 0 hallazgos; los rulesets del registro (`p/ci`, `p/owasp-top-ten`) correrán completos en GitHub Actions | Informativo | Nada que hacer |
 
 ```bash
@@ -215,10 +215,30 @@ Cierra la **Fase 3**: el despliegue automático a staging funciona de punta a pu
 | #23 `docs(piloto)` este registro | Fusionado `b3e538c`; run de `main` en verde |
 | **Copia a Google Drive rota** (Administración) | Causa medida en la consola del sitio: la CSP (`script-src 'self'`, vigente desde `37ec90e`, 2026-08-27) bloqueaba `https://accounts.google.com/gsi/client`; `window.google` quedaba sin definir y la aplicación decía «La API de Google no se cargó correctamente». No la causaron los despliegues de la jornada: `firebase.json` no cambió. El Client ID pertenece a `pretso-database` (número 48942361199) y la Drive API está habilitada |
 | #24 `fix(hosting)` CSP para Google Identity Services | Fusionado `4008a94`: `https://accounts.google.com` en `script-src` y `frame-src`, nada más. Despliegue, humo y ZAP en verde; CSP nueva publicada; `google.accounts.oauth2` presente. **Andres probó la copia a Drive y funcionó** |
-| #25 `feat(admin)` Client ID de Google fijo | Fusionado `9227bfb`: la aplicación trae el cliente OAuth web de `pretso-database`; un valor guardado en el navegador tiene prioridad y el cuadro vacío vuelve al fijo. `npm test`: 19 pruebas en 5 archivos (4 nuevas). Despliegue, humo y ZAP en verde; el sitio sirve `index-DBlYaXUt.js`, el mismo bundle del build local, con el Client ID dentro; en un navegador sin valor guardado la API de Google carga. La copia de punta a punta exige la sesión del administrador |
+| #25 `feat(admin)` Client ID de Google fijo | Fusionado `9227bfb`: la aplicación trae el cliente OAuth web de `pretso-database`; un valor guardado en el navegador tiene prioridad y el cuadro vacío vuelve al fijo. `npm test`: 19 pruebas en 5 archivos (4 nuevas). Despliegue, humo y ZAP en verde; el sitio sirve `index-DBlYaXUt.js`, el mismo bundle del build local, con el Client ID dentro; en un navegador sin valor guardado la API de Google carga. **Andres probó la copia completa sin pegar el Client ID y funcionó** |
 
 Costo de la jornada: 21 runs del pipeline (10 en PR y 11 en `main`, uno de ellos con el job de despliegue relanzado; ~10 min c/u) y 11 despliegues a `pretso-database` (uno por fusión a `main`, incluido este registro).
 
 Pendiente de #25: cuando `pretso-prod` tenga su propio cliente OAuth, el Client ID tendrá que salir por ambiente junto con la configuración de Firebase, que hoy también está fija en `src/firebase.ts`.
+
+## Jornada del 2026-09-26 — resultado real
+
+Cierra el **Bloque 1** del prompt y deja `./security-local.sh` **APROBADO** por primera vez desde que se instaló el estándar.
+
+| Paso | Resultado medido |
+|---|---|
+| #27 Bloque 1: `requirements.txt` y ruta del `.ods` | Fusionado `19d54db`. Con el `requirements.txt` anterior, leer el `.ods` daba `ImportError: Import odfpy failed` (reproducido). Ahora fija `firebase-admin` 7.5.0, `pandas` 3.0.6, `numpy` 2.5.3, `odfpy` 1.4.1 y las transitivas `anyio` 4.15.1 e `idna` 3.20 (osv-scanner las resolvía en versiones vulnerables). Los once scripts leen `PRETSO_ODS_PATH`, por omisión `~/Documentos/PRETSO/Hacia PRETSO rev AA 1.ods`. En venv limpio, los 8 scripts de solo lectura corren de punta a punta con **salida idéntica** en pandas 3.0.6 y 2.3.3. Los `migrate_*` no se ejecutaron: escriben en Firestore |
+| #28 excepción: clave de `pretso-platform` en el historial | Fusionado `7ea2684`. `pretso-platform` está en `DELETE_REQUESTED` (verificado); Andres confirmó que esa versión no se usa más. Dos excepciones de gitleaks por huella exacta (`afb0c3d`, líneas 55 y 66), vencen el 2026-12-25. No se reescribió el historial |
+| #29 `UserManagement.tsx` sin configuración duplicada | Fusionado `825f4c7`. Las dos copias eran idénticas (comparadas por hash); ahora importa `firebaseConfig` de `src/firebase.ts`. `npm test` 19/19; build servido en local sin errores; el sitio sirve `index-2C8egsrQ.js`, idéntico por sha256 al build local. Crear un usuario real no se probó (exige la sesión del administrador) |
+| #30 excepción: apiKey web en el historial | Fusionado `570d571`. Tres huellas (`firebase.ts` y `firebase-config.json` con `generic-api-key`, que la lista de permitidos no cubre; `UserManagement.tsx` en `b36587d`). Vencen el 2026-12-25, para obligar a hacer la Fase 4.5 |
+| `./security-local.sh` sobre `main` | **APROBADO**: 5 excepciones vigentes, 0 CRITICAL, 0 HIGH, 7 MEDIUM (`uuid` y `qs` transitivas en los `package-lock.json`; compromiso al 2026-10-26, vía Dependabot o la Fase 4.4) |
+
+Costo de la jornada: 11 runs del pipeline (#29 corrió dos veces en PR por quedar atrasado tras #30) y 5 despliegues a `pretso-database`, incluido este registro.
+
+Anotado, no resuelto:
+- `test_ods_keys.py` busca la columna `Sigla`, que la hoja «Compañías y empleador» ya no tiene.
+- En varias hojas `dropna` no descarta filas (999 donde se esperan 66): el `.ods` tiene celdas no vacías. Los `migrate_*` filtran por la columna clave, que da los recuentos correctos.
+- `src/firebase-config.json` no lo importa ningún archivo del código.
+- En la CI, gitleaks analiza solo los commits nuevos; el historial completo solo lo mira `./security-local.sh`.
 
 Sigue pendiente: `production` apunta a `pretso-prod`, **que está vacío** (sin datos de Firestore ni usuarios). Un tag `vX.Y.Z` hoy publicaría la aplicación sin datos; lo único que lo impide es el revisor del Environment. No se crea ningún tag hasta migrar datos y usuarios (Bloque 5 de `Prompts/cerrar-estandar-y-pase-a-produccion.md`).
