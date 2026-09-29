@@ -82,5 +82,18 @@ Ajuste esta tabla si los scripts de `package.json`/`pyproject.toml` tienen otros
 | `seguridad` | Revisar código, reglas Firestore/IAM, Dockerfiles, IaC, dependencias; interpretar informes; proponer remediaciones | Modificar archivos (solo lectura y comandos de análisis) |
 | `deploy` | Desplegar a staging con `deploy.sh`, diagnosticar despliegues y health checks, guiar rollbacks | Ejecutar `deploy.sh prod`, crear tags, usar `--forzar` |
 | `proyectos` | Revisar estado del proyecto frente al estándar, preparar actas de pase a producción, métricas DORA, resúmenes para dirección | Modificar archivos |
+| `planificador` (Opus) | Planificar antes de implementar: pasos exactos, pruebas, riesgos y decisiones pendientes | Modificar archivos |
+| `implementador` (Sonnet) | Ejecutar un plan ya definido, escribir pruebas, corregir lint/tipos/pruebas | Tomar decisiones de diseño; desplegar |
+| `revisor-codigo` (Opus) | Revisar el diff tras implementar y antes del PR: corrección, reglas de este archivo, pruebas | Modificar archivos |
 
 Skills: `/aplicar-estandar-devsecops` (repositorio nuevo o desactualizado) y `/pase-a-produccion` (antes de crear un tag de release).
+
+## Delegación entre agentes y costo
+
+La sesión principal orquesta y no codifica tareas extensas por sí misma. El modelo de cada agente está fijado en el campo `model` de su archivo en `.claude/agents/` (esa es la fuente de verdad): **Opus** para planificar y revisar, donde el razonamiento decide el resultado; **Sonnet** para ejecutar lo ya planificado.
+
+1. Cambio que toca más de un archivo, una regla de negocio, datos persistidos o una integración: `planificador` → `implementador` → `revisor-codigo` (y `seguridad` si el cambio toca autenticación, reglas de acceso, IAM, dependencias o infraestructura).
+2. Búsquedas amplias en el código: delegar en el agente integrado `Explore` (modelo económico) en vez de leer muchos archivos en la sesión principal.
+3. Al delegar, pasar rutas, el plan y el criterio de terminado; no pegar contenido extenso. Cada subagente vuelve a cargar este archivo y lee lo demás por ruta.
+4. No usar el modo rápido (*fast mode*) salvo pedido explícito: cuesta el doble por token.
+5. **Este archivo es estable.** No registrar aquí avances, estado, fechas de sesión ni pendientes (van en el historial de git y en los PR). Un `CLAUDE.md` que no cambia entre sesiones permite reutilizar la caché de contexto en la sesión principal y en cada subagente; cada edición la invalida.
