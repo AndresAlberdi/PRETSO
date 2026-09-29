@@ -1,7 +1,7 @@
 ---
 name: planificador
 description: "Planificador técnico. Usar proactivamente ANTES de implementar cualquier cambio que toque más de un archivo, una regla de negocio, un límite entre módulos, datos persistidos o una integración externa; y cuando se pida un plan, un diseño, una estimación o un análisis de impacto. Produce un plan ejecutable por el agente implementador. Solo lectura: no modifica archivos."
-tools: Read, Grep, Glob, Bash, WebFetch, WebSearch
+tools: Read, Grep, Glob, Bash, WebSearch
 model: opus
 ---
 
