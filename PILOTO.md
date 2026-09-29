@@ -242,3 +242,61 @@ Anotado, no resuelto:
 - En la CI, gitleaks analiza solo los commits nuevos; el historial completo solo lo mira `./security-local.sh`.
 
 Sigue pendiente: `production` apunta a `pretso-prod`, **que está vacío** (sin datos de Firestore ni usuarios). Un tag `vX.Y.Z` hoy publicaría la aplicación sin datos; lo único que lo impide es el revisor del Environment. No se crea ningún tag hasta migrar datos y usuarios (Bloque 5 de `Prompts/cerrar-estandar-y-pase-a-produccion.md`).
+
+## Entrega de octubre
+
+> **El contrato no está escrito en este repositorio ni en el registro de proyectos.** Lo que sigue es lo que se **infiere** del repositorio y de lo que Andres dijo; cada fila indica su fuente. Andres lo confirma o lo corrige.
+
+| Exigencia (inferida) | Fuente de la inferencia | Estado medido |
+|---|---|---|
+| Sitio en línea, estable, desplegado por tubería | Andres, 2026-09-25: «producción» es «tener el sistema arriba» (`Prompts/cerrar-estandar-y-pase-a-produccion.md`) | **Cumplido.** `pretso-database.web.app`; todos los runs de `main` en verde desde el 25/09; despliegue automático con prueba de humo y ZAP |
+| El equipo de investigación consulta el corpus (compañías, salarios, indicadores, bibliografía…) | `estructura_datos.md`; el sitio muestra el proyecto de investigación Horizon MSCA 101150056 | **Funciona.** Andres inicia sesión y carga datos (28/09). Los recuentos contra el `.ods` **no se verificaron** en esta jornada |
+| Administración: usuarios lectores, auditoría, exportación y respaldos | Pantalla «Administración» | **Funciona.** XML, XLSX y copia a Google Drive (probada por Andres el 25 y 26/09) |
+| Seguridad según el estándar | `CLAUDE.md`, `.devsecops.yml` | `./security-local.sh` **aprobado**; apiKey web restringida (28/09); App Check **pendiente**; excepciones de gitleaks vencen el 2026-12-25 |
+| Producción separada en `pretso-prod`, con datos | Andres, 2026-09-25: sigue siendo necesario «para tener un modelo robusto» | **No cumplido**: `pretso-prod` existe, pero **vacío**. **No se sabe si el contrato lo exige.** |
+
+### Qué falta, en orden de riesgo
+
+1. **Respaldo automático de Firestore: hoy no existe.** Recuperación a un punto en el tiempo (PITR), respaldo programado y protección contra borrado están **desactivados** en `pretso-database` y en `pretso-prod` (medido el 2026-09-29). Es el control DAT-04 del checklist (bloqueante). El único respaldo es la copia manual desde la pantalla «Administración». Un borrado o una edición equivocada del corpus hoy no se puede deshacer. Es independiente de la decisión de abajo y es lo que más protege la entrega.
+2. **Decidir el camino** (ver «Qué necesita de Andres»).
+3. **Camino B (con `pretso-prod`):** el plan está en `docs/produccion/plan-migracion-pretso-prod.md`. Su primer paso no es opcional: la aplicación tiene `pretso-database` **escrito fijo en el código**, así que un tag hoy publicaría en `pretso-prod` un sitio que lee y escribe en `pretso-database`.
+4. **Camino A (solo `pretso-database`):** lo mínimo para una entrega ordenada es el punto 1, un runbook de rollback (OPS-04), App Check en monitoreo y decidir cómo se registra la desviación REP-03.
+
+### Qué necesita de Andres (una palabra cada una)
+
+- **«A» o «B»**: ¿el contrato exige un entorno de producción separado (B), o basta el sistema arriba sobre `pretso-database` (A)?
+- **«sí» al respaldo automático** de `pretso-database` (PITR y respaldo diario de 30 días). El costo por almacenamiento se confirma en la consola de facturación antes de activarlo.
+- **Cuántos usuarios de autenticación hay** (para elegir entre recrearlos o importarlos, si es B).
+
+## Jornada del 2026-09-29 — gobierno y dependencias
+
+Trabajo de riesgo mínimo bajo la orden general del 2026-09-29. **Nada se fusionó ni se desplegó**: los tres PR quedan abiertos para que Andres decida cuándo, porque cada fusión redespliega `pretso-database` (el sitio en uso) con el mismo código.
+
+### Bloque 3 — Gobierno (medido, sin tocar el ruleset)
+
+| Control | Resultado |
+|---|---|
+| `proteccion-main` | Activo, **sin bypass**. Reglas: sin borrado, sin force push, historia lineal, PR obligatorio con **0 aprobaciones** (desviación de REP-03, ver más arriba), solo squash, `compuerta-pr` requerido con la rama al día |
+| `proteccion-tags` | Activo, sin bypass. Los tags `v*` no se borran, no se mueven y no se actualizan |
+| Environment `production` | Revisor obligatorio (AndresAlberdi); solo admite el tag `v*` |
+| Environment `staging` | Sin revisores: el despliegue automático no espera aprobación |
+| PR que no puede fusionarse sin `compuerta-pr` | **Evidenciado**: al empujar un commit nuevo a un PR, su estado pasó a `BLOCKED` y volvió a `CLEAN` solo cuando `compuerta-pr` terminó en verde (PR #33, 2026-09-29; y PR #22 el 2026-09-25) |
+| Push directo a `main` rechazado | **No probado en vivo**, a propósito: si la protección tuviera un hueco, el intento publicaría un commit en `main` y desplegaría el sitio en uso. La evidencia es la configuración leída por API: `enforcement=active`, 0 actores con bypass y las reglas anteriores |
+| REP-04 | `CODEOWNERS` existe y cubre `.github/`, `firestore.rules`, `firebase.json`, `.devsecops.yml` y los lockfiles |
+| SEC-02 y SEC-03 | Ningún secreto prohibido; los de producción (`GCP_SA_DEPLOY_PROD`, `GCP_WIF_PROVIDER`) están en el Environment `production` |
+| SEC-06 | Secret scanning y push protection **activados** |
+| REP-07 | Squash configurado por ruleset. En los ajustes del repositorio siguen habilitados el merge commit y el rebase; el ruleset los impide, pero conviene deshabilitarlos (cambio de configuración, queda a decisión de Andres) |
+| Borrado de ramas al fusionar | Activo desde el 2026-09-28 |
+
+Hallazgos que el checklist marca como **bloqueantes** y hoy están en rojo (detalle en el plan de migración): REP-03 (0 aprobaciones), SEC-01 (falta `docs/seguridad/inventario-secretos.md`), PIP-10 (falta el workflow `probar-identidad`), DAT-01 (no hay pruebas de las reglas de Firestore en el emulador), DAT-04 (sin respaldos), OPS-04 (falta el runbook de rollback) y REP-09 (parcial: ver Bloque 4). Ninguno afecta al sitio que hoy está en línea; todos importan antes de crear el primer tag.
+
+### Bloque 4 — Dependabot al día
+
+- No hay PR de Dependabot abiertos. Las alertas abiertas en GitHub son 4 (todas MEDIUM): `qs` y `uuid`.
+- PR #34 (abierto): cierra `qs` 6.16.0 (`functions/`, vía `express` 4.22.3 y `body-parser` 1.20.8) y `undici` 7.30.0 (raíz, solo pruebas), solo en los lockfiles. MEDIUM de `./security-local.sh`: 9 → 5. Pruebas 19/19 y ambos builds en verde.
+- **No se pueden cerrar ahora** los 5 restantes (todos `uuid`, CVE-2026-41907): en la raíz lo fija `exceljs` 4.4.0, sin versión corregida; en `functions/` lo fijan `firebase-admin` 12 y librerías de Google que exigen subirlo (Fase 4.4, Node 22). Además `dependabot.yml` excluye las versiones mayores, así que Dependabot no abrirá ese PR solo. Compromiso: 2026-10-26.
+- **`dependabot.yml` no cubre `pip`.** Se quitó el 2026-09-20 porque entonces no había `requirements.txt`; ahora existe y está fijado, y sin `pip` no recibirá actualizaciones (REP-09). Propuesta, no aplicada: añadir el bloque `pip` del estándar, con `directory: /`.
+
+### Rutas absolutas en un repositorio público
+
+`CLAUDE.md` y los agentes `deploy`, `devsecops`, `proyectos` y `seguridad` llevan rutas absolutas del equipo del propietario desde que se aplicó el estándar. El PR #33 no agrega ninguna y no las cambia (los volvería distintos de la plantilla que SeguridadGeneral compara byte a byte). Corregirlas es un PR aparte, coordinado con el estándar.
