@@ -6,7 +6,7 @@
 
 ## 0. Decisión previa: ¿hace falta este plan?
 
-Este plan solo aplica si el contrato de octubre exige (o Andres decide) un entorno de producción **separado**. Si basta con el sistema arriba sobre `pretso-database`, como hoy, no se ejecuta y `pretso-prod` queda como está. La pregunta está en `PILOTO.md` §«Entrega de octubre»; hasta que Andres responda, **no se crea ningún tag `v*`**.
+Andres confirmó el 2026-09-30 el **camino B**: hace falta un entorno de producción separado, y el destino es el `pretso-prod` existente. Este plan se ejecuta paso a paso, cada cambio de GCP o de GitHub con su «sí». **No se crea ningún tag `v*`** hasta completar los pasos 1 a 7.
 
 ## 1. Punto de partida (medido)
 
@@ -15,7 +15,7 @@ Este plan solo aplica si el contrato de octubre exige (o Andres decide) un entor
 | `pretso-database` | Sirve el sitio y contiene el corpus real. Hoy es a la vez «staging» y producción de hecho | Es el destino de `desplegar-staging` y lo que ven los usuarios |
 | `pretso-prod` | Existe, con Firebase, Firestore (`nam5`, misma región) y sitio de Hosting `pretso-prod`; **vacío**: sin datos ni usuarios | Bloque 5, hecho el 2026-09-25 |
 | Federación WIF y Environment `production` | Creados; revisor obligatorio (AndresAlberdi), despliegue solo desde tags `v*`; secretos `GCP_SA_DEPLOY_PROD` y `GCP_WIF_PROVIDER` en el Environment | `gh secret list --env production` |
-| Respaldo y protección de ambas bases | **PITR desactivado, protección contra borrado desactivada, sin respaldo programado**, en los dos proyectos | `gcloud firestore databases describe` (2026-09-29) |
+| Respaldo y protección | `pretso-database`: **activados el 2026-09-30** (PITR, protección contra borrado, respaldo diario de 30 días). `pretso-prod`: **desactivados** | `gcloud firestore databases describe` y `backups schedules list` |
 
 ### Hallazgo que condiciona todo: la configuración de Firebase está escrita fija en el código
 
@@ -85,7 +85,7 @@ Diez colecciones: `companias`, `manejo_de_caja`, `salarios`, `corpus_christi`, `
 | SEC-01 inventario de secretos | B | **Rojo** (`docs/seguridad/inventario-secretos.md` no existe) | Escribirlo |
 | PIP-10 workflow `probar-identidad` | B | **Rojo** (no existe) | Copiar la plantilla del estándar y correrlo para `production` |
 | DAT-01 pruebas de reglas en el emulador, en CI | B | **Rojo** (no hay `test:rules` ni carpeta de pruebas) | Escribirlas y añadirlas a la CI |
-| DAT-04 respaldos y PITR | B | **Rojo** (desactivados en ambos proyectos) | Paso 2 |
+| DAT-04 respaldos y PITR | B | **Verde en `pretso-database`** (activados el 2026-09-30); **Rojo en `pretso-prod`** | Paso 2 sobre `pretso-prod` |
 | OPS-04 runbook de rollback | B | **Rojo** (`docs/produccion/runbook-rollback.md` no existe) | Escribirlo |
 | NUB-G06 App Check en `enforce` | R (B con datos personales) | **Rojo** (sin encender) | Monitoreo, luego bloqueo |
 | REP-09 Dependabot para todos los ecosistemas | B | **Parcial**: cubre `github-actions` y `npm` (raíz y `functions/`), **no `pip`**, aunque ya existe `requirements.txt` | Añadir el bloque `pip` |

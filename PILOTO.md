@@ -253,20 +253,20 @@ Sigue pendiente: `production` apunta a `pretso-prod`, **que está vacío** (sin 
 | El equipo de investigación consulta el corpus (compañías, salarios, indicadores, bibliografía…) | `estructura_datos.md`; el sitio muestra el proyecto de investigación Horizon MSCA 101150056 | **Funciona.** Andres inicia sesión y carga datos (28/09). Los recuentos contra el `.ods` **no se verificaron** en esta jornada |
 | Administración: usuarios lectores, auditoría, exportación y respaldos | Pantalla «Administración» | **Funciona.** XML, XLSX y copia a Google Drive (probada por Andres el 25 y 26/09) |
 | Seguridad según el estándar | `CLAUDE.md`, `.devsecops.yml` | `./security-local.sh` **aprobado**; apiKey web restringida (28/09); App Check **pendiente**; excepciones de gitleaks vencen el 2026-12-25 |
-| Producción separada en `pretso-prod`, con datos | Andres, 2026-09-25: sigue siendo necesario «para tener un modelo robusto» | **No cumplido**: `pretso-prod` existe, pero **vacío**. **No se sabe si el contrato lo exige.** |
+| Producción separada en `pretso-prod`, con datos | Andres, 2026-09-25: sigue siendo necesario «para tener un modelo robusto» | **Andres confirmó el 2026-09-30 que hace falta (camino B).** Destino: el `pretso-prod` existente, que sigue **vacío**. (El 30/09 se creó por error `pretso-prod-d8a68`; Andres lo borró y se conserva el anterior) |
 
 ### Qué falta, en orden de riesgo
 
-1. **Respaldo automático de Firestore: hoy no existe.** Recuperación a un punto en el tiempo (PITR), respaldo programado y protección contra borrado están **desactivados** en `pretso-database` y en `pretso-prod` (medido el 2026-09-29). Es el control DAT-04 del checklist (bloqueante). El único respaldo es la copia manual desde la pantalla «Administración». Un borrado o una edición equivocada del corpus hoy no se puede deshacer. Es independiente de la decisión de abajo y es lo que más protege la entrega.
-2. **Decidir el camino** (ver «Qué necesita de Andres»).
+1. **Respaldo automático de Firestore.** El 2026-09-30, con autorización de Andres, se activaron en `pretso-database` la recuperación a un punto en el tiempo (PITR, ventana de 7 días), la protección contra borrado y un **respaldo diario con retención de 30 días**; verificado leyendo la base y el programa de respaldo. **Falta en `pretso-prod`** (PITR, protección y respaldo siguen desactivados, pero la base está vacía): hay que activarlos antes de cargarle datos (DAT-04).
+2. ~~Decidir el camino~~ **Decidido por Andres el 2026-09-30: camino B.**
 3. **Camino B (con `pretso-prod`):** el plan está en `docs/produccion/plan-migracion-pretso-prod.md`. Su primer paso no es opcional: la aplicación tiene `pretso-database` **escrito fijo en el código**, así que un tag hoy publicaría en `pretso-prod` un sitio que lee y escribe en `pretso-database`.
 4. **Camino A (solo `pretso-database`):** lo mínimo para una entrega ordenada es el punto 1, un runbook de rollback (OPS-04), App Check en monitoreo y decidir cómo se registra la desviación REP-03.
 
 ### Qué necesita de Andres (una palabra cada una)
 
-- **«A» o «B»**: ¿el contrato exige un entorno de producción separado (B), o basta el sistema arriba sobre `pretso-database` (A)?
-- **«sí» al respaldo automático** de `pretso-database` (PITR y respaldo diario de 30 días). El costo por almacenamiento se confirma en la consola de facturación antes de activarlo.
-- **Cuántos usuarios de autenticación hay** (para elegir entre recrearlos o importarlos, si es B).
+- **Activar el respaldo en `pretso-prod`** (PITR, protección contra borrado y respaldo diario de 30 días), antes de cargarle datos.
+- **Cuántos usuarios de autenticación hay** (para elegir entre recrearlos o importarlos).
+- **Autorizar el paso 1 del plan** (configuración de Firebase por ambiente en el código): lo preparo como PR; para fusionarlo hay que definir las variables del repositorio de `staging` (escritura en GitHub).
 
 ## Jornada del 2026-09-29 — gobierno y dependencias
 
@@ -300,3 +300,12 @@ Hallazgos que el checklist marca como **bloqueantes** y hoy están en rojo (deta
 ### Rutas absolutas en un repositorio público
 
 `CLAUDE.md` y los agentes `deploy`, `devsecops`, `proyectos` y `seguridad` llevan rutas absolutas del equipo del propietario desde que se aplicó el estándar. El PR #33 no agrega ninguna y no las cambia (los volvería distintos de la plantilla que SeguridadGeneral compara byte a byte). Corregirlas es un PR aparte, coordinado con el estándar.
+
+## Jornada del 2026-09-30 — cierre de los PR y respaldo
+
+- **Avisos nuevos rompieron la CI de `main`.** Trivy baja la base de vulnerabilidades en cada run y hoy aparecieron 18 HIGH en el `package-lock.json` (`brace-expansion`, `undici` con dos CVE nuevos y `@grpc/grpc-js`). Cualquier PR, aunque no tocara dependencias, fallaba en `seguridad-estatica`. Se corrigió con #34: `brace-expansion` 1.1.21 y 2.1.7, `undici` 7.30.0 y `qs` 6.16.0; HIGH de `./security-local.sh`: 18 → 0, MEDIUM: 9 → 5.
+- **Excepción de `@grpc/grpc-js` 1.9.16** (HIGH sin parche posible: lo fija `@firebase/firestore` 4.17.2 y `firebase` 12.19.0 es la última versión). Aprobada por Andres el 2026-09-30, vence el 2026-12-29. Evidencia: no aparece en el bundle publicado, `src/` no lo importa y los avisos son del lado servidor de gRPC.
+- **Fusionados, con autorización de Andres:** #34 (`8e94ede`) y #33 (`cb6c972`, modelo por rol v1 y v2). Cada uno redesplegó `pretso-database` con el mismo código; despliegue, humo y ZAP en verde y el sitio responde 200.
+- **Respaldo automático de `pretso-database` activado y verificado** (PITR, protección contra borrado, respaldo diario de 30 días). DAT-04 pasa a verde para ese proyecto.
+- **Camino B confirmado.** El 30/09 Andres creó por error `pretso-prod-d8a68` sin recordar que `pretso-prod` ya existía; lo borró (`DELETE_REQUESTED`). No se creó ni se cambió nada en ese proyecto. Se conserva `pretso-prod`.
+- **Dependabot abrió #36** (`@grpc/grpc-js` 1.14.4 → 1.14.5 en `functions/`); pendiente de decisión de Andres.
