@@ -81,7 +81,7 @@ Ajuste esta tabla si los scripts de `package.json`/`pyproject.toml` tienen otros
 | `devsecops` | Aplicar o corregir el estándar: workflows, manifiesto, rulesets, pines por SHA, `bootstrap-repo.sh`, migrar de v1 a v2 | Relajar controles; añadir excepciones |
 | `seguridad` | Revisar código, reglas Firestore/IAM, Dockerfiles, IaC, dependencias; interpretar informes; proponer remediaciones | Modificar archivos (solo lectura y comandos de análisis) |
 | `deploy` | Desplegar a staging con `deploy.sh`, diagnosticar despliegues y health checks, guiar rollbacks | Ejecutar `deploy.sh prod`, crear tags, usar `--forzar` |
-| `proyectos` | Revisar estado del proyecto frente al estándar, preparar actas de pase a producción, métricas DORA, resúmenes para dirección | Modificar archivos |
+| `proyectos` (Opus) | Revisar estado del proyecto frente al estándar, preparar actas de pase a producción, métricas DORA, resúmenes para dirección | Modificar archivos |
 | `planificador` (Opus) | Planificar antes de implementar: pasos exactos, pruebas, riesgos y decisiones pendientes | Modificar archivos |
 | `implementador` (Sonnet) | Ejecutar un plan ya definido, escribir pruebas, corregir lint/tipos/pruebas | Tomar decisiones de diseño; desplegar |
 | `revisor-codigo` (Opus) | Revisar el diff tras implementar y antes del PR: corrección, reglas de este archivo, pruebas | Modificar archivos |
@@ -90,7 +90,7 @@ Skills: `/aplicar-estandar-devsecops` (repositorio nuevo o desactualizado) y `/p
 
 ## Delegación entre agentes y costo
 
-La sesión principal orquesta y no codifica tareas extensas por sí misma. El modelo de cada agente está fijado en el campo `model` de su archivo en `.claude/agents/` (esa es la fuente de verdad): **Opus** para planificar y revisar, donde el razonamiento decide el resultado; **Sonnet** para ejecutar lo ya planificado.
+La sesión principal orquesta y no codifica tareas extensas por sí misma. El modelo de cada agente está fijado en el campo `model` de su archivo en `.claude/agents/` (esa es la fuente de verdad): lo decide quién verifica la salida del agente: **Sonnet** cuando después pasan pruebas o un revisor en Opus (ejecutar lo ya planificado); **Opus** cuando la salida es el veredicto, la cifra o el acta y nadie la vuelve a mirar (planificar, revisar, seguridad, actas).
 
 1. Cambio que toca más de un archivo, una regla de negocio, datos persistidos o una integración: `planificador` → `implementador` → `revisor-codigo` (y `seguridad` si el cambio toca autenticación, reglas de acceso, IAM, dependencias o infraestructura).
 2. Búsquedas amplias en el código: delegar en el agente integrado `Explore` (modelo económico) en vez de leer muchos archivos en la sesión principal. Al lanzar subagentes de exploración o de lectura masiva, usar `model: haiku`.
