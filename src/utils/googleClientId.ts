@@ -1,7 +1,8 @@
-// Cliente OAuth web del proyecto pretso-database, usado por la copia a Google Drive.
+import { googleClientId } from '@entorno/google';
+
+// Cliente OAuth web de Google Drive; depende del ambiente de build (src/environments/<ambiente>/google.ts).
 // Un Client ID es un identificador público (Google lo muestra en cada inicio de sesión), no un secreto.
-export const DEFAULT_GOOGLE_CLIENT_ID =
-  '48942361199-2gsj7os8nip8m49gtc9t9pdp1s9n0j4d.apps.googleusercontent.com';
+export const DEFAULT_GOOGLE_CLIENT_ID = googleClientId;
 
 export const GOOGLE_CLIENT_ID_STORAGE_KEY = 'google_client_id';
 

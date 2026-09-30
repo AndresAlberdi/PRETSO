@@ -20,7 +20,10 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,
-    "noFallthroughCasesInSwitch": true
+    "noFallthroughCasesInSwitch": true,
+
+    /* Solo para tipos: ambas carpetas de ambiente tienen la misma forma */
+    "paths": { "@entorno/*": ["./src/environments/staging/*"] }
   },
   "include": ["src"]
 }
