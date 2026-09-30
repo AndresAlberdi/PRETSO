@@ -25,10 +25,12 @@
 version: 2
 
 updates:
-  # Adaptado a PRETSO (2026-09-20): npm en la raíz y en functions/, que tiene
-  # su propio package-lock.json. Se quitaron pip, docker y terraform: no hay
-  # requirements.txt, Dockerfile ni infra/, y un `directory` que no existe no
-  # es inofensivo, Dependabot lo reporta como error de configuración.
+  # Adaptado a PRETSO (2026-09-20, actualizado el 2026-09-30): npm en la raíz y
+  # en functions/, que tiene su propio package-lock.json, y pip en la raíz, donde
+  # está requirements.txt de los scripts de mantenimiento (fijado el 2026-09-26;
+  # se había quitado porque entonces no existía). Se quitaron docker y terraform:
+  # no hay Dockerfile ni infra/, y un `directory` que no existe no es inofensivo,
+  # Dependabot lo reporta como error de configuración.
   # ---- GitHub Actions: pines por SHA de todos los workflows -------------------
   - package-ecosystem: github-actions
     directory: /
@@ -140,6 +142,33 @@ updates:
       functions-desarrollo:
         dependency-type: development
         update-types: [minor, patch]
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]
+
+  # ---- pip (scripts de mantenimiento de Firestore, requirements.txt) -----------
+  - package-ecosystem: pip
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: America/La_Paz
+    # Cooldown: ver el comentario del bloque npm. `semver-*-days` vale en pip
+    # porque sus paquetes versionan con semver.
+    cooldown:
+      default-days: 7
+      semver-major-days: 30
+      semver-minor-days: 7
+      semver-patch-days: 3
+    open-pull-requests-limit: 10
+    labels: [dependencias, python]
+    commit-message:
+      prefix: "chore(deps)"
+    groups:
+      pip-minor-patch:
+        update-types: [minor, patch]
+    # Mayores: fuera de la automatización (ver encabezado).
     ignore:
       - dependency-name: "*"
         update-types: ["version-update:semver-major"]
