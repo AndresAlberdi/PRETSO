@@ -67,3 +67,17 @@ seguridad:
       aprobado_por: AndresAlberdi
       creado: "2026-09-26"
       vence: "2026-12-25"
+    - id: GHSA-m9gg-hp2v-232j
+      herramienta: npm-audit
+      justificacion: >-
+        @grpc/grpc-js 1.9.16 llega solo por @firebase/firestore 4.17.2 (~1.9), y firebase 12.19.0 es la última versión, así que no hay parche posible (corregido en 1.13.6 y 1.14.5). El aviso es del lado servidor de gRPC (getAuthContext y manejadores de método); esta SPA solo usa el cliente web de Firestore. Verificado el 2026-09-30: no aparece en el bundle publicado y ningún archivo de src/ lo importa. Se revisa al salir una firebase que suba la dependencia.
+      aprobado_por: AndresAlberdi
+      creado: "2026-09-30"
+      vence: "2026-12-29"
+    - id: CVE-2026-101916
+      herramienta: osv-scanner
+      justificacion: >-
+        @grpc/grpc-js 1.9.16 llega solo por @firebase/firestore 4.17.2 (~1.9), y firebase 12.19.0 es la última versión, así que no hay parche posible (corregido en 1.13.6 y 1.14.5). El aviso es del lado servidor de gRPC (getAuthContext y manejadores de método); esta SPA solo usa el cliente web de Firestore. Verificado el 2026-09-30: no aparece en el bundle publicado y ningún archivo de src/ lo importa. Se revisa al salir una firebase que suba la dependencia.
+      aprobado_por: AndresAlberdi
+      creado: "2026-09-30"
+      vence: "2026-12-29"
