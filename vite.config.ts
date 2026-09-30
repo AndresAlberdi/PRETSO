@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => {
       `Modo de build desconocido «${mode}». Modos válidos: ${Object.keys(ENVIRONMENT_FOLDERS).join(', ')}.`,
     )
   }
-  assertPublishable(mode, process.env.GITHUB_REF_TYPE, productionConfig)
+  assertPublishable(mode, process.env.GITHUB_REF_TYPE, productionConfig, process.env.GITHUB_EVENT_NAME)
   return {
     plugins: [react()],
     resolve: {

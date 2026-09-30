@@ -26,12 +26,19 @@ export function assertFirebaseConfig(config: FirebaseWebConfig, ambiente: string
   }
 }
 
-// Publicar un tag con la configuración de producción incompleta dejaría un sitio que no arranca, y la
-// prueba de humo (solo mira el código HTTP) no lo detectaría. `refType` es GITHUB_REF_TYPE, que define
-// GitHub Actions: en PR y en push a rama el build de producción sí compila, porque la CI lo ejecuta en
-// cada run; solo falla cuando Actions lo construye para un tag.
-export function assertPublishable(mode: string, refType: string | undefined, config: FirebaseWebConfig): void {
-  if (mode === 'production' && refType === 'tag') {
+// Publicar con la configuración de producción incompleta dejaría un sitio que no arranca, y la prueba de
+// humo (solo mira el código HTTP) no lo detectaría. Los dos caminos de publicación de producción son un
+// tag y un `workflow_dispatch` manual: en este dispatch el tag llega como entrada y la referencia puede ser
+// `main`, así que `refType` (GITHUB_REF_TYPE) valdría `branch`; por eso se mira también el evento
+// (GITHUB_EVENT_NAME). En PR y en push a rama el build de producción sí compila, porque la CI lo ejecuta en
+// cada run; solo falla cuando Actions lo construye para publicar.
+export function assertPublishable(
+  mode: string,
+  refType: string | undefined,
+  config: FirebaseWebConfig,
+  eventName?: string,
+): void {
+  if (mode === 'production' && (refType === 'tag' || eventName === 'workflow_dispatch')) {
     assertFirebaseConfig(config, mode);
   }
 }

@@ -39,12 +39,19 @@ describe('publishing gate', () => {
     expect(() => assertPublishable('production', 'tag', production)).toThrow(/apiKey, appId/);
   });
 
+  it('blocks a manual workflow_dispatch even when the ref is a branch', () => {
+    expect(() => assertPublishable('production', 'branch', production, 'workflow_dispatch')).toThrow(/apiKey, appId/);
+  });
+
   it('lets PR and branch builds of production compile', () => {
     expect(() => assertPublishable('production', 'branch', production)).not.toThrow();
     expect(() => assertPublishable('production', undefined, production)).not.toThrow();
+    expect(() => assertPublishable('production', 'branch', production, 'push')).not.toThrow();
+    expect(() => assertPublishable('production', 'branch', production, 'pull_request')).not.toThrow();
   });
 
   it('never blocks the staging build, not even for a tag', () => {
     expect(() => assertPublishable('staging', 'tag', production)).not.toThrow();
+    expect(() => assertPublishable('staging', 'branch', production, 'workflow_dispatch')).not.toThrow();
   });
 });
