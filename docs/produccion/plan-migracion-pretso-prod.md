@@ -28,9 +28,12 @@ Andres confirmó el 2026-09-30 el **camino B**: hace falta un entorno de producc
 Cada paso indica quién lo hace, costo, prueba y cómo se revierte. «Claude opera» siempre con el «sí» de Andres en el chat.
 
 ### Paso 1 — Configuración por ambiente en el código (PR de código, riesgo medio)
-- Leer la configuración web de Firebase y el Client ID de Google desde variables de Vite (`VITE_FIREBASE_*`, `VITE_GOOGLE_CLIENT_ID`), con los valores de cada ambiente como **variables del repositorio** (no secretos: la apiKey web y el Client ID son públicos) inyectadas por el workflow en el paso «Build». `src/firebase.ts` y `UserManagement.tsx` ya comparten `firebaseConfig`, así que el cambio es en un solo lugar.
-- Con las variables sin definir, el build debe **fallar** (no volver en silencio a `pretso-database`).
-- **Prueba:** pruebas unitarias del selector de configuración; el bundle de `staging` contiene `pretso-database` y **no** `pretso-prod`, y el de `production` al revés (`grep` sobre `dist/`). Es la evidencia que faltaba.
+**Hecho en el PR de la rama `feat/config-por-ambiente`** (ver ese PR para el resultado medido). Se aparta del texto original de este plan en un punto, y conviene que Andres lo sepa: en vez de variables de Vite inyectadas por el workflow, la configuración vive en **archivos versionados por ambiente** (`src/environments/staging/` y `production/`), elegidos en tiempo de build por el modo de Vite con el alias `@entorno`. Motivo: `.gitignore` excluye `.env.*`, el checklist (REP-06) prohíbe `.env` versionados, la `apiKey` web y el Client ID son públicos por diseño, y así no hace falta tocar el workflow del estándar ni escribir variables en GitHub.
+- Cada bundle contiene solo la configuración de su ambiente; un modo de build desconocido falla con un error claro que lista los válidos.
+- `staging`, `development` y `test` usan `pretso-database` con la misma configuración de hoy (`src/firebase-config.json`). `production` usa `pretso-prod` con los datos ya conocidos, y **`apiKey`, `appId` y el Client ID vacíos hasta el paso 3**.
+- Mientras falten, `src/firebase.ts` lanza un error claro al iniciar (no cae en silencio a otro proyecto) y **el build de producción de un tag falla** (`GITHUB_REF_TYPE=tag`, que define Actions): así un tag creado antes del paso 3 no publica un sitio roto que la prueba de humo, que solo mira el código HTTP, no detectaría. En PR y en push a rama el build de producción compila, porque la CI lo ejecuta en cada run.
+- `package.json` gana `build:staging` y `build:production`, que `./deploy.sh` ya prefiere; sin ellos, `./deploy.sh staging` habría construido el bundle de producción.
+- **Se invierte en el paso 3:** dos pruebas de `src/__tests__/entornos.test.ts` (producción no publicable, y Client ID de producción vacío) y las tres líneas vacías de `src/environments/production/`.
 - **Costo:** un PR, dos runs. Fusionarlo redespliega staging con la misma configuración de hoy. **Reversión:** `git revert`.
 - Verificación adicional: la CSP de `firebase.json` no menciona proyectos concretos (`*.googleapis.com`, `*.firebaseio.com`), así que no cambia.
 
