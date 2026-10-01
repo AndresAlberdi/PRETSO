@@ -214,7 +214,7 @@ export async function generateZipBlob(xmlContent: string, xmlFilename: string): 
   return await zip.generateAsync({ type: "blob" });
 }
 
-// Upload a Blob to Google Drive of account pretsodatabase@gmail.com
+// Sube un Blob al Drive de la cuenta con la que se inició sesión
 export async function uploadToGoogleDrive(
   blob: Blob,
   filename: string,
