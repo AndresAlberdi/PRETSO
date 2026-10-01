@@ -1,6 +1,6 @@
 # Runbook de rollback e incidentes — PRETSO
 
-Control OPS-04 del checklist de pase a producción (`/home/andres-alberdi/SeguridadGeneral/01-seguridad/05-checklist-pase-a-produccion.md`), adaptado de `06-rollback-e-incidentes.md` del estándar. Cubre también OPS-05 (contactos) y OPS-07 (RTO/RPO) en su versión inicial.
+Control OPS-04 del checklist de pase a producción (`/home/andres-alberdi/SeguridadGeneral/01-seguridad/05-checklist-pase-a-produccion.md`), adaptado de `06-rollback-e-incidentes.md` del estándar. Cubre también OPS-05 (contactos) y OPS-07 (RTO/RPO, sección 4, confirmados por Andres el 2026-10-01).
 
 Alcance: aplicación web (React + Vite) en Firebase Hosting, reglas y datos de Firestore, Firebase Authentication, Cloud Functions (hoy hay una función antigua desplegada en `pretso-database`, véase 2.5) y configuración/IAM de dos proyectos:
 
@@ -283,15 +283,15 @@ Reglas:
 
 Antes de revertir, anotar la hora, el tag o sha afectado, el síntoma y quién autorizó. Después, abrir un issue con etiqueta `incidente` (hoy se abre a mano).
 
-## 4. RTO y RPO objetivo (OPS-07, valores iniciales)
+## 4. RTO y RPO objetivo (OPS-07, confirmados por Andres el 2026-10-01)
 
-Corresponden al perfil «SPA + Firestore con datos personales o transaccionales» de `06-rollback-e-incidentes.md` sección 6 (hay correos de usuarios). Ese perfil fija RTO 30 min y RPO 15 min, con exportación cada 6 h, y advierte que sin uptime check con alerta (OPS-01) ningún RTO inferior a una hora es realista. Los valores de abajo son propuestos para que Andres los confirme; no se han medido, y **se desvían de forma explícita** del estándar en lo siguiente: el RPO propuesto es 1 h (no 15 min) por la falta de detección y de ensayo de restauración, no por la exportación (PITR da una ventana técnica de aproximadamente 1 minuto), y el RTO de 30 min no es realista mientras OPS-01 (uptime check) no exista, ya que la detección hoy depende de un usuario o de la revisión manual.
+Corresponden al perfil «SPA + Firestore con datos personales o transaccionales» de `06-rollback-e-incidentes.md` sección 6 (hay correos de usuarios). Ese perfil fija RTO 30 min y RPO 15 min, con exportación cada 6 h, y advierte que sin uptime check con alerta (OPS-01) ningún RTO inferior a una hora es realista. Los valores de abajo fueron **confirmados por Andres el 2026-10-01** como objetivos del proyecto; se vuelven a medir cuando haya más datos y tras cada ensayo, y se revisan si cambian. **Se desvían de forma explícita** del estándar en lo siguiente: el RPO confirmado es 1 h (no 15 min) por la falta de detección y de ensayo de restauración, no por la exportación (PITR da una ventana técnica de aproximadamente 1 minuto), y el RTO de 30 min no es realista mientras OPS-01 (uptime check) no exista, ya que la detección hoy depende de un usuario o de la revisión manual.
 
 | Concepto | Objetivo | Cómo se cumple | Estado |
 |---|---|---|---|
-| RTO de la aplicación web | 30 min (desvío: sin OPS-01 el estándar no considera realista menos de 1 h) | Rollback de Hosting en menos de 1 minuto más decisión y verificación; la detección no está automatizada | No medido |
-| RTO de datos | 2 h | Clon PITR o restauración de respaldo a base nueva (2.3) | Medido el 2026-10-01 en staging: clon PITR y restauración de respaldo de una base de 563 documentos tardaron 12 a 14 min cada una (ensayos 6 y 7); el objetivo de 2 h sigue siendo razonable, pero con más datos hay que volver a medir |
-| RPO | 1 h como meta (desvío: el estándar fija 15 min; se propone 1 h por la falta de detección y de ensayo, no por la exportación); técnicamente hasta 1 minuto con PITR y 24 h con el respaldo diario | PITR (7 días) y respaldo diario (30 días) | Activado el 2026-09-30; restauración ensayada el 2026-10-01 (recuento idéntico al origen) |
+| RTO de la aplicación web | 30 min (desvío: sin OPS-01 el estándar no considera realista menos de 1 h; confirmado por Andres el 2026-10-01) | Rollback de Hosting en menos de 1 minuto más decisión y verificación; la detección no está automatizada | No medido |
+| RTO de datos | 2 h (confirmado por Andres el 2026-10-01) | Clon PITR o restauración de respaldo a base nueva (2.3) | Medido el 2026-10-01 en staging: clon PITR y restauración de respaldo de una base de 563 documentos tardaron 12 a 14 min cada una (ensayos 6 y 7); el objetivo de 2 h sigue siendo razonable, pero con más datos hay que volver a medir |
+| RPO | 1 h como meta, confirmada por Andres el 2026-10-01 (desvío: el estándar fija 15 min; se fija 1 h por la falta de detección y de ensayo, no por la exportación); técnicamente hasta 1 minuto con PITR y 24 h con el respaldo diario | PITR (7 días) y respaldo diario (30 días) | Activado el 2026-09-30; restauración ensayada el 2026-10-01 (recuento idéntico al origen) |
 
 ## 5. Incidentes de seguridad
 
