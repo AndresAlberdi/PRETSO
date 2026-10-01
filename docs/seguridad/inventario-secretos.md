@@ -71,7 +71,7 @@ Ninguna variable contiene credenciales. Regla: si una variable llegara a contene
 - Propietario: Andres Alberdi. Revisión de la condición de confianza y de los roles de las cuentas: antes de cada pase a producción (checklist, sección de identidad) y ante cualquier cambio de repositorio.
 - Roles de las cuentas de despliegue: documentados en `PILOTO.md` (incluido `roles/serviceusage.serviceUsageViewer`, mínimo para `firestore:rules`).
 
-- **Identidad de runtime de Cloud Functions (`functions/`)**: sin clave. La función `createReaderUser` no está desplegada en ningún proyecto (`FIREBASE_DEPLOY_ONLY=hosting,firestore:rules`), por lo que hoy no hay identidad de runtime activa. Antes de desplegarla habrá que registrar su cuenta de servicio y revisar sus roles (no usar la predeterminada con `roles/editor`). Propietario: Andres Alberdi.
+- **Identidad de runtime de Cloud Functions (`functions/`)**: la versión migrada del repositorio no se despliega (`FIREBASE_DEPLOY_ONLY=hosting,firestore:rules`; no está en el CI). Verificado con lecturas el 2026-10-01: en `pretso-prod` no hay funciones; en `pretso-database` **sigue desplegada una versión antigua de `createReaderUser`** (gen1, `nodejs20` deprecado, actualizada el 2026-07-29, autorizada por correo fijo, invocable públicamente como toda función callable y sin invocaciones en los últimos 30 días). Corre con la cuenta de servicio por defecto de App Engine de `pretso-database`, que tiene `roles/editor`: revisar y retirar el rol tras retirar la función. **Recomendación de seguridad: retirar la función; decisión pendiente de Andres Alberdi (no ejecutada).** Antes de desplegar cualquier versión futura habrá que registrar su cuenta de servicio y revisar sus roles (no usar la predeterminada con `roles/editor`). Propietario: Andres Alberdi.
 
 ## 5. Identificadores públicos por diseño (clase P)
 
@@ -90,6 +90,7 @@ Gitleaks detecta las apiKey por su forma. De los cinco hallazgos, tres son apiKe
 |---|---|
 | Qué es | Bloque `hashConfig` de Firebase Authentication (algoritmo scrypt, sal de parámetros del proyecto, rondas y costo de memoria) |
 | Incidente | El 2026-10-01 una sesión imprimió ese bloque, sin filtrar, en su salida al leer la configuración de Authentication como referencia |
+| Segunda impresión | El mismo bloque se imprimió una **segunda vez** el 2026-10-01 al leer la configuración de Authentication en una revisión de seguridad. Quedó solo en el transcript de la sesión del agente: sin hashes de usuarios ni contraseñas y sin escribirse en archivos. Andres decide si se rota (en Firebase no se puede rotar; solo serviría junto con un volcado de hashes). Recomendación: no compartir ese transcript |
 | Qué NO salió | Ningún hash de contraseña de usuario, ninguna contraseña, ningún correo ni identificador de usuario |
 | Riesgo | Bajo: esos parámetros solos no permiten reconstruir contraseñas; serían útiles junto con un export de hashes de usuarios, que no se filtró. No es una credencial de acceso |
 | Decisión | **Andres Alberdi, 2026-10-01: solo anotarlo; no se rota nada** (consta en `ESTADO.md`) |
@@ -140,7 +141,8 @@ Observación: el historial contiene en un commit antiguo (`#14`) un directorio `
 
 | Ítem | Estado | Responsable | Fecha |
 |---|---|---|---|
-| Rotación de parámetros de hash de `pretso-database` | **Decidido no rotar** (solo anotado) | Andres Alberdi | 2026-10-01 |
+| Rotación de parámetros de hash de `pretso-database` | **Decidido no rotar** (solo anotado) tras la primera impresión; la segunda impresión del mismo día queda pendiente de su decisión | Andres Alberdi | 2026-10-01 |
+| Retiro de la versión antigua de `createReaderUser` en `pretso-database` y de `roles/editor` de su cuenta de runtime | **Recomendado; pendiente de decisión** (no ejecutado) | Andres Alberdi | 2026-10-01 |
 | Excepciones de gitleaks sobre apiKey y clave de `pretso-platform` | Vigentes; revisar, y reducir a cero cuando App Check esté en `enforce` y `pretso-platform` se borre | Andres Alberdi | Vencen 2026-12-25 |
 | App Check en `enforce` (NUB-G06) | Pendiente (primero monitoreo) | Andres Alberdi | Antes del primer tag |
 | Verificar WIF (condición de confianza) y roles de las dos cuentas de despliegue | Pendiente de una lectura con permisos IAM, antes del pase a producción | Andres Alberdi / sesión con su autorización | Antes del primer tag |
