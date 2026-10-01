@@ -12,6 +12,8 @@ Propietario de todo lo listado: **Andres Alberdi** (único propietario y adminis
 
 PRETSO prácticamente no tiene secretos de larga duración: el despliegue usa federación de identidad (WIF/OIDC) y la aplicación no lee ninguna variable de entorno ni credencial en tiempo de ejecución. Lo único que se guarda como secreto son **cuatro identificadores de clase S3** en GitHub. No hay secretos S0 (prohibidos), S1 (críticos) ni S2 (tokens de terceros) en uso.
 
+Estado del control SEC-01: **Verde**. Las verificaciones que este inventario no pudo medir (condición de confianza del provider WIF y roles de las cuentas de despliegue) se siguen en SEC-07 del plan de migración, y el segundo factor de las cuentas de GitHub en la sección 10.
+
 ## 2. Secretos de GitHub
 
 Lectura hecha con `gh secret list` el 2026-10-01 (solo nombres y fechas).
@@ -54,6 +56,8 @@ Lectura con `gh variable list` el 2026-10-01. Son configuración; se listan para
 | `WORKFLOW_PRODUCCION`, `FIREBASE_DEPLOY_ONLY`, `HEALTH_PATH`, `MODO`, `NODE_VERSION`, `CODEQL_LENGUAJES`, `GHAS_ENABLED`, `TAG_FIRMADO_REQUERIDO` | 2026-09-25 | Parámetros del pipeline |
 | `COVERAGE_MIN` | 2026-09-20 | Umbral de cobertura |
 
+`BLOQUEAR_EN`, `FIREBASE_PREVIEW`, `FIREBASE_SITE_ID` y `PYTHON_VERSION` son variables opcionales que los workflows referencian pero que no están creadas; no son secretos.
+
 Ninguna variable contiene credenciales. Regla: si una variable llegara a contener algo sensible, se mueve a secreto y se anota aquí.
 
 ## 4. Federación WIF (despliegue sin claves)
@@ -67,16 +71,18 @@ Ninguna variable contiene credenciales. Regla: si una variable llegara a contene
 - Propietario: Andres Alberdi. Revisión de la condición de confianza y de los roles de las cuentas: antes de cada pase a producción (checklist, sección de identidad) y ante cualquier cambio de repositorio.
 - Roles de las cuentas de despliegue: documentados en `PILOTO.md` (incluido `roles/serviceusage.serviceUsageViewer`, mínimo para `firestore:rules`).
 
+- **Identidad de runtime de Cloud Functions (`functions/`)**: sin clave. La función `createReaderUser` no está desplegada en ningún proyecto (`FIREBASE_DEPLOY_ONLY=hosting,firestore:rules`), por lo que hoy no hay identidad de runtime activa. Antes de desplegarla habrá que registrar su cuenta de servicio y revisar sus roles (no usar la predeterminada con `roles/editor`). Propietario: Andres Alberdi.
+
 ## 5. Identificadores públicos por diseño (clase P)
 
 | ID | Elemento | Dónde vive | Por qué no es un secreto | Qué lo protege |
 |---|---|---|---|---|
-| SEC-P01 | apiKey web de Firebase de `pretso-database` (staging) | `src/firebase.ts`/`src/firebase-config.json` y `src/environments/staging/` | El navegador la recibe en cada carga del sitio; identifica el proyecto, no autentica a nadie | Restricción por referente HTTP (3 referentes) y por API (4: `identitytoolkit`, `securetoken`, `firestore`, `firebaseappcheck`); `firestore.rules`; Firebase Authentication. App Check pendiente (NUB-G06) |
+| SEC-P01 | apiKey web de Firebase de `pretso-database` (staging) | `src/firebase-config.json` (reexportada por `src/environments/staging/firebase.ts`); en el historial también en `src/firebase.ts` y `src/pages/UserManagement.tsx` (exceptuados) | El navegador la recibe en cada carga del sitio; identifica el proyecto, no autentica a nadie | Restricción por referente HTTP (3 referentes) y por API (4: `identitytoolkit`, `securetoken`, `firestore`, `firebaseappcheck`); `firestore.rules`; Firebase Authentication. App Check pendiente (NUB-G06) |
 | SEC-P02 | apiKey web de Firebase de `pretso-prod` | `src/environments/production/firebase.ts` | Ídem | Misma restricción: 4 APIs y los referentes `https://pretso-prod.web.app/*` y `https://pretso-prod.firebaseapp.com/*`; reglas de Firestore con custom claim `admin`; App Check pendiente |
 | SEC-P03 | Client ID OAuth web de Google (copia a Drive) de `pretso-database` y de `pretso-prod` | `src/environments/*/google.ts` | Un Client ID es público (Google lo muestra en cada inicio de sesión). No hay *client secret* en el repositorio: el flujo del navegador usa Google Identity Services sin secreto | Orígenes JavaScript autorizados del cliente (solo los sitios de cada ambiente) y el consentimiento del usuario, que limita el alcance concedido |
 | SEC-P04 | `appId`, `messagingSenderId`, `authDomain`, `storageBucket`, `projectId` | `src/environments/*/firebase.ts` | Configuración web estándar de Firebase | Mismas reglas de datos |
 
-Gitleaks detecta las apiKey por su forma; los cinco hallazgos están registrados como excepciones en `.devsecops.yml` (`seguridad.excepciones`), aprobadas por Andres el 2026-09-26 y con vencimiento **2026-12-25**, para obligar a revisarlas (por ejemplo, tras encender App Check). Rotar la apiKey es posible desde la consola (se crea una nueva clave restringida y se retira la antigua), pero no es necesario mientras no haya abuso medido.
+Gitleaks detecta las apiKey por su forma. De los cinco hallazgos, tres son apiKey web de Firebase y dos son la clave del proyecto `pretso-platform`, ya retirada del árbol; los cinco están registrados como excepciones en `.devsecops.yml` (`seguridad.excepciones`), aprobadas por Andres el 2026-09-26 y con vencimiento **2026-12-25**, para obligar a revisarlas (por ejemplo, tras encender App Check). Rotar la apiKey es posible desde la consola (se crea una nueva clave restringida y se retira la antigua), pero no es necesario mientras no haya abuso medido.
 
 ## 6. Parámetros de hash de Authentication de `pretso-database`
 
@@ -96,7 +102,7 @@ Solo se registra su existencia; nunca tokens ni rutas con valores.
 
 | Elemento | Dónde vive | Quién lo usa | Propietario | Rotación |
 |---|---|---|---|---|
-| Credenciales de aplicación por defecto (ADC) de `gcloud` | Equipo local de Andres, directorio de configuración de `gcloud` | `scripts/asignar_claim_admin.py`, `scripts/create_user.py`, `scripts/migrate_ods.py` (firebase-admin con `ApplicationDefault`) | Andres Alberdi | Renovar con `gcloud auth application-default login` cuando caduque o se cambie de equipo; revocar con `gcloud auth application-default revoke`. `asignar_claim_admin.py` rechaza `GOOGLE_APPLICATION_CREDENTIALS` para impedir claves estáticas |
+| Credenciales de aplicación por defecto (ADC) de `gcloud` | Equipo local de Andres, directorio de configuración de `gcloud` | `scripts/asignar_claim_admin.py`, `scripts/create_user.py`, `scripts/migrate_ods.py` (firebase-admin con `ApplicationDefault`) y `functions/migrate_keys.js` (firebase-admin, también con ADC) | Andres Alberdi | Renovar con `gcloud auth application-default login` cuando caduque o se cambie de equipo; revocar con `gcloud auth application-default revoke`. `asignar_claim_admin.py` avisa si `GOOGLE_APPLICATION_CREDENTIALS` está definida; no lo impide (sin valor mostrado) |
 | Sesión de `gcloud` / `gh` de Andres | Equipo local | Operaciones puntuales autorizadas por Andres | Andres Alberdi | Cierre de sesión al terminar la jornada de trabajo sensible; sin periodicidad fija |
 | Cuenta `segurolotengopy` (segundo colaborador del repositorio, flujo REP-03) | Cuenta de GitHub de la misma persona | Aprobación de PR bajo el ruleset `proteccion-main` | Andres Alberdi | Verificar que tenga autenticación de dos factores (**no verificable desde la sesión**); revisar el acceso al cerrar el piloto |
 | `PRETSO_ADMIN_EMAIL` / `PRETSO_ADMIN_PASSWORD` | Variables de entorno de una sola ejecución de `scripts/create_user.py` | Alta manual de un usuario | Andres Alberdi | No se guardan en archivos. La contraseña inicial se cambia al primer ingreso; no existe valor persistente |
@@ -109,7 +115,7 @@ No se usan tokens de n8n ni de otras integraciones: el repositorio no los mencio
 |---|---|---|
 | No hay claves JSON de cuentas de servicio versionadas | `git ls-files \| grep -iE 'serviceaccount\|-sa-key\|\.pem$\|\.key$'` y gitleaks (regla propia de JSON de cuenta de servicio en `.github/gitleaks.toml`) | Sin coincidencias en el árbol |
 | No hay `.env` versionados | `git ls-files \| grep -E '(^\|/)\.env'`; `.gitignore` excluye `.env`, `.env.*`, `*.key`, `serviceAccountKey*.json`, `*-sa-key.json` (se permite `.env.example`) | Sin coincidencias |
-| No hay secretos en el historial salvo los excepcionados | `gitleaks detect --config .github/gitleaks.toml --redact` (v8.30.1, 72 commits) | 5 hallazgos, todos ya excepcionados en `.devsecops.yml`: 2 `gcp-api-key` en un aviso de Dependabot pegado (proyecto `pretso-platform` en borrado, sin uso), y 3 apiKey web de `pretso-database` (públicas por diseño) |
+| No hay secretos en el historial salvo los excepcionados | `gitleaks detect --config .github/gitleaks.toml --redact` (v8.30.1, el historial completo; el número de commits varía con las referencias escaneadas) | 5 hallazgos, todos ya excepcionados en `.devsecops.yml`: 2 `gcp-api-key` en un aviso de Dependabot pegado (proyecto `pretso-platform` en borrado, sin uso), y 3 apiKey web de `pretso-database` (públicas por diseño) |
 | No hay `FIREBASE_TOKEN` ni PAT clásico | `gh secret list` (repositorio y ambos Environments) | Solo los cuatro S3 de la sección 2 |
 | La aplicación no lee secretos en tiempo de ejecución | Revisión de `src/environments/*` y de `vite.config.ts`: la configuración se fija en el build por modo | Confirmado |
 
