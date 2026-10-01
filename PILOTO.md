@@ -252,21 +252,21 @@ Sigue pendiente: `production` apunta a `pretso-prod`, **que está vacío** (sin 
 | Sitio en línea, estable, desplegado por tubería | Andres, 2026-09-25: «producción» es «tener el sistema arriba» (`Prompts/cerrar-estandar-y-pase-a-produccion.md`) | **Cumplido.** `pretso-database.web.app`; todos los runs de `main` en verde desde el 25/09; despliegue automático con prueba de humo y ZAP |
 | El equipo de investigación consulta el corpus (compañías, salarios, indicadores, bibliografía…) | `estructura_datos.md`; el sitio muestra el proyecto de investigación Horizon MSCA 101150056 | **Funciona.** Andres inicia sesión y carga datos (28/09). Los recuentos contra el `.ods` **no se verificaron** en esta jornada |
 | Administración: usuarios lectores, auditoría, exportación y respaldos | Pantalla «Administración» | **Funciona.** XML, XLSX y copia a Google Drive (probada por Andres el 25 y 26/09) |
-| Seguridad según el estándar | `CLAUDE.md`, `.devsecops.yml` | `./security-local.sh` **aprobado**; apiKey web restringida (28/09); App Check **pendiente**; excepciones de gitleaks vencen el 2026-12-25 |
-| Producción separada en `pretso-prod`, con datos | Andres, 2026-09-25: sigue siendo necesario «para tener un modelo robusto» | **Andres confirmó el 2026-09-30 que hace falta (camino B).** Destino: el `pretso-prod` existente, que sigue **vacío**. (El 30/09 se creó por error `pretso-prod-d8a68`; Andres lo borró y se conserva el anterior) |
+| Seguridad según el estándar | `CLAUDE.md`, `.devsecops.yml` | `./security-local.sh` **aprobado**; apiKey web restringida (28/09); App Check **pendiente**; excepciones de gitleaks vencen el 2026-12-25 y la de `@grpc/grpc-js` el 2026-12-29 |
+| Producción separada en `pretso-prod`, con datos | Andres, 2026-09-25: sigue siendo necesario «para tener un modelo robusto» | **Camino B confirmado por Andres el 2026-09-30.** Destino: el `pretso-prod` existente, todavía **vacío** y con respaldo activado. Paso 1 del plan hecho (#38). Faltan los pasos 2 a 8. (El 30/09 se creó por error `pretso-prod-d8a68`; Andres lo borró.) |
 
 ### Qué falta, en orden de riesgo
 
-1. **Respaldo automático de Firestore.** El 2026-09-30, con autorización de Andres, se activaron en `pretso-database` la recuperación a un punto en el tiempo (PITR, ventana de 7 días), la protección contra borrado y un **respaldo diario con retención de 30 días**; verificado leyendo la base y el programa de respaldo. **Falta en `pretso-prod`** (PITR, protección y respaldo siguen desactivados, pero la base está vacía): hay que activarlos antes de cargarle datos (DAT-04).
-2. ~~Decidir el camino~~ **Decidido por Andres el 2026-09-30: camino B.**
-3. **Camino B (con `pretso-prod`):** el plan está en `docs/produccion/plan-migracion-pretso-prod.md`. Su primer paso no es opcional: la aplicación tiene `pretso-database` **escrito fijo en el código**, así que un tag hoy publicaría en `pretso-prod` un sitio que lee y escribe en `pretso-database`.
-4. **Camino A (solo `pretso-database`):** lo mínimo para una entrega ordenada es el punto 1, un runbook de rollback (OPS-04), App Check en monitoreo y decidir cómo se registra la desviación REP-03.
+1. ~~Respaldo automático de Firestore~~ **Hecho el 2026-09-30, con autorización de Andres, en `pretso-database` y en `pretso-prod`:** recuperación a un punto en el tiempo (PITR, ventana de 7 días), protección contra borrado y **respaldo diario con retención de 30 días**; verificado leyendo cada base y su programa de respaldo. El costo por almacenamiento queda por confirmar en la consola de facturación (DAT-04, verde en ambos proyectos).
+2. ~~Decidir el camino~~ **Decidido por Andres el 2026-09-30: camino B** (producción separada). El camino A queda descartado.
+3. **Camino B (con `pretso-prod`):** el plan está en `docs/produccion/plan-migracion-pretso-prod.md`. **Paso 1 hecho** (#38): la configuración de Firebase y el Client ID de Google dependen ahora del ambiente de build; antes la aplicación tenía `pretso-database` escrito fijo, y un tag habría publicado en `pretso-prod` un sitio que leía y escribía en `pretso-database`. **Sigue el paso 3** (registrar la app web en `pretso-prod`, restringir su apiKey y crear su cliente OAuth), que completa los valores vacíos de `src/environments/production/`, y después los pasos 2 y 4 a 8. Hasta entonces el build de producción de un tag o de un `workflow_dispatch` **falla a propósito**.
 
 ### Qué necesita de Andres (una palabra cada una)
 
-- **Activar el respaldo en `pretso-prod`** (PITR, protección contra borrado y respaldo diario de 30 días), antes de cargarle datos.
-- **Cuántos usuarios de autenticación hay** (para elegir entre recrearlos o importarlos).
-- **Autorizar el paso 1 del plan** (configuración de Firebase por ambiente en el código): lo preparo como PR; para fusionarlo hay que definir las variables del repositorio de `staging` (escritura en GitHub).
+- **Comprobar el sitio tras #38:** abrir https://pretso-database.web.app, iniciar sesión y cargar una pantalla con datos (yo solo verifiqué que carga y muestra el login).
+- **El «sí» para el paso 3 del plan**, que son cambios de GCP: registrar la app web en `pretso-prod`, restringir su apiKey y crear su cliente OAuth.
+- **Cuántos usuarios de autenticación hay** (para elegir entre recrearlos o importarlos, en el paso 5).
+- **REP-03:** aceptar como «N/A justificado» el ruleset con 0 aprobaciones (un solo dueño) o dar escritura a una segunda cuenta.
 
 ## Jornada del 2026-09-29 — gobierno y dependencias
 
@@ -301,11 +301,35 @@ Hallazgos que el checklist marca como **bloqueantes** y hoy están en rojo (deta
 
 `CLAUDE.md` y los agentes `deploy`, `devsecops`, `proyectos` y `seguridad` llevan rutas absolutas del equipo del propietario desde que se aplicó el estándar. El PR #33 no agrega ninguna y no las cambia (los volvería distintos de la plantilla que SeguridadGeneral compara byte a byte). Corregirlas es un PR aparte, coordinado con el estándar.
 
-## Jornada del 2026-09-30 — cierre de los PR y respaldo
+## Jornada del 2026-09-30 — cierre de los PR, respaldo y paso 1
 
 - **Avisos nuevos rompieron la CI de `main`.** Trivy baja la base de vulnerabilidades en cada run y hoy aparecieron 18 HIGH en el `package-lock.json` (`brace-expansion`, `undici` con dos CVE nuevos y `@grpc/grpc-js`). Cualquier PR, aunque no tocara dependencias, fallaba en `seguridad-estatica`. Se corrigió con #34: `brace-expansion` 1.1.21 y 2.1.7, `undici` 7.30.0 y `qs` 6.16.0; HIGH de `./security-local.sh`: 18 → 0, MEDIUM: 9 → 5.
 - **Excepción de `@grpc/grpc-js` 1.9.16** (HIGH sin parche posible: lo fija `@firebase/firestore` 4.17.2 y `firebase` 12.19.0 es la última versión). Aprobada por Andres el 2026-09-30, vence el 2026-12-29. Evidencia: no aparece en el bundle publicado, `src/` no lo importa y los avisos son del lado servidor de gRPC.
-- **Fusionados, con autorización de Andres:** #34 (`8e94ede`) y #33 (`cb6c972`, modelo por rol v1 y v2). Cada uno redesplegó `pretso-database` con el mismo código; despliegue, humo y ZAP en verde y el sitio responde 200.
-- **Respaldo automático de `pretso-database` activado y verificado** (PITR, protección contra borrado, respaldo diario de 30 días). DAT-04 pasa a verde para ese proyecto.
+- **Fusionados con autorización de Andres, de a uno y con el CI en verde** (cada uno redesplegó `pretso-database` con el mismo código; despliegue, humo y ZAP en verde y el sitio respondió 200 en todos): #34 (`8e94ede`, dependencias y excepción), #33 (`cb6c972`, modelo por rol v1 y v2), #35 (`782e1e3`, documentación), #36 (`0764cbc`, `@grpc/grpc-js` 1.14.5 en `functions/`, tras revisar su diff), #37 (`3a324cc`, `pip` en `dependabot.yml`), #38 (`63b9a83`, paso 1 del plan), #40 (`1c4c8a4`, `oxlint`), #39 (`dcf1855`, `firebase-admin` 7.7.0, probado en un entorno limpio porque la CI no ejecuta `requirements.txt`) y #41 (`92c9cc7`, SHA de `snyk/actions`: la comparación muestra un solo commit, que cambia su `CODEOWNERS`).
+- **Respaldo automático activado y verificado** en `pretso-database` y en `pretso-prod` (PITR, protección contra borrado, respaldo diario de 30 días).
+- **Paso 1 del plan (#38).** Cada ambiente tiene su configuración en `src/environments/` y el alias `@entorno`, que `vite.config.ts` resuelve según el modo de build: el bundle de staging contiene `pretso-database` (3 ocurrencias) y ninguna de `pretso-prod`; el de producción, al revés (0 y 2). Staging queda idéntico a antes (mismos seis valores, comparados por hash; el bundle publicado es idéntico por sha256 al de un build local). Producción tiene `apiKey`, `appId` y el Client ID vacíos hasta el paso 3; mientras tanto la aplicación lanza un error claro al iniciar y **el build de producción de un tag o de un `workflow_dispatch` falla**. `package.json` gana `build:staging` y `build:production`, sin los cuales `./deploy.sh staging` habría construido producción. **34 pruebas** (antes 19). Pasó dos revisiones con el agente `revisor-codigo`: la primera dio NO APROBADO por dos bloqueantes reales (el squash volvía a disparar Gitleaks en el push a `main` y `deploy.sh` construía producción) y la segunda, aprobado con un ajuste (el hueco del `workflow_dispatch`); los tres se corrigieron. Desviación del plan: archivos versionados por ambiente en vez de variables del repositorio (`.gitignore` excluye `.env.*`, REP-06 los prohíbe, la apiKey web y el Client ID son públicos).
 - **Camino B confirmado.** El 30/09 Andres creó por error `pretso-prod-d8a68` sin recordar que `pretso-prod` ya existía; lo borró (`DELETE_REQUESTED`). No se creó ni se cambió nada en ese proyecto. Se conserva `pretso-prod`.
-- **Dependabot abrió #36** (`@grpc/grpc-js` 1.14.4 → 1.14.5 en `functions/`); pendiente de decisión de Andres.
+- **Carpeta principal limpia.** Antes de retirar los archivos sin versionar de la v1 se comprobó, uno por uno, que ya estaban en `main` (cinco idénticos; `CLAUDE.md` y `planificador.md` eran la versión anterior) y se guardó un respaldo. Los worktrees de los PR fusionados se retiraron tras comprobar que sus commits estaban dentro de lo fusionado.
+
+### Estado de los controles bloqueantes del checklist al cierre del 2026-09-30
+
+| Control | Estado | Qué lo cambió o qué falta |
+|---|---|---|
+| DAT-04 respaldos y PITR | **Verde** en `pretso-database` y `pretso-prod` | Activados hoy |
+| REP-09 Dependabot en todos los ecosistemas | **Verde** | #37 añadió `pip`; Dependabot abrió sus primeros PR de `pip` a los pocos minutos |
+| REP-03 revisores ≥ 1 en `main` | Rojo | Desviación documentada (un solo dueño); falta aceptarla como «N/A justificado» |
+| SEC-01 inventario de secretos | Rojo | Falta `docs/seguridad/inventario-secretos.md` |
+| PIP-10 workflow `probar-identidad` | Rojo | Falta copiar la plantilla del estándar y correrla para `production` |
+| DAT-01 pruebas de reglas de Firestore en el emulador | Rojo | No hay `test:rules` |
+| OPS-04 runbook de rollback | Rojo | Falta `docs/produccion/runbook-rollback.md` |
+| NUB-G06 App Check en `enforce` | Rojo (sería bloqueante con datos personales) | Se enciende primero en monitoreo |
+
+Criterio del estándar: un solo rojo bloqueante impide el pase; hoy quedan **cinco** (REP-03, SEC-01, PIP-10, DAT-01 y OPS-04) más NUB-G06. No afectan al sitio en línea; importan antes del primer tag.
+
+## Jornada del 2026-09-28 — registro tardío
+
+Esta jornada no se había anotado.
+
+- **Fase 4.5 (apiKey web de `pretso-database`), cerrada salvo App Check.** La clave pasó de 27 APIs a 4 (`identitytoolkit`, `securetoken`, `firestore` y `firebaseappcheck`) y de 5 referentes a 3 (`pretso-database.web.app`, `pretso-database.firebaseapp.com` y `localhost:5173`). Se guardó la configuración anterior para restaurarla. Verificado con seis pruebas de respuesta HTTP antes y después (inicio de sesión y renovación de sesión desde el sitio siguen permitidos; una API quitada y un referente quitado pasan a bloqueados) y confirmado por Andres iniciando sesión y cargando datos. **App Check sigue pendiente**: se enciende primero en modo monitoreo.
+- **Aviso de Firebase Hosting** (el sitio por defecto deja de crearse solo en proyectos nuevos desde el 15/10/2026): **PRETSO no tiene tarea**, porque `pretso-database` y `pretso-prod` ya tienen su sitio. Sí la tiene el script `setup-oidc-gcp.sh` del estándar, que no crea el sitio; va a SeguridadGeneral.
+- **#32** (`oxlint`/dependencias de desarrollo) fusionado.
