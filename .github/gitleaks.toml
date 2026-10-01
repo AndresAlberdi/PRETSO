@@ -1,16 +1,26 @@
 # =============================================================================
 # gitleaks.toml — Configuración de Gitleaks para _reusable-security.yml,
 #                 pre-commit y security-local.sh
-# Versión: 2.0 | Fecha: 2026-08-24 | Destino: .github/gitleaks.toml
+# Versión: 2.2 | Fecha: 2026-10-01 | Destino: .github/gitleaks.toml
+# PRETSO: segunda exención de generic-api-key (apiKey web de Firebase), al final.
 # -----------------------------------------------------------------------------
 # Extiende la configuración por defecto de Gitleaks (≈170 reglas: AWS, GCP,
 # GitHub, Slack, claves privadas, JWT, etc.) y añade:
 #   - Reglas propias para credenciales de OCI y GCP que el default no cubre
 #     bien (config de OCI con fingerprint + OCID, JSON de service account).
-#   - Allowlist de rutas de pruebas/fixtures/documentación (con cuidado:
+#   - Allowlist de rutas de pruebas/fixtures/artefactos (con cuidado:
 #     un secreto real en un fixture sigue siendo un secreto; la allowlist solo
 #     evita falsos positivos de datos claramente sintéticos).
-# Sintaxis de Gitleaks >= 8.21 ([[allowlists]]). Verificar con:
+#   - La documentación (docs/**/*.md) SÍ se analiza. Hasta la 2.1 estaba excluida
+#     entera y era un punto ciego: en proyectos cuyos informes operativos viven en
+#     docs/, una credencial pegada ahí no la veía ninguna regla (medido el 2026-10-01:
+#     una clave con formato AWS en docs/*.md pasaba limpia). Solo la regla genérica
+#     `generic-api-key` queda eximida en .md de docs/ (ver el final del archivo),
+#     porque ahí marca identificadores y tokens de ejemplo de las respuestas de API.
+# Sintaxis de [[allowlists]] (global y por regla). La versión de Gitleaks está fijada y es la
+# misma en CI (_reusable-security.yml), security-local.sh y pre-commit: la 8.24.3, que era la
+# de la acción en CI, ignora la sección global [[allowlists]] (medido); la 8.28.0 y la 8.30.1
+# la aplican. Verificar con:
 #   gitleaks detect --config .github/gitleaks.toml --redact -v
 # =============================================================================
 title = "Estándar DevSecOps — Gitleaks"
@@ -80,11 +90,10 @@ tags = ["firebase", "token"]
 # Allowlist global (aplica a todas las reglas)
 # -----------------------------------------------------------------------------
 [[allowlists]]
-description = "Rutas de pruebas, fixtures, documentación y artefactos generados"
+description = "Rutas de pruebas, fixtures y artefactos generados"
 paths = [
   '''(^|/)(test|tests|__tests__|spec|fixtures|__fixtures__|mocks|__mocks__)/''',
   '''\.(test|spec)\.(js|jsx|ts|tsx|py)$''',
-  '''(^|/)docs?/.*\.md$''',
   '''(^|/)package-lock\.json$''',
   '''(^|/)pnpm-lock\.yaml$''',
   '''(^|/)yarn\.lock$''',
@@ -98,6 +107,15 @@ paths = [
   '''\.(png|jpg|jpeg|gif|svg|ico|woff2?|ttf|pdf)$''',
   '''(^|/)\.gitleaks\.toml$''',
   '''(^|/)\.github/gitleaks\.toml$''',
+  # Artefactos que generan las propias herramientas del estándar. Todos están en
+  # .gitignore (security-local.sh y bootstrap-repo.sh los agregan), así que no hay
+  # código del proyecto ahí; pero Gitleaks en modo directorio (--no-git) no respeta
+  # .gitignore y en la SEGUNDA corrida de security-local.sh leía la base de Trivy
+  # (.trivy-cache/db/trivy.db) y daba ~20 CRITICAL falsos. Son directorios exactos,
+  # no nombres: un `src/trivy-cache.js` se sigue analizando.
+  '''(^|/)\.trivy-cache/''',
+  '''(^|/)\.security-reports/''',
+  '''(^|/)\.deploy-log/''',
 ]
 
 [[allowlists]]
@@ -110,19 +128,34 @@ regexes = [
 stopwords = ["ejemplo", "example", "placeholder", "sample"]
 
 # -----------------------------------------------------------------------------
-# apiKey web de Firebase en la configuración por ambiente (PRETSO, 2026-09-30)
-# -----------------------------------------------------------------------------
-# La regla propia gcp-api-key ya permite estas claves en archivos firebase.ts (arriba), pero la regla
-# genérica del conjunto por defecto (`useDefault = true`) también las marca. La apiKey web es pública por
-# diseño (la protegen las reglas de Firestore y su restricción por referente y por API), así que se permite
-# a esa regla, y solo en estos archivos: cualquier otra ruta con una clave sigue marcada. Aprobado por
-# Andres Alberdi el 2026-09-30.
+# Documentación: se analiza con todas las reglas de proveedor (AWS, GitHub, claves
+# privadas, JWT, las propias de OCI y GCP…). Solo se exime `generic-api-key`, la regla
+# por entropía y nombre de variable, porque en un .md de docs/ marca los ids y tokens de
+# EJEMPLO de las respuestas de API (caso real: un id de muestra en el contrato de
+# ManejoQRSimple, 2026-10-01). En código y en cualquier otra ruta sigue activa.
+# Qué se pierde: un token pegado en un .md sin formato de proveedor reconocible. Para
+# repositorios con informes operativos en docs/, revisarlos al publicarlos o quitar esta
+# exención en su copia.
 #
-# Se sobrescribe la regla por su `id` con un permitido propio, y no con `[[allowlists]]` + `targetRules`,
-# porque esa sintaxis exige gitleaks >= 8.25 y gitleaks-action v3 de la CI instala la 8.24.3.
+# PRETSO (2026-09-30, aprobado por Andres Alberdi): la misma regla tiene un segundo
+# permitido, la apiKey web de Firebase en la configuración por ambiente. La regla
+# propia gcp-api-key ya la permite en archivos firebase.ts (arriba), pero la regla
+# genérica del conjunto por defecto también la marca. La apiKey web es pública por
+# diseño (la protegen las reglas de Firestore y su restricción por referente y por
+# API), así que se permite a esa regla, y solo en esos archivos: cualquier otra ruta
+# con una clave sigue marcada.
+#
+# UN SOLO bloque `[[rules]] id = "generic-api-key"` con las dos exenciones: si hubiera
+# dos bloques con el mismo id, Gitleaks se queda con el último y la otra exención se
+# pierde sin aviso. Al actualizar este archivo desde el estándar, fusione aquí.
+# -----------------------------------------------------------------------------
 [[rules]]
 id = "generic-api-key"
 
 [[rules.allowlists]]
-description = "apiKey web de Firebase en src/environments/<ambiente>/firebase.ts"
+description = "Ids y tokens de ejemplo en la documentación"
+paths = ['''(^|/)docs?/.*\.md$''']
+
+[[rules.allowlists]]
+description = "apiKey web de Firebase en src/environments/<ambiente>/firebase.ts (PRETSO)"
 paths = ['''(^|/)src/environments/[^/]+/firebase\.ts$''']
