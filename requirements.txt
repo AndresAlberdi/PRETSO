@@ -8,7 +8,7 @@
 #
 # El .ods se lee de la variable PRETSO_ODS_PATH; por omisión,
 # ~/Documentos/PRETSO/Hacia PRETSO rev AA 1.ods.
-firebase-admin==7.5.0
+firebase-admin==7.7.0
 pandas==3.0.6
 numpy==2.5.3
 # Motor de pandas para leer .ods (pd.read_excel(..., engine='odf')).
