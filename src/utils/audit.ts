@@ -1,7 +1,7 @@
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../firebase";
 
-export async function logAction(action: 'CREATE' | 'EDIT' | 'DELETE', collectionName: string, recordId: string, details?: any) {
+export async function logAction(action: 'CREATE' | 'EDIT' | 'DELETE', collectionName: string, recordId: string, details?: Record<string, unknown>) {
   try {
     await addDoc(collection(db, "logs"), {
       action,
