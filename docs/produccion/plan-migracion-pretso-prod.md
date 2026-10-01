@@ -15,7 +15,7 @@ Andres confirmó el 2026-09-30 el **camino B**: hace falta un entorno de producc
 | `pretso-database` | Sirve el sitio y contiene el corpus real. Hoy es a la vez «staging» y producción de hecho | Es el destino de `desplegar-staging` y lo que ven los usuarios |
 | `pretso-prod` | Existe, con Firebase, Firestore (`nam5`, misma región) y sitio de Hosting `pretso-prod`; **vacío**: sin datos ni usuarios | Bloque 5, hecho el 2026-09-25 |
 | Federación WIF y Environment `production` | Creados; revisor obligatorio (AndresAlberdi), despliegue solo desde tags `v*`; secretos `GCP_SA_DEPLOY_PROD` y `GCP_WIF_PROVIDER` en el Environment | `gh secret list --env production` |
-| Respaldo y protección | `pretso-database`: **activados el 2026-09-30** (PITR, protección contra borrado, respaldo diario de 30 días). `pretso-prod`: **desactivados** | `gcloud firestore databases describe` y `backups schedules list` |
+| Respaldo y protección | **Activados el 2026-09-30 en `pretso-database` y en `pretso-prod`** (PITR, protección contra borrado, respaldo diario de 30 días) | `gcloud firestore databases describe` y `backups schedules describe` |
 
 ### Hallazgo que condiciona todo: la configuración de Firebase está escrita fija en el código
 
@@ -28,7 +28,7 @@ Andres confirmó el 2026-09-30 el **camino B**: hace falta un entorno de producc
 Cada paso indica quién lo hace, costo, prueba y cómo se revierte. «Claude opera» siempre con el «sí» de Andres en el chat.
 
 ### Paso 1 — Configuración por ambiente en el código (PR de código, riesgo medio)
-**Hecho en el PR de la rama `feat/config-por-ambiente`** (ver ese PR para el resultado medido). Se aparta del texto original de este plan en un punto, y conviene que Andres lo sepa: en vez de variables de Vite inyectadas por el workflow, la configuración vive en **archivos versionados por ambiente** (`src/environments/staging/` y `production/`), elegidos en tiempo de build por el modo de Vite con el alias `@entorno`. Motivo: `.gitignore` excluye `.env.*`, el checklist (REP-06) prohíbe `.env` versionados, la `apiKey` web y el Client ID son públicos por diseño, y así no hace falta tocar el workflow del estándar ni escribir variables en GitHub.
+**Hecho en #38** (`63b9a83`, fusionado el 2026-09-30; el resultado medido está en ese PR y en `PILOTO.md`). Se aparta del texto original de este plan en un punto, y conviene que Andres lo sepa: en vez de variables de Vite inyectadas por el workflow, la configuración vive en **archivos versionados por ambiente** (`src/environments/staging/` y `production/`), elegidos en tiempo de build por el modo de Vite con el alias `@entorno`. Motivo: `.gitignore` excluye `.env.*`, el checklist (REP-06) prohíbe `.env` versionados, la `apiKey` web y el Client ID son públicos por diseño, y así no hace falta tocar el workflow del estándar ni escribir variables en GitHub.
 - Cada bundle contiene solo la configuración de su ambiente; un modo de build desconocido falla con un error claro que lista los válidos.
 - `staging`, `development` y `test` usan `pretso-database` con la misma configuración de hoy (`src/firebase-config.json`). `production` usa `pretso-prod` con los datos ya conocidos, y **`apiKey`, `appId` y el Client ID vacíos hasta el paso 3**.
 - Mientras falten, `src/firebase.ts` lanza un error claro al iniciar (no cae en silencio a otro proyecto) y **el build de producción de un tag o de un `workflow_dispatch` falla** (`GITHUB_REF_TYPE=tag` o `GITHUB_EVENT_NAME=workflow_dispatch`, que define Actions; un tag de prerelease `-rc` también lo deja en rojo antes del paso 3, y es lo deseado: nada se etiqueta antes): así un tag creado antes del paso 3 no publica un sitio roto que la prueba de humo, que solo mira el código HTTP, no detectaría. En PR y en push a rama el build de producción compila, porque la CI lo ejecuta en cada run.
@@ -38,11 +38,11 @@ Cada paso indica quién lo hace, costo, prueba y cómo se revierte. «Claude ope
 - Verificación adicional: la CSP de `firebase.json` no menciona proyectos concretos (`*.googleapis.com`, `*.firebaseio.com`), así que no cambia.
 
 ### Paso 2 — Endurecer `pretso-prod` antes de cargarle datos (GCP, Andres autoriza)
-Controles bloqueantes del checklist que hoy están en rojo o sin medir para el proyecto nuevo:
-- **DAT-04**: respaldo programado con retención de 30 días (hay datos personales) y PITR: `gcloud firestore databases update --database='(default)' --enable-pitr --project pretso-prod` y `gcloud firestore backups schedules create --database='(default)' --recurrence=daily --retention=30d --project pretso-prod`. Protección contra borrado: `--delete-protection`.
+Controles bloqueantes del checklist para `pretso-prod` (el respaldo ya está hecho; el resto, pendiente):
+- **DAT-04 — HECHO el 2026-09-30**: respaldo programado con retención de 30 días (hay datos personales) y PITR: `gcloud firestore databases update --database='(default)' --enable-pitr --project pretso-prod` y `gcloud firestore backups schedules create --database='(default)' --recurrence=daily --retention=30d --project pretso-prod`. Protección contra borrado: `--delete-protection`.
 - **NUB-G04**: presupuesto con alerta. **NUB-G03**: Audit Logs de escritura en Firestore.
 - **NUB-G05**: en Authentication, dominios autorizados sin `localhost`, y proveedores mínimos (solo correo y contraseña).
-- **Costo:** PITR y respaldos se cobran por almacenamiento; con un corpus de este tamaño se estiman centavos al mes, **por confirmar en la consola de facturación** antes de activarlos. **Reversión:** cada ajuste se desactiva con el mismo comando.
+- **Costo:** PITR y respaldos se cobran por almacenamiento; con un corpus de este tamaño se estiman centavos al mes, **por confirmar en la consola de facturación** (el respaldo ya está activo). **Reversión:** cada ajuste se desactiva con el mismo comando.
 
 ### Paso 3 — Aplicación web y clave de `pretso-prod`
 - Registrar la aplicación web en `pretso-prod` (genera su `appId` y su apiKey).
@@ -88,16 +88,16 @@ Diez colecciones: `companias`, `manejo_de_caja`, `salarios`, `corpus_christi`, `
 | SEC-01 inventario de secretos | B | **Rojo** (`docs/seguridad/inventario-secretos.md` no existe) | Escribirlo |
 | PIP-10 workflow `probar-identidad` | B | **Rojo** (no existe) | Copiar la plantilla del estándar y correrlo para `production` |
 | DAT-01 pruebas de reglas en el emulador, en CI | B | **Rojo** (no hay `test:rules` ni carpeta de pruebas) | Escribirlas y añadirlas a la CI |
-| DAT-04 respaldos y PITR | B | **Verde en `pretso-database`** (activados el 2026-09-30); **Rojo en `pretso-prod`** | Paso 2 sobre `pretso-prod` |
+| DAT-04 respaldos y PITR | B | **Verde en los dos proyectos** (activados el 2026-09-30) | — |
 | OPS-04 runbook de rollback | B | **Rojo** (`docs/produccion/runbook-rollback.md` no existe) | Escribirlo |
 | NUB-G06 App Check en `enforce` | R (B con datos personales) | **Rojo** (sin encender) | Monitoreo, luego bloqueo |
-| REP-09 Dependabot para todos los ecosistemas | B | **Parcial**: cubre `github-actions` y `npm` (raíz y `functions/`), **no `pip`**, aunque ya existe `requirements.txt` | Añadir el bloque `pip` |
+| REP-09 Dependabot para todos los ecosistemas | B | **Verde** (#37 añadió `pip`; Dependabot ya abrió PR de `pip`) | — |
 | REP-01, REP-02, REP-04, SEC-02, SEC-03, SEC-06 | B | Verde, medido el 2026-09-29 (ver `PILOTO.md` §«Gobierno») | — |
 | SEC-07 federación GCP | B | Verde según su creación del 2026-09-25; no se volvió a medir hoy | Repetir los puntos 1 a 3 de `02-identidad-federada-oidc.md` al preparar el pase |
 | REP-06 sin `.env`, claves ni `tfvars` versionados | B | Verde en lo medido (no hay archivos sensibles en `git ls-files`); **no se comparó** el bloque base del `.gitignore` con el del estándar | Comparar |
 | PIP-05, PIP-09, REP-05 | B | Verde: `./security-local.sh` aprobado, ZAP y humo en verde, historial con 5 excepciones vigentes | Las excepciones vencen el 2026-12-25 |
 
-Criterio del estándar: **un solo Rojo bloqueante impide el pase.** Hoy hay **al menos siete** (REP-03, SEC-01, PIP-10, DAT-01, DAT-04, OPS-04 y REP-09, este último parcial), y NUB-G06 también lo sería porque hay datos personales (correos de usuarios). Es un recuento de esta jornada, no un acta: el acta la produce `/pase-a-produccion` cuando se vaya a crear un tag.
+Criterio del estándar: **un solo Rojo bloqueante impide el pase.** Al 2026-09-30 quedan **cinco** (REP-03, SEC-01, PIP-10, DAT-01 y OPS-04), y NUB-G06 también lo sería porque hay datos personales (correos de usuarios). Es un recuento de esa fecha, no un acta: el acta la produce `/pase-a-produccion` cuando se vaya a crear un tag.
 
 ## 4. Lo que este plan no hace, y por qué
 - No toca datos, usuarios, IAM, ruleset ni secretos: es un plan.
