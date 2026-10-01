@@ -108,3 +108,16 @@ regexes = [
   '''wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY''',
 ]
 stopwords = ["ejemplo", "example", "placeholder", "sample"]
+
+# -----------------------------------------------------------------------------
+# apiKey web de Firebase en la configuración por ambiente (PRETSO, 2026-09-30)
+# -----------------------------------------------------------------------------
+# La regla propia gcp-api-key ya permite estas claves en archivos firebase.ts (arriba), pero la regla
+# genérica del conjunto por defecto (`useDefault = true`) también las marca. La apiKey web es pública por
+# diseño (la protegen las reglas de Firestore y su restricción por referente y por API), así que se permite
+# a esa regla, y solo en estos archivos: cualquier otra ruta con una clave sigue marcada. Aprobado por
+# Andres Alberdi el 2026-09-30.
+[[allowlists]]
+description = "apiKey web de Firebase en src/environments/<ambiente>/firebase.ts"
+targetRules = ["generic-api-key"]
+paths = ['''(^|/)src/environments/[^/]+/firebase\.ts$''']

@@ -23,35 +23,42 @@ describe('environment configs', () => {
     expect(() => assertFirebaseConfig(staging, 'staging')).not.toThrow();
   });
 
-  // Los dos tests siguientes se invierten en el paso 3 del plan, cuando se completen apiKey, appId y el
-  // Client ID de producción.
-  it('production is not publishable until step 3 fills apiKey and appId', () => {
-    expect(() => assertFirebaseConfig(production, 'production')).toThrow(/apiKey, appId/);
+  it('production config is complete', () => {
+    expect(() => assertFirebaseConfig(production, 'production')).not.toThrow();
   });
 
-  it('production has no Google Client ID until step 3', () => {
+  // Este test se invierte cuando se cree el cliente OAuth de producción (paso 3 del plan, parte manual).
+  it('production has no Google Client ID until its OAuth client is created', () => {
     expect(productionClientId).toBe('');
   });
 });
 
 describe('publishing gate', () => {
+  // Configuración incompleta sintética: la de producción ya está completa desde el paso 3.
+  const incomplete = { ...production, apiKey: '', appId: '' };
+
   it('blocks a production build of a tag while the config is incomplete', () => {
-    expect(() => assertPublishable('production', 'tag', production)).toThrow(/apiKey, appId/);
+    expect(() => assertPublishable('production', 'tag', incomplete)).toThrow(/apiKey, appId/);
   });
 
   it('blocks a manual workflow_dispatch even when the ref is a branch', () => {
-    expect(() => assertPublishable('production', 'branch', production, 'workflow_dispatch')).toThrow(/apiKey, appId/);
+    expect(() => assertPublishable('production', 'branch', incomplete, 'workflow_dispatch')).toThrow(/apiKey, appId/);
   });
 
-  it('lets PR and branch builds of production compile', () => {
-    expect(() => assertPublishable('production', 'branch', production)).not.toThrow();
-    expect(() => assertPublishable('production', undefined, production)).not.toThrow();
-    expect(() => assertPublishable('production', 'branch', production, 'push')).not.toThrow();
-    expect(() => assertPublishable('production', 'branch', production, 'pull_request')).not.toThrow();
+  it('lets PR and branch builds of production compile even if incomplete', () => {
+    expect(() => assertPublishable('production', 'branch', incomplete)).not.toThrow();
+    expect(() => assertPublishable('production', undefined, incomplete)).not.toThrow();
+    expect(() => assertPublishable('production', 'branch', incomplete, 'push')).not.toThrow();
+    expect(() => assertPublishable('production', 'branch', incomplete, 'pull_request')).not.toThrow();
   });
 
   it('never blocks the staging build, not even for a tag', () => {
-    expect(() => assertPublishable('staging', 'tag', production)).not.toThrow();
-    expect(() => assertPublishable('staging', 'branch', production, 'workflow_dispatch')).not.toThrow();
+    expect(() => assertPublishable('staging', 'tag', incomplete)).not.toThrow();
+    expect(() => assertPublishable('staging', 'branch', incomplete, 'workflow_dispatch')).not.toThrow();
+  });
+
+  it('does not block a tag or a dispatch once the production config is complete', () => {
+    expect(() => assertPublishable('production', 'tag', production)).not.toThrow();
+    expect(() => assertPublishable('production', 'branch', production, 'workflow_dispatch')).not.toThrow();
   });
 });
