@@ -346,7 +346,7 @@ Esta jornada no se había anotado.
 
 ### Controles bloqueantes tras esta jornada
 
-DAT-04, REP-09 y GCP-06 (auditoría de escrituras de Firestore) en verde. En rojo: REP-03, SEC-01, PIP-10, DAT-01, OPS-04, **GCP-07 (presupuesto)** y NUB-G06 (App Check). Quedan **seis** bloqueantes más App Check.
+DAT-04, REP-09, GCP-06 (auditoría de escrituras de Firestore) y **REP-03** en verde; GCP-07 (presupuesto) **declarado como creado por Andres, sin verificar desde la sesión**. En rojo: SEC-01, PIP-10, DAT-01 y OPS-04, más NUB-G06 (App Check). Quedan **cuatro** bloqueantes más App Check.
 
 ### REP-03 (revisores ≥ 1 en `main`): las dos salidas
 
@@ -355,4 +355,14 @@ El checklist del estándar exige al menos una aprobación en los PR a `main` (co
 - **A. Aceptarlo como «N/A justificado»**, con la desviación firmada por Andres en el acta de pase (sección «Riesgos aceptados»), y revisarla cuando entre una segunda persona. No cambia ningún flujo de trabajo. Controles compensatorios vigentes: la CI completa debe pasar (SAST, gitleaks, dependencias, humo y ZAP), sin bypass, y **producción exige tag más aprobación del Environment `production`** por una persona.
 - **B. Poner el ruleset en 1 aprobación y dar acceso de escritura a una segunda cuenta** que apruebe cada PR. Cumple la letra del control, pero si esa segunda cuenta es de la misma persona **no aporta una revisión independiente**: es un trámite más en cada PR. Solo cambia la seguridad real si la cuenta es de otra persona.
 
-Pendiente la decisión de Andres. Hoy `main` despliega sin segunda revisión el sitio en uso (`pretso-database`); cuando `pretso-prod` sea producción, ese despliegue pasa a ser de un staging de verdad y el riesgo baja.
+**Decidido por Andres el 2026-10-01: salida B.** El ruleset `proteccion-main` pasó a **1 aprobación** (se cambió solo ese valor y se verificó leyendo de nuevo que todo lo demás quedó idéntico: sin bypass, solo squash, `compuerta-pr` con la rama al día, historia lineal) y el repositorio tiene un **segundo colaborador**, `segurolotengopy` (escritura), sin invitaciones pendientes. Esa cuenta es de la misma persona, así que cumple la letra del control pero **no es una revisión independiente**; si entra otra persona, conviene que apruebe ella.
+
+Cómo se trabaja ahora: cada PR necesita la aprobación de `segurolotengopy`, que la sesión da con el OK de Andres para ese PR concreto, nombrándolo. Como el ruleset descarta las aprobaciones al empujar nuevos commits (`dismiss_stale_reviews_on_push`), el orden es: poner la rama al día con `main`, esperar el CI en verde, aprobar y fusionar; cualquier push posterior obliga a aprobar de nuevo.
+
+Hoy `main` despliega sin una segunda mirada independiente el sitio en uso (`pretso-database`); cuando `pretso-prod` sea producción, ese despliegue pasa a ser de un staging de verdad y el riesgo baja.
+
+### Usuarios de autenticación (paso 5): medido el 2026-10-01
+
+`pretso-database` tiene **3 usuarios** de Authentication (contado sin mostrar correos ni identificadores): los 3 con contraseña, ninguno deshabilitado, ninguno con claims personalizados, todos con ingresos (el último, el 2026-10-01), creados entre el 2026-07-14 y el 2026-07-29. Con tan pocos, la recomendación del plan es **recrearlos** en `pretso-prod` y enviar a cada uno un restablecimiento de contraseña, en vez de exportar e importar los hashes. `pretso-prod` no tiene ninguno todavía, así que nadie puede iniciar sesión allí hasta crearlos.
+
+- **Presupuesto con alertas de `pretso-prod` (GCP-07):** creado por Andres el 2026-10-01 en la consola, **no verificable desde la sesión** (la cuenta de la sesión no tiene permisos sobre la cuenta de facturación).
