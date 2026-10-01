@@ -84,7 +84,7 @@ export default function CorpusChristi() {
     if (!recordToDelete) return;
     try {
       await deleteDoc(doc(db, "corpus_christi", recordToDelete.id));
-      await logAction('DELETE', 'corpus_christi', recordToDelete.id, 'pretsodatabase@gmail.com', recordToDelete);
+      await logAction('DELETE', 'corpus_christi', recordToDelete.id, recordToDelete);
       setData(data.filter(d => d.id !== recordToDelete.id));
       setRecordToDelete(null);
     } catch (error) {
@@ -96,7 +96,7 @@ export default function CorpusChristi() {
     try {
       const { id, ...dataToSave } = updatedRecord;
       await updateDoc(doc(db, "corpus_christi", id), dataToSave);
-      await logAction('EDIT', 'corpus_christi', id, 'pretsodatabase@gmail.com', dataToSave);
+      await logAction('EDIT', 'corpus_christi', id, dataToSave);
       setData(data.map(d => d.id === id ? updatedRecord : d).sort(
         (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
       ));

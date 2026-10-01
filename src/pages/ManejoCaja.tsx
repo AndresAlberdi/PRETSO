@@ -100,7 +100,7 @@ export default function ManejoCaja() {
     if (!recordToDelete) return;
     try {
       await deleteDoc(doc(db, "manejo_de_caja", recordToDelete.id));
-      await logAction('DELETE', 'manejo_de_caja', recordToDelete.id, 'pretsodatabase@gmail.com', recordToDelete);
+      await logAction('DELETE', 'manejo_de_caja', recordToDelete.id, recordToDelete);
       setData(data.filter(d => d.id !== recordToDelete.id));
       setRecordToDelete(null);
     } catch (error) {
@@ -112,7 +112,7 @@ export default function ManejoCaja() {
     try {
       const { id, ...dataToSave } = updatedRecord;
       await updateDoc(doc(db, "manejo_de_caja", id), dataToSave);
-      await logAction('EDIT', 'manejo_de_caja', id, 'pretsodatabase@gmail.com', dataToSave);
+      await logAction('EDIT', 'manejo_de_caja', id, dataToSave);
       setData(data.map(d => d.id === id ? updatedRecord : d).sort(
         (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
       ));

@@ -12,11 +12,11 @@ export const createReaderUser = functions.https.onCall(async (data, context) => 
     );
   }
 
-  // Ensure only the admin can call this
-  if (context.auth.token.email !== "pretsodatabase@gmail.com") {
+  // Solo quien tenga el custom claim `admin` puede llamar a esta función
+  if (context.auth.token.admin !== true) {
     throw new functions.https.HttpsError(
       "permission-denied",
-      "Sólo el administrador puede crear usuarios lectores."
+      "Sólo un administrador puede crear usuarios lectores."
     );
   }
 

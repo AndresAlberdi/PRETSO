@@ -9,9 +9,9 @@ exports.createReaderUser = functions.https.onCall(async (data, context) => {
     if (!context.auth) {
         throw new functions.https.HttpsError("unauthenticated", "Debe estar autenticado para crear usuarios lectores.");
     }
-    // Ensure only the admin can call this
-    if (context.auth.token.email !== "pretsodatabase@gmail.com") {
-        throw new functions.https.HttpsError("permission-denied", "Sólo el administrador puede crear usuarios lectores.");
+    // Solo quien tenga el custom claim `admin` puede llamar a esta función
+    if (context.auth.token.admin !== true) {
+        throw new functions.https.HttpsError("permission-denied", "Sólo un administrador puede crear usuarios lectores.");
     }
     const email = data.email;
     const password = data.password;

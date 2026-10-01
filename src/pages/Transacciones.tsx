@@ -78,7 +78,7 @@ export default function Transacciones() {
     if (!recordToDelete) return;
     try {
       await deleteDoc(doc(db, "transacciones", recordToDelete.id));
-      await logAction('DELETE', 'transacciones', recordToDelete.id, 'pretsodatabase@gmail.com', recordToDelete);
+      await logAction('DELETE', 'transacciones', recordToDelete.id, recordToDelete);
       setData(data.filter(d => d.id !== recordToDelete.id));
       setRecordToDelete(null);
     } catch (error) {
@@ -90,7 +90,7 @@ export default function Transacciones() {
     try {
       const { id, ...dataToSave } = updatedRecord;
       await updateDoc(doc(db, "transacciones", id), dataToSave);
-      await logAction('EDIT', 'transacciones', id, 'pretsodatabase@gmail.com', dataToSave);
+      await logAction('EDIT', 'transacciones', id, dataToSave);
       setData(data.map(d => d.id === id ? updatedRecord : d).sort(
         (a, b) => Number(a["Num"] || 0) - Number(b["Num"] || 0)
       ));
