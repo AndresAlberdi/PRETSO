@@ -189,8 +189,12 @@ jobs:
     permissions:
       contents: read
       # security-events: write solo lo usa el reusable cuando subir_sarif = true
-      # (Code Scanning en Modo A/B). No se concede pull-requests: write: los
-      # escáneres no comentan en el PR.
+      # (Code Scanning en Modo A/B). No se concede pull-requests: write (los
+      # escáneres no comentan en el PR).
+      # pull-requests: read lo pide el job `secretos` del reusable: gitleaks-action lista
+      # los commits del PR por la API y, en un repositorio privado, sin él responde 403.
+      # Un job llamador no puede conceder menos de lo que el reusable pide.
+      pull-requests: read
       security-events: write
       actions: read
     uses: ./.github/workflows/_reusable-security.yml
