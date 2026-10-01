@@ -1,0 +1,143 @@
+# =============================================================================
+# probar-identidad.yml — Prueba la federación WIF (GitHub → GCP) sin desplegar
+# Basado en: SeguridadGeneral/01-seguridad/02-identidad-federada-oidc.md, §5
+# Control: PIP-10 del checklist de pase a producción
+# -----------------------------------------------------------------------------
+# Adaptaciones a PRETSO respecto de la plantilla:
+#   - Un solo job `gcp`: PRETSO solo usa GCP/Firebase (sin AWS ni OCI), y los
+#     claims OIDC se muestran en el mismo job, que es el que se autentica, de
+#     modo que el `sub` mostrado es exactamente el que GCP evalúa.
+#   - Sin Cloud Run: comprobaciones de solo lectura sobre la identidad activa,
+#     la API de Firestore y el aislamiento entre proyectos Firebase.
+#   - El job se omite en PR de forks y de Dependabot (no reciben secretos ni
+#     deben poder pedir un token OIDC del repositorio).
+#
+# Disparadores:
+#   workflow_dispatch (ambiente=staging|production): declara el Environment;
+#     `production` exige revisor y solo admite refs `v*` (correrlo sobre un tag).
+#   pull_request que toque .github/workflows/**: sin Environment, cuenta de
+#     staging; cubre el `sub` `pull_request` de la condición de confianza.
+#
+# Secretos: GCP_WIF_PROVIDER, GCP_SA_DEPLOY_STAGING, GCP_SA_DEPLOY_PROD
+# Variables: GCP_PROJECT_ID_STAGING, GCP_PROJECT_ID_PROD, NODE_VERSION (22)
+# =============================================================================
+name: probar-identidad
+
+on:
+  workflow_dispatch:
+    inputs:
+      ambiente:
+        description: Ambiente cuya identidad se prueba
+        type: choice
+        options: [staging, production]
+        default: staging
+  pull_request:
+    paths: ['.github/workflows/**']
+
+# Mínimo global; el job eleva solo id-token.
+permissions:
+  contents: read
+
+concurrency:
+  group: probar-identidad-${{ inputs.ambiente || 'pr' }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: ${{ vars.NODE_VERSION || '22' }}
+  # Misma versión fijada que ci-node-firebase.yml (regresión de ADC en 15.22.2).
+  FIREBASE_TOOLS_VERSION: '15.28.1'
+
+jobs:
+  gcp:
+    name: gcp
+    # En PR: solo ramas del propio repositorio y nunca Dependabot.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.pull_request.head.repo.full_name == github.repository &&
+       github.actor != 'dependabot[bot]')
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # Solo el dispatch declara Environment; en pull_request el job corre SIN
+    # environment (staging/production lo restringirían por rama y fallaría):
+    # la identidad de PR la cubre el sub `pull_request` del binding WIF.
+    environment: ${{ github.event_name == 'workflow_dispatch' && inputs.ambiente || '' }}
+    permissions:
+      contents: read
+      id-token: write # token OIDC para WIF
+    steps:
+      - name: Mostrar claims del token OIDC (sin el token)
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        with:
+          script: |
+            const jwt = await core.getIDToken('inspeccion');
+            const payload = JSON.parse(Buffer.from(jwt.split('.')[1], 'base64url').toString());
+            const claves = ['sub', 'aud', 'repository', 'repository_id', 'repository_owner',
+              'repository_owner_id', 'ref', 'ref_type', 'environment', 'actor', 'job_workflow_ref'];
+            core.summary.addHeading('Claims OIDC').addTable([
+              [{ data: 'Claim', header: true }, { data: 'Valor', header: true }],
+              ...claves.map(k => [k, String(payload[k] ?? '')])
+            ]);
+            await core.summary.write();
+
+      - name: Autenticar en GCP (WIF + impersonación de la SA de deploy)
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ inputs.ambiente == 'production' && secrets.GCP_SA_DEPLOY_PROD || secrets.GCP_SA_DEPLOY_STAGING }}
+
+      - name: Instalar gcloud
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3
+
+      - name: Identidad activa == cuenta de despliegue del ambiente
+        env:
+          SA_ESPERADA: ${{ inputs.ambiente == 'production' && secrets.GCP_SA_DEPLOY_PROD || secrets.GCP_SA_DEPLOY_STAGING }}
+        run: |
+          set -euo pipefail
+          activa=$(gcloud auth list --filter=status:ACTIVE --format='value(account)')
+          if [ "$activa" != "$SA_ESPERADA" ]; then
+            echo "::error::La identidad activa no es la cuenta de despliegue del ambiente."
+            exit 1
+          fi
+          echo "Identidad activa: cuenta de despliegue del ambiente (coincide)."
+
+      - name: API de Firestore habilitada en el proyecto del ambiente
+        env:
+          PROYECTO: ${{ inputs.ambiente == 'production' && vars.GCP_PROJECT_ID_PROD || vars.GCP_PROJECT_ID_STAGING }}
+        run: |
+          set -euo pipefail
+          habilitada=$(gcloud services list --enabled --project "$PROYECTO" \
+            --filter=config.name=firestore.googleapis.com --format='value(config.name)')
+          if [ "$habilitada" != "firestore.googleapis.com" ]; then
+            echo "::error::firestore.googleapis.com no figura habilitada en $PROYECTO (o la cuenta no puede listarla)."
+            exit 1
+          fi
+          echo "firestore.googleapis.com habilitada en $PROYECTO."
+
+      - name: Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Aislamiento Firebase (ve su proyecto y NO el del otro ambiente)
+        env:
+          PROYECTO: ${{ inputs.ambiente == 'production' && vars.GCP_PROJECT_ID_PROD || vars.GCP_PROJECT_ID_STAGING }}
+          OTRO: ${{ inputs.ambiente == 'production' && vars.GCP_PROJECT_ID_STAGING || vars.GCP_PROJECT_ID_PROD }}
+        run: |
+          set -euo pipefail
+          if [ -z "$PROYECTO" ] || [ -z "$OTRO" ]; then
+            echo "::error::Faltan GCP_PROJECT_ID_STAGING o GCP_PROJECT_ID_PROD en las variables de Actions."
+            exit 1
+          fi
+          # A verificar en el primer run: que `projects:list --json` devuelva
+          # los proyectos en `.result[].projectId`.
+          npx --yes "firebase-tools@${FIREBASE_TOOLS_VERSION}" projects:list --json > proyectos.json
+          jq -r '.result[].projectId' proyectos.json | sort > ids.txt
+          if ! grep -qxF "$PROYECTO" ids.txt; then
+            echo "::error::La cuenta de despliegue no ve su proyecto Firebase ($PROYECTO)."
+            exit 1
+          fi
+          if grep -qxF "$OTRO" ids.txt; then
+            echo "::error::La cuenta de despliegue ve el proyecto del otro ambiente ($OTRO): falta aislamiento."
+            exit 1
+          fi
+          echo "Ve $PROYECTO y no ve $OTRO ($(wc -l < ids.txt) proyecto(s) visibles)."
