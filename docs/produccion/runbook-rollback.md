@@ -141,7 +141,13 @@ git checkout vX.Y.(Z-1) -- firestore.rules
 firebase deploy --only firestore:rules --project pretso-prod --non-interactive --message "rollback de reglas a vX.Y.(Z-1)"
 ```
 
-Nota de diseño: según `firestore.rules`, la escritura es solo de `admin`, en todas las colecciones; la lectura es de `admin` o `reader`, excepto `logs` y `users`, que solo lee `admin`. `logs` solo admite altas desde el cliente (autor igual al correo del token y hora del servidor); no se edita ni se borra, y la depuración de datos personales (APP-09/16) se haría con el Admin SDK, decisión pendiente de Andres. Antes de desplegar reglas con claims hay que asignarlos (sección 2.4); no asignarlos es la causa previsible más probable de un rollback de reglas.
+Nota de diseño: según `firestore.rules`, la escritura es solo de `admin`, en todas las colecciones; la lectura es de `admin` o `reader`, excepto `logs` y `users`, que solo lee `admin`. `logs` solo admite altas desde el cliente (autor igual al correo del token y hora del servidor); no se edita ni se borra, y la depuración de datos personales (APP-09/16) se haría con el Admin SDK, decisión pendiente de Andres.
+
+Riesgos conocidos de la bitácora (compromiso a 30 días: 2026-10-31):
+
+- La bitácora la escribe el navegador y es opcional: un administrador con token válido puede escribir con el SDK sin dejar registro. Solución de fondo: generarla en el servidor con una función y fijar `allow create: if false`.
+- `details` guarda una copia íntegra de los registros borrados o editados. Hay que minimizarla, definir una retención y preparar un script de depuración con el Admin SDK.
+- Un alta rechazada se pierde en silencio (el error solo queda en la consola del navegador). Todo administrador debe tener correo en el token. Antes de desplegar reglas con claims hay que asignarlos (sección 2.4); no asignarlos es la causa previsible más probable de un rollback de reglas.
 
 ### 2.3 Datos de Firestore (PITR y respaldo diario)
 

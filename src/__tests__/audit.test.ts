@@ -34,4 +34,10 @@ describe('logAction', () => {
     expect(payload.timestamp).toBe('TS');
     expect(payload.details).toBeNull();
   });
+
+  it('pasa details como objeto en el payload', async () => {
+    authMock.currentUser = { email: 'persona@example.com' };
+    await logAction('EDIT', 'companias', 'x4', { a: 1 });
+    expect(addDoc.mock.calls[0][1].details).toEqual({ a: 1 });
+  });
 });

@@ -178,6 +178,12 @@ describe('reglas: bitácora logs', () => {
     await assertSucceeds(addDoc(logs(ADMIN), entrada(ADMIN.email, { details: null })))
   })
 
+  it('admin crea una entrada con recordId de 1500 y collection de 100 caracteres', async () => {
+    await assertSucceeds(
+      addDoc(logs(ADMIN), entrada(ADMIN.email, { recordId: 'a'.repeat(1500), collection: 'b'.repeat(100) })),
+    )
+  })
+
   it('admin consulta la bitácora ordenada por timestamp', async () => {
     await sembrarDocs()
     await assertSucceeds(getDocs(query(logs(ADMIN), orderBy('timestamp', 'desc'))))
@@ -191,6 +197,10 @@ describe('reglas: bitácora logs', () => {
     ["details como cadena 'x'", { details: 'x' }],
     ['collection vacía', { collection: '' }],
     ['recordId que no es cadena', { recordId: 5 }],
+    ["recordId vacío", { recordId: '' }],
+    ['recordId de 1501 caracteres', { recordId: 'a'.repeat(1501) }],
+    ['collection de 101 caracteres', { collection: 'a'.repeat(101) }],
+    ['details como lista', { details: [1] }],
   ]
   for (const [nombre, extra] of invalidas) {
     it(`rechaza: ${nombre}`, async () => {

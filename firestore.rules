@@ -58,12 +58,6 @@ service cloud.firestore {
         && (d.details == null || d.details is map);
     }
 
-    // ------------------------------------------------------------------
-    // Declare aquí las colecciones reales del proyecto (ver
-    // estructura_datos.md) y elimine este bloque genérico cuando lo haga.
-    // Mientras tanto la lectura exige lector() y la escritura solo administrador
-    // (claim en lugar de correo fijo).
-    // ------------------------------------------------------------------
     match /logs/{logId} {
       allow read: if esAdmin();
       allow create: if esAdmin() && entradaBitacoraValida();
@@ -76,6 +70,12 @@ service cloud.firestore {
       allow delete: if esAdmin();
     }
 
+    // ------------------------------------------------------------------
+    // Declare aquí las colecciones reales del proyecto (ver
+    // estructura_datos.md) y elimine este bloque genérico cuando lo haga.
+    // Mientras tanto la lectura exige lector() y la escritura solo administrador
+    // (claim en lugar de correo fijo).
+    // ------------------------------------------------------------------
     match /{document=**} {
       allow read: if esAdmin() || (lector() && !coleccionReservada());
       allow create, update: if esAdmin() && !coleccionReservada();
