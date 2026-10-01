@@ -96,7 +96,7 @@ Diez colecciones: `companias`, `manejo_de_caja`, `salarios`, `corpus_christi`, `
 | PIP-10 workflow `probar-identidad` | B | **Rojo** (no existe) | Copiar la plantilla del estándar y correrlo para `production` |
 | DAT-01 pruebas de reglas en el emulador, en CI | B | **Rojo** hasta fusionar el PR. Pruebas escritas (`npm run test:rules`, carpeta `tests/rules`; PR pendiente de fusión). Las reglas con claim ya son `firestore.rules` (PR 3 de DAT-01; asignar el claim antes del despliegue). Hallazgo: con el registro por correo abierto en Authentication cualquier persona podría leer, por eso la propuesta restringe la lectura (`admin` o `reader`; `logs` y `users` solo admin); el registro **se desactivó el 2026-10-01** en `pretso-database` y `pretso-prod` (`disabledUserSignup`, verificado leyendo la configuración); la pantalla «Gestión de usuarios» ya no puede crear cuentas desde el navegador. | Fusionar el PR (propuesta ya promovida a `firestore.rules`); asignar el claim `admin` en `pretso-prod` antes del despliegue |
 | DAT-04 respaldos y PITR | B | **Verde en los dos proyectos** (activados el 2026-09-30) | — |
-| OPS-04 runbook de rollback | B | **Verde con reservas: runbook escrito, ensayos pendientes** ([`runbook-rollback.md`](runbook-rollback.md)) | Ensayar en staging la restauración PITR/respaldo y el rollback (OPS-06) |
+| OPS-04 runbook de rollback | B | **Verde** ([`runbook-rollback.md`](runbook-rollback.md)): runbook con comandos reales y responsable; los ensayos se siguen en OPS-06 | Ensayar en staging la restauración PITR/respaldo y el rollback (OPS-06, pendiente aparte) |
 | NUB-G06 App Check en `enforce` | R (B con datos personales) | **Rojo** (sin encender) | Monitoreo, luego bloqueo |
 | REP-09 Dependabot para todos los ecosistemas | B | **Verde** (#37 añadió `pip`; Dependabot ya abrió PR de `pip`) | — |
 | REP-01, REP-02, REP-04, SEC-02, SEC-03, SEC-06 | B | Verde, medido el 2026-09-29 (ver `PILOTO.md` §«Gobierno») | — |
@@ -104,7 +104,7 @@ Diez colecciones: `companias`, `manejo_de_caja`, `salarios`, `corpus_christi`, `
 | REP-06 sin `.env`, claves ni `tfvars` versionados | B | Verde en lo medido (no hay archivos sensibles en `git ls-files`); **no se comparó** el bloque base del `.gitignore` con el del estándar | Comparar |
 | PIP-05, PIP-09, REP-05 | B | Verde: `./security-local.sh` aprobado, ZAP y humo en verde, historial con 5 excepciones vigentes | Las excepciones vencen el 2026-12-25 |
 
-Criterio del estándar: **un solo Rojo bloqueante impide el pase.** Al 2026-10-01 quedan **cuatro** (SEC-01, PIP-10, DAT-01 y OPS-04), y NUB-G06 también lo sería porque hay datos personales (correos de usuarios). Es un recuento de esa fecha, no un acta: el acta la produce `/pase-a-produccion` cuando se vaya a crear un tag.
+Criterio del estándar: **un solo Rojo bloqueante impide el pase.** Al 2026-10-01 quedan **tres** (SEC-01, PIP-10 y DAT-01; SEC-01 está en el PR #51 sin fusionar, de modo que son dos tras fusionarlo), y NUB-G06 también lo sería porque hay datos personales (correos de usuarios). Es un recuento de esa fecha, no un acta: el acta la produce `/pase-a-produccion` cuando se vaya a crear un tag.
 
 ## 4. Lo que este plan no hace, y por qué
 - No toca datos, usuarios, IAM, ruleset ni secretos: es un plan.

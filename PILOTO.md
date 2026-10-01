@@ -333,10 +333,10 @@ Hallazgos que el checklist marca como **bloqueantes** y hoy están en rojo (deta
 | SEC-01 inventario de secretos | **Verde**: inventario en [`docs/seguridad/inventario-secretos.md`](docs/seguridad/inventario-secretos.md); las verificaciones pendientes (condición de confianza WIF y roles de las cuentas de despliegue) se siguen en SEC-07 y el segundo factor en la sección 10 del inventario |
 | PIP-10 workflow `probar-identidad` | Rojo | Falta copiar la plantilla del estándar y correrla para `production` |
 | DAT-01 pruebas de reglas de Firestore en el emulador | Rojo hasta fusionar el PR | Pruebas escritas (`npm run test:rules`, carpeta `tests/rules`; PR pendiente de fusión). Las reglas con claim ya son `firestore.rules` (promovidas junto con la app y la función; asignar el claim antes del despliegue). Hallazgo: con el registro por correo abierto en Authentication cualquier persona podría leer, por eso la propuesta restringe la lectura (`admin` o `reader`; `logs` y `users` solo admin); el registro **se desactivó el 2026-10-01** en `pretso-database` y `pretso-prod` (`disabledUserSignup`, verificado leyendo la configuración); la pantalla «Gestión de usuarios» ya no puede crear cuentas desde el navegador. |
-| OPS-04 runbook de rollback | **Verde con reservas: runbook escrito, ensayos pendientes** | [`docs/produccion/runbook-rollback.md`](docs/produccion/runbook-rollback.md); ninguna restauración ni rollback de producción se ha ensayado (OPS-06 sigue pendiente) |
+| OPS-04 runbook de rollback | **Verde** | [`docs/produccion/runbook-rollback.md`](docs/produccion/runbook-rollback.md): comandos reales y responsable por componente, con lo no probado marcado como tal. Los ensayos de rollback y restauración se siguen en OPS-06 (pendiente aparte); ninguno se ha hecho |
 | NUB-G06 App Check en `enforce` | Rojo (sería bloqueante con datos personales) | Se enciende primero en monitoreo |
 
-Criterio del estándar: un solo rojo bloqueante impide el pase; hoy quedan **cinco** (REP-03, SEC-01, PIP-10, DAT-01 y OPS-04) más NUB-G06. No afectan al sitio en línea; importan antes del primer tag.
+Criterio del estándar: un solo rojo bloqueante impide el pase; con este PR quedan **tres** (SEC-01, PIP-10 y DAT-01) más NUB-G06; SEC-01 está en el PR #51 aún sin fusionar, de modo que no se cuenta como verde hasta que se fusione (tras fusionar #51 y este PR quedarían PIP-10 y DAT-01 más NUB-G06, y OPS-06 como control aparte). No afectan al sitio en línea; importan antes del primer tag.
 
 ## Jornada del 2026-09-28 — registro tardío
 
@@ -354,7 +354,7 @@ Esta jornada no se había anotado.
 
 ### Controles bloqueantes tras esta jornada
 
-DAT-04, REP-09, GCP-06 (auditoría de escrituras de Firestore) y **REP-03** en verde; GCP-07 (presupuesto) **declarado como creado por Andres, sin verificar desde la sesión**. En rojo: SEC-01, PIP-10, DAT-01 y OPS-04, más NUB-G06 (App Check). Quedan **cuatro** bloqueantes más App Check.
+DAT-04, REP-09, GCP-06 (auditoría de escrituras de Firestore) y **REP-03** en verde; GCP-07 (presupuesto) **declarado como creado por Andres, sin verificar desde la sesión**. En rojo: SEC-01 (PR #51 sin fusionar), PIP-10 y DAT-01, más NUB-G06 (App Check); OPS-04 pasa a verde con el runbook de este PR. Quedan **tres** bloqueantes más App Check (**dos** tras fusionar #51).
 
 ### REP-03 (revisores ≥ 1 en `main`): las dos salidas
 
