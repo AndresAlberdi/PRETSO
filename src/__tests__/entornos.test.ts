@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { firebaseConfig as staging } from '../environments/staging/firebase';
 import { firebaseConfig as production } from '../environments/production/firebase';
+import { googleClientId as stagingClientId } from '../environments/staging/google';
 import { googleClientId as productionClientId } from '../environments/production/google';
 import { assertFirebaseConfig, assertPublishable } from '../utils/firebaseConfig';
 
@@ -27,9 +28,10 @@ describe('environment configs', () => {
     expect(() => assertFirebaseConfig(production, 'production')).not.toThrow();
   });
 
-  // Este test se invierte cuando se cree el cliente OAuth de producción (paso 3 del plan, parte manual).
-  it('production has no Google Client ID until its OAuth client is created', () => {
-    expect(productionClientId).toBe('');
+  it('production Google Client ID belongs to the pretso-prod project and differs from staging', () => {
+    // El número inicial de un Client ID es el número del proyecto que lo creó (pretso-prod: 309066922693).
+    expect(productionClientId).toMatch(/^309066922693-[a-z0-9]+\.apps\.googleusercontent\.com$/);
+    expect(productionClientId).not.toBe(stagingClientId);
   });
 });
 
