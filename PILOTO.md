@@ -313,7 +313,7 @@ Hallazgos que el checklist marca como **bloqueantes** y hoy están en rojo (deta
 - **Sitio comprobado por Andres tras #38:** abrió https://pretso-database.web.app y lo verificó.
 - **Paso 3 del plan en GCP, con autorización de Andres.** `pretso-prod`: app web «PRETSO» registrada; **apiKey restringida** (de 27 APIs y sin restricción de referente a 4 APIs y 2 referentes, sin `localhost`; verificado con seis pruebas de respuesta HTTP antes y después); **Firebase Authentication inicializado** (no lo estaba: el inicio de sesión respondía `CONFIGURATION_NOT_FOUND`) con solo correo y contraseña y dominios autorizados limitados a los dos del sitio; **API de Drive habilitada**. El inicio de sesión desde el sitio responde ahora `INVALID_LOGIN_CREDENTIALS`, igual que en `pretso-database`.
 - **Configuración de producción en el código** (`src/environments/production/firebase.ts`, con la `apiKey`, el `appId` y el `storageBucket` reales). Gitleaks marca con su regla genérica cualquier `apiKey` nueva aunque sea la clave web pública, porque el repositorio usa las reglas por defecto y el permitido del estándar cubre solo `gcp-api-key`. Con la aprobación de Andres se añadió a `.github/gitleaks.toml` un permitido de la regla `generic-api-key` acotado a `src/environments/<ambiente>/firebase.ts` (probado con una clave falsa en una copia: esas dos rutas permitidas, cualquier otra ruta con una clave sigue marcada). Es un hueco del estándar y se lleva a SeguridadGeneral.
-- **Incidente menor, de mi parte:** al leer la configuración de Authentication de `pretso-database` como referencia imprimí sin filtrar el bloque `hashConfig` (parámetros de hash de contraseñas del proyecto) en la salida de la sesión. No salió ningún hash de usuario ni ninguna contraseña. Se reportó a Andres para su evaluación y no se repitió: las lecturas posteriores filtran esos campos.
+- **Incidente menor, de mi parte:** al leer la configuración de Authentication de `pretso-database` como referencia imprimí sin filtrar el bloque `hashConfig` (parámetros de hash de contraseñas del proyecto) en la salida de la sesión. No salió ningún hash de usuario ni ninguna contraseña. Se reportó a Andres para su evaluación y no se repitió: las lecturas posteriores filtran esos campos. **Decisión de Andres (2026-10-01): solo anotarlo; no se rota nada.**
 
 ### Estado de los controles bloqueantes del checklist al cierre del 2026-09-30
 
@@ -347,3 +347,12 @@ Esta jornada no se había anotado.
 ### Controles bloqueantes tras esta jornada
 
 DAT-04, REP-09 y GCP-06 (auditoría de escrituras de Firestore) en verde. En rojo: REP-03, SEC-01, PIP-10, DAT-01, OPS-04, **GCP-07 (presupuesto)** y NUB-G06 (App Check). Quedan **seis** bloqueantes más App Check.
+
+### REP-03 (revisores ≥ 1 en `main`): las dos salidas
+
+El checklist del estándar exige al menos una aprobación en los PR a `main` (control bloqueante). `main` tiene 0 desde el 2026-09-25, porque el repositorio tiene un solo colaborador y GitHub no permite aprobar el propio PR; se conservan PR obligatorio, `compuerta-pr` con la rama al día, historia lineal, solo squash y cero bypass. Antes del primer tag hay que resolverlo de una de dos formas:
+
+- **A. Aceptarlo como «N/A justificado»**, con la desviación firmada por Andres en el acta de pase (sección «Riesgos aceptados»), y revisarla cuando entre una segunda persona. No cambia ningún flujo de trabajo. Controles compensatorios vigentes: la CI completa debe pasar (SAST, gitleaks, dependencias, humo y ZAP), sin bypass, y **producción exige tag más aprobación del Environment `production`** por una persona.
+- **B. Poner el ruleset en 1 aprobación y dar acceso de escritura a una segunda cuenta** que apruebe cada PR. Cumple la letra del control, pero si esa segunda cuenta es de la misma persona **no aporta una revisión independiente**: es un trámite más en cada PR. Solo cambia la seguridad real si la cuenta es de otra persona.
+
+Pendiente la decisión de Andres. Hoy `main` despliega sin segunda revisión el sitio en uso (`pretso-database`); cuando `pretso-prod` sea producción, ese despliegue pasa a ser de un staging de verdad y el riesgo baja.
