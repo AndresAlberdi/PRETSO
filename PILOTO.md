@@ -129,13 +129,13 @@ npm i -D @firebase/rules-unit-testing
 # (ejemplos de pruebas en SeguridadGeneral/01-seguridad/03-hardening-por-nube.md, sección Firestore)
 
 # 4.3 Reglas endurecidas (custom claim en lugar del correo fijo)
-# a) Asigne el claim admin UNA vez (con las credenciales de administrador del proyecto):
-node -e '
-const admin = require("firebase-admin");
-admin.initializeApp({ projectId: "pretso-database" });
-admin.auth().getUserByEmail("pretsodatabase@gmail.com")
-  .then(u => admin.auth().setCustomUserClaims(u.uid, { admin: true }))
-  .then(() => console.log("claim admin asignado"))'
+# a) Asigne el claim admin UNA vez (con las credenciales de administrador del proyecto).
+#    Primero en modo solo lectura (no escribe; muestra el cambio previsto):
+python3 scripts/asignar_claim_admin.py --proyecto pretso-database --correo pretsodatabase@gmail.com
+#    Luego con --aplicar (escribe solo si hay cambio y lo verifica releyendo):
+python3 scripts/asignar_claim_admin.py --proyecto pretso-database --correo pretsodatabase@gmail.com --aplicar
+#    El claim no se ve hasta renovar el token: espere 1 hora o cierre y abra sesión.
+#    Para revertir: añada --quitar. El script nunca imprime uid ni credenciales.
 # b) Pruebe las reglas propuestas en el emulador, y recién entonces:
 mv firestore.rules.propuesta firestore.rules
 # c) Declare las colecciones reales (estructura_datos.md) en lugar del bloque genérico.
