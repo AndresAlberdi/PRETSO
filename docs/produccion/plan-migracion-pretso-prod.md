@@ -42,7 +42,7 @@ Controles bloqueantes del checklist para `pretso-prod`. **Hecho, salvo el presup
 - **DAT-04 — HECHO el 2026-09-30**: respaldo programado con retención de 30 días (hay datos personales) y PITR: `gcloud firestore databases update --database='(default)' --enable-pitr --project pretso-prod` y `gcloud firestore backups schedules create --database='(default)' --recurrence=daily --retention=30d --project pretso-prod`. Protección contra borrado: `--delete-protection`.
 - **NUB-G03 / GCP-06 (auditoría) — HECHO el 2026-10-01**: Data Access de **escrituras de Firestore** (`DATA_WRITE`) activado en la política del proyecto. Se añadió solo el bloque `auditConfigs`; los 12 roles y sus miembros quedaron idénticos (comparado antes y después). **Defecto de la guía del estándar:** `03-hardening-por-nube.md` indica `firestore.googleapis.com`, y la API lo rechaza (`does not exist or does not support service level configuration of Google Cloud audit logging`); Firestore registra su auditoría de datos bajo **`datastore.googleapis.com`**. Se lleva a SeguridadGeneral. Admin Activity está siempre activo. Secret Manager no se audita porque `pretso-prod` no lo usa (la API no está habilitada).
 - **NUB-G05 — HECHO el 2026-09-30 (paso 3)**: dominios autorizados sin `localhost` y solo el proveedor de correo y contraseña.
-- **NUB-G04 / GCP-07 (presupuesto con alertas a 50, 90 y 100 % y umbral de previsión; bloqueante) — PENDIENTE, lo crea Andres.** La cuenta de la sesión (`alberdi.andres@gmail.com`) **no tiene permisos sobre la cuenta de facturación** (puede ver que el proyecto está vinculado, pero no describir la cuenta ni listar o crear presupuestos), y darse esos permisos no corresponde a la sesión. Se crea en la consola: Facturación → Presupuestos y alertas → «Crear presupuesto», con alcance **solo el proyecto `pretso-prod`**, el monto mensual que Andres elija (en la moneda de la cuenta) y umbrales de 50 %, 90 % y 100 % del gasto, más el de previsión.
+- **NUB-G04 / GCP-07 (presupuesto con alertas a 50, 90 y 100 % y umbral de previsión; bloqueante) — creado por Andres el 2026-10-01 en la consola; no verificable desde la sesión.** La cuenta de la sesión (`alberdi.andres@gmail.com`) no tiene permisos sobre la cuenta de facturación (puede ver que el proyecto está vinculado, pero no describirla ni listar o crear presupuestos), y darse esos permisos no corresponde a la sesión.
 - **Costo:** PITR y respaldos se cobran por almacenamiento, y los registros de acceso a datos por volumen ingerido más allá del nivel gratuito; con un corpus de este tamaño se estiman centavos al mes, **por confirmar en la consola de facturación**. **Reversión:** cada ajuste se desactiva con el mismo comando; la auditoría se retira quitando el bloque `auditConfigs` de la política.
 
 ### Paso 3 — Aplicación web y clave de `pretso-prod`
@@ -66,8 +66,9 @@ Diez colecciones: `companias`, `manejo_de_caja`, `salarios`, `corpus_christi`, `
 - **Reversión:** vaciar `pretso-prod`; el origen no se toca.
 
 ### Paso 5 — Usuarios de autenticación
-- Averiguar primero **cuántos usuarios hay** (no medido). Con pocos (un administrador y unos lectores), lo más simple y seguro es **recrearlos** en `pretso-prod` desde la pantalla «Gestión de usuarios» y enviar restablecimiento de contraseña a cada lector.
-- Con muchos, exportar con `firebase auth:export` e importar con `auth:import` usando los parámetros de hash (scrypt) del proyecto de origen. El archivo exportado **contiene correos y hashes de contraseña**: se guarda fuera del repositorio, con permisos restringidos, y se destruye al terminar.
+- **Medido el 2026-10-01: `pretso-database` tiene 3 usuarios**, todos con contraseña, ninguno deshabilitado ni con claims, todos con ingresos. `pretso-prod` tiene Authentication inicializado (paso 3) y **ninguno**: nadie puede iniciar sesión allí todavía.
+- **Recomendado: recrearlos** en `pretso-prod` y enviar a cada uno un restablecimiento de contraseña. Con 3 usuarios es lo más simple y evita exportar un archivo con hashes de contraseña. El primer administrador no puede crearse desde la pantalla «Gestión de usuarios» (hay que haber iniciado sesión como administrador): se crea una vez en la consola de Firebase de `pretso-prod` (Authentication → Usuarios → Agregar usuario) con la contraseña que elija esa persona; con ese acceso se crean los otros dos desde la pantalla. El privilegio de administrador depende hoy del **correo**, así que el administrador debe usar en producción el mismo correo que en `pretso-database`.
+- Alternativa, solo si se quisiera conservar las contraseñas actuales: exportar con `firebase auth:export` e importar con `auth:import` usando los parámetros de hash (scrypt) del proyecto de origen. El archivo exportado **contiene correos y hashes de contraseña**: se guarda fuera del repositorio, con permisos restringidos, y se destruye al terminar. No compensa con 3 usuarios.
 - **Claim de administrador:** asignar `admin: true` al administrador en `pretso-prod` con el Admin SDK y verificarlo leyendo el usuario. Hoy el privilegio de escritura depende del correo escrito fijo en `firestore.rules`, en `functions/src/index.ts` y en `src/context/AdminContext.tsx`; **este plan mantiene el mecanismo del correo** para no cambiar reglas de seguridad durante la migración. La migración al claim (Fase 4.3 de `PILOTO.md`) es un PR posterior, con pruebas de reglas en el emulador (DAT-01).
 
 ### Paso 6 — Reglas, Hosting y App Check en `pretso-prod`
@@ -89,7 +90,7 @@ Diez colecciones: `companias`, `manejo_de_caja`, `salarios`, `corpus_christi`, `
 
 | Control | Nivel | Estado hoy | Qué falta |
 |---|---|---|---|
-| REP-03 revisores ≥ 1 en `main` | B | **Rojo** (0 aprobaciones, desviación documentada en `PILOTO.md`) | Que el propietario del estándar la acepte como «N/A justificado» (un solo dueño) |
+| REP-03 revisores ≥ 1 en `main` | B | **Verde** desde el 2026-10-01: ruleset en 1 aprobación y segundo colaborador (`segurolotengopy`). Cumple la letra; esa cuenta es de la misma persona, así que no es revisión independiente | — |
 | SEC-01 inventario de secretos | B | **Rojo** (`docs/seguridad/inventario-secretos.md` no existe) | Escribirlo |
 | PIP-10 workflow `probar-identidad` | B | **Rojo** (no existe) | Copiar la plantilla del estándar y correrlo para `production` |
 | DAT-01 pruebas de reglas en el emulador, en CI | B | **Rojo** (no hay `test:rules` ni carpeta de pruebas) | Escribirlas y añadirlas a la CI |
@@ -102,7 +103,7 @@ Diez colecciones: `companias`, `manejo_de_caja`, `salarios`, `corpus_christi`, `
 | REP-06 sin `.env`, claves ni `tfvars` versionados | B | Verde en lo medido (no hay archivos sensibles en `git ls-files`); **no se comparó** el bloque base del `.gitignore` con el del estándar | Comparar |
 | PIP-05, PIP-09, REP-05 | B | Verde: `./security-local.sh` aprobado, ZAP y humo en verde, historial con 5 excepciones vigentes | Las excepciones vencen el 2026-12-25 |
 
-Criterio del estándar: **un solo Rojo bloqueante impide el pase.** Al 2026-09-30 quedan **cinco** (REP-03, SEC-01, PIP-10, DAT-01 y OPS-04), y NUB-G06 también lo sería porque hay datos personales (correos de usuarios). Es un recuento de esa fecha, no un acta: el acta la produce `/pase-a-produccion` cuando se vaya a crear un tag.
+Criterio del estándar: **un solo Rojo bloqueante impide el pase.** Al 2026-10-01 quedan **cuatro** (SEC-01, PIP-10, DAT-01 y OPS-04), y NUB-G06 también lo sería porque hay datos personales (correos de usuarios). Es un recuento de esa fecha, no un acta: el acta la produce `/pase-a-produccion` cuando se vaya a crear un tag.
 
 ## 4. Lo que este plan no hace, y por qué
 - No toca datos, usuarios, IAM, ruleset ni secretos: es un plan.
