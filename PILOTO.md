@@ -356,7 +356,7 @@ Esta jornada no se había anotado.
 
 ### Controles bloqueantes tras esta jornada
 
-DAT-04, REP-09, GCP-06 (auditoría de escrituras de Firestore) y **REP-03** en verde; GCP-07 (presupuesto) **declarado como creado por Andres, sin verificar desde la sesión**. DAT-01 pasa a verde (run de `main` 36866213607 (sha 7648692, job `calidad`, paso «Pruebas de reglas de Firestore (emulador)» en success) y los PR #48 a #50). SEC-01: verde en el PR #51, pendiente de fusión. OPS-04 pasa a verde con el runbook de este PR. En rojo: PIP-10, OPS-06 (ninguno de los ensayos ejecutado), OPS-07 (valores pendientes de confirmar por Andres) y NUB-G06 (App Check); PIP-14 depende de OPS-06. Quedan **cuatro** Rojo B tras fusionar #51 (**cinco** antes, con SEC-01).
+DAT-04, REP-09, GCP-06 (auditoría de escrituras de Firestore) y **REP-03** en verde; GCP-07 (presupuesto) **declarado como creado por Andres, sin verificar desde la sesión**. DAT-01 pasa a verde (run de `main` 36866213607 (sha 7648692, job `calidad`, paso «Pruebas de reglas de Firestore (emulador)» en success) y los PR #48 a #50). SEC-01: verde, fusionado en #51. OPS-04 pasa a verde con el runbook de este PR. En rojo: PIP-10, OPS-06 (ninguno de los ensayos ejecutado), OPS-07 (valores pendientes de confirmar por Andres) y NUB-G06 (App Check); PIP-14 depende de OPS-06. Quedan **cuatro** Rojo B tras fusionar #51 (**cinco** antes, con SEC-01).
 
 ### REP-03 (revisores ≥ 1 en `main`): las dos salidas
 
