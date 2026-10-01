@@ -14,6 +14,8 @@ rules_version = '2';
 //    abierto por la apiKey pública, cualquiera podría leer todo. Ahora exige
 //    administrador o el claim `reader` (función lector()); `logs` y `users`
 //    solo los lee el administrador.
+// 3. `logs` solo admite altas válidas (autor = correo del token, hora del
+//    servidor); nadie la edita ni la borra desde el cliente.
 //
 // Pendiente: la lectura por colección (principio de menor privilegio) sigue sin
 // declararse; el bloque global `{document=**}` existe, pero restringido a
@@ -42,16 +44,30 @@ service cloud.firestore {
       return request.path[3] in ['logs', 'users'];
     }
 
+    // Forma exacta que escribe logAction (src/utils/audit.ts).
+    function entradaBitacoraValida() {
+      let d = request.resource.data;
+      let campos = ['action', 'collection', 'recordId', 'user', 'timestamp', 'details'];
+      return d.keys().hasAll(campos)
+        && d.keys().hasOnly(campos)
+        && d.action in ['CREATE', 'EDIT', 'DELETE']
+        && d.collection is string && d.collection.size() > 0 && d.collection.size() <= 100
+        && d.recordId is string && d.recordId.size() > 0 && d.recordId.size() <= 1500
+        && d.user == request.auth.token.email
+        && d.timestamp == request.time
+        && (d.details == null || d.details is map);
+    }
+
     // ------------------------------------------------------------------
     // Declare aquí las colecciones reales del proyecto (ver
     // estructura_datos.md) y elimine este bloque genérico cuando lo haga.
     // Mientras tanto la lectura exige lector() y la escritura solo administrador
     // (claim en lugar de correo fijo).
     // ------------------------------------------------------------------
-    match /logs/{document=**} {
+    match /logs/{logId} {
       allow read: if esAdmin();
-      allow create, update: if esAdmin();
-      allow delete: if esAdmin();
+      allow create: if esAdmin() && entradaBitacoraValida();
+      allow update, delete: if false;
     }
 
     match /users/{document=**} {
@@ -62,8 +78,8 @@ service cloud.firestore {
 
     match /{document=**} {
       allow read: if esAdmin() || (lector() && !coleccionReservada());
-      allow create, update: if esAdmin();
-      allow delete: if esAdmin();
+      allow create, update: if esAdmin() && !coleccionReservada();
+      allow delete: if esAdmin() && !coleccionReservada();
     }
   }
 }

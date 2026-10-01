@@ -141,7 +141,7 @@ git checkout vX.Y.(Z-1) -- firestore.rules
 firebase deploy --only firestore:rules --project pretso-prod --non-interactive --message "rollback de reglas a vX.Y.(Z-1)"
 ```
 
-Nota de diseño: según `firestore.rules`, la escritura es solo de `admin`, en todas las colecciones; la lectura es de `admin` o `reader`, excepto `logs` y `users`, que solo lee `admin`. Antes de desplegar reglas con claims hay que asignarlos (sección 2.4); no asignarlos es la causa previsible más probable de un rollback de reglas.
+Nota de diseño: según `firestore.rules`, la escritura es solo de `admin`, en todas las colecciones; la lectura es de `admin` o `reader`, excepto `logs` y `users`, que solo lee `admin`. `logs` solo admite altas desde el cliente (autor igual al correo del token y hora del servidor); no se edita ni se borra, y la depuración de datos personales (APP-09/16) se haría con el Admin SDK, decisión pendiente de Andres. Antes de desplegar reglas con claims hay que asignarlos (sección 2.4); no asignarlos es la causa previsible más probable de un rollback de reglas.
 
 ### 2.3 Datos de Firestore (PITR y respaldo diario)
 
