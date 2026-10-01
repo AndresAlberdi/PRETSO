@@ -1,6 +1,6 @@
 # =============================================================================
 # _reusable-dast.yml — Fase 5 "dast-y-humo" (workflow reutilizable)
-# Versión: 2.1 | Fecha: 2026-09-04
+# Versión: 2.2 | Fecha: 2026-10-01
 # -----------------------------------------------------------------------------
 # Propósito: verificar la aplicación YA DESPLEGADA (normalmente staging):
 #   1. humo: la URL responde 200 con reintentos y expone cabeceras de seguridad
@@ -37,7 +37,7 @@ on:
       ruta_salud:
         description: Path del health check (además de /)
         type: string
-        default: '/healthz'
+        default: '/health'
       exigir_cabeceras:
         description: Fallar si faltan HSTS o CSP en la respuesta de /
         type: boolean
@@ -81,7 +81,14 @@ jobs:
           codigo=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 15 -L "$url$RUTA_SALUD" || echo 000)
           case "$codigo" in
             200) echo "OK  $url$RUTA_SALUD -> 200" ;;
-            404) echo "::warning::$url$RUTA_SALUD devolvió 404 (defina un health check o cambie ruta_salud)" ;;
+            404)
+              if [[ "$RUTA_SALUD" == *z && "$url" == *.run.app* ]]; then
+                # Cloud Run reserva en *.run.app las rutas que terminan en «z»: Google
+                # responde por su cuenta y la petición no llega al contenedor.
+                echo "::warning::$url$RUTA_SALUD devolvió 404: Cloud Run reserva en *.run.app las rutas que terminan en «z» y Google responde sin llegar al contenedor. Use /health (variable HEALTH_PATH)."
+              else
+                echo "::warning::$url$RUTA_SALUD devolvió 404 (defina un health check o cambie ruta_salud)"
+              fi ;;
             *)   echo "::error::$url$RUTA_SALUD devolvió $codigo"; exit 1 ;;
           esac
 
