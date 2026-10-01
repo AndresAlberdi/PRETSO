@@ -11,10 +11,14 @@ rules_version = '2';
 // 1. El privilegio de escritura deja de depender de un correo escrito de forma
 //    fija ('pretsodatabase@gmail.com') y pasa a un custom claim `admin` que se
 //    administra desde el backend sin editar ni redesplegar reglas.
-// 2. La lectura deja de ser global para usuarios autenticados: se declara
-//    colección por colección (principio de menor privilegio); `{document=**}`
-//    global desaparece.
-// 3. Se limita el tamaño de los documentos escritos para contener abuso.
+// 2. La lectura deja de ser «cualquier usuario autenticado»: con el registro
+//    abierto por la apiKey pública, cualquiera podría leer todo. Ahora exige
+//    administrador o el claim `reader` (función lector()); `logs` y `users`
+//    solo los lee el administrador.
+//
+// Pendiente: la lectura por colección (principio de menor privilegio) sigue sin
+// declararse; el bloque global `{document=**}` existe, pero restringido a
+// lector().
 // ============================================================================
 service cloud.firestore {
   match /databases/{database}/documents {
@@ -29,20 +33,38 @@ service cloud.firestore {
       return autenticado() && request.auth.token.admin == true;
     }
 
-    function tamanoRazonable() {
-      // Rechaza documentos desproporcionados (defensa ante abuso).
-      return request.resource.size() < 200;
+    function lector() {
+      return esAdmin() || request.auth.token.reader == true;
+    }
+
+    // Las reglas de `match` solapados se suman (basta que una permita), así
+    // que el bloque global debe excluir explícitamente `logs` y `users`.
+    function coleccionReservada() {
+      return request.path[3] in ['logs', 'users'];
     }
 
     // ------------------------------------------------------------------
     // Declare aquí las colecciones reales del proyecto (ver
     // estructura_datos.md) y elimine este bloque genérico cuando lo haga.
-    // Mientras tanto conserva el comportamiento actual (lectura autenticada,
-    // escritura solo administrador) pero con claim en lugar de correo fijo.
+    // Mientras tanto la lectura exige lector() y la escritura solo administrador
+    // (claim en lugar de correo fijo).
     // ------------------------------------------------------------------
+    match /logs/{document=**} {
+      allow read: if esAdmin();
+      allow create, update: if esAdmin();
+      allow delete: if esAdmin();
+    }
+
+    match /users/{document=**} {
+      allow read: if esAdmin();
+      allow create, update: if esAdmin();
+      allow delete: if esAdmin();
+    }
+
     match /{document=**} {
-      allow read: if autenticado();
-      allow write: if esAdmin() && tamanoRazonable();
+      allow read: if esAdmin() || (lector() && !coleccionReservada());
+      allow create, update: if esAdmin();
+      allow delete: if esAdmin();
     }
   }
 }
