@@ -50,11 +50,14 @@ env:
 jobs:
   gcp:
     name: gcp
-    # En PR: solo ramas del propio repositorio y nunca Dependabot.
+    # En PR: solo ramas del propio repositorio y nunca Dependabot (ni por el actor
+    # ni por el autor del PR: una persona que empuja a una rama de Dependabot
+    # cambia el actor, no el autor).
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (github.event.pull_request.head.repo.full_name == github.repository &&
-       github.actor != 'dependabot[bot]')
+       github.actor != 'dependabot[bot]' &&
+       github.event.pull_request.user.login != 'dependabot[bot]')
     runs-on: ubuntu-latest
     timeout-minutes: 10
     # Solo el dispatch declara Environment; en pull_request el job corre SIN
