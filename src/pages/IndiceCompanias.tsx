@@ -94,7 +94,7 @@ export default function IndiceCompanias() {
     if (!recordToDelete) return;
     try {
       await deleteDoc(doc(db, "companias", recordToDelete.id));
-      await logAction('DELETE', 'companias', recordToDelete.id, 'pretsodatabase@gmail.com', recordToDelete);
+      await logAction('DELETE', 'companias', recordToDelete.id, recordToDelete);
       setData(data.filter(d => d.id !== recordToDelete.id));
       setRecordToDelete(null);
     } catch (error) {
@@ -106,7 +106,7 @@ export default function IndiceCompanias() {
     try {
       const { id, ...dataToSave } = updatedRecord;
       await updateDoc(doc(db, "companias", id), dataToSave);
-      await logAction('EDIT', 'companias', id, 'pretsodatabase@gmail.com', dataToSave);
+      await logAction('EDIT', 'companias', id, dataToSave);
       setData(data.map(d => d.id === id ? updatedRecord : d).sort(
         (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
       ));

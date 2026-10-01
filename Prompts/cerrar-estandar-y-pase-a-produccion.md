@@ -254,10 +254,9 @@ antes de mover a nadie.
 ### Bloque 6 — Endurecimiento, ya sin bloquear a nadie (la misma semana)
 Rama por tema. En orden de valor:
 
-1. **Reglas de Firestore.** Las vigentes dan escritura a un correo escrito fijo
-   en el archivo. `firestore.rules.propuesta` ya trae la versión con claim
-   `admin`. Asignar el claim, **probar en el emulador**, y recién entonces
-   reemplazar y desplegar.
+1. **Reglas de Firestore.** Ya usan el claim `admin` (promovidas desde la
+   propuesta, con pruebas en el emulador). Antes de desplegarlas a un proyecto
+   hay que asignar el claim en él; sin eso nadie podrá escribir ni leer.
 2. **Cobertura real.** El proyecto **sí tiene pruebas** —15, en 4 archivos, que
    pasan en 1,1 s—; `COVERAGE_MIN` está en 0 porque falta `@vitest/coverage-v8`,
    no porque no haya qué medir. Instalarlo y subir el umbral.

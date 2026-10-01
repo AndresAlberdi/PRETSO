@@ -81,7 +81,7 @@ export default function Indicadores() {
     if (!recordToDelete) return;
     try {
       await deleteDoc(doc(db, "indicadores", recordToDelete.id));
-      await logAction('DELETE', 'indicadores', recordToDelete.id, 'pretsodatabase@gmail.com', recordToDelete);
+      await logAction('DELETE', 'indicadores', recordToDelete.id, recordToDelete);
       setData(data.filter(d => d.id !== recordToDelete.id));
       setRecordToDelete(null);
     } catch (error) {
@@ -93,7 +93,7 @@ export default function Indicadores() {
     try {
       const { id, ...dataToSave } = updatedRecord;
       await updateDoc(doc(db, "indicadores", id), dataToSave);
-      await logAction('EDIT', 'indicadores', id, 'pretsodatabase@gmail.com', dataToSave);
+      await logAction('EDIT', 'indicadores', id, dataToSave);
       setData(data.map(d => d.id === id ? updatedRecord : d).sort(
         (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
       ));

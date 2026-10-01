@@ -17,7 +17,7 @@ Este documento lista, en orden, los comandos que **usted** debe ejecutar con sus
 | `.github/` (8) | `dependabot.yml`, `zap-rules.tsv`, `gitleaks.toml`, `trivy.yaml`, `semgrep.yml`, `CODEOWNERS` (@AndresAlberdi), `PULL_REQUEST_TEMPLATE.md`, `devsecops.schema.json` |
 | `.github/rulesets/` (2) | `main.json` y `tags.json` para aplicar con `gh api` |
 | `firebase.json` | Se añadieron cabeceras de seguridad (HSTS, CSP, X-Frame-Options…) — la prueba de humo del pipeline las exige. Verifique la aplicación en el canal de vista previa del PR antes de fusionar; si la CSP bloquea algún recurso, ajústela en este archivo |
-| `firestore.rules.propuesta` | Reglas endurecidas (custom claim en lugar de correo fijo). **No** reemplaza a `firestore.rules` hasta el paso 7.3 |
+| `firestore.rules` | Reglas endurecidas (custom claim `admin` en lugar de correo fijo; lectura restringida) |
 | `deploy.sh` | v2 del estándar (reemplaza a la v1; la v1 queda en el historial git). Ahora **bloquea** en vulnerabilidades CRITICAL/HIGH y ya no hace push a `master` |
 | `security-local.sh` | Análisis de seguridad local, mismo criterio que CI |
 | `CLAUDE.md`, `.claude/agents/`, `.claude/skills/` | Política ejecutable para Claude Code y sus 4 subagentes |
@@ -142,8 +142,10 @@ python3 scripts/asignar_claim_admin.py --proyecto pretso-database --correo prets
 #    Pruebas del script (venv con requirements.txt): python3 -m unittest scripts/test_asignar_claim_admin.py
 #    Aún no corren en CI: la decisión de añadirlas a un workflow está pendiente
 #    (la evaluará el agente devsecops).
-# b) Pruebe las reglas propuestas en el emulador, y recién entonces:
-mv firestore.rules.propuesta firestore.rules
+# b) Las reglas con claim ya son `firestore.rules` y se prueban en el emulador (`npm run test:rules`).
+#    ORDEN OBLIGATORIO: asigne el claim en el proyecto ANTES de que el merge despliegue estas reglas;
+#    si no, nadie podrá escribir ni leer. Resuelto por el PR 3 de DAT-01 (privilegio por claim en reglas,
+#    `AdminContext.tsx` y `functions/src/index.ts`).
 # c) Declare las colecciones reales (estructura_datos.md) en lugar del bloque genérico.
 
 # 4.4 Cloud Functions: subir runtime (Node 20 está en fin de soporte) y desplegarlas por CI
@@ -162,7 +164,7 @@ Corrí las herramientas del estándar sobre el código real antes de tocar el pi
 | 1 | `npm audit`: `brace-expansion` y `nanoid` (transitivas) con severidad **HIGH**; `exceljs`, `postcss`, `uuid` moderate | Bloqueante en CI | Ejecutar `npm audit fix` ANTES del primer PR (paso 3.0 abajo). `exceljs` no tiene fix publicado: si persiste como moderate no bloquea; vigilarlo vía Dependabot |
 | 2 | `functions/`: 9 vulnerabilidades moderate | No bloqueante | `cd functions && npm audit fix`; se resolverán mejor al subir firebase-admin/functions en la Fase 4.4 |
 | 3 | Gitleaks: la `apiKey` web de Firebase aparece en `src/firebase.ts`, `src/firebase-config.json` y `src/pages/UserManagement.tsx` | Falso positivo documentado | Es un identificador público por diseño; quedó una allowlist acotada y justificada en `.github/gitleaks.toml`. El control real es la Fase 4.5. Los hallazgos del historial quedaron como excepciones con vencimiento en #30 |
-| 4 | El privilegio de administrador depende del correo fijo en **tres** lugares: `firestore.rules`, `src/context/AdminContext.tsx` y `functions/src/index.ts` | Deuda de diseño | La migración al custom claim (Fase 4.3) debe cubrir los tres: reglas → `request.auth.token.admin == true`; AdminContext → `getIdTokenResult().claims.admin`; función → `context.auth.token.admin === true` |
+| 4 | El privilegio de administrador depende del correo fijo en **tres** lugares: `firestore.rules`, `src/context/AdminContext.tsx` y `functions/src/index.ts` | Resuelto por el PR 3 de DAT-01 (nota de orden: asignar el claim en el proyecto ANTES de que el merge despliegue las reglas) | La migración al custom claim (Fase 4.3) debe cubrir los tres: reglas → `request.auth.token.admin == true`; AdminContext → `getIdTokenResult().claims.admin`; función → `context.auth.token.admin === true` |
 | 5 | `src/pages/UserManagement.tsx` duplica la configuración de Firebase para crear usuarios con una app secundaria | Observación | Importar la config desde `src/firebase-config.json` en lugar de duplicarla. **Cerrado en #29** (importa `firebaseConfig` de `src/firebase.ts`) |
 | 6 | Semgrep (reglas propias del estándar): 0 hallazgos; los rulesets del registro (`p/ci`, `p/owasp-top-ten`) correrán completos en GitHub Actions | Informativo | Nada que hacer |
 
@@ -330,7 +332,7 @@ Hallazgos que el checklist marca como **bloqueantes** y hoy están en rojo (deta
 | REP-03 revisores ≥ 1 en `main` | Rojo | Desviación documentada (un solo dueño); falta aceptarla como «N/A justificado» |
 | SEC-01 inventario de secretos | Rojo | Falta `docs/seguridad/inventario-secretos.md` |
 | PIP-10 workflow `probar-identidad` | Rojo | Falta copiar la plantilla del estándar y correrla para `production` |
-| DAT-01 pruebas de reglas de Firestore en el emulador | Rojo hasta fusionar el PR | Pruebas escritas (`npm run test:rules`, carpeta `tests/rules`; PR pendiente de fusión). La propuesta `firestore.rules.propuesta` está probada pero sin promover a `firestore.rules`. Hallazgo: con el registro por correo abierto en Authentication cualquier persona podría leer, por eso la propuesta restringe la lectura (`admin` o `reader`; `logs` y `users` solo admin); el registro **se desactivó el 2026-10-01** en `pretso-database` y `pretso-prod` (`disabledUserSignup`, verificado leyendo la configuración); la pantalla «Gestión de usuarios» ya no puede crear cuentas desde el navegador. |
+| DAT-01 pruebas de reglas de Firestore en el emulador | Rojo hasta fusionar el PR | Pruebas escritas (`npm run test:rules`, carpeta `tests/rules`; PR pendiente de fusión). Las reglas con claim ya son `firestore.rules` (promovidas junto con la app y la función; asignar el claim antes del despliegue). Hallazgo: con el registro por correo abierto en Authentication cualquier persona podría leer, por eso la propuesta restringe la lectura (`admin` o `reader`; `logs` y `users` solo admin); el registro **se desactivó el 2026-10-01** en `pretso-database` y `pretso-prod` (`disabledUserSignup`, verificado leyendo la configuración); la pantalla «Gestión de usuarios» ya no puede crear cuentas desde el navegador. |
 | OPS-04 runbook de rollback | Rojo | Falta `docs/produccion/runbook-rollback.md` |
 | NUB-G06 App Check en `enforce` | Rojo (sería bloqueante con datos personales) | Se enciende primero en monitoreo |
 

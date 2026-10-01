@@ -11,7 +11,7 @@ import {
 } from 'firebase/firestore'
 import { crearEntorno } from './helpers.ts'
 
-const REGLAS = 'firestore.rules.propuesta'
+const REGLAS = 'firestore.rules'
 const entorno = crearEntorno('demo-pruebas-claim', REGLAS)
 
 const RUTAS = ['corpus_christi/c1', 'corpus_christi/c1/sub/s1', 'logs/l1', 'users/u1']
@@ -29,7 +29,7 @@ const contexto = (claims?: Record<string, unknown>) =>
     ? entorno.env().unauthenticatedContext().firestore()
     : entorno.env().authenticatedContext('usuario', claims).firestore()
 
-describe('reglas propuestas: claim admin verdadero', () => {
+describe('reglas: claim admin verdadero', () => {
   const variantes: Array<[string, Record<string, unknown>]> = [
     ['con correo administrador', { admin: true, email: 'pretsodatabase@gmail.com', email_verified: true }],
     ['con otro correo', { admin: true, email: 'alberdi.andres@gmail.com', email_verified: true }],
@@ -49,7 +49,7 @@ describe('reglas propuestas: claim admin verdadero', () => {
   }
 })
 
-describe('reglas propuestas: correo administrador sin claim', () => {
+describe('reglas: correo administrador sin claim', () => {
   for (const ruta of RUTAS) {
     it(`no lee ni escribe en ${ruta}`, async () => {
       await sembrarDocs()
@@ -62,7 +62,7 @@ describe('reglas propuestas: correo administrador sin claim', () => {
   }
 })
 
-describe('reglas propuestas: claims que no son admin == true', () => {
+describe('reglas: claims que no son admin == true', () => {
   const casos: Array<[string, Record<string, unknown>]> = [
     ["admin: 'true' (cadena)", { admin: 'true' }],
     ["admin: 'True' (cadena)", { admin: 'True' }],
@@ -86,7 +86,7 @@ describe('reglas propuestas: claims que no son admin == true', () => {
   }
 })
 
-describe('reglas propuestas: lectura', () => {
+describe('reglas: lectura', () => {
   for (const ruta of RUTAS_GLOBALES) {
     it(`{reader:true} lee ${ruta}`, async () => {
       await sembrarDocs()
@@ -135,7 +135,7 @@ describe('reglas propuestas: lectura', () => {
   }
 })
 
-describe('reglas propuestas: anónimo', () => {
+describe('reglas: anónimo', () => {
   for (const ruta of RUTAS) {
     it(`no lee ni escribe en ${ruta}`, async () => {
       await sembrarDocs()

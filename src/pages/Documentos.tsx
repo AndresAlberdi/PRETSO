@@ -79,7 +79,7 @@ export default function Documentos() {
     if (!recordToDelete) return;
     try {
       await deleteDoc(doc(db, "documentos", recordToDelete.id));
-      await logAction('DELETE', 'documentos', recordToDelete.id, 'pretsodatabase@gmail.com', recordToDelete);
+      await logAction('DELETE', 'documentos', recordToDelete.id, recordToDelete);
       setData(data.filter(d => d.id !== recordToDelete.id));
       setRecordToDelete(null);
     } catch (error) {
@@ -91,7 +91,7 @@ export default function Documentos() {
     try {
       const { id, ...dataToSave } = updatedRecord;
       await updateDoc(doc(db, "documentos", id), dataToSave);
-      await logAction('EDIT', 'documentos', id, 'pretsodatabase@gmail.com', dataToSave);
+      await logAction('EDIT', 'documentos', id, dataToSave);
       setData(data.map(d => d.id === id ? updatedRecord : d).sort(
         (a, b) => Number(a["Doc"] || 0) - Number(b["Doc"] || 0)
       ));

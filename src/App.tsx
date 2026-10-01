@@ -1,5 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router';
 import ProtectedRoute from './components/ProtectedRoute';
+import AdminRoute from './components/AdminRoute';
 import Login from './pages/Login';
 import Inicio from './pages/Inicio';
 import ManejoCaja from './pages/ManejoCaja';
@@ -94,9 +95,9 @@ export default function App() {
           <Route path="/bibliografia" element={<ProtectedRoute><Layout><Bibliografia /></Layout></ProtectedRoute>} />
           <Route path="/transacciones" element={<ProtectedRoute><Layout><Transacciones /></Layout></ProtectedRoute>} />
           <Route path="/documentos" element={<ProtectedRoute><Layout><Documentos /></Layout></ProtectedRoute>} />
-          <Route path="/auditoria" element={<ProtectedRoute><Layout><Auditoria /></Layout></ProtectedRoute>} />
-          <Route path="/administracion" element={<ProtectedRoute><Layout><Administracion /></Layout></ProtectedRoute>} />
-          <Route path="/usuarios" element={<ProtectedRoute><Layout><UserManagement /></Layout></ProtectedRoute>} />
+          <Route path="/auditoria" element={<ProtectedRoute><AdminRoute><Layout><Auditoria /></Layout></AdminRoute></ProtectedRoute>} />
+          <Route path="/administracion" element={<ProtectedRoute><AdminRoute><Layout><Administracion /></Layout></AdminRoute></ProtectedRoute>} />
+          <Route path="/usuarios" element={<ProtectedRoute><AdminRoute><Layout><UserManagement /></Layout></AdminRoute></ProtectedRoute>} />
           
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

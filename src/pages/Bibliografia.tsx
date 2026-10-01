@@ -51,7 +51,7 @@ export default function Bibliografia() {
     if (!recordToDelete) return;
     try {
       await deleteDoc(doc(db, "bibliografia", recordToDelete.id));
-      await logAction('DELETE', 'bibliografia', recordToDelete.id, 'pretsodatabase@gmail.com', recordToDelete);
+      await logAction('DELETE', 'bibliografia', recordToDelete.id, recordToDelete);
       setData(data.filter(d => d.id !== recordToDelete.id));
       setRecordToDelete(null);
     } catch (error) {
@@ -63,7 +63,7 @@ export default function Bibliografia() {
     try {
       const { id, ...dataToSave } = updatedRecord;
       await updateDoc(doc(db, "bibliografia", id), dataToSave);
-      await logAction('EDIT', 'bibliografia', id, 'pretsodatabase@gmail.com', dataToSave);
+      await logAction('EDIT', 'bibliografia', id, dataToSave);
       setData(data.map(d => d.id === id ? updatedRecord : d).sort(
         (a, b) => String(a["Autores"] || '').localeCompare(String(b["Autores"] || ''))
       ));

@@ -256,7 +256,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
       const docRef = await addDoc(collection(db, collectionName), recordToSave);
       
       // 3. Log Action
-      await logAction('CREATE', collectionName, docRef.id, 'pretsodatabase@gmail.com', recordToSave);
+      await logAction('CREATE', collectionName, docRef.id, recordToSave);
 
       // 4. Return to parent
       onCreated({ id: docRef.id, ...recordToSave });

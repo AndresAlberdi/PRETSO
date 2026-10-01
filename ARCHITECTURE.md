@@ -29,7 +29,7 @@ El código fuente del frontend sigue una estructura modular orientada a componen
 Toda la lógica compleja para ordenar arreglos de objetos por claves específicas está abstraída en este Hook. Devuelve los datos ordenados (`items`), la función para solicitar un cambio de orden (`requestSort`) y la configuración actual del ordenamiento (`sortConfig`).
 
 ### 3.2. Contexto de Administración (`AdminContext`)
-Evita el *prop-drilling* del estado de autenticación. Escucha los cambios del estado de Firebase Auth (`onAuthStateChanged`) y expone un booleano `isEditMode`. Si el usuario es `pretsodatabase@gmail.com`, `isEditMode` es `true`. El privilegio de administrador se está migrando a un custom claim `admin` (asignado con `scripts/asignar_claim_admin.py`; reglas propuestas en `firestore.rules.propuesta`); la app y la función aún usan el correo fijo hasta el PR 3. Si es `lector@pretso.com`, la vista es solo de lectura.
+Evita el *prop-drilling* del estado de autenticación. Escucha los cambios del estado de Firebase Auth (`onAuthStateChanged`) y expone un booleano `isEditMode`. El privilegio de administrador es el custom claim `admin === true` (asignado con `scripts/asignar_claim_admin.py`); `AdminContext` lo lee con `getIdTokenResult(user, true)` mediante `hasAdminClaim`, y las reglas de Firestore y la función `createReaderUser` aplican la misma condición. Quien no tiene el claim ve la aplicación en solo lectura.
 
 ### 3.3. Modales Genéricos
 La creación y edición de registros comparte mucha estructura repetitiva. Se implementaron `GenericCreateModal` y `GenericEditModal`.

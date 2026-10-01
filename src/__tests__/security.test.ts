@@ -1,32 +1,24 @@
 import { describe, it, expect } from 'vitest';
+import { hasAdminClaim } from '../utils/adminClaims';
 
-// Simulate the admin authentication check logic from AdminContext.tsx
-function isUserAdmin(user: { email: string | null } | null): boolean {
-  if (!user) return false;
-  return user.email === 'pretsodatabase@gmail.com';
-}
+describe('hasAdminClaim', () => {
+  it('concede privilegio solo con admin === true', () => {
+    expect(hasAdminClaim({ admin: true })).toBe(true);
+    expect(hasAdminClaim({ admin: true, email: 'otro@example.com' })).toBe(true);
+  });
 
-describe('Firestore and Application Security Controls', () => {
-  describe('Admin Privilege Check', () => {
-    it('should grant admin privilege to pretsodatabase@gmail.com', () => {
-      const user = { email: 'pretsodatabase@gmail.com' };
-      expect(isUserAdmin(user)).toBe(true);
-    });
+  it.each([
+    ['admin como cadena', { admin: 'true' }],
+    ['admin como número', { admin: 1 }],
+    ['admin falso', { admin: false }],
+    ['solo el correo histórico', { email: 'pretsodatabase@gmail.com' }],
+    ['claims vacíos', {}],
+  ])('deniega con %s', (_nombre, claims) => {
+    expect(hasAdminClaim(claims)).toBe(false);
+  });
 
-    it('should deny admin privilege to other email addresses', () => {
-      const user1 = { email: 'admin@pretso.org' };
-      const user2 = { email: 'testuser@gmail.com' };
-      const user3 = { email: 'pretsodatabase@gmail.com.co' };
-      
-      expect(isUserAdmin(user1)).toBe(false);
-      expect(isUserAdmin(user2)).toBe(false);
-      expect(isUserAdmin(isUserAdmin as any)).toBe(false); // safety check
-      expect(isUserAdmin(user3)).toBe(false);
-    });
-
-    it('should deny admin privilege if no user is authenticated', () => {
-      expect(isUserAdmin(null)).toBe(false);
-      expect(isUserAdmin({ email: null })).toBe(false);
-    });
+  it('deniega con null o undefined', () => {
+    expect(hasAdminClaim(null)).toBe(false);
+    expect(hasAdminClaim(undefined)).toBe(false);
   });
 });

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
+import { auth } from '../firebase';
 import { generateDatabaseXml, downloadXml, generateZipBlob, uploadToGoogleDrive } from '../utils/backup';
 import { generateDatabaseXlsx, downloadXlsx } from '../utils/xlsxExport';
 import { GOOGLE_CLIENT_ID_STORAGE_KEY, resolveGoogleClientId } from '../utils/googleClientId';
@@ -101,7 +102,8 @@ export default function Administracion() {
         }
       });
 
-      client.requestAccessToken({ login_hint: 'pretsodatabase@gmail.com' });
+      const hint = auth.currentUser?.email;
+      client.requestAccessToken(hint ? { login_hint: hint } : {});
 
     } catch (err: any) {
       console.error(err);
