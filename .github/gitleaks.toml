@@ -117,7 +117,12 @@ stopwords = ["ejemplo", "example", "placeholder", "sample"]
 # diseño (la protegen las reglas de Firestore y su restricción por referente y por API), así que se permite
 # a esa regla, y solo en estos archivos: cualquier otra ruta con una clave sigue marcada. Aprobado por
 # Andres Alberdi el 2026-09-30.
-[[allowlists]]
+#
+# Se sobrescribe la regla por su `id` con un permitido propio, y no con `[[allowlists]]` + `targetRules`,
+# porque esa sintaxis exige gitleaks >= 8.25 y gitleaks-action v3 de la CI instala la 8.24.3.
+[[rules]]
+id = "generic-api-key"
+
+[[rules.allowlists]]
 description = "apiKey web de Firebase en src/environments/<ambiente>/firebase.ts"
-targetRules = ["generic-api-key"]
 paths = ['''(^|/)src/environments/[^/]+/firebase\.ts$''']
