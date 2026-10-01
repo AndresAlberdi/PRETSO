@@ -365,4 +365,6 @@ Hoy `main` despliega sin una segunda mirada independiente el sitio en uso (`pret
 
 `pretso-database` tiene **3 usuarios** de Authentication (contado sin mostrar correos ni identificadores): los 3 con contraseña, ninguno deshabilitado, ninguno con claims personalizados, todos con ingresos (el último, el 2026-10-01), creados entre el 2026-07-14 y el 2026-07-29. Con tan pocos, la recomendación del plan es **recrearlos** en `pretso-prod` y enviar a cada uno un restablecimiento de contraseña, en vez de exportar e importar los hashes. `pretso-prod` no tiene ninguno todavía, así que nadie puede iniciar sesión allí hasta crearlos.
 
+**Decisión del 2026-10-01 (Andres):** en producción habrá **dos administradores**, `alberdi.andres@gmail.com` y `pretsodatabase@gmail.com`, y **ningún otro usuario por ahora** (los lectores se verán más adelante). El mecanismo actual por correo fijo admite solo uno, así que la migración al custom claim `admin` (Fase 4.3, que cubre reglas, `AdminContext.tsx` y `functions/src/index.ts`) pasa a ser requisito del pase, con sus pruebas en el emulador (DAT-01).
+
 - **Presupuesto con alertas de `pretso-prod` (GCP-07):** creado por Andres el 2026-10-01 en la consola, **no verificable desde la sesión** (la cuenta de la sesión no tiene permisos sobre la cuenta de facturación).
