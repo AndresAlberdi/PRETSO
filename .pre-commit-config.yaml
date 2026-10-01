@@ -1,6 +1,6 @@
 # =============================================================================
 # pre-commit-config.yaml — Controles locales antes de cada commit
-# Versión: 2.0 | Fecha: 2026-08-24 | Destino: .pre-commit-config.yaml (raíz)
+# Versión: 2.1 | Fecha: 2026-10-01 | Destino: .pre-commit-config.yaml (raíz)
 # -----------------------------------------------------------------------------
 # Objetivo: que el desarrollador (o Claude Code) detecte secretos, YAML roto,
 # formato y errores de workflows ANTES de subir; el pipeline repite todo en CI.
@@ -17,7 +17,7 @@ fail_fast: false
 repos:
   # ---- Secretos (bloqueante): mismo motor y misma config que CI --------------
   - repo: https://github.com/gitleaks/gitleaks
-    rev: v8.28.0
+    rev: v8.30.1
     hooks:
       - id: gitleaks
         name: Gitleaks (secretos)

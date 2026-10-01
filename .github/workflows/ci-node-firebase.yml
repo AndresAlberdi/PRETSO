@@ -1,7 +1,15 @@
 # =============================================================================
 # ci-node-firebase.yml — Pipeline completo SPA Node/React (Vite/Vitest)
 #                        → Firebase Hosting + reglas de Firestore
-# Versión: 2.2 | Fecha: 2026-09-25
+# Versión: 2.7 | Fecha: 2026-10-01
+# Adaptación PRETSO (conservar en cada actualización del estándar):
+#   - test:rules con Java 21 explícito (firebase-tools 15 lo exige).
+#   - previsualizar excluye Dependabot por actor Y por autor de la PR.
+#   - Pasos «Conservar copia de la versión actual»: si el clone live → previa
+#     falla, el paso queda en rojo pero NO detiene el job, porque el paso
+#     tiene `continue-on-error: true` (igual que en main); el despliegue
+#     sigue sin copia para rollback. El `|| echo ::warning` de la plantilla
+#     2.3 no se adoptó aún (el canal previa y el rollback se revisan en otro PR).
 # -----------------------------------------------------------------------------
 # Flujo (ver 00-gobernanza/02-flujo-git-y-versionado.md):
 #   PR → main ............ preparar, calidad, seguridad-estatica, construir
@@ -49,8 +57,19 @@ permissions:
 # Un solo run activo por rama/tag. En producción NO se cancela un despliegue
 # en curso (concurrency propia en el job).
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+  # Un PR cancela su corrida anterior (misma ref); cualquier otra corrida (push a main,
+  # tag, workflow_dispatch) tiene su grupo único y nunca se cancela. Es `github.run_id`
+  # y NO `github.sha`: con sha, el push de un tag vX.Y.Z y un workflow_dispatch sobre
+  # ese mismo commit compartirían grupo y la segunda corrida cancelaría la corrida
+  # ENTERA de la primera, incluido un despliegue a producción en curso (la concurrency
+  # propia del job, deploy-production, no lo evita: protege al job de otros jobs, no de
+  # que cancelen su corrida). Lo señaló la sesión de novuchat-site el 2026-10-01.
+  # La condición va en `group` y NO en
+  # `cancel-in-progress`: Checkov descarta en silencio, sin error ni aviso, todo
+  # workflow cuyo `cancel-in-progress` sea una expresión (medido el 2026-10-01 con
+  # checkov 3.3.13), y el job `iac` pasaba en verde sin analizarlo.
+  group: ci-${{ github.workflow }}-${{ github.event_name == 'pull_request' && github.ref || github.run_id }}
+  cancel-in-progress: true
 
 env:
   NODE_VERSION: ${{ vars.NODE_VERSION || '22' }}
@@ -189,8 +208,12 @@ jobs:
     permissions:
       contents: read
       # security-events: write solo lo usa el reusable cuando subir_sarif = true
-      # (Code Scanning en Modo A/B). No se concede pull-requests: write: los
-      # escáneres no comentan en el PR.
+      # (Code Scanning en Modo A/B). No se concede pull-requests: write (los
+      # escáneres no comentan en el PR).
+      # pull-requests: read lo pide el job `secretos` del reusable: gitleaks-action lista
+      # los commits del PR por la API y, en un repositorio privado, sin él responde 403.
+      # Un job llamador no puede conceder menos de lo que el reusable pide.
+      pull-requests: read
       security-events: write
       actions: read
     uses: ./.github/workflows/_reusable-security.yml
@@ -276,10 +299,16 @@ jobs:
     # `seguridad-estatica`, y ambas corren igual, como Semgrep, Trivy, Gitleaks
     # y CodeQL. Aplique el mismo `if` a cualquier job de PR que use
     # credenciales de nube en los demás pipelines.
+    #
+    # PRETSO: además del actor se mira el AUTOR de la PR. `github.actor` es quien
+    # disparó ESTA corrida: si una persona empuja un commit a la rama de una PR
+    # abierta por Dependabot, el actor deja de ser dependabot[bot] y el job
+    # correría con los secretos del repositorio sobre una PR de dependencias.
     if: >-
       github.event_name == 'pull_request'
       && github.event.pull_request.head.repo.full_name == github.repository
       && github.actor != 'dependabot[bot]'
+      && github.event.pull_request.user.login != 'dependabot[bot]'
       && vars.FIREBASE_PREVIEW == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
@@ -314,8 +343,13 @@ jobs:
         run: |
           set -euo pipefail
           npm i -g "firebase-tools@${FIREBASE_TOOLS_VERSION}"
+          rc=0
           firebase hosting:channel:deploy "$CANAL" --project "$PROYECTO" \
-            --expires 7d --non-interactive --json | tee canal.json
+            --expires 7d --non-interactive --json 2>/tmp/canal.err | tee canal.json || rc=$?
+          if [ "$rc" -ne 0 ] && grep -qiE 'site not found|404.*site|no site (named|with id)' /tmp/canal.err canal.json; then
+            echo "::error::El proyecto $PROYECTO no tiene creado el sitio de Hosting, así que no hay dónde publicar la vista previa. Créelo una vez con: firebase hosting:sites:create $PROYECTO --project $PROYECTO"
+          fi
+          [ "$rc" -eq 0 ] || { cat /tmp/canal.err >&2; exit "$rc"; }
           url=$(jq -r '.result | to_entries[0].value.url' canal.json)
           echo "url=$url" >> "$GITHUB_OUTPUT"
 
@@ -422,6 +456,7 @@ jobs:
       - name: Desplegar hosting + reglas (staging)
         env:
           PROYECTO: ${{ vars.GCP_PROJECT_ID_STAGING }}
+          SITIO: ${{ vars.GCP_PROJECT_ID_STAGING }}
           SOLO: ${{ vars.FIREBASE_DEPLOY_ONLY || 'hosting,firestore:rules' }}
           URL_STAGING: ${{ vars.STAGING_URL }}
         run: |
@@ -434,9 +469,19 @@ jobs:
           # Lo destapó el health check posterior. Un despliegue que miente es
           # peor que uno que falla: el acta de producción se firma con lo que
           # dice el pipeline.
+          rc=0
           firebase deploy --only "$SOLO" --project "$PROYECTO" --non-interactive \
             --message "staging ${GITHUB_SHA::7} (run ${GITHUB_RUN_ID})" 2>&1 \
-            | tee /tmp/despliegue.log
+            | tee /tmp/despliegue.log || rc=$?
+          # Sitio de Hosting ausente: desde el 15/10/2026 un proyecto nuevo no
+          # trae creado el suyo (aviso de Firebase, 28/09/2026) y firebase
+          # deploy solo dice «404 Site Not Found». Sin esta traducción, el
+          # primer despliegue de un proyecto nuevo es un error opaco.
+          if grep -qiE 'site not found|404.*site|no site (named|with id)' /tmp/despliegue.log; then
+            echo "::error::El proyecto $PROYECTO no tiene creado el sitio de Hosting '$SITIO'. Créelo una vez con: firebase hosting:sites:create $SITIO --project $PROYECTO (03-scripts/setup-oidc-gcp.sh lo verifica y lo crea al federar). Si el siteId no puede ser el del proyecto, declárelo en firebase.json (\"site\") y, en producción, en la variable FIREBASE_SITE_ID."
+            exit 1
+          fi
+          [ "$rc" -eq 0 ] || exit "$rc"
           if grep -qiE 'failed to create function|failed to update function|Build failed with status|Deploy failed|had HTTP Error' /tmp/despliegue.log; then
             echo "::error::firebase deploy terminó con código 0 pero su registro contiene fallos: el despliegue NO está completo."
             exit 1
@@ -457,7 +502,7 @@ jobs:
       url_objetivo: ${{ vars.STAGING_URL }}
       reglas: .github/zap-rules.tsv
       escaneo_completo: false
-      ruta_salud: ${{ vars.HEALTH_PATH || '/healthz' }}
+      ruta_salud: ${{ vars.HEALTH_PATH || '/health' }}
 
   # ---------------------------------------------------------------------------
   # Fase 6 — desplegar-produccion (D3): push de tag v* estable (nunca
@@ -596,6 +641,7 @@ jobs:
       - name: Desplegar hosting + reglas (producción)
         env:
           PROYECTO: ${{ vars.GCP_PROJECT_ID_PROD }}
+          SITIO: ${{ vars.FIREBASE_SITE_ID || vars.GCP_PROJECT_ID_PROD }}
           SOLO: ${{ vars.FIREBASE_DEPLOY_ONLY || 'hosting,firestore:rules' }}
           URL_PROD: ${{ vars.PROD_URL }}
         run: |
@@ -608,9 +654,19 @@ jobs:
           # Lo destapó el health check posterior. Un despliegue que miente es
           # peor que uno que falla: el acta de producción se firma con lo que
           # dice el pipeline.
+          rc=0
           firebase deploy --only "$SOLO" --project "$PROYECTO" --non-interactive \
             --message "producción ${GITHUB_REF_NAME} (run ${GITHUB_RUN_ID})" 2>&1 \
-            | tee /tmp/despliegue.log
+            | tee /tmp/despliegue.log || rc=$?
+          # Sitio de Hosting ausente: desde el 15/10/2026 un proyecto nuevo no
+          # trae creado el suyo (aviso de Firebase, 28/09/2026) y firebase
+          # deploy solo dice «404 Site Not Found». Sin esta traducción, el
+          # primer despliegue de un proyecto nuevo es un error opaco.
+          if grep -qiE 'site not found|404.*site|no site (named|with id)' /tmp/despliegue.log; then
+            echo "::error::El proyecto $PROYECTO no tiene creado el sitio de Hosting '$SITIO'. Créelo una vez con: firebase hosting:sites:create $SITIO --project $PROYECTO (03-scripts/setup-oidc-gcp.sh lo verifica y lo crea al federar). Si el siteId no puede ser el del proyecto, declárelo en firebase.json (\"site\") y, en producción, en la variable FIREBASE_SITE_ID."
+            exit 1
+          fi
+          [ "$rc" -eq 0 ] || exit "$rc"
           if grep -qiE 'failed to create function|failed to update function|Build failed with status|Deploy failed|had HTTP Error' /tmp/despliegue.log; then
             echo "::error::firebase deploy terminó con código 0 pero su registro contiene fallos: el despliegue NO está completo."
             exit 1
@@ -637,12 +693,12 @@ jobs:
         id: salud
         env:
           URL: ${{ vars.PROD_URL }}
-          RUTA_SALUD: ${{ vars.HEALTH_PATH || '/healthz' }}
+          RUTA_SALUD: ${{ vars.HEALTH_PATH || '/health' }}
         run: |
           set -uo pipefail
           for i in $(seq 1 10); do
             codigo=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 15 -L "${URL%/}${RUTA_SALUD}" || echo 000)
-            # Una SPA estática puede no exponer /healthz: 404 en la ruta de salud
+            # Una SPA estática puede no exponer /health: 404 en la ruta de salud
             # se acepta si / responde 200.
             if [[ "$codigo" == "404" ]]; then
               codigo=$(curl -sS -o /dev/null -w '%{http_code}' --max-time 15 -L "${URL%/}/" || echo 000)
