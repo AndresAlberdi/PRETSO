@@ -330,7 +330,7 @@ Hallazgos que el checklist marca como **bloqueantes** y hoy están en rojo (deta
 | DAT-04 respaldos y PITR | **Verde** en `pretso-database` y `pretso-prod` | Activados hoy |
 | REP-09 Dependabot en todos los ecosistemas | **Verde** | #37 añadió `pip`; Dependabot abrió sus primeros PR de `pip` a los pocos minutos |
 | REP-03 revisores ≥ 1 en `main` | Rojo | Desviación documentada (un solo dueño); falta aceptarla como «N/A justificado» |
-| SEC-01 inventario de secretos | Rojo | Falta `docs/seguridad/inventario-secretos.md` |
+| SEC-01 inventario de secretos | **Verde con reservas** | inventario escrito en [`docs/seguridad/inventario-secretos.md`](docs/seguridad/inventario-secretos.md); sin verificar la condición de confianza WIF, los roles de las cuentas de despliegue ni el segundo factor de las cuentas de GitHub (sección 10 del inventario) |
 | PIP-10 workflow `probar-identidad` | Rojo | Falta copiar la plantilla del estándar y correrla para `production` |
 | DAT-01 pruebas de reglas de Firestore en el emulador | Rojo hasta fusionar el PR | Pruebas escritas (`npm run test:rules`, carpeta `tests/rules`; PR pendiente de fusión). Las reglas con claim ya son `firestore.rules` (promovidas junto con la app y la función; asignar el claim antes del despliegue). Hallazgo: con el registro por correo abierto en Authentication cualquier persona podría leer, por eso la propuesta restringe la lectura (`admin` o `reader`; `logs` y `users` solo admin); el registro **se desactivó el 2026-10-01** en `pretso-database` y `pretso-prod` (`disabledUserSignup`, verificado leyendo la configuración); la pantalla «Gestión de usuarios» ya no puede crear cuentas desde el navegador. |
 | OPS-04 runbook de rollback | Rojo | Falta `docs/produccion/runbook-rollback.md` |
