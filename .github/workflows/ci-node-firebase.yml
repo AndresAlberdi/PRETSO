@@ -5,9 +5,11 @@
 # Adaptación PRETSO (conservar en cada actualización del estándar):
 #   - test:rules con Java 21 explícito (firebase-tools 15 lo exige).
 #   - previsualizar excluye Dependabot por actor Y por autor de la PR.
-#   - Pasos «Conservar copia de la versión actual»: el clone live → previa
-#     sigue siendo fatal; el `|| echo ::warning` de la plantilla 2.3 no se
-#     adoptó aún (el canal previa y el rollback se revisan en otro PR).
+#   - Pasos «Conservar copia de la versión actual»: si el clone live → previa
+#     falla, el paso queda en rojo pero NO detiene el job, porque el paso
+#     tiene `continue-on-error: true` (igual que en main); el despliegue
+#     sigue sin copia para rollback. El `|| echo ::warning` de la plantilla
+#     2.3 no se adoptó aún (el canal previa y el rollback se revisan en otro PR).
 # -----------------------------------------------------------------------------
 # Flujo (ver 00-gobernanza/02-flujo-git-y-versionado.md):
 #   PR → main ............ preparar, calidad, seguridad-estatica, construir

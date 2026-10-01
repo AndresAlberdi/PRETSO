@@ -111,11 +111,12 @@ paths = [
   # .gitignore (security-local.sh y bootstrap-repo.sh los agregan), así que no hay
   # código del proyecto ahí; pero Gitleaks en modo directorio (--no-git) no respeta
   # .gitignore y en la SEGUNDA corrida de security-local.sh leía la base de Trivy
-  # (.trivy-cache/db/trivy.db) y daba ~20 CRITICAL falsos. Son directorios exactos,
-  # no nombres: un `src/trivy-cache.js` se sigue analizando.
-  '''(^|/)\.trivy-cache/''',
-  '''(^|/)\.security-reports/''',
-  '''(^|/)\.deploy-log/''',
+  # (.trivy-cache/db/trivy.db) y daba ~20 CRITICAL falsos. Son directorios exactos
+  # y anclados a la raíz (donde escriben security-local.sh y deploy.sh): un
+  # `src/trivy-cache.js` o un `functions/.trivy-cache/` se siguen analizando.
+  '''^\.trivy-cache/''',
+  '''^\.security-reports/''',
+  '''^\.deploy-log/''',
 ]
 
 [[allowlists]]
@@ -130,7 +131,8 @@ stopwords = ["ejemplo", "example", "placeholder", "sample"]
 # -----------------------------------------------------------------------------
 # Documentación: se analiza con todas las reglas de proveedor (AWS, GitHub, claves
 # privadas, JWT, las propias de OCI y GCP…). Solo se exime `generic-api-key`, la regla
-# por entropía y nombre de variable, porque en un .md de docs/ marca los ids y tokens de
+# por entropía y nombre de variable, y solo en los .md de docs/ de la raíz (no en
+# doc/ ni en <componente>/docs/), porque ahí marca los ids y tokens de
 # EJEMPLO de las respuestas de API (caso real: un id de muestra en el contrato de
 # ManejoQRSimple, 2026-10-01). En código y en cualquier otra ruta sigue activa.
 # Qué se pierde: un token pegado en un .md sin formato de proveedor reconocible. Para
@@ -154,7 +156,7 @@ id = "generic-api-key"
 
 [[rules.allowlists]]
 description = "Ids y tokens de ejemplo en la documentación"
-paths = ['''(^|/)docs?/.*\.md$''']
+paths = ['''^docs/.*\.md$''']
 
 [[rules.allowlists]]
 description = "apiKey web de Firebase en src/environments/<ambiente>/firebase.ts (PRETSO)"
