@@ -1,5 +1,5 @@
 import { fileURLToPath } from 'node:url'
-import { defineConfig } from 'vitest/config'
+import { configDefaults, defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import { assertPublishable } from './src/utils/firebaseConfig.ts'
 import { firebaseConfig as productionConfig } from './src/environments/production/firebase.ts'
@@ -30,6 +30,8 @@ export default defineConfig(({ mode }) => {
     },
     test: {
       environment: 'jsdom',
+      // Las pruebas de reglas requieren el emulador: se ejecutan con `npm run test:rules`.
+      exclude: [...configDefaults.exclude, 'tests/rules/**'],
     },
   }
 })

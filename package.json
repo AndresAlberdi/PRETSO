@@ -11,7 +11,8 @@
     "lint": "oxlint",
     "test": "vitest run",
     "preview": "vite preview",
-    "deploy": "bash deploy.sh"
+    "deploy": "bash deploy.sh",
+    "test:rules": "vitest run --config vitest.rules.config.ts"
   },
   "dependencies": {
     "exceljs": "^4.4.0",
@@ -22,6 +23,7 @@
     "react-router": "^8.4.0"
   },
   "devDependencies": {
+    "@firebase/rules-unit-testing": "^5.0.2",
     "@testing-library/dom": "^10.4.2",
     "@testing-library/react": "^16.3.3",
     "@types/jszip": "^3.4.1",
