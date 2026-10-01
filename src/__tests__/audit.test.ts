@@ -25,4 +25,19 @@ describe('logAction', () => {
     await logAction('DELETE', 'companias', 'x2');
     expect(addDoc.mock.calls[0][1]).toMatchObject({ user: 'desconocido' });
   });
+
+  it('escribe exactamente los campos que validan las reglas', async () => {
+    authMock.currentUser = { email: 'persona@example.com' };
+    await logAction('EDIT', 'companias', 'x3');
+    const payload = addDoc.mock.calls[0][1];
+    expect(Object.keys(payload).sort()).toEqual(['action', 'collection', 'details', 'recordId', 'timestamp', 'user']);
+    expect(payload.timestamp).toBe('TS');
+    expect(payload.details).toBeNull();
+  });
+
+  it('pasa details como objeto en el payload', async () => {
+    authMock.currentUser = { email: 'persona@example.com' };
+    await logAction('EDIT', 'companias', 'x4', { a: 1 });
+    expect(addDoc.mock.calls[0][1].details).toEqual({ a: 1 });
+  });
 });
