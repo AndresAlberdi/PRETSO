@@ -1,5 +1,5 @@
 # Dependencias de los scripts de mantenimiento de Firestore de la raíz
-# (check_db.py, migrate_*.py, print_*.py, test_ods_*.py, scripts/migrate_ods.py).
+# (check_db.py, migrate_*.py, print_*.py, test_ods_*.py, scripts/migrate_ods.py, scripts/asignar_claim_admin.py).
 # Hasta el 2026-09-20 vivían solo en un venv/ versionado por error.
 #
 # Versiones fijadas el 2026-09-25, probadas en un venv limpio (Python 3.12)
