@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { firebaseConfig as staging } from '../environments/staging/firebase';
-import { firebaseConfig as production } from '../environments/production/firebase';
+import { firebaseConfig as staging, recaptchaSiteKey as stagingSiteKey } from '../environments/staging/firebase';
+import { firebaseConfig as production, recaptchaSiteKey as productionSiteKey } from '../environments/production/firebase';
+import { isValidRecaptchaSiteKey } from '../utils/appCheckConfig';
 import { googleClientId as stagingClientId } from '../environments/staging/google';
 import { googleClientId as productionClientId } from '../environments/production/google';
 import { assertFirebaseConfig, assertPublishable } from '../utils/firebaseConfig';
@@ -32,6 +33,17 @@ describe('environment configs', () => {
     // El número inicial de un Client ID es el número del proyecto que lo creó (pretso-prod: 309066922693).
     expect(productionClientId).toMatch(/^309066922693-[a-z0-9]+\.apps\.googleusercontent\.com$/);
     expect(productionClientId).not.toBe(stagingClientId);
+  });
+});
+
+describe('App Check site keys', () => {
+  it('staging key is valid', () => {
+    expect(isValidRecaptchaSiteKey(stagingSiteKey)).toBe(true);
+  });
+
+  it('production key is empty or valid, and never equals the staging one', () => {
+    expect(productionSiteKey === '' || isValidRecaptchaSiteKey(productionSiteKey)).toBe(true);
+    expect(productionSiteKey).not.toBe(stagingSiteKey);
   });
 });
 

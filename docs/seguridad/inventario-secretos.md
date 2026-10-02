@@ -2,6 +2,7 @@
 
 | Versión | Fecha | Alcance | Control |
 |---|---|---|---|
+| 1.3 | 2026-10-02 | Repositorio `AndresAlberdi/PRETSO`, proyectos Firebase `pretso-database` (staging) y `pretso-prod` (producción) | NUB-G06 (App Check en monitoreo): site key de reCAPTCHA Enterprise (SEC-P05) y token de depuración local; mantiene SEC-01 |
 | 1.2 | 2026-10-02 UTC (2026-10-01 hora de Bolivia) | Repositorio `AndresAlberdi/PRETSO`, proyectos Firebase `pretso-database` (staging) y `pretso-prod` (producción) | SEC-07 de `05-checklist-pase-a-produccion.md` (capas 1 y 2 de WIF de producción aplicadas y verificadas con dos pruebas negativas); mantiene SEC-01 |
 | 1.1 | 2026-10-01 (hora de Bolivia) | Repositorio `AndresAlberdi/PRETSO`, proyectos Firebase `pretso-database` (staging) y `pretso-prod` (producción) | SEC-01 de `05-checklist-pase-a-produccion.md`; formato de la sección 2 de `01-gestion-de-secretos.md` |
 
@@ -100,6 +101,7 @@ Pruebas:
 | SEC-P02 | apiKey web de Firebase de `pretso-prod` | `src/environments/production/firebase.ts` | Ídem | Misma restricción: 4 APIs y los referentes `https://pretso-prod.web.app/*` y `https://pretso-prod.firebaseapp.com/*`; reglas de Firestore con custom claim `admin`; App Check pendiente |
 | SEC-P03 | Client ID OAuth web de Google (copia a Drive) de `pretso-database` y de `pretso-prod` | `src/environments/*/google.ts` | Un Client ID es público (Google lo muestra en cada inicio de sesión). No hay *client secret* en el repositorio: el flujo del navegador usa Google Identity Services sin secreto | Orígenes JavaScript autorizados del cliente (solo los sitios de cada ambiente) y el consentimiento del usuario, que limita el alcance concedido |
 | SEC-P04 | `appId`, `messagingSenderId`, `authDomain`, `storageBucket`, `projectId` | `src/environments/*/firebase.ts` | Configuración web estándar de Firebase | Mismas reglas de datos |
+| SEC-P05 | Site key de reCAPTCHA Enterprise por ambiente (App Check) | `src/environments/*/firebase.ts` (`recaptchaSiteKey`); la de `pretso-prod` está pendiente (vacía hasta registrar App Check) | El navegador la recibe al cargar reCAPTCHA; identifica la clave, no autentica a nadie | Dominios permitidos de la clave y App Check en monitoreo |
 
 Gitleaks detecta las apiKey por su forma. De los cinco hallazgos, tres son apiKey web de Firebase y dos son la clave del proyecto `pretso-platform`, ya retirada del árbol; los cinco están registrados como excepciones en `.devsecops.yml` (`seguridad.excepciones`), aprobadas por Andres el 2026-09-26 y con vencimiento **2026-12-25**, para obligar a revisarlas (por ejemplo, tras encender App Check). Rotar la apiKey es posible desde la consola (se crea una nueva clave restringida y se retira la antigua), pero no es necesario mientras no haya abuso medido.
 
@@ -126,6 +128,7 @@ Solo se registra su existencia; nunca tokens ni rutas con valores.
 | Sesión de `gcloud` / `gh` de Andres | Equipo local | Operaciones puntuales autorizadas por Andres | Andres Alberdi | Cierre de sesión al terminar la jornada de trabajo sensible; sin periodicidad fija |
 | Cuenta `segurolotengopy` (segundo colaborador del repositorio, flujo REP-03) | Cuenta de GitHub de la misma persona | Aprobación de PR bajo el ruleset `proteccion-main` | Andres Alberdi | Verificar que tenga autenticación de dos factores (**no verificable desde la sesión**); revisar el acceso al cerrar el piloto |
 | `PRETSO_ADMIN_EMAIL` / `PRETSO_ADMIN_PASSWORD` | Variables de entorno de una sola ejecución de `scripts/create_user.py` | Alta manual de un usuario | Andres Alberdi | No se guardan en archivos. La contraseña inicial se cambia al primer ingreso; no existe valor persistente |
+| Token de depuración de App Check (`VITE_APPCHECK_DEBUG_TOKEN`) | `.env.development.local` en el equipo de Andres; nunca en el repositorio ni en CI (`vite.config.ts` hace fallar cualquier build o prueba fuera de development que lo reciba) | `npm run dev` (desarrollo local contra `pretso-database`) | Andres Alberdi | Revocar en la consola de App Check si se filtra o se cambia de equipo, y registrar uno nuevo |
 
 No se usan tokens de n8n ni de otras integraciones: el repositorio no los menciona.
 

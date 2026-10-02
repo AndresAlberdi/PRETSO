@@ -13,3 +13,8 @@ export const firebaseConfig = {
   authDomain: config.authDomain,
   messagingSenderId: config.messagingSenderId,
 } satisfies FirebaseWebConfig;
+
+// Site key de reCAPTCHA Enterprise para App Check (proyecto pretso-database; App Check en monitoreo).
+// Es pública por diseño: el navegador la recibe al cargar reCAPTCHA; la protegen los dominios permitidos
+// de la clave.
+export const recaptchaSiteKey: string = '6Lf3ONstAAAAAMSYIktWKowb2Jhczxs8cKC4SkDM';
