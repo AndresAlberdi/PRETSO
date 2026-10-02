@@ -55,6 +55,8 @@ Controles bloqueantes del checklist para `pretso-prod`. **Hecho, salvo el presup
 - **Cliente OAuth de Drive — creado por Andres el 2026-10-01** en la consola de `pretso-prod` (Google no permite crearlo por `gcloud` ni por API). Su Client ID está en `src/environments/production/google.ts`, y su número inicial (`309066922693`) es el del proyecto `pretso-prod`. **Falta probar la copia a Drive en producción**, lo que solo puede hacerse con su sesión una vez publicado el sitio (paso 7). No se reutilizó el de `pretso-database`, para no atar el sitio a un proyecto que va a dejar de ser producción.
 
 ### Paso 4 — Datos de Firestore (el paso delicado)
+**Estado: ensayo hecho el 2026-10-02 (UTC) y verificado; falta el volcado definitivo en el corte.** Evidencia en la subsección «Ensayo del 2026-10-02» de este paso.
+
 Nueve colecciones (`users` no existe en el origen; decisión de Andres del 2026-10-01: **se migra `logs`**): `bibliografia`, `companias`, `corpus_christi`, `documentos`, `indicadores`, `logs`, `manejo_de_caja`, `salarios`, `transacciones`.
 
 - **Método recomendado: exportación e importación gestionadas de Firestore** (`gcloud firestore export` desde `pretso-database` hacia un bucket y `gcloud firestore import` en `pretso-prod`). Copia exacta: conserva identificadores y tipos de todas las colecciones. Requiere un bucket en la misma ubicación multirregión que la base (`nam5`) y permisos de exportación/importación sobre los dos proyectos: **son cambios de IAM y facturación; los aprueba y registra Andres**.
@@ -65,6 +67,18 @@ Nueve colecciones (`users` no existe en el origen; decisión de Andres del 2026-
 - **`logs`** contiene el correo del administrador y copias de registros (PII). **Decisión de Andres del 2026-10-01: se migra** (en contra de la recomendación de empezar vacío: APP-09 y APP-16 piden minimizar datos personales; queda como riesgo aceptado y como tarea posterior cambiar `logs.user` de correo a `uid` y definir retención). El bucket temporal que lo contiene se borra al terminar.
 - **Ventana de corte:** congelar las escrituras en `pretso-database` durante la exportación (el corpus lo edita una persona, así que basta con avisarle).
 - **Reversión:** vaciar `pretso-prod`; el origen no se toca.
+
+#### Ensayo del 2026-10-02 (UTC; 2026-10-01 y 02 en hora de Bolivia), con autorización de Andres paso a paso
+
+- **Decisiones de Andres:** se migra `logs` (riesgo aceptado, ver arriba); rol mínimo de lectura para importar; volcado de ensayo ahora y volcado definitivo en el corte.
+- **Bucket temporal** `pretso-database-migracion-fs-20261002` en `pretso-database`: ubicación US, acceso público bloqueado, acceso uniforme, soft-delete en 0 y ciclo de vida de 1 día. Al agente de servicio de Firestore de `pretso-prod` se le dieron solo `roles/storage.legacyBucketReader` y `roles/storage.objectViewer` sobre ese bucket: el rol mínimo bastó (no hizo falta `storage.admin`).
+- **Exportación** (9 colecciones, unos 347 KB): `gcloud firestore export gs://<bucket>/v1 --project=pretso-database --database='(default)' --snapshot-time=2026-10-02T04:10:00Z --collection-ids=bibliografia,companias,corpus_christi,documentos,indicadores,logs,manejo_de_caja,salarios,transacciones`.
+- **Importación:** el destino se verificó vacío antes; `gcloud firestore import gs://<bucket>/v1 --project=pretso-prod --database='(default)'` terminó con 563 documentos.
+- **Verificación** con `scripts/verificar_copia_firestore.py` contra los dos proyectos reales (`--hora-origen 2026-10-02T04:10:00Z` y las 9 colecciones): **«LA COPIA COINCIDE», código de salida 0**. Documentos: bibliografia 18, companias 19, corpus_christi 21, documentos 75, indicadores 56, logs 123, manejo_de_caja 69, salarios 44, transacciones 138 (total 563). Iguales por huella en todos; 0 distintos, 0 solo en origen, 0 solo en destino; muestra sin diferencias; sin colecciones de más ni no pedidas; sin huérfanos en origen ni en destino.
+- **Limpieza:** el bucket temporal se borró (`gcloud storage rm -r`); sus permisos desaparecieron con él; se verificó que no aparece en la lista. `pretso-prod` no tiene buckets. En `pretso-database` queda el bucket `gcf-sources-<n>-us-central1` de la función retirada (pendiente revisarlo y limpiarlo: puede contener el código de la función).
+- **Lo aprendido:** el verificador tardó más de 5 minutos por el recuento de subcolecciones documento a documento. Los tipos mezclados y los nombres de campo con espacio final se conservaron (huellas idénticas).
+- **`logs` en producción:** ya trae correos y copias de registros; como el destino es producción, se trata como datos personales (APP-09).
+- **PENDIENTE: volcado definitivo en la ventana de corte.** (1) Avisar al editor del corpus. (2) Vaciar el destino con `gcloud firestore bulk-delete --project=pretso-prod --database='(default)' --collection-ids=<lista explícita de las 9>`; nunca sin `--collection-ids` ni sin `--project` (el `gcloud` por defecto apunta a otro proyecto ajeno). (3) Confirmar que quedó vacío. (4) Exportar con una nueva hora de corte a un bucket nuevo (mismas condiciones y permisos mínimos). (5) Importar. (6) Verificar **sin** `--hora-origen` si no hubo ediciones tras la exportación. (7) Borrar el bucket.
 
 ### Paso 5 — Usuarios de autenticación
 - **Medido el 2026-10-01: `pretso-database` tiene 3 usuarios**, todos con contraseña, ninguno deshabilitado ni con claims, todos con ingresos. `pretso-prod` tiene Authentication inicializado (paso 3) y **ninguno**: nadie puede iniciar sesión allí todavía.

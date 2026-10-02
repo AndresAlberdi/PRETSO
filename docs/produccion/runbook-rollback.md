@@ -167,6 +167,16 @@ gcloud firestore databases update --database="$BASE_NUEVA" --no-delete-protectio
 gcloud firestore databases delete --database="$BASE_NUEVA" --project "$PROYECTO"   # reintentar si sigue «in the middle of restore»
 ```
 
+**Copia entre proyectos (paso 4 del plan de migración).** El 2026-10-02 (UTC) se ensayó la copia de `pretso-database` a `pretso-prod` y ya hay una **copia de ensayo** en `pretso-prod` (563 documentos, verificada). Comandos reales usados (el bucket temporal, con acceso uniforme, sin acceso público y ciclo de vida de 1 día, se borró después):
+
+```bash
+gcloud firestore export gs://<bucket>/v1 --project=pretso-database --database='(default)' --snapshot-time=<ISO UTC, minuto entero> --collection-ids=<lista explícita de las 9 colecciones>
+gcloud firestore import gs://<bucket>/v1 --project=pretso-prod --database='(default)'
+python3 scripts/verificar_copia_firestore.py --colecciones <las 9> --hora-origen <la misma hora>   # solo lectura
+```
+
+Para vaciar el destino antes del volcado definitivo (o para revertir la copia): `gcloud firestore bulk-delete --project=pretso-prod --database='(default)' --collection-ids=<lista explícita de las 9>`. **Nunca** sin `--collection-ids` ni sin `--project`: el `gcloud` por defecto apunta a otro proyecto ajeno. Después, confirmar que quedó vacío. La importación sobrescribe documentos con el mismo ID y no borra los demás, por eso se vacía antes. `logs` trae correos: el bucket y la copia se tratan como datos personales (APP-09).
+
 Regla de oro: **nunca restaurar sobre la base afectada**. Las dos formas crean una base nueva; después se compara y se decide.
 
 ```bash
@@ -292,7 +302,7 @@ Corresponden al perfil «SPA + Firestore con datos personales o transaccionales�
 | Concepto | Objetivo | Cómo se cumple | Estado |
 |---|---|---|---|
 | RTO de la aplicación web | 30 min (desvío: sin OPS-01 el estándar no considera realista menos de 1 h; confirmado por Andres el 2026-10-01) | Rollback de Hosting en menos de 1 minuto más decisión y verificación; la detección no está automatizada | No medido |
-| RTO de datos | 2 h (confirmado por Andres el 2026-10-01) | Clon PITR o restauración de respaldo a base nueva (2.3) | Medido el 2026-10-01 en staging: clon PITR y restauración de respaldo de una base de 563 documentos tardaron 12 a 14 min cada una (ensayos 6 y 7); el objetivo de 2 h sigue siendo razonable, pero con más datos hay que volver a medir |
+| RTO de datos | 2 h (confirmado por Andres el 2026-10-01) | Clon PITR o restauración de respaldo a base nueva (2.3) | Medido el 2026-10-01 en staging: clon PITR y restauración de respaldo de una base de 563 documentos tardaron 12 a 14 min cada una (ensayos 6 y 7); el objetivo de 2 h sigue siendo razonable, pero con más datos hay que volver a medir. Copia entre proyectos medida el 2026-10-02 (563 documentos): exportación unos 1 min, importación unos 2 a 3 min, verificación más de 5 min (por el recuento de subcolecciones documento a documento); aproximados |
 | RPO | 1 h como meta, confirmada por Andres el 2026-10-01 (desvío: el estándar fija 15 min; se fija 1 h por la falta de detección y de ensayo, no por la exportación); técnicamente hasta 1 minuto con PITR y 24 h con el respaldo diario | PITR (7 días) y respaldo diario (30 días) | Activado el 2026-09-30; restauración ensayada el 2026-10-01 (recuento idéntico al origen) |
 
 ## 5. Incidentes de seguridad
