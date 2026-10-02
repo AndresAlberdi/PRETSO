@@ -6,6 +6,8 @@
 #   - test:rules con Java 21 explícito (firebase-tools 15 lo exige).
 #   - Pines aprobados vía Dependabot por encima de la tabla del estándar:
 #     actions/download-artifact v8.0.1 y actions/github-script v9.0.0.
+#   - calidad: paso «Pruebas de lógica de los workflows» (tests/workflows,
+#     unittest con el python3 del runner; ensayo 10 de OPS-06, 2026-10-02).
 # -----------------------------------------------------------------------------
 # Flujo (ver 00-gobernanza/02-flujo-git-y-versionado.md):
 #   PR → main ............ preparar, calidad, seguridad-estatica, construir
@@ -190,6 +192,16 @@ jobs:
           npx --yes firebase-tools@${{ env.FIREBASE_TOOLS_VERSION }} \
             emulators:exec --only firestore --project demo-pruebas \
             "npm run test:rules"
+
+      - name: Pruebas de lógica de los workflows (Python, sin red)
+        # tests/workflows ejecuta el `run:` real de pasos de este pipeline con
+        # dobles de curl/firebase/gcloud (p. ej. el rollback automático de
+        # desplegar-produccion, ensayo 10 de OPS-06). Usa el python3 del runner,
+        # que trae PyYAML (como la CI del estándar): sin pip install. Acotado a
+        # tests/workflows: los test_ods_*.py de la raíz son scripts que leen un
+        # .ods local al importarse y un `discover` en la raíz los ejecutaría.
+        if: hashFiles('tests/workflows/test_*.py') != ''
+        run: python3 -m unittest discover -s tests/workflows -v
 
   # ---------------------------------------------------------------------------
   # Fase 2 — seguridad-estatica: reusable OSS (todos los modos).
