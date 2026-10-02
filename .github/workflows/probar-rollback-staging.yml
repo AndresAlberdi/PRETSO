@@ -1,0 +1,329 @@
+# =============================================================================
+# probar-rollback-staging.yml — Ensayo 10 de OPS-06 (parte B): rollback real
+#                               de Firebase Hosting en STAGING, y restauración
+# Runbook: docs/produccion/runbook-rollback.md (sección 0, fila 10, y sección 7)
+# -----------------------------------------------------------------------------
+# AVISO: ESTE WORKFLOW TOCA EL SITIO EN USO. Staging (pretso-database) es hoy
+# también el sitio que usan las personas. Durante unos minutos `live` sirve la
+# versión ANTERIOR (la del canal «previa») y después se restaura la versión
+# que estaba publicada. Solo se lanza con la autorización expresa de Andres,
+# escribiendo ROLLBACK-STAGING en el input `confirmar`.
+#
+# Qué hace (el mismo procedimiento que el rollback automático de
+# desplegar-produccion en ci-node-firebase.yml, sin tocar producción):
+#   1. Comprueba que la URL de staging responde 200 y registra la versión de
+#      `live` y la del canal `previa` (API REST de Hosting con el token de
+#      gcloud, sin x-goog-user-project). Si `previa` no existe, caduca en menos
+#      de una hora, su versión no está FINALIZED o es la misma que `live`,
+#      TERMINA EN ROJO SIN HABER TOCADO NADA y explica el motivo.
+#   2. Fuerza el camino de rollback: firebase hosting:clone SITIO:previa SITIO:live.
+#   3. Verifica que `live` quedó con la versión de `previa` y que responde 200.
+#   4. RESTAURA `live` a la versión original (hosting:clone SITIO@VERSION SITIO:live)
+#      y verifica versión y HTTP 200. Este paso corre aunque falle (o se
+#      cancele) cualquier paso posterior al 1, siempre que el paso 1 haya
+#      terminado bien (es el que registra la versión original). Es idempotente:
+#      si live ya sirve la original no hace nada; si sirve la de `previa`,
+#      restaura; si encuentra una tercera versión (alguien desplegó entretanto)
+#      no sobrescribe `live`, falla y pide revisar a mano.
+#      Una cancelación forzada o la pérdida del runner impiden este paso: en ese
+#      caso se restaura a mano con el id completo de la versión que imprime el
+#      paso 1 (runbook, sección 2.1).
+#   El job termina en rojo ante cualquier fallo, aunque la restauración salga bien.
+#   En el resumen del job: versiones (6 primeros caracteres), tiempos y resultado.
+#
+# Concurrency `deploy-staging`, la misma del job desplegar-staging: un
+# despliegue a staging no corre a la vez que el ensayo (lo que haría que la
+# restauración pisara ese despliegue). Un `deploy.sh staging` manual sí podría:
+# no se despliega a mano mientras dura el ensayo.
+#
+# Disparador: solo workflow_dispatch (sin push ni pull_request).
+# Secretos: GCP_WIF_PROVIDER, GCP_SA_DEPLOY_STAGING (Environment/repositorio)
+# Variables: GCP_PROJECT_ID_STAGING, GCP_PROJECT_ID_PROD, STAGING_URL, NODE_VERSION (opcional, 22)
+# Pruebas de su lógica sin red: tests/workflows/test_probar_rollback_staging.py
+# =============================================================================
+name: probar-rollback-staging
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmar:
+        description: Escriba ROLLBACK-STAGING (el sitio de staging en uso servirá la versión anterior unos minutos)
+        type: string
+        required: true
+
+# Mínimo global; el job eleva solo id-token.
+permissions:
+  contents: read
+
+concurrency:
+  group: probar-rollback-staging
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: ${{ vars.NODE_VERSION || '22' }}
+  # Misma versión fijada que ci-node-firebase.yml (regresión de ADC en 15.22.2).
+  FIREBASE_TOOLS_VERSION: '15.28.1'
+
+jobs:
+  ensayo:
+    name: ensayo-rollback-staging
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment:
+      name: staging
+      url: ${{ vars.STAGING_URL }}
+    concurrency:
+      group: deploy-staging # la misma que desplegar-staging (ci-node-firebase.yml)
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write # token OIDC para WIF
+    env:
+      PROYECTO: ${{ vars.GCP_PROJECT_ID_STAGING }}
+      SITIO: ${{ vars.GCP_PROJECT_ID_STAGING }}
+      URL_STAGING: ${{ vars.STAGING_URL }}
+    steps:
+      - name: Exigir la confirmación ROLLBACK-STAGING
+        env:
+          # Solo el resultado de la comparación llega al shell, nunca el texto del input.
+          CONFIRMADO: ${{ inputs.confirmar == 'ROLLBACK-STAGING' }}
+          PROYECTO_PROD: ${{ vars.GCP_PROJECT_ID_PROD }}
+        run: |
+          set -euo pipefail
+          if [[ "$CONFIRMADO" != "true" ]]; then
+            echo "::error::Confirmación ausente o distinta: escriba ROLLBACK-STAGING en 'confirmar'. No se tocó nada."
+            exit 1
+          fi
+          if [[ -z "$PROYECTO" || -z "$URL_STAGING" ]]; then
+            echo "::error::Faltan GCP_PROJECT_ID_STAGING o STAGING_URL en las variables de Actions."
+            exit 1
+          fi
+          if [[ "$PROYECTO" == "${PROYECTO_PROD:-}" ]]; then
+            echo "::error::GCP_PROJECT_ID_STAGING es igual a GCP_PROJECT_ID_PROD: este ensayo nunca corre contra producción."
+            exit 1
+          fi
+          echo "Ensayo confirmado sobre el sitio $SITIO ($URL_STAGING)."
+
+      # Node y firebase-tools se instalan ANTES de autenticar: así los scripts de
+      # instalación de npm no encuentran el archivo de credenciales de GCP que
+      # deja el paso de auth. Limitación: ACTIONS_ID_TOKEN_REQUEST_URL y
+      # ACTIONS_ID_TOKEN_REQUEST_TOKEN existen durante todo el job (id-token:
+      # write es por job), de modo que un paquete malicioso aún podría pedir un
+      # token OIDC; lo acota la versión fijada de firebase-tools.
+      - name: Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Instalar firebase-tools (versión fijada)
+        run: npm i -g "firebase-tools@${FIREBASE_TOOLS_VERSION}"
+
+      - name: Autenticar en GCP (WIF + impersonación, SA de staging)
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
+          service_account: ${{ secrets.GCP_SA_DEPLOY_STAGING }}
+
+      - name: Instalar gcloud
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3
+
+      - name: Estado inicial (live, previa y HTTP 200)
+        id: inicial
+        run: |
+          set -euo pipefail
+          # El sitio debe estar sano ANTES: un ensayo sobre un sitio caído no
+          # prueba nada y complicaría saber a qué volver.
+          codigo=$(curl -sS -o /dev/null -w '%{http_code}' --connect-timeout 10 --max-time 15 -L "${URL_STAGING%/}/" || echo 000)
+          if [[ "$codigo" != "200" ]]; then
+            echo "::error::$URL_STAGING responde $codigo antes del ensayo: no se toca nada."
+            exit 1
+          fi
+          token="$(gcloud auth print-access-token)"
+          api() { # api <ruta relativa a v1beta1/> <archivo de salida>  -> imprime el código HTTP
+            curl -sS --connect-timeout 10 --max-time 30 -o "$2" -w '%{http_code}' \
+              -H "Authorization: Bearer $token" \
+              "https://firebasehosting.googleapis.com/v1beta1/$1" || echo 000
+          }
+          live_json="$(mktemp)"; previa_json="$(mktemp)"
+          codigo=$(api "sites/${SITIO}/channels/live" "$live_json")
+          [[ "$codigo" == "200" ]] || { echo "::error::No se pudo leer el canal live de $SITIO (HTTP $codigo). No se tocó nada."; exit 1; }
+          original=$(jq -r '.release.version.name // empty' "$live_json")
+          [[ -n "$original" ]] || { echo "::error::El canal live de $SITIO no tiene versión publicada. No se tocó nada."; exit 1; }
+          codigo=$(api "sites/${SITIO}/channels/previa" "$previa_json")
+          if [[ "$codigo" == "404" ]]; then
+            echo "::error::El canal 'previa' no existe en $SITIO: no hay copia a la que volver. Se crea con el siguiente despliegue a staging. No se tocó nada."
+            exit 1
+          fi
+          [[ "$codigo" == "200" ]] || { echo "::error::No se pudo leer el canal 'previa' (HTTP $codigo). No se tocó nada."; exit 1; }
+          previa=$(jq -r '.release.version.name // empty' "$previa_json")
+          [[ -n "$previa" ]] || { echo "::error::El canal 'previa' no tiene versión. No se tocó nada."; exit 1; }
+          vence=$(jq -r '.expireTime // empty' "$previa_json")
+          if [[ -n "$vence" ]]; then
+            vence_s=$(jq -rn --arg t "$vence" '$t | sub("\\.[0-9]+"; "") | fromdateiso8601')
+            if (( vence_s < $(date +%s) + 3600 )); then
+              echo "::error::El canal 'previa' caduca en menos de una hora ($vence). No se tocó nada."
+              exit 1
+            fi
+          fi
+          if [[ "$previa" == "$original" ]]; then
+            echo "::error::'previa' y live sirven la misma versión (${original##*/}): el rollback no cambiaría nada y el ensayo no probaría nada. Haga un despliegue a staging y vuelva a lanzarlo. No se tocó nada."
+            exit 1
+          fi
+          # El release del canal incluye la versión con su estado. Si la API no
+          # lo trajera (no verificado contra el servicio real), se avisa y se
+          # sigue: hosting:clone falla por sí solo ante una versión inservible.
+          estado=$(jq -r '.release.version.status // empty' "$previa_json")
+          if [[ -z "$estado" ]]; then
+            echo "::notice::La API no informó el estado de la versión de 'previa'; se continúa."
+          elif [[ "$estado" != "FINALIZED" ]]; then
+            echo "::error::La versión de 'previa' (${previa##*/}) está en estado '$estado', no FINALIZED. No se tocó nada."
+            exit 1
+          fi
+          rm -f "$live_json" "$previa_json"
+          {
+            echo "original=$original"
+            echo "previa=$previa"
+            echo "vence=$vence"
+          } >> "$GITHUB_OUTPUT"
+          echo "live=${original##*/} previa=${previa##*/} (vence $vence); HTTP 200 antes del ensayo."
+          # Id completo para restaurar a mano si el job se cancela a la fuerza o se pierde el runner:
+          echo "Versión original de live (restauración manual, runbook 2.1): ${SITIO}@${original##*/}"
+
+      - name: Forzar el rollback (clonar "previa" sobre live)
+        id: rollback
+        run: |
+          set -euo pipefail
+          # Desde aquí live puede cambiar. La restauración depende solo de que el
+          # paso inicial haya terminado bien (no de una salida de este paso).
+          echo "t_rollback=$(date +%s)" >> "$GITHUB_OUTPUT"
+          firebase hosting:clone "$SITIO:previa" "$SITIO:live" --project "$PROYECTO" --non-interactive
+
+      - name: Verificar que live sirve la versión de "previa"
+        id: verificar
+        env:
+          PREVIA: ${{ steps.inicial.outputs.previa }}
+        run: |
+          set -euo pipefail
+          token="$(gcloud auth print-access-token)"
+          live_json="$(mktemp)"
+          codigo=$(curl -sS --connect-timeout 10 --max-time 30 -o "$live_json" -w '%{http_code}' \
+            -H "Authorization: Bearer $token" \
+            "https://firebasehosting.googleapis.com/v1beta1/sites/${SITIO}/channels/live" || echo 000)
+          actual=$(jq -r '.release.version.name // empty' "$live_json" 2>/dev/null || true)
+          rm -f "$live_json"
+          if [[ "$codigo" != "200" || "$actual" != "$PREVIA" ]]; then
+            echo "::error::Tras el clon, live sirve '${actual##*/}' (HTTP $codigo) y se esperaba '${PREVIA##*/}'."
+            exit 1
+          fi
+          http=000
+          for i in 1 2 3 4 5 6; do
+            http=$(curl -sS -o /dev/null -w '%{http_code}' --connect-timeout 10 --max-time 15 -L "${URL_STAGING%/}/" || echo 000)
+            [[ "$http" == "200" ]] && break
+            echo "Intento $i: $http"; sleep 10
+          done
+          echo "http_rollback=$http" >> "$GITHUB_OUTPUT"
+          echo "t_verificado=$(date +%s)" >> "$GITHUB_OUTPUT"
+          if [[ "$http" != "200" ]]; then
+            echo "::error::Con la versión de 'previa' el sitio responde $http."
+            exit 1
+          fi
+          echo "live = previa (${PREVIA##*/}) y HTTP 200."
+
+      - name: Restaurar la versión original en live
+        id: restaurar
+        # Corre aunque haya fallado o se haya cancelado un paso posterior al
+        # estado inicial, siempre que este haya terminado bien (registra la
+        # versión original). Idempotente: live == original no hace nada,
+        # live == previa restaura, otra versión falla sin sobrescribir. Sin
+        # continue-on-error: si la restauración falla, el job queda en rojo.
+        if: always() && steps.inicial.outcome == 'success'
+        env:
+          ORIGINAL: ${{ steps.inicial.outputs.original }}
+          PREVIA: ${{ steps.inicial.outputs.previa }}
+        run: |
+          set -euo pipefail
+          token="$(gcloud auth print-access-token)"
+          version_live() {
+            local f codigo v
+            f="$(mktemp)"
+            codigo=$(curl -sS --connect-timeout 10 --max-time 30 -o "$f" -w '%{http_code}' \
+              -H "Authorization: Bearer $token" \
+              "https://firebasehosting.googleapis.com/v1beta1/sites/${SITIO}/channels/live" || echo 000)
+            v=$(jq -r '.release.version.name // empty' "$f" 2>/dev/null || true)
+            rm -f "$f"
+            [[ "$codigo" == "200" ]] || { echo "::error::No se pudo leer el canal live (HTTP $codigo)." >&2; return 1; }
+            printf '%s' "$v"
+          }
+          actual=$(version_live)
+          if [[ "$actual" == "$ORIGINAL" ]]; then
+            echo "live ya sirve la versión original (${ORIGINAL##*/}): no hay nada que restaurar."
+          elif [[ "$actual" == "$PREVIA" ]]; then
+            firebase hosting:clone "${SITIO}@${ORIGINAL##*/}" "$SITIO:live" --project "$PROYECTO" --non-interactive
+          else
+            echo "::error::live sirve una tercera versión (${actual##*/}): alguien desplegó durante el ensayo. No se sobrescribe; revise a mano (runbook, sección 2.1) y restaure si corresponde la versión ${ORIGINAL##*/}."
+            exit 1
+          fi
+          actual=$(version_live)
+          if [[ "$actual" != "$ORIGINAL" ]]; then
+            echo "::error::Tras restaurar, live sirve '${actual##*/}' y se esperaba la original '${ORIGINAL##*/}'. Restaure a mano: firebase hosting:clone ${SITIO}@${ORIGINAL##*/} ${SITIO}:live (runbook, sección 2.1)."
+            exit 1
+          fi
+          http=000
+          for i in 1 2 3 4 5 6; do
+            http=$(curl -sS -o /dev/null -w '%{http_code}' --connect-timeout 10 --max-time 15 -L "${URL_STAGING%/}/" || echo 000)
+            [[ "$http" == "200" ]] && break
+            echo "Intento $i: $http"; sleep 10
+          done
+          echo "http_final=$http" >> "$GITHUB_OUTPUT"
+          echo "t_restaurado=$(date +%s)" >> "$GITHUB_OUTPUT"
+          if [[ "$http" != "200" ]]; then
+            echo "::error::Restaurada la versión original, el sitio responde $http."
+            exit 1
+          fi
+          echo "restaurado=true" >> "$GITHUB_OUTPUT"
+          echo "live restaurado a la versión original (${ORIGINAL##*/}) y HTTP 200."
+
+      - name: Resumen del ensayo
+        if: always()
+        env:
+          ORIGINAL: ${{ steps.inicial.outputs.original }}
+          PREVIA: ${{ steps.inicial.outputs.previa }}
+          VENCE: ${{ steps.inicial.outputs.vence }}
+          R_INICIAL: ${{ steps.inicial.outcome }}
+          R_ROLLBACK: ${{ steps.rollback.outcome }}
+          R_VERIFICAR: ${{ steps.verificar.outcome }}
+          R_RESTAURAR: ${{ steps.restaurar.outcome }}
+          RESTAURADO: ${{ steps.restaurar.outputs.restaurado }}
+          INICIO_ROLLBACK: ${{ steps.rollback.outputs.t_rollback }}
+          T_VERIFICADO: ${{ steps.verificar.outputs.t_verificado }}
+          T_RESTAURADO: ${{ steps.restaurar.outputs.t_restaurado }}
+          HTTP_ROLLBACK: ${{ steps.verificar.outputs.http_rollback }}
+          HTTP_FINAL: ${{ steps.restaurar.outputs.http_final }}
+        run: |
+          set -uo pipefail
+          corto() { local v="${1##*/}"; printf '%s' "${v:0:6}"; }
+          dur() { [[ -n "$1" && -n "$2" ]] && printf '%s s' "$(( $2 - $1 ))" || printf '—'; }
+          if [[ "$R_INICIAL" == "success" && "$R_ROLLBACK" == "success" && "$R_VERIFICAR" == "success" && "$RESTAURADO" == "true" ]]; then
+            resultado="OK: rollback ensayado y versión original restaurada"
+          elif [[ "$R_ROLLBACK" == "skipped" || -z "$R_ROLLBACK" ]]; then
+            resultado="NO EJECUTADO: no se tocó el sitio (vea el error del paso que falló)"
+          elif [[ "$RESTAURADO" == "true" ]]; then
+            resultado="FALLO durante el ensayo; versión original restaurada"
+          else
+            resultado="FALLO: la restauración no se completó; revise live a mano (runbook, sección 2.1)"
+          fi
+          {
+            echo "### Ensayo 10 (OPS-06): rollback de Hosting en staging"
+            echo ""
+            echo "| Dato | Valor |"
+            echo "|---|---|"
+            echo "| Sitio | \`$SITIO\` |"
+            echo "| Versión live original | \`$(corto "$ORIGINAL")\` |"
+            echo "| Versión de \`previa\` | \`$(corto "$PREVIA")\` (vence ${VENCE:-—}) |"
+            echo "| Rollback (clon → live verificado) | $(dur "$INICIO_ROLLBACK" "$T_VERIFICADO"), HTTP ${HTTP_ROLLBACK:-—} |"
+            echo "| Tiempo con la versión anterior en live | $(dur "$INICIO_ROLLBACK" "$T_RESTAURADO") |"
+            echo "| HTTP tras restaurar | ${HTTP_FINAL:-—} |"
+            echo "| Pasos | inicial=$R_INICIAL, rollback=${R_ROLLBACK:-—}, verificar=${R_VERIFICAR:-—}, restaurar=${R_RESTAURAR:-—} |"
+            echo "| Resultado | **$resultado** |"
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "$resultado"
