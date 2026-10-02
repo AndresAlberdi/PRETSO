@@ -12,3 +12,8 @@ export const firebaseConfig = {
   authDomain: 'pretso-prod.firebaseapp.com',
   messagingSenderId: '309066922693',
 } satisfies FirebaseWebConfig;
+
+// Site key de reCAPTCHA Enterprise para App Check. PENDIENTE: App Check aún no está registrado en
+// pretso-prod. Vacía significa que App Check no se inicializa; debe completarse antes del primer tag
+// (NUB-G06): el build de publicación falla mientras esté vacía.
+export const recaptchaSiteKey: string = '';

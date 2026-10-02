@@ -1,8 +1,13 @@
 import { fileURLToPath } from 'node:url'
+import { loadEnv } from 'vite'
 import { configDefaults, defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import { assertPublishable } from './src/utils/firebaseConfig.ts'
-import { firebaseConfig as productionConfig } from './src/environments/production/firebase.ts'
+import { assertAppCheckPublishable, assertNoDebugTokenOutsideDevelopment } from './src/utils/appCheckConfig.ts'
+import {
+  firebaseConfig as productionConfig,
+  recaptchaSiteKey as productionSiteKey,
+} from './src/environments/production/firebase.ts'
 
 // Modo de Vite -> carpeta de src/environments con la configuración del ambiente.
 const ENVIRONMENT_FOLDERS: Record<string, string> = {
@@ -13,14 +18,18 @@ const ENVIRONMENT_FOLDERS: Record<string, string> = {
 }
 
 // https://vite.dev/config/
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
   const folder = ENVIRONMENT_FOLDERS[mode]
   if (!folder) {
     throw new Error(
       `Modo de build desconocido «${mode}». Modos válidos: ${Object.keys(ENVIRONMENT_FOLDERS).join(', ')}.`,
     )
   }
+  // El token de depuración de App Check es un secreto: solo se admite en el servidor de desarrollo local (`npm run dev`).
+  const viteEnv = loadEnv(mode, process.cwd(), 'VITE_')
+  assertNoDebugTokenOutsideDevelopment(mode, command, viteEnv.VITE_APPCHECK_DEBUG_TOKEN)
   assertPublishable(mode, process.env.GITHUB_REF_TYPE, productionConfig, process.env.GITHUB_EVENT_NAME)
+  assertAppCheckPublishable(mode, process.env.GITHUB_REF_TYPE, productionSiteKey, process.env.GITHUB_EVENT_NAME)
   return {
     plugins: [react()],
     resolve: {
