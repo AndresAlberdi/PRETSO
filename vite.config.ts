@@ -18,16 +18,16 @@ const ENVIRONMENT_FOLDERS: Record<string, string> = {
 }
 
 // https://vite.dev/config/
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
   const folder = ENVIRONMENT_FOLDERS[mode]
   if (!folder) {
     throw new Error(
       `Modo de build desconocido «${mode}». Modos válidos: ${Object.keys(ENVIRONMENT_FOLDERS).join(', ')}.`,
     )
   }
-  // El token de depuración de App Check es un secreto: solo se admite en desarrollo local.
+  // El token de depuración de App Check es un secreto: solo se admite en el servidor de desarrollo local (`npm run dev`).
   const viteEnv = loadEnv(mode, process.cwd(), 'VITE_')
-  assertNoDebugTokenOutsideDevelopment(mode, viteEnv.VITE_APPCHECK_DEBUG_TOKEN)
+  assertNoDebugTokenOutsideDevelopment(mode, command, viteEnv.VITE_APPCHECK_DEBUG_TOKEN)
   assertPublishable(mode, process.env.GITHUB_REF_TYPE, productionConfig, process.env.GITHUB_EVENT_NAME)
   assertAppCheckPublishable(mode, process.env.GITHUB_REF_TYPE, productionSiteKey, process.env.GITHUB_EVENT_NAME)
   return {

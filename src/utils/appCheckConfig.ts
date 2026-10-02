@@ -25,13 +25,19 @@ export function resolveDebugToken(env: AppCheckEnv): string | undefined {
   return token ? token : undefined;
 }
 
-// El token de depuración es un secreto: un build o una prueba fuera de development que lo reciba
-// (por ejemplo, desde un .env.local olvidado) podría incrustarlo en el paquete publicado.
-export function assertNoDebugTokenOutsideDevelopment(mode: string, value: string | undefined): void {
-  if (mode !== 'development' && value?.trim()) {
+// El token de depuración es un secreto: solo se admite con el servidor de desarrollo (`vite serve`, es decir
+// `npm run dev`) en modo development. Cualquier build (en cualquier modo) o prueba que lo reciba (por ejemplo,
+// desde un .env.local olvidado) podría incrustarlo en el paquete publicado, así que falla.
+export function assertNoDebugTokenOutsideDevelopment(
+  mode: string,
+  command: string,
+  value: string | undefined,
+): void {
+  if (value?.trim() && !(command === 'serve' && mode === 'development')) {
     throw new Error(
-      `${DEBUG_TOKEN_ENV_VAR} solo se admite en desarrollo local (modo development). ` +
-        `Quítelo de .env, .env.local o del entorno antes de construir o probar en modo «${mode}».`,
+      `${DEBUG_TOKEN_ENV_VAR} solo se admite en \`npm run dev\` (servidor de desarrollo local, modo development). ` +
+        `Cualquier build o prueba falla si la variable tiene valor: quítela de .env, .env.local, ` +
+        `.env.development.local o del entorno antes de ejecutar «${command}» en modo «${mode}».`,
     );
   }
 }

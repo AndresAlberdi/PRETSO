@@ -46,15 +46,28 @@ describe('resolveDebugToken', () => {
 });
 
 describe('assertNoDebugTokenOutsideDevelopment', () => {
-  it('does not throw when allowed', () => {
-    expect(() => assertNoDebugTokenOutsideDevelopment('development', 'x')).not.toThrow();
-    expect(() => assertNoDebugTokenOutsideDevelopment('production', undefined)).not.toThrow();
-    expect(() => assertNoDebugTokenOutsideDevelopment('production', '  ')).not.toThrow();
+  it('does not throw for serve + development with a token', () => {
+    expect(() => assertNoDebugTokenOutsideDevelopment('development', 'serve', 'x')).not.toThrow();
   });
 
-  it('throws outside development when the variable has a value', () => {
+  it('does not throw without a token or with a blank one', () => {
+    expect(() => assertNoDebugTokenOutsideDevelopment('production', 'build', undefined)).not.toThrow();
+    expect(() => assertNoDebugTokenOutsideDevelopment('production', 'build', '')).not.toThrow();
+    expect(() => assertNoDebugTokenOutsideDevelopment('production', 'build', '  ')).not.toThrow();
+    expect(() => assertNoDebugTokenOutsideDevelopment('test', 'serve', undefined)).not.toThrow();
+  });
+
+  it('throws for build + development with a token', () => {
+    expect(() => assertNoDebugTokenOutsideDevelopment('development', 'build', 'x')).toThrow(/VITE_APPCHECK_DEBUG_TOKEN/);
+  });
+
+  it('throws for serve + test with a token', () => {
+    expect(() => assertNoDebugTokenOutsideDevelopment('test', 'serve', 'x')).toThrow(/npm run dev/);
+  });
+
+  it('throws for any build mode with a token', () => {
     for (const mode of ['staging', 'production', 'test']) {
-      expect(() => assertNoDebugTokenOutsideDevelopment(mode, 'x')).toThrow(/VITE_APPCHECK_DEBUG_TOKEN/);
+      expect(() => assertNoDebugTokenOutsideDevelopment(mode, 'build', 'x')).toThrow(/VITE_APPCHECK_DEBUG_TOKEN/);
     }
   });
 });
@@ -70,5 +83,17 @@ describe('assertAppCheckPublishable', () => {
     expect(() => assertAppCheckPublishable('production', 'branch', '', 'pull_request')).not.toThrow();
     expect(() => assertAppCheckPublishable('staging', 'tag', '', 'workflow_dispatch')).not.toThrow();
     expect(() => assertAppCheckPublishable('production', 'tag', stagingKey)).not.toThrow();
+  });
+
+  it('lets a valid key pass on workflow_dispatch', () => {
+    expect(() => assertAppCheckPublishable('production', 'branch', stagingKey, 'workflow_dispatch')).not.toThrow();
+  });
+
+  it('lets a local build with undefined refType and eventName pass with an empty key', () => {
+    expect(() => assertAppCheckPublishable('production', undefined, '', undefined)).not.toThrow();
+  });
+
+  it('blocks a tag with a non-empty key of invalid format', () => {
+    expect(() => assertAppCheckPublishable('production', 'tag', 'AIza' + 'a'.repeat(36))).toThrow(/site key/);
   });
 });
