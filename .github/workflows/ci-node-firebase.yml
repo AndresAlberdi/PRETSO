@@ -1,22 +1,18 @@
 # =============================================================================
 # ci-node-firebase.yml — Pipeline completo SPA Node/React (Vite/Vitest)
 #                        → Firebase Hosting + reglas de Firestore
-# Versión: 2.7 | Fecha: 2026-10-01
+# Versión: 2.9 | Fecha: 2026-10-01
 # Adaptación PRETSO (conservar en cada actualización del estándar):
 #   - test:rules con Java 21 explícito (firebase-tools 15 lo exige).
-#   - previsualizar excluye Dependabot por actor Y por autor de la PR.
-#   - Pasos «Conservar copia de la versión actual»: si el clone live → previa
-#     falla, el paso queda en rojo pero NO detiene el job, porque el paso
-#     tiene `continue-on-error: true` (igual que en main); el despliegue
-#     sigue sin copia para rollback. El `|| echo ::warning` de la plantilla
-#     2.3 no se adoptó aún (el canal previa y el rollback se revisan en otro PR).
+#   - Pines aprobados vía Dependabot por encima de la tabla del estándar:
+#     actions/download-artifact v8.0.1 y actions/github-script v9.0.0.
 # -----------------------------------------------------------------------------
 # Flujo (ver 00-gobernanza/02-flujo-git-y-versionado.md):
 #   PR → main ............ preparar, calidad, seguridad-estatica, construir
 #   push main ............ + desplegar-staging → dast-y-humo
 #   push tag v* .......... + desplegar-produccion (Environment production)
-#                            → post-despliegue (health check + rollback)
-#   workflow_dispatch .... Modo B0: producción manual con confirmar=DESPLEGAR
+#                            (health check y rollback incluidos) → post-despliegue (registro)
+#   workflow_dispatch .... Modo B0: producción manual con confirmar=DESPLEGAR, lanzado sobre el tag (--ref vX.Y.Z)
 #
 # Identidad: Workload Identity Federation (sin JSON de service account).
 # FirebaseExtended/action-hosting-deploy NO se usa porque solo acepta JSON de
@@ -95,7 +91,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # En workflow_dispatch se analiza/despliega el tag aprobado (D3)
-          ref: ${{ inputs.tag || github.ref }}
+          ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.ref }}
 
       - name: Detectar gestor de paquetes
         id: pm
@@ -138,7 +134,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # En workflow_dispatch se analiza/despliega el tag aprobado (D3)
-          ref: ${{ inputs.tag || github.ref }}
+          ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.ref }}
 
       - name: Habilitar corepack
         if: needs.preparar.outputs.pm != 'npm'
@@ -222,7 +218,7 @@ jobs:
       stack: node
       bloquear_en: ${{ vars.BLOQUEAR_EN || 'CRITICAL,HIGH' }}
       subir_sarif: ${{ github.event.repository.visibility == 'public' || vars.GHAS_ENABLED == 'true' }}
-      ref: ${{ inputs.tag || '' }}
+      ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || '' }}
     # Mínimo privilegio: solo los dos secretos que el reusable declara en
     # `on.workflow_call.secrets` (ambos opcionales). `secrets: inherit`
     # pasaba también los de despliegue, que ningún escáner necesita.
@@ -250,7 +246,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # En workflow_dispatch se analiza/despliega el tag aprobado (D3)
-          ref: ${{ inputs.tag || github.ref }}
+          ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.ref }}
 
       - name: Habilitar corepack
         if: needs.preparar.outputs.pm != 'npm'
@@ -300,10 +296,12 @@ jobs:
     # y CodeQL. Aplique el mismo `if` a cualquier job de PR que use
     # credenciales de nube en los demás pipelines.
     #
-    # PRETSO: además del actor se mira el AUTOR de la PR. `github.actor` es quien
-    # disparó ESTA corrida: si una persona empuja un commit a la rama de una PR
-    # abierta por Dependabot, el actor deja de ser dependabot[bot] y el job
-    # correría con los secretos del repositorio sobre una PR de dependencias.
+    # Dos condiciones, no una: `github.actor` es quien disparó ESTA ejecución y
+    # cambia si una persona empuja un commit a la rama de Dependabot (el actor
+    # pasa a ser esa persona y el job recibiría los secretos y el OIDC del
+    # repositorio sobre código que Dependabot abrió). `pull_request.user.login`
+    # es el autor del PR y sigue siendo Dependabot aunque cambie el actor. El
+    # job corre solo si ninguno de los dos es Dependabot.
     if: >-
       github.event_name == 'pull_request'
       && github.event.pull_request.head.repo.full_name == github.repository
@@ -321,7 +319,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # En workflow_dispatch se analiza/despliega el tag aprobado (D3)
-          ref: ${{ inputs.tag || github.ref }}
+          ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.ref }}
 
       - name: Descargar dist/
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
@@ -389,7 +387,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # En workflow_dispatch se analiza/despliega el tag aprobado (D3)
-          ref: ${{ inputs.tag || github.ref }}
+          ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.ref }}
 
       - name: Descargar dist/
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
@@ -443,15 +441,51 @@ jobs:
       - name: Conservar copia de la versión actual (canal "previa" para rollback)
         # D7: antes de CADA deploy a live (staging y producción) se clona el
         # contenido en vivo a un canal "previa". El rollback es clonar de vuelta.
+        # AVISO: la llamada REST de renovación (PATCH sobre
+        # sites/<sitio>/channels/previa con updateMask=ttl) NO se verificó
+        # contra el servicio real de Firebase Hosting: solo con dobles en
+        # pruebas-workflows/canal_previa.py. Si falla en el primer uso real, el
+        # efecto es únicamente el ::warning:: y el canal conserva su plazo.
         continue-on-error: true
         env:
           PROYECTO: ${{ vars.GCP_PROJECT_ID_STAGING }}
           SITIO: ${{ vars.GCP_PROJECT_ID_STAGING }}
         run: |
           npm i -g "firebase-tools@${FIREBASE_TOOLS_VERSION}"
-          firebase hosting:channel:create previa --project "$PROYECTO" --expires 30d \
+          firebase hosting:channel:create previa --project "$PROYECTO" --site "$SITIO" --expires 30d \
             --non-interactive >/dev/null 2>&1 || true
-          firebase hosting:clone "$SITIO:live" "$SITIO:previa" --project "$PROYECTO"
+          if ! firebase hosting:clone "$SITIO:live" "$SITIO:previa" --project "$PROYECTO"; then
+            echo "::notice::No se pudo clonar live a 'previa' (esperable en el primer despliegue, cuando aún no hay versión en live; si no lo es, vea el error de arriba): no hay copia para rollback automático hasta el siguiente despliegue."
+            echo "::warning::No se pudo guardar la copia para rollback (clone $SITIO:live → previa). Si el sitio '$SITIO' todavía no existe, créelo: firebase hosting:sites:create $SITIO --project $PROYECTO"
+            exit 0
+          fi
+          # Renueva el plazo del canal: `--expires 30d` solo rige al CREARLO y
+          # `hosting:clone` no lo extiende. Sin esto "previa" caduca 30 días
+          # después de crearse aunque se clone en cada despliegue. Un fallo
+          # aquí NUNCA tumba el despliegue: solo avisa. Sin la cabecera
+          # x-goog-user-project a propósito: exige serviceusage.services.use sobre
+          # el proyecto y la cuenta de despliegue del estándar no lo tiene; con un
+          # token de cuenta de servicio la cuota ya va al proyecto de esa cuenta.
+          # Con tiempos máximos: un curl colgado agotaría el timeout del job
+          # (continue-on-error no protege de eso).
+          token="$(gcloud auth print-access-token 2>/dev/null)" || token=""
+          if [[ -z "$token" ]]; then
+            echo "::warning::No se pudo obtener el token para renovar el plazo del canal 'previa' (gcloud auth print-access-token); conserva el plazo que tenía."
+            exit 0
+          fi
+          respuesta="$(mktemp)"
+          codigo="$(curl -sS --connect-timeout 10 --max-time 30 -o "$respuesta" -w '%{http_code}' -X PATCH \
+            -H "Authorization: Bearer $token" \
+            -H "Content-Type: application/json" \
+            --data '{"ttl":"2592000s"}' \
+            "https://firebasehosting.googleapis.com/v1beta1/sites/${SITIO}/channels/previa?updateMask=ttl")" || codigo="000"
+          # El motivo del fallo (error.message de la respuesta; no contiene el token).
+          motivo="$(python3 -c 'import json, sys; d = json.load(open(sys.argv[1])); print(str(d.get("error", {}).get("message", ""))[:200])' "$respuesta" 2>/dev/null)" || motivo=""
+          rm -f "$respuesta"
+          case "$codigo" in
+            2??) echo "Plazo del canal 'previa' renovado a 30 días." ;;
+            *)   echo "::warning::No se pudo renovar el plazo del canal 'previa' (HTTP $codigo${motivo:+: $motivo}); conserva el plazo que tenía." ;;
+          esac
 
       - name: Desplegar hosting + reglas (staging)
         env:
@@ -518,7 +552,9 @@ jobs:
         && !contains(github.ref_name, '-') && vars.MODO != 'B0')
       || (github.event_name == 'workflow_dispatch' && inputs.confirmar == 'DESPLEGAR')
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
+    outputs:
+      salud_ok: ${{ steps.salud.outputs.ok }}
     environment:
       name: production
       url: ${{ vars.PROD_URL }}
@@ -533,7 +569,7 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           # En workflow_dispatch se analiza/despliega el tag aprobado (D3)
-          ref: ${{ inputs.tag || github.ref }}
+          ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.ref }}
           fetch-depth: 0 # historial y tags completos para verificar la aprobación
 
       # D3 — Verificación de aprobación previa a producción (todos los modos).
@@ -544,10 +580,26 @@ jobs:
           ACTOR: ${{ github.actor }}
           APROBADORES: ${{ vars.APROBADORES_PROD }}
           FIRMA_REQUERIDA: ${{ vars.TAG_FIRMADO_REQUERIDO }}
+          REF_EJECUCION: ${{ github.ref }}
         run: |
           set -euo pipefail
           git fetch --quiet origin main
           if [[ "$EVENTO" == "workflow_dispatch" ]]; then
+            # 0) El dispatch se lanza SOBRE el mismo tag estable que despliega. Control de coherencia del propio
+            #    workflow (NO es una barrera: quien edita el workflow en una rama puede quitarlo; la barrera de
+            #    identidad es la condición del provider de producción, setup-oidc-gcp.sh 2.3, PR-B, pendiente).
+            if [[ ! "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+              echo "::error::El tag del dispatch debe tener la forma vX.Y.Z (versión estable; un prerelease no se despliega a producción)."
+              exit 1
+            fi
+            if [[ "$REF_EJECUCION" != "refs/tags/$TAG" ]]; then
+              wf="${GITHUB_WORKFLOW_REF%%@*}"; wf="${wf##*/}"
+              echo "::error::Lance el workflow_dispatch sobre el mismo tag que despliega: gh workflow run ${wf} --ref ${TAG} -f tag=${TAG} -f confirmar=DESPLEGAR (ref de esta ejecución: ${REF_EJECUCION})"
+              exit 1
+            fi
+            # 0b) El código descargado es el del tag aprobado, no el de una rama con el mismo nombre.
+            [[ "$(git rev-parse HEAD)" == "$(git rev-parse "refs/tags/$TAG^{commit}")" ]] \
+              || { echo "::error::El código del workspace no es el del tag $TAG (¿existe una rama con el mismo nombre?)"; exit 1; }
             # 1) El tag existe
             git rev-parse -q --verify "refs/tags/$TAG" >/dev/null \
               || { echo "::error::El tag '$TAG' no existe en el repositorio"; exit 1; }
@@ -626,17 +678,53 @@ jobs:
 
       - name: Conservar copia de la versión actual (canal "previa" para rollback)
         # Clona el contenido en vivo a un canal de vista previa de larga
-        # duración. Si el health check posterior falla, post-despliegue lo
-        # vuelve a clonar sobre live. Ver 01-seguridad/06-rollback-e-incidentes.md.
+        # duración. Si el health check posterior falla, el paso "Rollback de
+        # hosting" de este mismo job lo vuelve a clonar sobre live. Ver 01-seguridad/06-rollback-e-incidentes.md.
+        # AVISO: la llamada REST de renovación (PATCH sobre
+        # sites/<sitio>/channels/previa con updateMask=ttl) NO se verificó
+        # contra el servicio real de Firebase Hosting: solo con dobles en
+        # pruebas-workflows/canal_previa.py. Si falla en el primer uso real, el
+        # efecto es únicamente el ::warning:: y el canal conserva su plazo.
         continue-on-error: true
         env:
           PROYECTO: ${{ vars.GCP_PROJECT_ID_PROD }}
           SITIO: ${{ vars.FIREBASE_SITE_ID || vars.GCP_PROJECT_ID_PROD }}
         run: |
           npm i -g "firebase-tools@${FIREBASE_TOOLS_VERSION}"
-          firebase hosting:channel:create previa --project "$PROYECTO" --expires 30d \
+          firebase hosting:channel:create previa --project "$PROYECTO" --site "$SITIO" --expires 30d \
             --non-interactive >/dev/null 2>&1 || true
-          firebase hosting:clone "$SITIO:live" "$SITIO:previa" --project "$PROYECTO"
+          if ! firebase hosting:clone "$SITIO:live" "$SITIO:previa" --project "$PROYECTO"; then
+            echo "::notice::No se pudo clonar live a 'previa' (esperable en el primer despliegue, cuando aún no hay versión en live; si no lo es, vea el error de arriba): no hay copia para rollback automático hasta el siguiente despliegue."
+            echo "::warning::No se pudo guardar la copia para rollback (clone $SITIO:live → previa). Si el sitio '$SITIO' todavía no existe, créelo: firebase hosting:sites:create $SITIO --project $PROYECTO"
+            exit 0
+          fi
+          # Renueva el plazo del canal: `--expires 30d` solo rige al CREARLO y
+          # `hosting:clone` no lo extiende. Sin esto "previa" caduca 30 días
+          # después de crearse aunque se clone en cada despliegue. Un fallo
+          # aquí NUNCA tumba el despliegue: solo avisa. Sin la cabecera
+          # x-goog-user-project a propósito: exige serviceusage.services.use sobre
+          # el proyecto y la cuenta de despliegue del estándar no lo tiene; con un
+          # token de cuenta de servicio la cuota ya va al proyecto de esa cuenta.
+          # Con tiempos máximos: un curl colgado agotaría el timeout del job
+          # (continue-on-error no protege de eso).
+          token="$(gcloud auth print-access-token 2>/dev/null)" || token=""
+          if [[ -z "$token" ]]; then
+            echo "::warning::No se pudo obtener el token para renovar el plazo del canal 'previa' (gcloud auth print-access-token); conserva el plazo que tenía."
+            exit 0
+          fi
+          respuesta="$(mktemp)"
+          codigo="$(curl -sS --connect-timeout 10 --max-time 30 -o "$respuesta" -w '%{http_code}' -X PATCH \
+            -H "Authorization: Bearer $token" \
+            -H "Content-Type: application/json" \
+            --data '{"ttl":"2592000s"}' \
+            "https://firebasehosting.googleapis.com/v1beta1/sites/${SITIO}/channels/previa?updateMask=ttl")" || codigo="000"
+          # El motivo del fallo (error.message de la respuesta; no contiene el token).
+          motivo="$(python3 -c 'import json, sys; d = json.load(open(sys.argv[1])); print(str(d.get("error", {}).get("message", ""))[:200])' "$respuesta" 2>/dev/null)" || motivo=""
+          rm -f "$respuesta"
+          case "$codigo" in
+            2??) echo "Plazo del canal 'previa' renovado a 30 días." ;;
+            *)   echo "::warning::No se pudo renovar el plazo del canal 'previa' (HTTP $codigo${motivo:+: $motivo}); conserva el plazo que tenía." ;;
+          esac
 
       - name: Desplegar hosting + reglas (producción)
         env:
@@ -674,21 +762,6 @@ jobs:
 
           echo "### Producción desplegada: $URL_PROD (${GITHUB_REF_NAME})" >> "$GITHUB_STEP_SUMMARY"
 
-  # ---------------------------------------------------------------------------
-  # Fase 7 — post-despliegue: health check con reintentos; si falla, rollback
-  # y registro del Deployment. El Environment ya crea un Deployment de GitHub;
-  # aquí se registra además el resultado de la verificación (útil en Modo B0).
-  # ---------------------------------------------------------------------------
-  post-despliegue:
-    name: post-despliegue
-    needs: desplegar-produccion
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    permissions:
-      contents: read
-      id-token: write
-      deployments: write
-    steps:
       - name: Health check de producción (10 intentos, 15 s)
         id: salud
         env:
@@ -709,13 +782,6 @@ jobs:
           echo "ok=false" >> "$GITHUB_OUTPUT"
           echo "::error::Producción no responde 200 tras 10 intentos"
 
-      - name: Autenticar en GCP para rollback
-        if: steps.salud.outputs.ok == 'false'
-        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
-        with:
-          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
-          service_account: ${{ secrets.GCP_SA_DEPLOY_PROD }}
-
       - name: Rollback de hosting (clonar canal "previa" sobre live)
         if: steps.salud.outputs.ok == 'false'
         env:
@@ -729,21 +795,53 @@ jobs:
           # existe, el rollback es MANUAL: consola Firebase → Hosting →
           # Historial de versiones → "Revertir" (ver 06-rollback-e-incidentes.md).
           # Las reglas de Firestore se revierten con `git revert` + nuevo tag.
+          # ALCANCE: este paso revierte SOLO Hosting. Las reglas de Firestore,
+          # las funciones y los datos NO se revierten solos.
           if firebase hosting:clone "$SITIO:previa" "$SITIO:live" --project "$PROYECTO"; then
-            echo "::warning::ROLLBACK ejecutado: live restaurado desde el canal 'previa'."
+            echo "::warning::ROLLBACK ejecutado: live restaurado desde el canal 'previa'. Se revirtió SOLO Hosting: las reglas de Firestore, las funciones y los datos NO se revierten solos; si el despliegue los cambió, use git revert + nuevo tag (ver 01-seguridad/06-rollback-e-incidentes.md)."
           else
-            echo "::error::Rollback automático no disponible. Ejecute el rollback manual: consola Firebase → Hosting → Historial → Revertir. Ver 01-seguridad/06-rollback-e-incidentes.md"
+            echo "::error::Rollback automático no disponible (y aunque lo estuviera, revertiría SOLO Hosting: reglas de Firestore, funciones y datos no se revierten solos). Ejecute el rollback manual: consola Firebase → Hosting → Historial → Revertir; para reglas y funciones, git revert + nuevo tag. Ver 01-seguridad/06-rollback-e-incidentes.md"
           fi
 
+      - name: Fallar si producción no responde
+        if: steps.salud.outputs.ok == 'false'
+        run: echo "::error::Health check de producción fallido tras el despliegue; se intentó el rollback (paso anterior)."; exit 1
+
+  # ---------------------------------------------------------------------------
+  # Fase 7 — post-despliegue: registra el resultado como Deployment (útil en B0).
+  # El health check y el rollback corren al final de desplegar-produccion, el único
+  # job aprobado por el Environment (los secretos del Environment solo llegan a los
+  # jobs que lo declaran). Cuando exista la condición del provider de producción
+  # (03-scripts/setup-oidc-gcp.sh 2.3, PR-B, pendiente), la identidad de producción
+  # en GCP solo aceptará tokens de un tag v* estable y, en Modos A/B, de un job con
+  # environment: production. Declarar aquí el Environment pediría otra aprobación.
+  # Este job no recibe credenciales de nube.
+  # ---------------------------------------------------------------------------
+  post-despliegue:
+    name: post-despliegue
+    needs: desplegar-produccion
+    if: >-
+      always() && contains(fromJSON('["success","failure"]'), needs.desplegar-produccion.result)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      deployments: write
+    steps:
       - name: Registrar resultado del despliegue
-        if: always()
         uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
         env:
-          SALUD_OK: ${{ steps.salud.outputs.ok }}
+          RESULTADO: ${{ needs.desplegar-produccion.result }}
+          SALUD_OK: ${{ needs.desplegar-produccion.outputs.salud_ok }}
           URL_PROD: ${{ vars.PROD_URL }}
         with:
           script: |
-            const ok = process.env.SALUD_OK === 'true';
+            const ok = process.env.RESULTADO === 'success';
+            const descripcion = ok
+              ? 'Health check correcto'
+              : process.env.SALUD_OK === 'false'
+                ? 'Health check fallido; rollback intentado en desplegar-produccion'
+                : 'desplegar-produccion falló antes de verificar la salud';
             const { data: d } = await github.rest.repos.createDeployment({
               owner: context.repo.owner, repo: context.repo.repo,
               ref: context.ref, environment: 'production', auto_merge: false,
@@ -755,12 +853,12 @@ jobs:
               deployment_id: d.id, state: ok ? 'success' : 'failure',
               environment_url: process.env.URL_PROD,
               log_url: `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`,
-              description: ok ? 'Health check correcto' : 'Health check fallido; rollback intentado'
+              description: descripcion
             });
             core.summary.addHeading('Post-despliegue')
-              .addRaw(ok ? 'Producción verificada correctamente.' : 'FALLO de verificación: revise el rollback.')
+              .addRaw(ok ? 'Producción verificada correctamente.' : `FALLO: ${descripcion}.`)
               .write();
-            if (!ok) core.setFailed('Health check de producción fallido');
+            if (!ok) core.setFailed('Despliegue a producción fallido: vea el job desplegar-produccion');
 
   # ---------------------------------------------------------------------------
   # compuerta-pr (D1): ÚNICO status check que exigen los rulesets de main.
