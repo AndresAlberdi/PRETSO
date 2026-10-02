@@ -20,9 +20,14 @@
 #   3. Verifica que `live` quedó con la versión de `previa` y que responde 200.
 #   4. RESTAURA `live` a la versión original (hosting:clone SITIO@VERSION SITIO:live)
 #      y verifica versión y HTTP 200. Este paso corre aunque falle (o se
-#      cancele) cualquier paso intermedio, siempre que el paso 2 haya empezado;
-#      no sobrescribe `live` si encuentra una tercera versión (alguien desplegó
-#      entretanto): en ese caso falla y pide revisar a mano.
+#      cancele) cualquier paso posterior al 1, siempre que el paso 1 haya
+#      terminado bien (es el que registra la versión original). Es idempotente:
+#      si live ya sirve la original no hace nada; si sirve la de `previa`,
+#      restaura; si encuentra una tercera versión (alguien desplegó entretanto)
+#      no sobrescribe `live`, falla y pide revisar a mano.
+#      Una cancelación forzada o la pérdida del runner impiden este paso: en ese
+#      caso se restaura a mano con el id completo de la versión que imprime el
+#      paso 1 (runbook, sección 2.1).
 #   El job termina en rojo ante cualquier fallo, aunque la restauración salga bien.
 #   En el resumen del job: versiones (6 primeros caracteres), tiempos y resultado.
 #
@@ -33,7 +38,7 @@
 #
 # Disparador: solo workflow_dispatch (sin push ni pull_request).
 # Secretos: GCP_WIF_PROVIDER, GCP_SA_DEPLOY_STAGING (Environment/repositorio)
-# Variables: GCP_PROJECT_ID_STAGING, GCP_PROJECT_ID_PROD, STAGING_URL, NODE_VERSION (22)
+# Variables: GCP_PROJECT_ID_STAGING, GCP_PROJECT_ID_PROD, STAGING_URL, NODE_VERSION (opcional, 22)
 # Pruebas de su lógica sin red: tests/workflows/test_probar_rollback_staging.py
 # =============================================================================
 name: probar-rollback-staging
@@ -99,6 +104,20 @@ jobs:
           fi
           echo "Ensayo confirmado sobre el sitio $SITIO ($URL_STAGING)."
 
+      # Node y firebase-tools se instalan ANTES de autenticar: así los scripts de
+      # instalación de npm no encuentran el archivo de credenciales de GCP que
+      # deja el paso de auth. Limitación: ACTIONS_ID_TOKEN_REQUEST_URL y
+      # ACTIONS_ID_TOKEN_REQUEST_TOKEN existen durante todo el job (id-token:
+      # write es por job), de modo que un paquete malicioso aún podría pedir un
+      # token OIDC; lo acota la versión fijada de firebase-tools.
+      - name: Node.js
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Instalar firebase-tools (versión fijada)
+        run: npm i -g "firebase-tools@${FIREBASE_TOOLS_VERSION}"
+
       - name: Autenticar en GCP (WIF + impersonación, SA de staging)
         uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093 # v3
         with:
@@ -107,14 +126,6 @@ jobs:
 
       - name: Instalar gcloud
         uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db # v3
-
-      - name: Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-
-      - name: Instalar firebase-tools (versión fijada)
-        run: npm i -g "firebase-tools@${FIREBASE_TOOLS_VERSION}"
 
       - name: Estado inicial (live, previa y HTTP 200)
         id: inicial
@@ -175,13 +186,15 @@ jobs:
             echo "vence=$vence"
           } >> "$GITHUB_OUTPUT"
           echo "live=${original##*/} previa=${previa##*/} (vence $vence); HTTP 200 antes del ensayo."
+          # Id completo para restaurar a mano si el job se cancela a la fuerza o se pierde el runner:
+          echo "Versión original de live (restauración manual, runbook 2.1): ${SITIO}@${original##*/}"
 
       - name: Forzar el rollback (clonar "previa" sobre live)
         id: rollback
         run: |
           set -euo pipefail
-          # Desde aquí live puede cambiar: la restauración queda armada.
-          echo "tocado=true" >> "$GITHUB_OUTPUT"
+          # Desde aquí live puede cambiar. La restauración depende solo de que el
+          # paso inicial haya terminado bien (no de una salida de este paso).
           echo "t_rollback=$(date +%s)" >> "$GITHUB_OUTPUT"
           firebase hosting:clone "$SITIO:previa" "$SITIO:live" --project "$PROYECTO" --non-interactive
 
@@ -218,10 +231,12 @@ jobs:
 
       - name: Restaurar la versión original en live
         id: restaurar
-        # Corre aunque haya fallado o se haya cancelado un paso anterior, siempre
-        # que el rollback haya empezado (tocado=true). Sin continue-on-error: si
-        # la restauración falla, el job queda en rojo.
-        if: always() && steps.rollback.outputs.tocado == 'true'
+        # Corre aunque haya fallado o se haya cancelado un paso posterior al
+        # estado inicial, siempre que este haya terminado bien (registra la
+        # versión original). Idempotente: live == original no hace nada,
+        # live == previa restaura, otra versión falla sin sobrescribir. Sin
+        # continue-on-error: si la restauración falla, el job queda en rojo.
+        if: always() && steps.inicial.outcome == 'success'
         env:
           ORIGINAL: ${{ steps.inicial.outputs.original }}
           PREVIA: ${{ steps.inicial.outputs.previa }}

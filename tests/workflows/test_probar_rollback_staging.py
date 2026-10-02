@@ -7,12 +7,18 @@ falle lo que falle, intenta restaurar la versión original, no la pisa si
 alguien desplegó entretanto, termina en rojo y no filtra el token.
 
 Cómo. Se ejecuta el `run:` REAL de cada paso con bash (`bash --noprofile
---norc -e`, el shell por defecto de Actions) y dobles CON ESTADO de `curl`
+--norc -eo pipefail`, el shell por defecto de Actions en Linux) y dobles CON
+ESTADO de `curl`
 (API REST de Hosting y URL del sitio), `firebase` (hosting:clone cambia la
 versión de live), `gcloud` (token), `npm` y `sleep`. Los pasos `uses:` se dan
 por correctos. Los `if:` y los `env:` se evalúan con un evaluador mínimo que
 solo admite las formas presentes en el workflow: una forma nueva hace fallar la
-prueba y obliga a revisarla.
+prueba y obliga a revisarla. El entorno de cada subproceso se construye DESDE
+CERO (PATH con los dobles al frente y /usr/bin:/bin; HOME, TMPDIR y
+CLOUDSDK_CONFIG en el temporal): no hereda credenciales de la máquina que corre
+la prueba (GOOGLE_APPLICATION_CREDENTIALS, CLOUDSDK_*, GH_TOKEN, GITHUB_TOKEN),
+de modo que un doble ausente nunca cae en la herramienta real con una sesión
+real.
 
 LÍMITE: la forma de las respuestas de la API (release.version.name, .status,
 expireTime) sigue a firebase-tools 15 (hosting-clone.js usa
@@ -105,6 +111,19 @@ exit 0
 """
 
 
+def entorno_base(tmp, binarios):
+    """Entorno de los subprocesos, desde cero: nada de os.environ."""
+    (tmp / "home").mkdir(exist_ok=True)
+    (tmp / "gcloud-config").mkdir(exist_ok=True)
+    return dict(
+        PATH=f"{binarios}:/usr/bin:/bin",
+        HOME=str(tmp / "home"),
+        TMPDIR=str(tmp),
+        CLOUDSDK_CONFIG=str(tmp / "gcloud-config"),
+        LANG="C.UTF-8",
+    )
+
+
 def cargar():
     return yaml.safe_load(WORKFLOW.read_text(encoding="utf-8"))
 
@@ -153,11 +172,11 @@ class Contexto:
         if expr == "always()":
             return True
         m = re.fullmatch(
-            r"always\(\)\s*&&\s*steps\.([\w-]+)\.outputs\.([\w-]+)\s*==\s*'([^']*)'",
+            r"always\(\)\s*&&\s*steps\.([\w-]+)\.outcome\s*==\s*'([^']*)'",
             expr,
         )
         if m:
-            return self.salidas.get(m.group(1), {}).get(m.group(2), "") == m.group(3)
+            return self.resultados.get(m.group(1), "") == m.group(2)
         raise AssertionError(f"condición no admitida por la prueba: {expr}")
 
 
@@ -167,6 +186,7 @@ def simular(
     previa=PREVIA,
     live=ORIGINAL,
     vence_en=10 * 86400,
+    cancelar_en=None,
     **dobles,
 ):
     d = cargar()
@@ -193,9 +213,9 @@ def simular(
         vence = time.strftime(
             "%Y-%m-%dT%H:%M:%S.123456Z", time.gmtime(time.time() + vence_en)
         )
+        # Entorno desde cero: nada de os.environ (credenciales de la máquina).
         base = dict(
-            os.environ,
-            PATH=f"{binarios}:{os.environ['PATH']}",
+            entorno_base(tmp, binarios),
             REGISTRO=str(registro),
             ESTADO=str(estado),
             TOKEN_ESPERADO=TOKEN,
@@ -213,6 +233,12 @@ def simular(
             if not ctx.evaluar_if(s.get("if"), fallido):
                 ctx.resultados[clave] = "skipped"
                 continue
+            if cancelar_en is not None and clave == cancelar_en:
+                # Cancelación del run en este paso: no corre, el resto sin
+                # always() se omite y los que tienen always() siguen corriendo.
+                ctx.resultados[clave] = "cancelled"
+                fallido = True
+                continue
             if "uses" in s:
                 ctx.resultados[clave] = "success"
                 continue
@@ -226,7 +252,7 @@ def simular(
             guion = tmp / f"paso-{i}.sh"
             guion.write_text(s["run"], encoding="utf-8")
             r = subprocess.run(
-                ["bash", "--noprofile", "--norc", "-e", str(guion)],
+                ["bash", "--noprofile", "--norc", "-eo", "pipefail", str(guion)],
                 cwd=tmp,
                 capture_output=True,
                 text=True,
@@ -320,6 +346,30 @@ class EstructuraTest(unittest.TestCase):
 
     def test_firebase_tools_fijado(self):
         self.assertEqual(self.d["env"]["FIREBASE_TOOLS_VERSION"], "15.28.1")
+
+    def test_node_y_firebase_tools_antes_de_autenticar(self):
+        nombres = [s["name"] for s in self.job["steps"]]
+        self.assertEqual(
+            nombres[:6],
+            [
+                "Exigir la confirmación ROLLBACK-STAGING",
+                "Node.js",
+                "Instalar firebase-tools (versión fijada)",
+                "Autenticar en GCP (WIF + impersonación, SA de staging)",
+                "Instalar gcloud",
+                "Estado inicial (live, previa y HTTP 200)",
+            ],
+        )
+        self.assertIn("ACTIONS_ID_TOKEN_REQUEST", self.texto)
+
+    def test_restauracion_atada_al_estado_inicial(self):
+        pasos = {s.get("id"): s for s in self.job["steps"]}
+        self.assertEqual(
+            pasos["restaurar"]["if"], "always() && steps.inicial.outcome == 'success'"
+        )
+        self.assertNotIn("continue-on-error", pasos["restaurar"])
+        # El paso inicial deja en el log el id completo para restaurar a mano.
+        self.assertIn("${SITIO}@${original##*/}", pasos["inicial"]["run"])
 
     def test_la_cabecera_avisa_que_toca_el_sitio_en_uso(self):
         self.assertIn("TOCA EL SITIO EN USO", self.texto)
@@ -420,6 +470,59 @@ class EnsayoTest(unittest.TestCase):
         self.assertIn("tercera versión", r.texto)
         self.assertTrue(r.live_final.endswith("tercera999"))
         self.assertIn("la restauración no se completó", r.resumen)
+
+    def test_cancelado_antes_del_clon_restaurar_corre_y_no_hace_nada(self):
+        r = simular(cancelar_en="rollback")
+        self.assertTrue(r.fallido)
+        self.assertEqual(r.clones, [])
+        self.assertEqual(r.ctx.resultados["restaurar"], "success", r.texto)
+        self.assertIn("no hay nada que restaurar", r.texto)
+        self.assertEqual(r.live_final, ORIGINAL)
+        self.assertSinToken(r)
+
+    def test_cancelado_tras_el_clon_restaura(self):
+        r = simular(cancelar_en="verificar")
+        self.assertTrue(r.fallido)
+        self.assertEqual(r.clones, [CLON_ROLLBACK, CLON_RESTAURAR])
+        self.assertEqual(r.ctx.resultados["restaurar"], "success", r.texto)
+        self.assertEqual(r.live_final, ORIGINAL)
+        self.assertIn("FALLO durante el ensayo; versión original restaurada", r.resumen)
+
+    def test_estado_inicial_imprime_el_id_completo_para_restaurar_a_mano(self):
+        r = simular()
+        self.assertIn(f"{SITIO}@abc123original", r.texto)
+
+    def test_entorno_sin_credenciales_heredadas(self):
+        viejo = dict(os.environ)
+        os.environ.update(
+            GOOGLE_APPLICATION_CREDENTIALS="/no/existe.json",
+            CLOUDSDK_CORE_PROJECT="pretso-prod",
+            GH_TOKEN="gh-no-debe-llegar",
+            GITHUB_TOKEN="gh-no-debe-llegar",
+        )
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                tmp = pathlib.Path(tmp)
+                r = subprocess.run(
+                    ["bash", "--noprofile", "--norc", "-eo", "pipefail", "-c", "env"],
+                    capture_output=True,
+                    text=True,
+                    env=entorno_base(tmp, tmp),
+                    timeout=10,
+                )
+        finally:
+            os.environ.clear()
+            os.environ.update(viejo)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        claves = {linea.split("=", 1)[0] for linea in r.stdout.splitlines()}
+        for prohibida in (
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "CLOUDSDK_CORE_PROJECT",
+            "GH_TOKEN",
+            "GITHUB_TOKEN",
+        ):
+            self.assertNotIn(prohibida, claves)
+        self.assertNotIn("gh-no-debe-llegar", r.stdout)
 
     def test_restauracion_falla_rojo_y_lo_dice(self):
         r = simular(RC_CLONE_RESTAURAR=1)

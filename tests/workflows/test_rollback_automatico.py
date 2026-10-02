@@ -9,9 +9,13 @@ reemplaza el ensayo real (parte B, workflow probar-rollback-staging.yml), pero
 verifica sin red y en segundos que la LÓGICA hace lo que el runbook promete.
 
 Cómo. Se extrae con PyYAML el `run:` REAL de los pasos del job y se ejecuta con
-bash (`bash --noprofile --norc -e`, el shell por defecto de GitHub Actions en
-Linux cuando el paso no declara `shell:`) con dobles de `curl`, `sleep`, `npm`,
-`npx`, `firebase` y `gcloud` en un directorio temporal al frente del PATH. Los
+bash (`bash --noprofile --norc -eo pipefail`, el shell por defecto de GitHub
+Actions en Linux cuando el paso no declara `shell:`) con dobles de `curl`,
+`sleep`, `npm`, `npx`, `firebase` y `gcloud` en un directorio temporal al frente
+del PATH. El entorno de los subprocesos se construye DESDE CERO (PATH con los
+dobles al frente y /usr/bin:/bin; HOME, TMPDIR y CLOUDSDK_CONFIG en el
+temporal): no hereda GOOGLE_APPLICATION_CREDENTIALS, CLOUDSDK_*, GH_TOKEN ni
+GITHUB_TOKEN de la máquina que corre la prueba. Los
 dobles registran sus argumentos y la prueba controla sus respuestas. Las
 condiciones `if:` de los pasos se evalúan con un evaluador mínimo que solo
 acepta las formas presentes hoy en el workflow (si alguien cambia una condición,
@@ -84,6 +88,19 @@ DOBLE_SIMPLE = r"""#!/usr/bin/env bash
 printf '%s\n' "$*" >> "$REGISTRO/{nombre}.log"
 exit 0
 """
+
+
+def entorno_base(tmp, binarios):
+    """Entorno de los subprocesos, desde cero: nada de os.environ."""
+    (tmp / "home").mkdir(exist_ok=True)
+    (tmp / "gcloud-config").mkdir(exist_ok=True)
+    return dict(
+        PATH=f"{binarios}:/usr/bin:/bin",
+        HOME=str(tmp / "home"),
+        TMPDIR=str(tmp),
+        CLOUDSDK_CONFIG=str(tmp / "gcloud-config"),
+        LANG="C.UTF-8",
+    )
 
 
 def cargar_job():
@@ -163,9 +180,8 @@ class Simulacion:
             f.write_text(texto, encoding="utf-8")
             f.chmod(0o755)
         self.vars = vars_
-        self.base = dict(os.environ)
+        self.base = entorno_base(self.tmp, binarios)
         self.base.update(
-            PATH=f"{binarios}:{os.environ['PATH']}",
             REGISTRO=str(self.registro),
             FIREBASE_TOOLS_VERSION="15.28.1",
             GITHUB_REF_NAME="v9.9.9",
@@ -202,7 +218,7 @@ class Simulacion:
             guion = self.tmp / f"paso-{len(self.resultados)}.sh"
             guion.write_text(run, encoding="utf-8")
             r = subprocess.run(
-                ["bash", "--noprofile", "--norc", "-e", str(guion)],
+                ["bash", "--noprofile", "--norc", "-eo", "pipefail", str(guion)],
                 cwd=self.tmp,
                 capture_output=True,
                 text=True,
@@ -446,6 +462,38 @@ class EvaluadorTest(unittest.TestCase):
             )
         )
         self.assertFalse(evaluar_if("steps.salud.outputs.ok == 'false'", False, {}))
+
+    def test_entorno_sin_credenciales_heredadas(self):
+        viejo = dict(os.environ)
+        os.environ.update(
+            GOOGLE_APPLICATION_CREDENTIALS="/no/existe.json",
+            CLOUDSDK_CORE_PROJECT="pretso-prod",
+            GH_TOKEN="gh-no-debe-llegar",
+            GITHUB_TOKEN="gh-no-debe-llegar",
+        )
+        try:
+            with tempfile.TemporaryDirectory() as tmp:
+                tmp = pathlib.Path(tmp)
+                r = subprocess.run(
+                    ["bash", "--noprofile", "--norc", "-eo", "pipefail", "-c", "env"],
+                    capture_output=True,
+                    text=True,
+                    env=entorno_base(tmp, tmp),
+                    timeout=10,
+                )
+        finally:
+            os.environ.clear()
+            os.environ.update(viejo)
+        self.assertEqual(r.returncode, 0, r.stderr)
+        claves = {linea.split("=", 1)[0] for linea in r.stdout.splitlines()}
+        for prohibida in (
+            "GOOGLE_APPLICATION_CREDENTIALS",
+            "CLOUDSDK_CORE_PROJECT",
+            "GH_TOKEN",
+            "GITHUB_TOKEN",
+        ):
+            self.assertNotIn(prohibida, claves)
+        self.assertNotIn("gh-no-debe-llegar", r.stdout)
 
     def test_rechaza_formas_desconocidas(self):
         with self.assertRaises(AssertionError):

@@ -106,6 +106,8 @@ curl -sS -X POST -d '' -H "Authorization: Bearer $TOKEN" -H "x-goog-user-project
   "https://firebasehosting.googleapis.com/v1beta1/sites/$SITIO/releases?versionName=$VERSION"
 ```
 
+**Ensayo 10 (`probar-rollback-staging.yml`) interrumpido a la fuerza.** El paso «Restaurar la versión original en live» corre aunque falle o se cancele un paso posterior al estado inicial, pero no corre si la ejecución se cancela a la fuerza (*force cancel*) o se pierde el runner. En ese caso `live` puede quedar sirviendo la versión de `previa` y se restaura a mano: el paso «Estado inicial (live, previa y HTTP 200)» imprime en su log el id completo de la versión original (`Versión original de live (restauración manual, runbook 2.1): <sitio>@<VERSION_ID>`). Se comprueba primero qué versión sirve `live` (lectura REST del paso 1 de arriba, cambiando `previa` por `live`); si es la de `previa`, se ejecuta `firebase hosting:clone "<sitio>@<VERSION_ID>" "<sitio>:live" --project "$PROYECTO"` con ese id completo (no con los 6 caracteres del resumen) y se verifica la versión y el HTTP 200; si es una tercera versión, alguien desplegó entretanto y no se sobrescribe sin revisarlo.
+
 Alternativa por consola de Firebase: Hosting, «Release history», menú de la versión anterior, «Rollback» (la hace Andres si Claude no tiene acceso). Cada despliegue lleva el mensaje `producción <tag> (run <id>)` o `staging <sha> (run <id>)`, que permite identificar la versión.
 
 Límite: Hosting no revierte reglas ni datos (secciones 2.2 y 2.3).
