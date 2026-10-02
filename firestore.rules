@@ -2,6 +2,8 @@ rules_version = '2';
 // ============================================================================
 // Reglas endurecidas de PRETSO (estándar DevSecOps v2.0)
 // Documento de referencia: SeguridadGeneral/01-seguridad/03-hardening-por-nube.md
+// Ensayo OPS-06 (2026-10-02): esta línea es un cambio inocuo para ensayar el
+// rollback de reglas (git revert + PR + despliegue); se revierte a continuación.
 //
 // Requisito previo al despliegue: el custom claim `admin` debe estar asignado
 // en el proyecto (scripts/asignar_claim_admin.py); de lo contrario nadie escribe.
