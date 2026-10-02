@@ -2,7 +2,7 @@
 
 | Versión | Fecha | Alcance | Control |
 |---|---|---|---|
-| 1.0 | 2026-10-01 | Repositorio `AndresAlberdi/PRETSO`, proyectos Firebase `pretso-database` (staging) y `pretso-prod` (producción) | SEC-01 de `05-checklist-pase-a-produccion.md`; formato de la sección 2 de `01-gestion-de-secretos.md` |
+| 1.1 | 2026-10-02 | Repositorio `AndresAlberdi/PRETSO`, proyectos Firebase `pretso-database` (staging) y `pretso-prod` (producción) | SEC-01 de `05-checklist-pase-a-produccion.md`; formato de la sección 2 de `01-gestion-de-secretos.md` |
 
 Este inventario **no contiene valores**, solo metadatos. Los nombres de recurso que figuran (proyectos, cuentas de servicio, pool WIF) ya constan en el repositorio y no permiten autenticarse por sí solos: la nube solo entrega credenciales si el token OIDC de GitHub cumple la condición de confianza del provider.
 
@@ -10,7 +10,7 @@ Propietario de todo lo listado: **Andres Alberdi** (único propietario y adminis
 
 ## 1. Resumen
 
-PRETSO prácticamente no tiene secretos de larga duración: el despliegue usa federación de identidad (WIF/OIDC) y la aplicación no lee ninguna variable de entorno ni credencial en tiempo de ejecución. Lo único que se guarda como secreto son **cuatro identificadores de clase S3** en GitHub. No hay secretos S0 (prohibidos), S1 (críticos) ni S2 (tokens de terceros) en uso.
+PRETSO prácticamente no tiene secretos de larga duración: el despliegue usa federación de identidad (WIF/OIDC) y la aplicación no lee ninguna variable de entorno ni credencial en tiempo de ejecución. Lo único que se guarda como secreto son **cinco identificadores de clase S3** en GitHub (cuatro hasta el 2026-10-02, cuando se añadió `GCP_WIF_PROVIDER_PROD`). No hay secretos S0 (prohibidos), S1 (críticos) ni S2 (tokens de terceros) en uso.
 
 Estado del control SEC-01: **Verde**. Las verificaciones que este inventario no pudo medir (condición de confianza del provider WIF y roles de las cuentas de despliegue) se siguen en SEC-07 del plan de migración, y el segundo factor de las cuentas de GitHub en la sección 10.
 
@@ -24,12 +24,14 @@ Lectura hecha con `gh secret list` el 2026-10-01 (solo nombres y fechas).
 | SEC-002 | `GCP_SA_DEPLOY_STAGING` | S3 | Cuenta de servicio a impersonar para desplegar a staging (`deploy-staging@pretso-database`) | Secreto de repositorio | `google-github-actions/auth` (jobs de vista previa y de staging) | Andres Alberdi | 2026-09-25 | Al cambiar la cuenta | Ídem |
 | SEC-003 | `GCP_WIF_PROVIDER` (Environment `production`) | S3 | Provider WIF del proyecto `pretso-prod` | Secreto de Environment `production` | `google-github-actions/auth` en los jobs de producción (solo tras aprobación) | Andres Alberdi | 2026-09-25 | Al cambiar el pool o el proyecto | Ídem |
 | SEC-004 | `GCP_SA_DEPLOY_PROD` | S3 | Cuenta de servicio a impersonar para desplegar a producción (`deploy-production@pretso-prod`) | Secreto de Environment `production` | `google-github-actions/auth` (despliegue y rollback de producción) | Andres Alberdi | 2026-09-25 | Al cambiar la cuenta | Ídem |
+| SEC-005 | `GCP_WIF_PROVIDER_PROD` | S3 | Ruta del provider WIF del pool `github` de `pretso-prod` (identificador, no credencial), para la prueba negativa | Secreto de repositorio (a propósito fuera del Environment: la prueba corre sin él) | Solo `probar-identidad-negativa.yml` | Andres Alberdi | 2026-10-02 | Al cambiar la infraestructura (pool, provider o proyecto) | Recargar con `gh secret set` (por la sesión, con autorización de Andres), sin mostrar el valor |
 
 Notas:
 
 - El Environment `production` tiene revisores requeridos y política de ramas/tags (verificado con `gh api .../environments`). El Environment `staging` no tiene reglas de protección, por diseño (modo A).
 - Existen dos secretos distintos con el mismo nombre `GCP_WIF_PROVIDER` (uno de repositorio para staging, otro de Environment para producción); el de Environment prevalece en los jobs con `environment: production`.
-- La barrera real no es el secreto sino la condición de confianza del provider WIF (`repository_owner`, `sub`/`ref` del repositorio), que restringe qué ejecuciones pueden obtener credenciales.
+- `GCP_WIF_PROVIDER_PROD` contiene la misma ruta que el `GCP_WIF_PROVIDER` del Environment `production`, pero como secreto de repositorio: así un job **sin** Environment puede intentar el intercambio y comprobar que se le niega. Conocer la ruta no da acceso (véase la sección 4).
+- La barrera real no es el secreto sino la condición de confianza del provider WIF y el binding de cada cuenta de despliegue (sección 4), que restringen qué ejecuciones pueden obtener credenciales.
 - No existen secretos de Dependabot ni de Codespaces (`gh secret list --app dependabot` y `--app codespaces`, vacíos).
 - El Environment `staging` y el `production` no tienen variables propias.
 
@@ -72,6 +74,20 @@ Ninguna variable contiene credenciales. Regla: si una variable llegara a contene
 - Roles de las cuentas de despliegue: documentados en `PILOTO.md` (incluido `roles/serviceusage.serviceUsageViewer`, mínimo para `firestore:rules`).
 
 - **Identidad de runtime de Cloud Functions (`functions/`)**: la versión migrada del repositorio no se despliega (`FIREBASE_DEPLOY_ONLY=hosting,firestore:rules`; no está en el CI). Verificado con lecturas el 2026-10-01: en `pretso-prod` no hay funciones; en `pretso-database` **sigue desplegada una versión antigua de `createReaderUser`** (gen1, `nodejs20` deprecado, actualizada el 2026-07-29, autorizada por correo fijo, invocable públicamente como toda función callable y sin invocaciones en los últimos 30 días). Corre con la cuenta de servicio por defecto de App Engine de `pretso-database`, que tiene `roles/editor`: revisar y retirar el rol tras retirar la función. **Recomendación de seguridad: retirar la función; decisión pendiente de Andres Alberdi (no ejecutada).** Antes de desplegar cualquier versión futura habrá que registrar su cuenta de servicio y revisar sus roles (no usar la predeterminada con `roles/editor`). Propietario: Andres Alberdi.
+
+### 4.1 Quién puede impersonar cada cuenta (desde el 2026-10-02)
+
+| Capa | Staging (`pretso-database`) | Producción (`pretso-prod`) |
+|---|---|---|
+| 1. Binding de la cuenta (`roles/iam.workloadIdentityUser`) | Sin cambios | `deploy-production` solo acepta el principal `principal://…/subject/repo:AndresAlberdi/PRETSO:environment:production` y su variante con identificadores inmutables. **El acceso amplio por repositorio (`principalSet://…/attribute.repository/…`) se quitó el 2026-10-02.** En la práctica: solo un job con `environment: production`, es decir, tras la aprobación del Environment, obtiene credenciales de producción |
+| 2. Condición del provider | Basada en identificadores inmutables del repositorio y del propietario | **Pendiente**: condición por identificadores, `environment == production` y ref de tag `v*`. Se aplica **después** de ejecutar la prueba negativa, para que esa prueba mida la capa 1 aislada |
+
+Pruebas:
+
+- **Negativa** (`.github/workflows/probar-identidad-negativa.yml`, solo `workflow_dispatch`, sin Environment): intenta el intercambio y la impersonación de `deploy-production`; verde si la rechaza el provider (capa 2) o el binding (capa 1), rojo si obtiene un token. **Pendiente de ejecutar.**
+- **Positiva**: `probar-identidad.yml` con `ambiente=production` sobre el primer tag `v*` (PIP-10).
+
+> **ADVERTENCIA: no volver a ejecutar `setup-oidc-gcp.sh` del estándar (2.2, ni la 2.1 que figura en la copia local) contra `pretso-prod` ni contra `pretso-database`.** Si el provider ya existe, el script lo actualiza con su propia condición (solo el nombre del propietario del repositorio), sobrescribiendo la vigente, y vuelve a otorgar a la cuenta de despliegue el acceso amplio por repositorio (`principalSet://…/attribute.repository/…`), deshaciendo lo descrito arriba. Cualquier cambio de WIF se hace a mano, con autorización de Andres, y se verifica con la prueba negativa.
 
 ## 5. Identificadores públicos por diseño (clase P)
 
@@ -117,7 +133,7 @@ No se usan tokens de n8n ni de otras integraciones: el repositorio no los mencio
 | No hay claves JSON de cuentas de servicio versionadas | `git ls-files \| grep -iE 'serviceaccount\|-sa-key\|\.pem$\|\.key$'` y gitleaks (regla propia de JSON de cuenta de servicio en `.github/gitleaks.toml`) | Sin coincidencias en el árbol |
 | No hay `.env` versionados | `git ls-files \| grep -E '(^\|/)\.env'`; `.gitignore` excluye `.env`, `.env.*`, `*.key`, `serviceAccountKey*.json`, `*-sa-key.json` (se permite `.env.example`) | Sin coincidencias |
 | No hay secretos en el historial salvo los excepcionados | `gitleaks detect --config .github/gitleaks.toml --redact` (v8.30.1, el historial completo; el número de commits varía con las referencias escaneadas) | 5 hallazgos, todos ya excepcionados en `.devsecops.yml`: 2 `gcp-api-key` en un aviso de Dependabot pegado (proyecto `pretso-platform` en borrado, sin uso), y 3 apiKey web de `pretso-database` (públicas por diseño) |
-| No hay `FIREBASE_TOKEN` ni PAT clásico | `gh secret list` (repositorio y ambos Environments) | Solo los cuatro S3 de la sección 2 |
+| No hay `FIREBASE_TOKEN` ni PAT clásico | `gh secret list` (repositorio y ambos Environments) | Solo los cuatro S3 de la sección 2 (el quinto, `GCP_WIF_PROVIDER_PROD`, se creó el 2026-10-02) |
 | La aplicación no lee secretos en tiempo de ejecución | Revisión de `src/environments/*` y de `vite.config.ts`: la configuración se fija en el build por modo | Confirmado |
 
 Observación: el historial contiene en un commit antiguo (`#14`) un directorio `venv/` con paquetes de Python que incluye paquetes de certificados raíz públicos (`cacert.pem`, `roots.pem`). Son certificados públicos de autoridades, no claves privadas; ya no están en el árbol.
@@ -145,7 +161,7 @@ Observación: el historial contiene en un commit antiguo (`#14`) un directorio `
 | Retiro de la versión antigua de `createReaderUser` en `pretso-database` y de `roles/editor` de su cuenta de runtime | **Recomendado; pendiente de decisión** (no ejecutado) | Andres Alberdi | 2026-10-01 |
 | Excepciones de gitleaks sobre apiKey y clave de `pretso-platform` | Vigentes; revisar, y reducir a cero cuando App Check esté en `enforce` y `pretso-platform` se borre | Andres Alberdi | Vencen 2026-12-25 |
 | App Check en `enforce` (NUB-G06) | Pendiente (primero monitoreo) | Andres Alberdi | Antes del primer tag |
-| Verificar WIF (condición de confianza) y roles de las dos cuentas de despliegue | Pendiente de una lectura con permisos IAM, antes del pase a producción | Andres Alberdi / sesión con su autorización | Antes del primer tag |
+| Verificar WIF (condición de confianza) y roles de las dos cuentas de despliegue | Binding de `deploy-production` estrechado al Environment `production` el 2026-10-02 (sección 4.1). Pendientes: ejecutar la prueba negativa, aplicar la condición del provider de producción (capa 2) y la prueba positiva sobre el primer tag | Andres Alberdi / sesión con su autorización | Antes del primer tag |
 | Verificar autenticación de dos factores de `AndresAlberdi` y `segurolotengopy` | Pendiente, acción de Andres | Andres Alberdi | Antes del primer tag |
 | Revisión periódica de este inventario | Cada trimestre y en cada pase a producción | Andres Alberdi | Próxima: 2027-01-01 |
 

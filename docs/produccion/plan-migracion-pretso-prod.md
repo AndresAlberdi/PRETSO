@@ -102,7 +102,7 @@ Diez colecciones: `companias`, `manejo_de_caja`, `salarios`, `corpus_christi`, `
 | NUB-G06 App Check en `enforce` | R (B con datos personales) | **Rojo** (sin encender) | Monitoreo, luego bloqueo |
 | REP-09 Dependabot para todos los ecosistemas | B | **Verde** (#37 añadió `pip`; Dependabot ya abrió PR de `pip`) | — |
 | REP-01, REP-02, REP-04, SEC-02, SEC-03, SEC-06 | B | Verde, medido el 2026-09-29 (ver `PILOTO.md` §«Gobierno») | — |
-| SEC-07 federación GCP | B | Verde según su creación del 2026-09-25; no se volvió a medir hoy | Repetir los puntos 1 a 3 de `02-identidad-federada-oidc.md` al preparar el pase |
+| SEC-07 federación GCP | B | **Amarillo**. El 2026-10-02 se estrechó el binding de `deploy-production@pretso-prod`: solo el principal `…:environment:production` (y su variante con identificadores inmutables); se quitó el acceso amplio por repositorio. Workflow `probar-identidad-negativa.yml` creado, **pendiente de ejecutar** (detalle en [`inventario-secretos.md`](../seguridad/inventario-secretos.md), sección 4.1) | Ejecutar la prueba negativa (verde esperado: rechazo en la capa 1); después, aplicar la 2.ª capa (condición del provider de producción por identificadores, `environment == production` y ref de tag `v*`) y repetir la negativa; prueba positiva (`probar-identidad`, `ambiente=production`) sobre el primer tag |
 | REP-06 sin `.env`, claves ni `tfvars` versionados | B | Verde en lo medido (no hay archivos sensibles en `git ls-files`); **no se comparó** el bloque base del `.gitignore` con el del estándar | Comparar |
 | PIP-05, PIP-09, REP-05 | B | Verde: `./security-local.sh` aprobado, ZAP y humo en verde, historial con 5 excepciones vigentes | Las excepciones vencen el 2026-12-25 |
 
