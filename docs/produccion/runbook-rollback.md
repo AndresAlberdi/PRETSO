@@ -264,6 +264,7 @@ Reglas:
 
 - Los workflows, `.devsecops.yml` y `firebase.json` están versionados: se revierten con `git revert` + PR, igual que las reglas.
 - Los secretos (`GCP_WIF_PROVIDER`, `GCP_SA_DEPLOY_PROD` en el Environment `production`) no se versionan: se vuelven a configurar por nombre. Nunca se imprime su valor.
+- **El acceso a la cuenta de producción está atado al Environment.** Desde el 2026-10-02 UTC (2026-10-01 en hora de Bolivia), `deploy-production@pretso-prod` solo acepta el principal `…:environment:production`: un job sin `environment: production` (por ejemplo, un rollback manual desde un workflow nuevo o desde una rama) **no obtiene credenciales** y falla en `google-github-actions/auth`. No es un fallo a corregir ampliando el binding: el rollback de producción por pipeline corre en un job con el Environment (y su aprobación); fuera de él, lo ejecuta Claude con la sesión de `gcloud`/`firebase` de Andres y su autorización. Detalle y advertencia sobre `setup-oidc-gcp.sh` en [`inventario-secretos.md`](../seguridad/inventario-secretos.md), sección 4.1.
 - Ningún rollback relaja IAM, Firestore, CORS ni CSP para «hacer que funcione».
 - Para detener un despliegue en curso: cancelar el run en GitHub Actions o rechazar la aprobación del Environment (la hace Andres).
 
