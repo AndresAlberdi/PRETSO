@@ -379,10 +379,10 @@ Hoy `main` despliega sin una segunda mirada independiente el sitio en uso (`pret
 
 - **Presupuesto con alertas de `pretso-prod` (GCP-07):** creado por Andres el 2026-10-01 en la consola, **no verificable desde la sesión** (la cuenta de la sesión no tiene permisos sobre la cuenta de facturación).
 
-## Jornada del 2026-10-02 — SEC-07: cuenta de producción atada al Environment
+## Jornada del 2026-10-02 UTC (2026-10-01 en hora de Bolivia) — SEC-07: cuenta de producción atada al Environment
 
 - **Binding estrechado.** `deploy-production@pretso-prod` solo acepta el principal `…/subject/repo:AndresAlberdi/PRETSO:environment:production` (y su variante con identificadores inmutables); el acceso amplio por repositorio se quitó. Solo un job con el Environment `production`, tras su aprobación, obtiene credenciales de producción.
 - **Secreto nuevo `GCP_WIF_PROVIDER_PROD`** (S3, de repositorio): la ruta del provider de `pretso-prod`, para que un job sin Environment pueda intentar el intercambio.
-- **Prueba negativa** `.github/workflows/probar-identidad-negativa.yml` (solo `workflow_dispatch`, sin Environment): verde si rechaza el provider (capa 2) o el binding (capa 1); rojo si obtiene un token de la cuenta. **Pendiente de ejecutar.**
+- **Prueba negativa** `.github/workflows/probar-identidad-negativa.yml` (solo `workflow_dispatch`, sin Environment): verde si rechaza el provider (capa 2) o el binding (capa 1); rojo si obtiene un token de la cuenta o si la respuesta no es exactamente el rechazo esperado (otro error, secreto o proyecto que no son los de `pretso-prod`, job con Environment). **Pendiente de ejecutar.**
 - **Pendientes de SEC-07, en orden:** ejecutar la negativa; aplicar la 2.ª capa (condición del provider de producción por identificadores, `environment == production` y ref de tag `v*`) y repetir la negativa; la prueba positiva (`probar-identidad`, `ambiente=production`) sobre el primer tag.
-- **No volver a ejecutar `setup-oidc-gcp.sh` del estándar** contra `pretso-prod` ni `pretso-database`: sobrescribe la condición del provider y recrea el acceso amplio (véase `docs/seguridad/inventario-secretos.md`, sección 4.1). Es un defecto a llevar a SeguridadGeneral en su sesión.
+- **No volver a ejecutar `setup-oidc-gcp.sh` del estándar** contra `pretso-prod` ni `pretso-database`: sobrescribe la condición del provider y recrea el acceso amplio (véase `docs/seguridad/inventario-secretos.md`, sección 4.1). Es un defecto a llevar a SeguridadGeneral en su sesión (según la v2.1 leída localmente; la 2.2 debe verificarse en la sesión de SeguridadGeneral).

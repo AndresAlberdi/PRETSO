@@ -6,16 +6,18 @@
 # -----------------------------------------------------------------------------
 # Qué prueba: que una ejecución del repositorio SIN Environment `production`
 # (y por tanto sin aprobación humana) NO puede obtener credenciales de la
-# cuenta de despliegue de producción. Desde el 2026-10-02 esa cuenta solo
-# acepta el principal `...:environment:production`.
+# cuenta de despliegue de producción. Desde el 2026-10-02 UTC (2026-10-01 en
+# hora de Bolivia) esa cuenta solo acepta el principal
+# `...:environment:production`.
 #
-# Resultado:
-#   VERDE  si el provider rechaza el intercambio (capa 2: condición del
-#          provider) o si la cuenta rechaza la impersonación (capa 1: binding
-#          IAM de la cuenta, HTTP 403).
+# Resultado (solo da verde ante el rechazo esperado):
+#   VERDE  si STS responde 400 `unauthorized_client` por la attribute
+#          condition (capa 2), o si generateAccessToken responde 403
+#          PERMISSION_DENIED sobre iam.serviceAccounts.getAccessToken (capa 1).
 #   ROJO   si se obtiene un token de la cuenta de producción (fallo de
-#          seguridad: la cuenta es alcanzable sin aprobación) o si la
-#          respuesta no permite concluir (otro código HTTP).
+#          seguridad: la cuenta es alcanzable sin aprobación), si el secreto
+#          o la variable no apuntan a pretso-prod, si el job tiene Environment,
+#          o si la respuesta no permite concluir (cualquier otro error).
 #
 # Por qué curl y no google-github-actions/auth: probar un rechazo con esa
 # acción exigiría `continue-on-error` (prohibido por CLAUDE.md, regla 7) y no
@@ -66,6 +68,10 @@ jobs:
             if (numero) core.setSecret(numero);
             const jwt = await core.getIDToken(`https://iam.googleapis.com/${ruta}`);
             const payload = JSON.parse(Buffer.from(jwt.split('.')[1], 'base64url').toString());
+            if (payload.environment) {
+              core.setFailed('El job tiene Environment: la prueba dejaría de ser negativa.');
+              return;
+            }
             const claves = ['sub', 'ref', 'ref_type', 'environment'];
             core.summary.addHeading('Claims OIDC de esta ejecución').addTable([
               [{ data: 'Claim', header: true }, { data: 'Valor', header: true }],
@@ -87,6 +93,19 @@ jobs:
           numero="${WIF_PROVIDER#projects/}"
           numero="${numero%%/*}"
           if [ -n "$numero" ]; then echo "::add-mask::$numero"; fi
+
+          # Anclas: sin ellas, un secreto o variable que apunte a otro proyecto
+          # (p. ej. staging) daría un rechazo "verde" que no prueba nada sobre
+          # producción. La huella (16 hex de SHA-256) no revela la ruta.
+          huella=$(printf '%s' "$WIF_PROVIDER" | sha256sum | cut -c1-16)
+          if [ "$huella" != "238cebed5d99b48d" ]; then
+            echo "::error::GCP_WIF_PROVIDER_PROD no es el provider de pretso-prod (huella ${huella}): resultado inconcluso."
+            exit 1
+          fi
+          if [ "$PROYECTO_PROD" != "pretso-prod" ]; then
+            echo "::error::GCP_PROJECT_ID_PROD no es pretso-prod: resultado inconcluso."
+            exit 1
+          fi
 
           resumen() { printf '%s\n' "$*" >> "$GITHUB_STEP_SUMMARY"; }
           resumen "## Prueba negativa de la cuenta de producción"
@@ -118,11 +137,26 @@ jobs:
           sts_cuerpo="${sts%$'\n'*}"
           unset sts
           if [ "$sts_codigo" != "200" ]; then
-            sts_error=$(printf '%s' "$sts_cuerpo" | jq -r '.error // "(sin campo error)"' 2>/dev/null || echo "(respuesta no JSON)")
+            # Solo cuenta como verde el rechazo por la attribute condition del
+            # provider; cualquier otro error (audiencia, provider borrado o
+            # deshabilitado, cuota) es inconcluso. error_description nunca se
+            # imprime: puede contener claims o identificadores. Si `.error` es un
+            # objeto (formato de error de Google), solo se toma su `status`:
+            # imprimir el objeto entero filtraría su `message`.
+            sts_error=$(printf '%s' "$sts_cuerpo" | jq -r '.error | if type == "object" then (.status // empty) else . end | strings' 2>/dev/null || true)
+            sts_desc=$(printf '%s' "$sts_cuerpo" | jq -r '.error_description // empty | strings' 2>/dev/null || true)
             unset sts_cuerpo
-            resumen "**VERDE: rechazado por el provider (capa 2).** HTTP ${sts_codigo}, error \`${sts_error}\`."
-            echo "Rechazado por el provider (capa 2): HTTP ${sts_codigo}, error ${sts_error}."
-            exit 0
+            if [ "$sts_codigo" = "400" ] && [ "$sts_error" = "unauthorized_client" ] \
+              && printf '%s' "$sts_desc" | grep -qi 'attribute condition'; then
+              unset sts_desc
+              resumen "**VERDE: rechazado por la condición del provider (capa 2).** HTTP 400, \`unauthorized_client\` (attribute condition)."
+              echo "Rechazado por la condición del provider (capa 2): HTTP 400, unauthorized_client (attribute condition)."
+              exit 0
+            fi
+            unset sts_desc
+            resumen "**ROJO: inconcluso.** STS respondió HTTP ${sts_codigo}, error \`${sts_error:-(sin campo error)}\`: no es un rechazo por la condición del provider (revise el secreto, la audiencia o el estado del provider)."
+            echo "::error::Resultado inconcluso: STS respondió HTTP ${sts_codigo}, error ${sts_error:-(sin campo error)}; no es un rechazo por la condición del provider."
+            exit 1
           fi
           federado=$(printf '%s' "$sts_cuerpo" | jq -r '.access_token // empty')
           unset sts_cuerpo
@@ -148,10 +182,25 @@ jobs:
           unset iam
           case "$iam_codigo" in
             403)
-              iam_estado=$(printf '%s' "$iam_cuerpo" | jq -r '.error.status // "(sin estado)"' 2>/dev/null || echo "(respuesta no JSON)")
+              # Solo es verde la denegación del permiso getAccessToken sobre la
+              # cuenta; otro 403 (API deshabilitada, facturación) es inconcluso.
+              filtro_info='[.error.details[]? | select(."@type" == "type.googleapis.com/google.rpc.ErrorInfo")][0]'
+              iam_estado=$(printf '%s' "$iam_cuerpo" | jq -r '.error.status // empty | strings' 2>/dev/null || true)
+              iam_razon=$(printf '%s' "$iam_cuerpo" | jq -r "${filtro_info} | .reason // empty | strings" 2>/dev/null || true)
+              iam_permiso=$(printf '%s' "$iam_cuerpo" | jq -r "${filtro_info} | .metadata.permission // empty | strings" 2>/dev/null || true)
+              iam_msg_ok=$(printf '%s' "$iam_cuerpo" | jq -r '(.error.message // "") | test("iam\\.serviceAccounts\\.getAccessToken")' 2>/dev/null || echo false)
               unset iam_cuerpo
-              resumen "**VERDE: rechazado por el binding de la cuenta (capa 1).** HTTP 403, estado \`${iam_estado}\`."
-              echo "Rechazado por el binding de la cuenta (capa 1): HTTP 403, ${iam_estado}."
+              if [ "$iam_estado" = "PERMISSION_DENIED" ] && {
+                   { [ "$iam_razon" = "IAM_PERMISSION_DENIED" ] && [ "$iam_permiso" = "iam.serviceAccounts.getAccessToken" ]; } \
+                   || { [ -z "$iam_razon" ] && [ "$iam_msg_ok" = "true" ]; }
+                 }; then
+                resumen "**VERDE: rechazado por el binding de la cuenta (capa 1).** HTTP 403, \`PERMISSION_DENIED\` sobre \`iam.serviceAccounts.getAccessToken\`."
+                echo "Rechazado por el binding de la cuenta (capa 1): HTTP 403, PERMISSION_DENIED (iam.serviceAccounts.getAccessToken)."
+              else
+                resumen "**ROJO: inconcluso.** generateAccessToken respondió HTTP 403 con estado \`${iam_estado:-(sin estado)}\` y razón \`${iam_razon:-(sin razón)}\`: no es la denegación del binding de la cuenta."
+                echo "::error::Resultado inconcluso: generateAccessToken respondió HTTP 403 con estado ${iam_estado:-(sin estado)} y razón ${iam_razon:-(sin razón)}; no es la denegación del binding de la cuenta."
+                exit 1
+              fi
               ;;
             200)
               unset iam_cuerpo
