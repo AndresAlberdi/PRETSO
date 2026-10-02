@@ -99,8 +99,8 @@ git push origin vX.Y.Z
 # Modo A/B: el push del tag ejecuta desplegar-produccion del ci-<stack>.yml;
 #           aprobar el Environment 'production' en ese run.
 # Modo B0: el push del tag NO despliega. Ejecutar el workflow_dispatch del ci-<stack>.yml:
-#   gh workflow run ci-<stack>.yml -f tag=vX.Y.Z -f confirmar=DESPLEGAR
-#   (el actor debe estar en vars.APROBADORES_PROD)
+#   gh workflow run ci-<stack>.yml --ref vX.Y.Z -f tag=vX.Y.Z -f confirmar=DESPLEGAR
+#   (el dispatch se lanza SOBRE el tag: --ref debe coincidir con -f tag; el actor debe estar en vars.APROBADORES_PROD)
 ```
 
 Indique si `user.signingkey` no está configurada y cómo configurarla (GPG o SSH) antes de crear el tag. Si el acta tiene ítems en "no cumple", diga explícitamente que el pase **no debe proceder** hasta resolverlos, aunque la persona tenga el comando a mano. Claude Code no ejecuta ninguno de estos comandos: los entrega.
