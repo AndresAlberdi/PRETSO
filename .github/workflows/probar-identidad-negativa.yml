@@ -1,0 +1,168 @@
+# =============================================================================
+# probar-identidad-negativa.yml — Prueba NEGATIVA del acceso a la cuenta de
+# despliegue de producción (deploy-production@<proyecto de producción>)
+# Basado en: SeguridadGeneral/01-seguridad/02-identidad-federada-oidc.md
+# Control: SEC-07 del checklist de pase a producción (complementa PIP-10)
+# -----------------------------------------------------------------------------
+# Qué prueba: que una ejecución del repositorio SIN Environment `production`
+# (y por tanto sin aprobación humana) NO puede obtener credenciales de la
+# cuenta de despliegue de producción. Desde el 2026-10-02 esa cuenta solo
+# acepta el principal `...:environment:production`.
+#
+# Resultado:
+#   VERDE  si el provider rechaza el intercambio (capa 2: condición del
+#          provider) o si la cuenta rechaza la impersonación (capa 1: binding
+#          IAM de la cuenta, HTTP 403).
+#   ROJO   si se obtiene un token de la cuenta de producción (fallo de
+#          seguridad: la cuenta es alcanzable sin aprobación) o si la
+#          respuesta no permite concluir (otro código HTTP).
+#
+# Por qué curl y no google-github-actions/auth: probar un rechazo con esa
+# acción exigiría `continue-on-error` (prohibido por CLAUDE.md, regla 7) y no
+# distingue en qué capa se produjo el rechazo.
+#
+# Higiene: ningún token ni número de proyecto se imprime; los tokens viven
+# solo en variables del shell (nunca en disco ni en outputs) y se enmascaran.
+#
+# Secretos: GCP_WIF_PROVIDER_PROD (ruta del provider de producción, clase S3)
+# Variables: GCP_PROJECT_ID_PROD
+# =============================================================================
+name: probar-identidad-negativa
+
+on:
+  workflow_dispatch:
+
+# Mínimo global; el job eleva solo id-token.
+permissions:
+  contents: read
+
+concurrency:
+  group: probar-identidad-negativa-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  produccion-sin-aprobacion:
+    name: produccion-sin-aprobacion
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    # SIN `environment` a propósito: es justamente lo que se prueba.
+    permissions:
+      contents: read
+      id-token: write # token OIDC para intentar el intercambio en GCP
+    steps:
+      - name: Mostrar claims del token OIDC (sin el token)
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3 # v9.0.0
+        env:
+          WIF_PROVIDER: ${{ secrets.GCP_WIF_PROVIDER_PROD }}
+        with:
+          script: |
+            const ruta = process.env.WIF_PROVIDER || '';
+            if (!ruta) {
+              core.setFailed('Falta el secreto GCP_WIF_PROVIDER_PROD.');
+              return;
+            }
+            core.setSecret(ruta);
+            const numero = (ruta.match(/^projects\/([^/]+)\//) || [])[1];
+            if (numero) core.setSecret(numero);
+            const jwt = await core.getIDToken(`https://iam.googleapis.com/${ruta}`);
+            const payload = JSON.parse(Buffer.from(jwt.split('.')[1], 'base64url').toString());
+            const claves = ['sub', 'ref', 'ref_type', 'environment'];
+            core.summary.addHeading('Claims OIDC de esta ejecución').addTable([
+              [{ data: 'Claim', header: true }, { data: 'Valor', header: true }],
+              ...claves.map(k => [k, String(payload[k] ?? '(ausente)')])
+            ]);
+            await core.summary.write();
+
+      - name: Intentar obtener credenciales de la cuenta de producción
+        env:
+          WIF_PROVIDER: ${{ secrets.GCP_WIF_PROVIDER_PROD }}
+          PROYECTO_PROD: ${{ vars.GCP_PROJECT_ID_PROD }}
+        run: |
+          set -euo pipefail
+          if [ -z "$WIF_PROVIDER" ] || [ -z "$PROYECTO_PROD" ]; then
+            echo "::error::Faltan el secreto GCP_WIF_PROVIDER_PROD o la variable GCP_PROJECT_ID_PROD."
+            exit 1
+          fi
+          echo "::add-mask::$WIF_PROVIDER"
+          numero="${WIF_PROVIDER#projects/}"
+          numero="${numero%%/*}"
+          if [ -n "$numero" ]; then echo "::add-mask::$numero"; fi
+
+          resumen() { printf '%s\n' "$*" >> "$GITHUB_STEP_SUMMARY"; }
+          resumen "## Prueba negativa de la cuenta de producción"
+          resumen ""
+
+          # 1) Token OIDC de GitHub con la audiencia del provider (en memoria).
+          audiencia="https://iam.googleapis.com/${WIF_PROVIDER}"
+          audiencia_url=$(jq -rn --arg a "$audiencia" '$a|@uri')
+          oidc=$(printf 'Authorization: bearer %s\n' "$ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
+            | curl -sS --fail -H @- "${ACTIONS_ID_TOKEN_REQUEST_URL}&audience=${audiencia_url}" \
+            | jq -r '.value // empty')
+          if [ -z "$oidc" ]; then
+            echo "::error::No se obtuvo el token OIDC de GitHub (resultado inconcluso)."
+            exit 1
+          fi
+          echo "::add-mask::$oidc"
+
+          # 2) Intercambio en STS (capa 2: condición del provider).
+          sts=$(printf '%s' "$oidc" | curl -sS -X POST https://sts.googleapis.com/v1/token \
+            -w '\n%{http_code}' \
+            --data-urlencode "grant_type=urn:ietf:params:oauth:grant-type:token-exchange" \
+            --data-urlencode "subject_token_type=urn:ietf:params:oauth:token-type:jwt" \
+            --data-urlencode "requested_token_type=urn:ietf:params:oauth:token-type:access_token" \
+            --data-urlencode "scope=https://www.googleapis.com/auth/cloud-platform" \
+            --data-urlencode "audience=//iam.googleapis.com/${WIF_PROVIDER}" \
+            --data-urlencode "subject_token@-")
+          unset oidc
+          sts_codigo="${sts##*$'\n'}"
+          sts_cuerpo="${sts%$'\n'*}"
+          unset sts
+          if [ "$sts_codigo" != "200" ]; then
+            sts_error=$(printf '%s' "$sts_cuerpo" | jq -r '.error // "(sin campo error)"' 2>/dev/null || echo "(respuesta no JSON)")
+            unset sts_cuerpo
+            resumen "**VERDE: rechazado por el provider (capa 2).** HTTP ${sts_codigo}, error \`${sts_error}\`."
+            echo "Rechazado por el provider (capa 2): HTTP ${sts_codigo}, error ${sts_error}."
+            exit 0
+          fi
+          federado=$(printf '%s' "$sts_cuerpo" | jq -r '.access_token // empty')
+          unset sts_cuerpo
+          if [ -z "$federado" ]; then
+            echo "::error::STS respondió 200 sin access_token (resultado inconcluso)."
+            resumen "**ROJO: inconcluso.** STS respondió 200 sin token federado."
+            exit 1
+          fi
+          echo "::add-mask::$federado"
+          resumen "- Capa 2 (provider): el intercambio fue **aceptado** (HTTP 200); se prueba la capa 1."
+
+          # 3) Impersonación de la cuenta (capa 1: binding IAM de la cuenta).
+          #    El cuerpo de la respuesta nunca se imprime ni se guarda.
+          cuenta="deploy-production@${PROYECTO_PROD}.iam.gserviceaccount.com"
+          iam=$(printf 'Authorization: Bearer %s\n' "$federado" | curl -sS -X POST \
+            -H @- -H 'Content-Type: application/json' \
+            -w '\n%{http_code}' \
+            -d '{"scope":["https://www.googleapis.com/auth/cloud-platform"],"lifetime":"300s"}' \
+            "https://iamcredentials.googleapis.com/v1/projects/-/serviceAccounts/${cuenta}:generateAccessToken")
+          unset federado
+          iam_codigo="${iam##*$'\n'}"
+          iam_cuerpo="${iam%$'\n'*}"
+          unset iam
+          case "$iam_codigo" in
+            403)
+              iam_estado=$(printf '%s' "$iam_cuerpo" | jq -r '.error.status // "(sin estado)"' 2>/dev/null || echo "(respuesta no JSON)")
+              unset iam_cuerpo
+              resumen "**VERDE: rechazado por el binding de la cuenta (capa 1).** HTTP 403, estado \`${iam_estado}\`."
+              echo "Rechazado por el binding de la cuenta (capa 1): HTTP 403, ${iam_estado}."
+              ;;
+            200)
+              unset iam_cuerpo
+              resumen "**ROJO: la cuenta de producción es alcanzable sin aprobación.** generateAccessToken respondió 200 sin Environment \`production\`."
+              echo "::error::La cuenta de producción es alcanzable sin aprobación: generateAccessToken respondió 200 desde un job sin Environment production. El token no se guardó ni se mostró."
+              exit 1
+              ;;
+            *)
+              unset iam_cuerpo
+              resumen "**ROJO: inconcluso.** generateAccessToken respondió HTTP ${iam_codigo}."
+              echo "::error::Resultado inconcluso: generateAccessToken respondió HTTP ${iam_codigo}."
+              exit 1
+              ;;
+          esac
