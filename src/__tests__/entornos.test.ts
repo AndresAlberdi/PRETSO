@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { firebaseConfig as staging, recaptchaSiteKey as stagingSiteKey } from '../environments/staging/firebase';
 import { firebaseConfig as production, recaptchaSiteKey as productionSiteKey } from '../environments/production/firebase';
-import { isValidRecaptchaSiteKey } from '../utils/appCheckConfig';
+import { assertAppCheckPublishable, isValidRecaptchaSiteKey } from '../utils/appCheckConfig';
 import { googleClientId as stagingClientId } from '../environments/staging/google';
 import { googleClientId as productionClientId } from '../environments/production/google';
 import { assertFirebaseConfig, assertPublishable } from '../utils/firebaseConfig';
@@ -41,9 +41,15 @@ describe('App Check site keys', () => {
     expect(isValidRecaptchaSiteKey(stagingSiteKey)).toBe(true);
   });
 
-  it('production key is empty or valid, and never equals the staging one', () => {
-    expect(productionSiteKey === '' || isValidRecaptchaSiteKey(productionSiteKey)).toBe(true);
+  it('production key is valid (not empty) and never equals the staging one', () => {
+    expect(productionSiteKey).not.toBe('');
+    expect(isValidRecaptchaSiteKey(productionSiteKey)).toBe(true);
     expect(productionSiteKey).not.toBe(stagingSiteKey);
+  });
+
+  it('does not block the production tag build with the production key', () => {
+    expect(() => assertAppCheckPublishable('production', 'tag', productionSiteKey)).not.toThrow();
+    expect(() => assertAppCheckPublishable('production', 'branch', productionSiteKey, 'workflow_dispatch')).not.toThrow();
   });
 });
 
