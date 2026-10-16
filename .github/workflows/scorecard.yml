@@ -53,14 +53,14 @@ jobs:
           publish_results: true
 
       - name: Guardar SARIF como artifact
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: scorecard-sarif
           path: resultados.sarif
           retention-days: 7
 
       - name: Subir a Code Scanning
-        uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4
+        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4
         with:
           sarif_file: resultados.sarif
           category: scorecard

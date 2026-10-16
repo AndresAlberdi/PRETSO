@@ -113,7 +113,7 @@ jobs:
         run: corepack enable
 
       - name: Node.js con caché
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: ${{ steps.pm.outputs.pm }}
@@ -143,7 +143,7 @@ jobs:
         run: corepack enable
 
       - name: Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: ${{ needs.preparar.outputs.pm }}
@@ -265,7 +265,7 @@ jobs:
         run: corepack enable
 
       - name: Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: ${{ needs.preparar.outputs.pm }}
@@ -280,7 +280,7 @@ jobs:
         run: npm run build -- --mode "$APP_ENV"
 
       - name: Guardar dist/
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: dist-${{ matrix.ambiente }}
           path: dist/
@@ -334,7 +334,7 @@ jobs:
           ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.ref }}
 
       - name: Descargar dist/
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: dist-staging
           path: dist
@@ -402,7 +402,7 @@ jobs:
           ref: ${{ inputs.tag && format('refs/tags/{0}', inputs.tag) || github.ref }}
 
       - name: Descargar dist/
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: dist-staging
           path: dist
@@ -414,7 +414,7 @@ jobs:
           service_account: ${{ secrets.GCP_SA_DEPLOY_STAGING }}
 
       - name: Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: ${{ env.NODE_VERSION }}
 
@@ -640,7 +640,7 @@ jobs:
           echo "Aprobación verificada: $TAG por $ACTOR ($EVENTO)"
 
       - name: Descargar dist/
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: dist-production
           path: dist
@@ -652,7 +652,7 @@ jobs:
           service_account: ${{ secrets.GCP_SA_DEPLOY_PROD }}
 
       - name: Node.js
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: ${{ env.NODE_VERSION }}
 

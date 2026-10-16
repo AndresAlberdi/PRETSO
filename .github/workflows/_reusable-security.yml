@@ -349,7 +349,7 @@ jobs:
       # outputs tienen límite de tamaño y no admiten archivos). Uno por
       # componente: el nombre lleva su `slug`.
       - name: Publicar archivos de excepciones generados
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: excepciones-generadas-${{ github.run_id }}-${{ github.run_attempt }}-${{ steps.excepciones.outputs.slug }}
           path: excepciones-generadas/
@@ -395,7 +395,7 @@ jobs:
           fetch-depth: 0
 
       - name: Descargar excepciones generadas (.gitleaksignore)
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: excepciones-generadas-${{ github.run_id }}-${{ github.run_attempt }}-${{ needs.preparar.outputs.slug }}
           path: excepciones-generadas
@@ -526,7 +526,7 @@ jobs:
 
       - name: Subir SARIF a Code Scanning (Modo A/B)
         if: inputs.subir_sarif && always()
-        uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4
+        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4
         with:
           # Sin los exceptuados con nosemgrep (paso anterior).
           sarif_file: semgrep-code-scanning.sarif
@@ -536,7 +536,7 @@ jobs:
       # la constancia de lo exceptuado, que Code Scanning ya no muestra.
       - name: Guardar SARIF completo como artifact (auditoría; única salida en B0)
         if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: sarif-semgrep-${{ needs.preparar.outputs.slug }}
           path: |
@@ -567,7 +567,7 @@ jobs:
           ref: ${{ env.REF }}
 
       - name: Descargar excepciones generadas (.trivyignore.yaml)
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: excepciones-generadas-${{ github.run_id }}-${{ github.run_attempt }}-${{ needs.preparar.outputs.slug }}
           path: excepciones-generadas
@@ -606,7 +606,7 @@ jobs:
 
       - name: Node.js
         if: needs.preparar.outputs.hay_node == 'true'
-        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
         with:
           node-version: ${{ vars.NODE_VERSION || '22' }}
 
@@ -799,14 +799,14 @@ jobs:
 
       - name: Subir SARIF a Code Scanning (Modo A/B)
         if: inputs.subir_sarif && always()
-        uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4
+        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4
         with:
           sarif_file: trivy-fs.sarif
           category: trivy-fs${{ needs.preparar.outputs.sufijo_sarif }}
 
       - name: Guardar SARIF como artifact (Modo B0)
         if: inputs.subir_sarif == false && always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: sarif-trivy-fs-${{ needs.preparar.outputs.slug }}
           path: trivy-fs.sarif
@@ -834,7 +834,7 @@ jobs:
           ref: ${{ env.REF }}
 
       - name: Descargar excepciones generadas (.trivyignore.yaml)
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: excepciones-generadas-${{ github.run_id }}-${{ github.run_attempt }}-${{ needs.preparar.outputs.slug }}
           path: excepciones-generadas
@@ -843,7 +843,7 @@ jobs:
         run: cp excepciones-generadas/trivyignore.yaml .trivyignore.yaml
 
       - name: Checkov
-        uses: bridgecrewio/checkov-action@444c9db6fa75e2d9c19ebf1fde7322089be9009e # master @ 2026-09-17 (sin release vigente)
+        uses: bridgecrewio/checkov-action@c13aafd679d3814a25067d10fcaf98c4f7594931 # master @ 2026-09-17 (sin release vigente)
         with:
           directory: ${{ inputs.ruta }}
           # github_actions NO va aquí: lo analiza el job `workflows`, que corre siempre y sobre
@@ -876,7 +876,7 @@ jobs:
       # razón que nada tiene que ver con la seguridad del código.
       - name: Subir SARIF a Code Scanning (Modo A/B)
         if: inputs.subir_sarif && always() && hashFiles('trivy-config.sarif') != ''
-        uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4
+        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4
         with:
           sarif_file: trivy-config.sarif
           category: trivy-config${{ needs.preparar.outputs.sufijo_sarif }}
@@ -918,14 +918,14 @@ jobs:
 
       - name: Subir SARIF de Checkov a Code Scanning (Modo A/B)
         if: inputs.subir_sarif && always() && steps.sarif_checkov.outputs.archivo != ''
-        uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4
+        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4
         with:
           sarif_file: ${{ steps.sarif_checkov.outputs.archivo }}
           category: checkov${{ needs.preparar.outputs.sufijo_sarif }}
 
       - name: Guardar SARIF como artifact (Modo B0)
         if: inputs.subir_sarif == false && always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: sarif-iac-${{ needs.preparar.outputs.slug }}
           path: |
@@ -1018,14 +1018,14 @@ jobs:
 
       - name: Subir SARIF de los workflows a Code Scanning (Modo A/B)
         if: inputs.subir_sarif && always() && hashFiles('resultados-workflows/resultados.sarif') != ''
-        uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4
+        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4
         with:
           sarif_file: resultados-workflows/resultados.sarif
           category: checkov-workflows${{ needs.preparar.outputs.sufijo_sarif }}
 
       - name: Guardar SARIF como artifact (Modo B0)
         if: inputs.subir_sarif == false && always() && hashFiles('resultados-workflows/resultados.sarif') != ''
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7
         with:
           name: sarif-workflows-${{ needs.preparar.outputs.slug }}
           path: resultados-workflows/resultados.sarif
