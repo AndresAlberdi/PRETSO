@@ -10,6 +10,22 @@
   --border-color: rgba(255, 255, 255, 0.08);
   --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-serif: 'Playfair Display', Georgia, serif;
+
+  /* Colores de acento y de estado (antes usados sin definir) */
+  --accent-color: #4a90e2;
+  --danger-color: #ff4d4f;
+  --success-color: #2ecc71;
+  /* Borde de controles de formulario: contraste >= 3:1 (WCAG 1.4.11) */
+  --input-border: #7a8294;
+  /* Texto sobre cada color de relleno: contraste >= 4,5:1 (WCAG 1.4.3) */
+  --on-primary: #0b0f19;
+  --on-accent: #0b0f19;
+  --on-danger: #0b0f19;
+  --on-success: #0b0f19;
+  /* Alias usados por el código */
+  --bg-body: var(--bg-color);
+  --text-primary: var(--text-color);
+  --text-secondary: var(--text-muted);
 }
 
 * {
@@ -39,12 +55,20 @@ h1, h2, h3 {
   letter-spacing: -0.02em;
 }
 
+/* Marca del menú: conserva el aspecto del antiguo h2 sin ser un encabezado */
+.marca {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
 h1 {
   font-size: 2.5rem;
   margin-bottom: 1.5rem;
 }
 
-h1, h2, h3, .page-title {
+h1, h2, h3, .page-title, .marca {
   background: linear-gradient(135deg, #ffffff 0%, #e5a93b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -68,14 +92,13 @@ input[type="password"],
 select,
 textarea {
   background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--input-border);
   border-radius: 8px;
   color: #ffffff;
   padding: 0.75rem 1rem;
   font-family: var(--font-sans);
   font-size: 0.95rem;
   transition: all 0.2s ease-in-out;
-  outline: none;
 }
 
 select option {
@@ -93,6 +116,38 @@ textarea:focus {
   box-shadow: 0 0 0 3px rgba(241, 176, 76, 0.15);
 }
 
+/* Foco visible (WCAG 2.4.7); los estilos en línea no tocan outline */
+:focus-visible {
+  outline: 3px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+/* main recibe el foco por programa al cambiar de ruta; no es un control */
+main:focus {
+  outline: none;
+}
+
+/* Enlace «Saltar al contenido» (WCAG 2.4.1) */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 2000;
+  padding: 0.75rem 1.25rem;
+  background: var(--primary-color);
+  color: var(--on-primary);
+  font-weight: 600;
+  border-radius: 0 0 8px 0;
+}
+
+.skip-link:focus {
+  left: 0;
+}
+
+.skip-link:hover {
+  color: var(--on-primary);
+}
+
 button {
   font-family: var(--font-sans);
   font-weight: 600;
@@ -108,7 +163,7 @@ button {
 
 button:not([disabled]) {
   background: var(--primary-color);
-  color: #0b0f19;
+  color: var(--on-primary);
 }
 
 button:not([disabled]):hover {
@@ -189,4 +244,17 @@ main {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+/* Reducir movimiento (WCAG 2.3.3) */
+@media (prefers-reduced-motion: reduce) {
+  main {
+    animation: none;
+  }
+
+  button,
+  button:not([disabled]):hover {
+    transition: none;
+    transform: none;
+  }
 }

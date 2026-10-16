@@ -230,7 +230,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
             </button>
             <button 
               type="submit"
-              style={{ padding: '0.5rem 1.2rem', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+              style={{ padding: '0.5rem 1.2rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
               disabled={loading}
             >
               {loading ? 'Guardando...' : 'Guardar Cambios'}

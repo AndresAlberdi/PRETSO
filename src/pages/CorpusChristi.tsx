@@ -161,7 +161,7 @@ export default function CorpusChristi() {
           {isEditMode && (
             <button 
               onClick={() => setIsCreateOpen(true)}
-              style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+              style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
             >
               Nuevo Registro
             </button>
@@ -208,7 +208,7 @@ export default function CorpusChristi() {
                       return (
                         <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
                           {docs.map((docCode, idx) => (
-                            <button key={idx} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.85rem', padding: '0.1rem 0.4rem', cursor: 'pointer', background: 'var(--accent-color)', color: 'white', border: 'none', borderRadius: '4px' }}>Doc. {docCode}</button>
+                            <button key={idx} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.85rem', padding: '0.1rem 0.4rem', cursor: 'pointer', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px' }}>Doc. {docCode}</button>
                           ))}
                         </div>
                       );
@@ -299,7 +299,7 @@ export default function CorpusChristi() {
                   <td>
                     {companiasList.map((c, idx) => (
                       <div key={idx} style={{ marginBottom: '4px' }}>
-                        <button onClick={() => setActiveCompania(c)} style={{ padding: '0.2rem 0.5rem', background: 'var(--accent-color)', color: 'white', borderRadius: '4px', border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}>{c}</button>
+                        <button onClick={() => setActiveCompania(c)} style={{ padding: '0.2rem 0.5rem', background: 'var(--accent-color)', color: 'var(--on-accent)', borderRadius: '4px', border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}>{c}</button>
                       </div>
                     ))}
                   </td>
@@ -313,7 +313,7 @@ export default function CorpusChristi() {
                       return (
                         <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
                           {docs.map((docCode, idx) => (
-                            <button key={idx} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.85rem', padding: '0.1rem 0.4rem', cursor: 'pointer', background: 'var(--accent-color)', color: 'white', border: 'none', borderRadius: '4px' }}>Doc. {docCode}</button>
+                            <button key={idx} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.85rem', padding: '0.1rem 0.4rem', cursor: 'pointer', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px' }}>Doc. {docCode}</button>
                           ))}
                         </div>
                       );
@@ -377,7 +377,7 @@ export default function CorpusChristi() {
       )}
 
       {brokenLinkAlert && (
-        <div style={{ position: 'fixed', bottom: '2rem', right: '2rem', background: '#ff4d4f', color: 'white', padding: '1rem', borderRadius: '8px', zIndex: 1000, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+        <div style={{ position: 'fixed', bottom: '2rem', right: '2rem', background: '#ff4d4f', color: 'var(--on-danger)', padding: '1rem', borderRadius: '8px', zIndex: 1000, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
           <p style={{ margin: 0 }}>{brokenLinkAlert}</p>
           <button onClick={() => setBrokenLinkAlert(null)} style={{ marginTop: '0.5rem', background: 'white', color: '#ff4d4f', border: 'none', padding: '0.2rem 0.5rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Cerrar</button>
         </div>

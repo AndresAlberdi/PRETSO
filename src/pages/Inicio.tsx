@@ -196,7 +196,7 @@ export default function Inicio() {
                   <div>
                     <span style={{ 
                       background: 'var(--primary-color)', 
-                      color: 'white', 
+                      color: 'var(--on-primary)', 
                       padding: '0.2rem 0.5rem', 
                       borderRadius: '4px', 
                       fontSize: '0.8rem', 

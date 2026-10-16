@@ -51,7 +51,7 @@ export default function ConfirmModal({
           )}
           <button 
             onClick={isAlertOnly ? onCancel : onConfirm}
-            style={{ padding: '0.5rem 1rem', background: isAlertOnly ? 'var(--primary-color)' : '#ff4d4f', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+            style={{ padding: '0.5rem 1rem', background: isAlertOnly ? 'var(--primary-color)' : '#ff4d4f', color: isAlertOnly ? 'var(--on-primary)' : 'var(--on-danger)', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
           >
             {isAlertOnly ? 'Entendido' : confirmText}
           </button>

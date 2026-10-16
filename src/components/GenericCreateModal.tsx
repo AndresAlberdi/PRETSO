@@ -876,7 +876,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
               <button
                 type="submit"
                 disabled={saving}
-                style={{ padding: '0.5rem 1.2rem', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                style={{ padding: '0.5rem 1.2rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
               >
                 {saving ? 'Guardando...' : 'Crear Registro'}
               </button>

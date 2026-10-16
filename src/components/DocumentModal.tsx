@@ -40,7 +40,7 @@ export default function DocumentModal({ documentCode, onClose }: DocumentModalPr
         
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
           <h2 style={{ margin: 0, color: 'var(--primary-color)' }}>Documento {documentCode}</h2>
-          <button onClick={onClose} style={{ padding: '0.4rem 1rem', background: '#e74c3c', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Cerrar</button>
+          <button onClick={onClose} style={{ padding: '0.4rem 1rem', background: '#e74c3c', color: 'var(--on-danger)', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Cerrar</button>
         </div>
 
         {loading ? <p>Cargando información...</p> : !document ? <p>No se encontró información para el documento {documentCode}.</p> : (

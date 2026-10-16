@@ -83,7 +83,7 @@ export default function UserManagement() {
         <button 
           type="submit" 
           disabled={loading}
-          style={{ padding: '1rem', marginTop: '1rem', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer' }}
+          style={{ padding: '1rem', marginTop: '1rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer' }}
         >
           {loading ? 'Creando...' : 'Crear Usuario Lector'}
         </button>

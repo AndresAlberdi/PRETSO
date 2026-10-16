@@ -124,7 +124,7 @@ export default function Transacciones() {
             style={{
               padding: '0.1rem 0.5rem',
               background: 'var(--accent-color)',
-              color: 'white',
+              color: 'var(--on-accent)',
               borderRadius: '4px',
               border: 'none',
               cursor: 'pointer',
@@ -145,7 +145,7 @@ export default function Transacciones() {
         {isEditMode && (
           <button 
             onClick={() => setIsCreateOpen(true)}
-            style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+            style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
           >
             Nuevo Registro
           </button>
