@@ -152,7 +152,7 @@ export default function IndiceCompanias() {
             placeholder="Buscar por nombre o autores..." 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'rgba(255,255,255,0.05)', color: 'white', minWidth: '250px' }}
+            style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--input-border)', background: 'rgba(255,255,255,0.05)', color: 'white', minWidth: '250px' }}
           />
         </div>
       </div>

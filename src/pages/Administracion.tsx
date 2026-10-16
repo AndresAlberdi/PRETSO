@@ -212,7 +212,7 @@ export default function Administracion() {
               type="text" 
               placeholder="Ingrese su Client ID (ej: 123...apps.googleusercontent.com)"
               defaultValue={clientId}
-              style={{ width: '100%', padding: '0.8rem', marginBottom: '1.5rem', background: 'var(--bg-body, #222)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px' }}
+              style={{ width: '100%', padding: '0.8rem', marginBottom: '1.5rem', background: 'var(--bg-body, #222)', border: '1px solid var(--input-border)', color: 'var(--text-primary)', borderRadius: '4px' }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') saveClientId(e.currentTarget.value);
               }}
