@@ -170,7 +170,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
                     style={{
                       padding: '0.6rem',
                       borderRadius: '4px',
-                      border: '1px solid var(--border-color)',
+                      border: '1px solid var(--input-border)',
                       background: 'var(--bg-body)',
                       color: 'var(--text-primary)',
                       fontSize: '0.95rem'
@@ -192,7 +192,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
                     style={{
                       padding: '0.6rem',
                       borderRadius: '4px',
-                      border: '1px solid var(--border-color)',
+                      border: '1px solid var(--input-border)',
                       background: isReadOnly ? 'rgba(255,255,255,0.05)' : 'var(--bg-body)',
                       color: 'var(--text-primary)',
                       fontFamily: 'inherit',
@@ -208,7 +208,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
                     style={{
                       padding: '0.6rem',
                       borderRadius: '4px',
-                      border: '1px solid var(--border-color)',
+                      border: '1px solid var(--input-border)',
                       background: isReadOnly ? 'rgba(255,255,255,0.05)' : 'var(--bg-body)',
                       color: 'var(--text-primary)',
                       fontSize: '0.95rem'
@@ -230,7 +230,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
             </button>
             <button 
               type="submit"
-              style={{ padding: '0.5rem 1.2rem', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+              style={{ padding: '0.5rem 1.2rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
               disabled={loading}
             >
               {loading ? 'Guardando...' : 'Guardar Cambios'}

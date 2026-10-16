@@ -49,7 +49,7 @@ export default function SearchBar({ onSearch, categories }: SearchBarProps) {
         <select 
           value={category} 
           onChange={e => setCategory(e.target.value)}
-          style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'rgba(255,255,255,0.05)', color: 'white' }}
+          style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--input-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }}
         >
           {categories.map(c => (
             <option key={c.id} value={c.id}>{c.label}</option>
@@ -60,7 +60,7 @@ export default function SearchBar({ onSearch, categories }: SearchBarProps) {
           value={query} 
           onChange={e => setQuery(e.target.value)} 
           placeholder="Añadir filtro..."
-          style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'rgba(255,255,255,0.05)', color: 'white' }}
+          style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--input-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }}
         />
         <button type="submit" style={{ padding: '0.5rem 1rem', background: 'transparent', color: 'var(--primary-color)', border: '1px solid var(--primary-color)', borderRadius: '4px', fontWeight: 'bold' }}>
           Agregar

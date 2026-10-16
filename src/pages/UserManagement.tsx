@@ -57,7 +57,7 @@ export default function UserManagement() {
             onChange={e => setEmail(e.target.value)}
             placeholder="lector@pretso.com"
             required
-            style={{ width: '100%', padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'var(--bg-body)', color: 'white' }}
+            style={{ width: '100%', padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--input-border)', background: 'var(--bg-body)', color: 'white' }}
           />
         </div>
         
@@ -70,7 +70,7 @@ export default function UserManagement() {
             placeholder="********"
             required
             minLength={6}
-            style={{ width: '100%', padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--border-color)', background: 'var(--bg-body)', color: 'white' }}
+            style={{ width: '100%', padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--input-border)', background: 'var(--bg-body)', color: 'white' }}
           />
         </div>
 
@@ -83,7 +83,7 @@ export default function UserManagement() {
         <button 
           type="submit" 
           disabled={loading}
-          style={{ padding: '1rem', marginTop: '1rem', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer' }}
+          style={{ padding: '1rem', marginTop: '1rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer' }}
         >
           {loading ? 'Creando...' : 'Crear Usuario Lector'}
         </button>

@@ -130,13 +130,13 @@ export default function Administracion() {
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '1rem' }}>
             <Link 
               to="/auditoria" 
-              style={{ padding: '0.8rem 1.5rem', background: 'var(--primary-color)', color: 'white', textDecoration: 'none', borderRadius: '4px', fontWeight: 'bold' }}
+              style={{ padding: '0.8rem 1.5rem', background: 'var(--primary-color)', color: 'var(--on-primary)', textDecoration: 'none', borderRadius: '4px', fontWeight: 'bold' }}
             >
               Auditoría (Logs)
             </Link>
             <Link 
               to="/usuarios" 
-              style={{ padding: '0.8rem 1.5rem', background: 'var(--primary-color)', color: 'white', textDecoration: 'none', borderRadius: '4px', fontWeight: 'bold' }}
+              style={{ padding: '0.8rem 1.5rem', background: 'var(--primary-color)', color: 'var(--on-primary)', textDecoration: 'none', borderRadius: '4px', fontWeight: 'bold' }}
             >
               Gestión de Usuarios
             </Link>
@@ -148,21 +148,21 @@ export default function Administracion() {
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '1rem' }}>
             <button 
               onClick={handleDownloadXml}
-              style={{ padding: '0.8rem 1.5rem', background: 'var(--accent-color)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+              style={{ padding: '0.8rem 1.5rem', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
               disabled={backupStatus === 'loading'}
             >
               Descargar Base de Datos (XML)
             </button>
             <button 
               onClick={handleDownloadXlsx}
-              style={{ padding: '0.8rem 1.5rem', background: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+              style={{ padding: '0.8rem 1.5rem', background: '#28a745', color: 'var(--on-success)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
               disabled={backupStatus === 'loading'}
             >
               Descargar Base de Datos (XLSX)
             </button>
             <button 
               onClick={handleGoogleDriveBackup}
-              style={{ padding: '0.8rem 1.5rem', background: '#4285F4', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+              style={{ padding: '0.8rem 1.5rem', background: '#4285F4', color: 'var(--on-accent)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
               disabled={backupStatus === 'loading'}
             >
               Copia a Google Drive
@@ -212,7 +212,7 @@ export default function Administracion() {
               type="text" 
               placeholder="Ingrese su Client ID (ej: 123...apps.googleusercontent.com)"
               defaultValue={clientId}
-              style={{ width: '100%', padding: '0.8rem', marginBottom: '1.5rem', background: 'var(--bg-body, #222)', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px' }}
+              style={{ width: '100%', padding: '0.8rem', marginBottom: '1.5rem', background: 'var(--bg-body, #222)', border: '1px solid var(--input-border)', color: 'var(--text-primary)', borderRadius: '4px' }}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') saveClientId(e.currentTarget.value);
               }}
@@ -225,7 +225,7 @@ export default function Administracion() {
                   const input = e.currentTarget.parentElement?.previousSibling as HTMLInputElement;
                   saveClientId(input.value);
                 }} 
-                style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
               >
                 Guardar
               </button>

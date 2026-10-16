@@ -52,7 +52,7 @@ export default function DetailsModal({ record, onClose, title = "Detalles del Re
         <div style={{ marginTop: '2rem', textAlign: 'right' }}>
           <button 
             onClick={onClose}
-            style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+            style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
           >
             Cerrar
           </button>
