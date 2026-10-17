@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { collection, getDocs, query, deleteDoc, doc, where } from "firebase/firestore";
 import { db } from "../firebase";
 import { cleanFirebaseData } from "../utils";
@@ -10,6 +10,17 @@ import GenericEditModal from "../components/GenericEditModal";
 import DocumentModal from "../components/DocumentModal";
 import { updateDoc } from "firebase/firestore";
 import { useSortableTable } from "../hooks/useSortableTable";
+import SearchBar, { type SearchFilter } from "../components/SearchBar";
+import { filtrarRegistros } from "../utils/filtrarRegistros";
+import { CAMPOS_BUSQUEDA_TRANSACCIONES } from "../utils/camposBusqueda";
+
+const SEARCH_CATEGORIES = [
+  { id: 'num', label: 'Nro.' },
+  { id: 'noticia', label: 'Noticia' },
+  { id: 'fuentes', label: 'Fuentes' },
+  { id: 'doc', label: 'Documento vinculado' },
+  { id: 'all', label: 'Texto libre' },
+];
 
 export default function Transacciones() {
   const [data, setData] = useState<any[]>([]);
@@ -22,7 +33,10 @@ export default function Transacciones() {
   const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
   const [activeDoc, setActiveDoc] = useState<string | number | null>(null);
 
-  const { items: sortedData, requestSort, sortConfig } = useSortableTable(data);
+  const [filters, setFilters] = useState<SearchFilter[]>([]);
+  const filteredData = useMemo(() => filtrarRegistros(data, filters, CAMPOS_BUSQUEDA_TRANSACCIONES), [data, filters]);
+
+  const { items: sortedData, requestSort, sortConfig } = useSortableTable(filteredData);
 
   const SortIndicator = ({ column }: { column: string }) => {
     if (!sortConfig || sortConfig.key !== column) return null;
@@ -140,19 +154,28 @@ export default function Transacciones() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', marginBottom: "1rem" }}>
         <h1>Transacciones</h1>
-        {isEditMode && (
-          <button 
-            onClick={() => setIsCreateOpen(true)}
-            style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-          >
-            Nuevo Registro
-          </button>
-        )}
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          {isEditMode && (
+            <button 
+              onClick={() => setIsCreateOpen(true)}
+              style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+            >
+              Nuevo Registro
+            </button>
+          )}
+          <SearchBar onSearch={setFilters} categories={SEARCH_CATEGORIES} />
+        </div>
       </div>
       
       {loading ? <p>Cargando datos...</p> : (
+        <>
+        <output aria-live="polite" style={{ display: 'block', margin: '0 0 0.5rem' }}>
+          {filteredData.length === 0 && filters.length > 0
+            ? 'No se encontraron registros con los filtros aplicados.'
+            : `Mostrando ${filteredData.length} de ${data.length} registros`}
+        </output>
         <div style={{ overflowX: "auto" }}>
           <table className="sortable">
             <thead>
@@ -182,6 +205,7 @@ export default function Transacciones() {
             </tbody>
           </table>
         </div>
+        </>
       )}
 
       {isCreateOpen && (
