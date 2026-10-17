@@ -19,16 +19,48 @@ const ESPERADO: Record<string, string[]> = {
   'Transacciones.tsx': ['Nro.'],
 };
 
-function etiquetasOrdenables(archivo: string): string[] {
-  const texto = readFileSync(join(PAGINAS, archivo), 'utf-8');
+// Analiza el texto completo (no línea por línea): cada bloque <th ...>...</th> es ordenable si
+// contiene onClick o SortIndicator (también cuando hay un <button> dentro), aunque esté en varias líneas.
+function etiquetasOrdenablesEnTexto(texto: string): string[] {
   const resultado: string[] = [];
-  for (const linea of texto.split('\n')) {
-    if (!/<th\b[^>]*\bonClick/.test(linea)) continue;
-    const m = linea.match(/>\s*([^<>]*?)\s*<SortIndicator/);
-    resultado.push(m ? m[1] : '?');
+  for (const [bloque] of texto.matchAll(/<th\b[\s\S]*?<\/th>/g)) {
+    if (!/onClick|<SortIndicator/.test(bloque)) continue;
+    // El «>» de «=>» dentro del atributo no cierra la etiqueta de apertura.
+    const m = bloque.match(/(?<!=)>([^<>]*)<SortIndicator/);
+    const visible = m ? m[1] : bloque.replace(/<[^>]*>/g, ' ').replace(/\{[^}]*\}/g, ' ');
+    resultado.push(visible.replace(/\s+/g, ' ').trim() || '?');
   }
   return resultado;
 }
+
+function etiquetasOrdenables(archivo: string): string[] {
+  return etiquetasOrdenablesEnTexto(readFileSync(join(PAGINAS, archivo), 'utf-8'));
+}
+
+describe('detector de encabezados ordenables', () => {
+  it('detecta un <th> ordenable escrito en varias líneas', () => {
+    const texto = `<th
+      style={{ cursor: 'pointer' }}
+      onClick={() => requestSort('Ciudad')}
+    >
+      Ciudad
+      <SortIndicator column="Ciudad" />
+    </th>`;
+    expect(etiquetasOrdenablesEnTexto(texto)).toEqual(['Ciudad']);
+  });
+
+  it('detecta un <th> con <button> dentro', () => {
+    const texto = `<th scope="col"><button type="button" onClick={() => requestSort('Año')}>Año <SortIndicator column="Año" /></button></th>`;
+    expect(etiquetasOrdenablesEnTexto(texto)).toEqual(['Año']);
+  });
+
+  it('no marca como ordenable un <th scope="col"> sin onClick', () => {
+    const texto = `<thead><tr><th scope="col">Noticia</th><th scope="col">
+      Fuentes
+    </th></tr></thead>`;
+    expect(etiquetasOrdenablesEnTexto(texto)).toEqual([]);
+  });
+});
 
 describe('tablas: encabezados que ordenan', () => {
   const archivos = readdirSync(PAGINAS).filter((f) => f.endsWith('.tsx'));
@@ -73,6 +105,7 @@ describe('«Num» se muestra como «Nro.»', () => {
     const texto = readFileSync(join(PAGINAS, 'Transacciones.tsx'), 'utf-8');
     expect(texto).toMatch(/>Nro\. <SortIndicator column="Num" \/>/);
     expect(texto).not.toMatch(/>Num <SortIndicator/);
+    expect(texto).toContain("requestSort('Num')");
   });
 
   it('FIELD_LABEL_MAP de GenericEditModal mapea Num a Nro.', () => {
@@ -82,6 +115,9 @@ describe('«Num» se muestra como «Nro.»', () => {
 
   it('el campo de datos y la exportación siguen usando «Num»', () => {
     const xlsx = readFileSync(join(SRC, 'utils', 'xlsxExport.ts'), 'utf-8');
+    expect(xlsx).toMatch(/transacciones:\s*\['Num'/);
     expect(xlsx).not.toContain('Nro.');
+    const modal = readFileSync(join(SRC, 'components', 'TransactionModal.tsx'), 'utf-8');
+    expect(modal).toContain("where('Num'");
   });
 });
