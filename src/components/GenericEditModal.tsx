@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { collection, query, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { cleanFirebaseData } from '../utils';
+import { esCampoCompaniaCorpus } from '../utils/referenciaCompania';
+import SelectorCompania from './SelectorCompania';
 
 interface GenericEditModalProps {
   collectionName: string;
@@ -49,6 +51,12 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
   const [formData, setFormData] = useState<any>({ ...record });
   const [loading, setLoading] = useState(false);
   const [documents, setDocuments] = useState<any[]>([]);
+  const [companias, setCompanias] = useState<any[]>([]);
+
+  // Colecciones cuyo campo de compañía es una referencia (número de registro), no texto libre
+  const referenciaCompania = (key: string) =>
+    (['manejo_de_caja', 'salarios', 'indicadores'].includes(collectionName) && key === 'Sigla Compañía') ||
+    (collectionName === 'corpus_christi' && esCampoCompaniaCorpus(key));
 
   useEffect(() => {
     async function loadDocuments() {
@@ -63,7 +71,18 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
         }
       }
     }
+    async function loadCompanias() {
+      if (['manejo_de_caja', 'salarios', 'indicadores', 'corpus_christi'].includes(collectionName)) {
+        try {
+          const snap = await getDocs(query(collection(db, 'companias')));
+          setCompanias(snap.docs.map(cleanFirebaseData));
+        } catch (error) {
+          console.error("Error loading companies in GenericEditModal", error);
+        }
+      }
+    }
     loadDocuments();
+    loadCompanias();
   }, [collectionName]);
 
   const handleChange = (key: string, value: any) => {
@@ -78,6 +97,8 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
     const processedData = { ...formData };
     for (const key of Object.keys(processedData)) {
       if (key === 'id') continue;
+      // El selector de compañía ya entrega el número (o conserva el valor original)
+      if (referenciaCompania(key)) continue;
       const originalValue = record[key];
 
       // Handle number type conversions
@@ -163,7 +184,23 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
                   {displayLabel} {isReadOnly && <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>(No Editable)</span>}
                 </label>
                 
-                {isDocField ? (
+                {referenciaCompania(key) ? (
+                  <SelectorCompania
+                    ariaLabel={displayLabel}
+                    companias={companias}
+                    value={formData[key]}
+                    onChange={v => handleChange(key, v)}
+                    disabled={isReadOnly || loading}
+                    style={{
+                      padding: '0.6rem',
+                      borderRadius: '4px',
+                      border: '1px solid var(--input-border)',
+                      background: 'var(--bg-body)',
+                      color: 'var(--text-primary)',
+                      fontSize: '0.95rem'
+                    }}
+                  />
+                ) : isDocField ? (
                   <select
                     value={formData[key] !== null && formData[key] !== undefined ? formData[key] : ''}
                     onChange={e => handleChange(key, e.target.value === '' ? null : Number(e.target.value))}

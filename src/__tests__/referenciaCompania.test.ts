@@ -1,0 +1,82 @@
+import { describe, it, expect } from 'vitest';
+import {
+  canonizarReferencia, normalizarSigla, resolverCompania, siglaDeReferencia,
+  valorDeReferencia, etiquetaCompania, esCampoCompaniaCorpus,
+} from '../utils/referenciaCompania';
+
+const companias = [
+  { id: 'a', 'Indicador de registro': 7.0, 'Sigla Compañía': 'GA-JR', Autores: 'Alarcón y Ramírez' },
+  { id: 'b', 'Indicador de registro': 0, 'Sigla Compañía': 'Ñandú', Autores: 'Cero' },
+  { id: 'c', 'Indicador de registro': 12, 'Sigla Compañía': 'JG', Autores: 'Juan' },
+];
+
+describe('canonizarReferencia', () => {
+  it('trata None, indefinido y vacío como cadena vacía', () => {
+    expect(canonizarReferencia(null)).toBe('');
+    expect(canonizarReferencia(undefined)).toBe('');
+    expect(canonizarReferencia('')).toBe('');
+    expect(canonizarReferencia('   ')).toBe('');
+  });
+  it('canoniza 7.0 y "7.0" como 7, y conserva el 0', () => {
+    expect(canonizarReferencia(7.0)).toBe('7');
+    expect(canonizarReferencia('7.0')).toBe('7');
+    expect(canonizarReferencia('7')).toBe('7');
+    expect(canonizarReferencia(0)).toBe('0');
+  });
+  it('conserva el texto no numérico recortado', () => {
+    expect(canonizarReferencia(' GA-JR ')).toBe('GA-JR');
+  });
+});
+
+describe('resolverCompania', () => {
+  it('resuelve por número (número, decimal y cadena)', () => {
+    expect(resolverCompania(7, companias)?.id).toBe('a');
+    expect(resolverCompania('7.0', companias)?.id).toBe('a');
+    expect(resolverCompania('12', companias)?.id).toBe('c');
+  });
+  it('resuelve el número 0', () => {
+    expect(resolverCompania(0, companias)?.id).toBe('b');
+  });
+  it('respalda por sigla normalizada (tildes y mayúsculas)', () => {
+    expect(resolverCompania('ga-jr', companias)?.id).toBe('a');
+    expect(resolverCompania('NANDU', companias)?.id).toBe('b');
+  });
+  it('devuelve null si no resuelve o está vacío', () => {
+    expect(resolverCompania(99, companias)).toBeNull();
+    expect(resolverCompania('XX', companias)).toBeNull();
+    expect(resolverCompania(null, companias)).toBeNull();
+    expect(resolverCompania('', companias)).toBeNull();
+  });
+});
+
+describe('siglaDeReferencia y etiquetas', () => {
+  it('devuelve la sigla de la compañía resuelta', () => {
+    expect(siglaDeReferencia(7, companias)).toBe('GA-JR');
+  });
+  it('si no resuelve devuelve la referencia canonizada', () => {
+    expect(siglaDeReferencia(99.0, companias)).toBe('99');
+    expect(siglaDeReferencia(null, companias)).toBe('');
+  });
+  it('arma la etiqueta «sigla - autores»', () => {
+    expect(etiquetaCompania(companias[0])).toBe('GA-JR - Alarcón y Ramírez');
+  });
+  it('normaliza siglas', () => {
+    expect(normalizarSigla(' Ñandú ')).toBe('nandu');
+  });
+});
+
+describe('valorDeReferencia', () => {
+  it('devuelve el número de registro con tipo numérico', () => {
+    expect(valorDeReferencia(companias[0])).toBe(7);
+    expect(typeof valorDeReferencia(companias[0])).toBe('number');
+    expect(valorDeReferencia({ 'Indicador de registro': '12' })).toBe(12);
+    expect(valorDeReferencia(companias[1])).toBe(0);
+  });
+});
+
+describe('esCampoCompaniaCorpus', () => {
+  it('reconoce los campos de compañía de Corpus Christi', () => {
+    for (const k of ['Compañía', 'Compañía2', 'Compañía10', 'Cmp', 'Cmp2']) expect(esCampoCompaniaCorpus(k)).toBe(true);
+    for (const k of ['Ciudad', 'Sigla Compañía', 'Compañía Principal']) expect(esCampoCompaniaCorpus(k)).toBe(false);
+  });
+});

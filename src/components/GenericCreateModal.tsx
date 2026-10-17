@@ -3,6 +3,8 @@ import { collection, getDocs, query, addDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { cleanFirebaseData } from '../utils';
 import { logAction } from '../utils/audit';
+import { canonizarReferencia, valorDeReferencia } from '../utils/referenciaCompania';
+import SelectorCompania from './SelectorCompania';
 
 const COLLECTION_LABELS: Record<string, string> = {
   documentos: 'Documentos',
@@ -130,7 +132,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
         // Set default values for other inputs
         if (collectionName === 'salarios' || collectionName === 'manejo_de_caja') {
           // Pre-populate with first company
-          const defaultComp = compList[0] ? compList[0]['Sigla Compañía'] : '';
+          const defaultComp = compList[0] ? valorDeReferencia(compList[0]) : '';
           setFormData((prev: any) => ({ ...prev, 'Sigla Compañía': defaultComp }));
         }
 
@@ -218,7 +220,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
 
       // Salarios
       if (collectionName === 'salarios') {
-        if (!recordToSave['Sigla Compañía']) {
+        if (canonizarReferencia(recordToSave['Sigla Compañía']) === '') {
           throw new Error("Debe elegir una compañía existente.");
         }
         if (!recordToSave['Transacción']) {
@@ -232,7 +234,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
 
       // Manejo de Caja
       if (collectionName === 'manejo_de_caja') {
-        if (!recordToSave['Sigla Compañía']) {
+        if (canonizarReferencia(recordToSave['Sigla Compañía']) === '') {
           throw new Error("Debe elegir una compañía existente.");
         }
         if (!recordToSave['Transacción']) {
@@ -449,17 +451,16 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
             {/* --- MANEJO DE CAJA --- */}
             {collectionName === 'manejo_de_caja' && (
               <>
-                <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label htmlFor="selector-compania" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <strong>Sigla Compañía (Obligatorio)</strong>
-                  <select
+                  <SelectorCompania
+                    id="selector-compania"
                     required
-                    value={formData['Sigla Compañía'] || ''}
-                    onChange={e => handleChange('Sigla Compañía', e.target.value)}
-                  >
-                    {companies.map(c => (
-                      <option key={c.id} value={c['Sigla Compañía']}>{c['Sigla Compañía']} - {c['Autores']}</option>
-                    ))}
-                  </select>
+                    companias={companies}
+                    value={formData['Sigla Compañía']}
+                    onChange={v => handleChange('Sigla Compañía', v ?? '')}
+                    textoVacio="Seleccione una compañía..."
+                  />
                 </label>
                 <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <strong>Transacción Relacionada (Obligatorio)</strong>
@@ -530,17 +531,16 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
             {/* --- SALARIOS --- */}
             {collectionName === 'salarios' && (
               <>
-                <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label htmlFor="selector-compania" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <strong>Sigla Compañía (Obligatorio)</strong>
-                  <select
+                  <SelectorCompania
+                    id="selector-compania"
                     required
-                    value={formData['Sigla Compañía'] || ''}
-                    onChange={e => handleChange('Sigla Compañía', e.target.value)}
-                  >
-                    {companies.map(c => (
-                      <option key={c.id} value={c['Sigla Compañía']}>{c['Sigla Compañía']} - {c['Autores']}</option>
-                    ))}
-                  </select>
+                    companias={companies}
+                    value={formData['Sigla Compañía']}
+                    onChange={v => handleChange('Sigla Compañía', v ?? '')}
+                    textoVacio="Seleccione una compañía..."
+                  />
                 </label>
                 <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <strong>Transacción Relacionada (Obligatorio)</strong>
@@ -749,12 +749,13 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                     onChange={e => handleChange('Fondos', e.target.value)}
                   />
                 </label>
-                <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <strong>Compañía Principal (Nombre)</strong>
-                  <input
-                    type="text"
-                    value={formData['Compañía'] || ''}
-                    onChange={e => handleChange('Compañía', e.target.value)}
+                <label htmlFor="selector-compania" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                  <strong>Compañía Principal</strong>
+                  <SelectorCompania
+                    id="selector-compania"
+                    companias={companies}
+                    value={formData['Compañía']}
+                    onChange={v => handleChange('Compañía', v)}
                   />
                 </label>
               </>
@@ -847,17 +848,14 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                     onChange={e => handleChange('Nota', e.target.value)}
                   />
                 </label>
-                <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label htmlFor="selector-compania" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <strong>Compañía</strong>
-                  <select
-                    value={formData['Sigla Compañía'] || ''}
-                    onChange={e => handleChange('Sigla Compañía', e.target.value || null)}
-                  >
-                    <option value="">Ninguna</option>
-                    {companies.map(c => (
-                      <option key={c.id} value={c['Sigla Compañía']}>{c['Sigla Compañía']} - {c['Autores']}</option>
-                    ))}
-                  </select>
+                  <SelectorCompania
+                    id="selector-compania"
+                    companias={companies}
+                    value={formData['Sigla Compañía']}
+                    onChange={v => handleChange('Sigla Compañía', v)}
+                  />
                 </label>
               </>
             )}
