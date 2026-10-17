@@ -11,6 +11,7 @@ const companias = [
 
 let colecciones: Record<string, any[]> = {};
 const ubicacion = vi.hoisted(() => ({ search: '' }));
+const admin = vi.hoisted(() => ({ isEditMode: false }));
 
 vi.mock('../firebase', () => ({ db: {} }));
 vi.mock('../utils/audit', () => ({ logAction: vi.fn() }));
@@ -18,7 +19,7 @@ vi.mock('react-router', () => ({
   useNavigate: () => vi.fn(),
   useLocation: () => ({ pathname: '/x', search: ubicacion.search, state: null }),
 }));
-vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isEditMode: false }) }));
+vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isEditMode: admin.isEditMode }) }));
 vi.mock('firebase/firestore', () => ({
   collection: (_db: unknown, nombre: string) => nombre,
   query: (nombre: string) => nombre,
@@ -30,6 +31,7 @@ vi.mock('firebase/firestore', () => ({
 
 beforeEach(() => {
   ubicacion.search = '';
+  admin.isEditMode = false;
   colecciones = {
     companias,
     transacciones: [],
@@ -47,7 +49,7 @@ afterEach(cleanup);
 
 function buscar(categoria: string, texto: string) {
   const selects = screen.getAllByRole('combobox');
-  fireEvent.change(selects[selects.length - 1], { target: { value: categoria } });
+  fireEvent.change(selects[0], { target: { value: categoria } });
   fireEvent.change(screen.getByPlaceholderText('Añadir filtro...'), { target: { value: texto } });
   fireEvent.click(screen.getAllByRole('button', { name: 'Buscar' })[0]);
 }
@@ -122,5 +124,69 @@ describe.each([
     colecciones[coleccion] = [{ id: 'b', 'Sigla Compañía': '7.0', Ciudad: 'Oruro', 'Año': 1601 }];
     render(<Pagina />);
     expect(await screen.findByText('Compañía de Alarcón', { exact: false })).toBeTruthy();
+  });
+});
+
+describe.each([
+  ['Manejo de Caja', ManejoCaja, 'manejo_de_caja'],
+  ['Remuneraciones', Salarios, 'salarios'],
+])('%s: la columna «Compañía» de los resultados ordena por sigla', (_nombre, Pagina, coleccion) => {
+  it('ordena alfabéticamente por sigla y no por número guardado, en ambos sentidos', async () => {
+    // Número y sigla en orden contrario: 7 -> ZZ, 12 -> AA.
+    colecciones.companias = [
+      { id: 'c7', 'Indicador de registro': 7, 'Sigla Compañía': 'ZZ', Autores: 'Z' },
+      { id: 'c12', 'Indicador de registro': 12, 'Sigla Compañía': 'AA', Autores: 'A' },
+      { id: 'c30', 'Indicador de registro': 30, 'Sigla Compañía': 'mm', Autores: 'M' },
+    ];
+    colecciones[coleccion] = [
+      { id: 'a', 'Sigla Compañía': 7, Ciudad: 'Potosí', 'Año': 1600 },
+      { id: 'b', 'Sigla Compañía': 12, Ciudad: 'Lima', 'Año': 1610 },
+      { id: 'c', 'Sigla Compañía': 30, Ciudad: 'Quito', 'Año': 1620 },
+    ];
+    render(<Pagina />);
+    await screen.findByText(/Mostrando \d+ registros/);
+    buscar('Año', '16');
+    await screen.findByText('Resultados de Búsqueda (3 registros)');
+    const columna = () => screen.getAllByRole('row').slice(1).map(r => within(r).getAllByRole('cell')[0].textContent);
+    fireEvent.click(screen.getByRole('columnheader', { name: /Compañía/ }));
+    expect(columna()).toEqual(['AA', 'mm', 'ZZ']);
+    fireEvent.click(screen.getByRole('columnheader', { name: /Compañía/ }));
+    expect(columna()).toEqual(['ZZ', 'mm', 'AA']);
+  });
+
+  it('el campo derivado de orden no llega al registro que se edita', async () => {
+    admin.isEditMode = true;
+    render(<Pagina />);
+    await screen.findByText(/Mostrando \d+ registros/);
+    buscar('Ciudad', 'Lima');
+    await screen.findByText('Resultados de Búsqueda (1 registros)');
+    fireEvent.click(screen.getByRole('button', { name: 'Editar' }));
+    expect(document.body.innerHTML).not.toContain('__sigla');
+  });
+});
+
+describe.each([
+  ['Manejo de Caja', ManejoCaja],
+  ['Remuneraciones', Salarios],
+])('%s: enlace con una compañía inexistente', (_nombre, Pagina) => {
+  it('muestra «Compañía no encontrada» y no «0 registros para 99»', async () => {
+    ubicacion.search = '?compania=99';
+    render(<Pagina />);
+    expect(await screen.findByText('Compañía no encontrada')).toBeTruthy();
+    expect(screen.queryByText(/registros para/)).toBeNull();
+    expect(screen.queryByText(/99/)).toBeNull();
+  });
+});
+
+describe('Manejo de Caja: el mensaje de borrado dice la sigla', () => {
+  it('«registro de caja de GA-JR (1600)» y no el número', async () => {
+    admin.isEditMode = true;
+    render(<ManejoCaja />);
+    await screen.findByText(/Mostrando \d+ registros/);
+    buscar('Ciudad', 'Potosí');
+    await screen.findByText('Resultados de Búsqueda (1 registros)');
+    fireEvent.click(screen.getByRole('button', { name: 'Borrar' }));
+    expect(await screen.findByText(/eliminar este registro de caja de GA-JR \(1600\)\?/)).toBeTruthy();
+    expect(screen.queryByText(/caja de 7 /)).toBeNull();
   });
 });

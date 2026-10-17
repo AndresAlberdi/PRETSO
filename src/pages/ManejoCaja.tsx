@@ -13,7 +13,7 @@ import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
 import { useSortableTable } from "../hooks/useSortableTable";
 import Tooltip from "../components/Tooltip";
-import { canonizarReferencia, resolverCompania, siglaDeReferencia } from "../utils/referenciaCompania";
+import { canonizarReferencia, normalizarSigla, resolverCompania, siglaDeReferencia } from "../utils/referenciaCompania";
 import DetailsModal from "../components/DetailsModal";
 
 export default function ManejoCaja() {
@@ -161,6 +161,13 @@ export default function ManejoCaja() {
     });
   }, [data, filters, companias]);
 
+  // Campo derivado solo de presentación: la sigla resuelta, para que la columna «Compañía»
+  // ordene por lo que se ve y no por el número guardado. Nunca se persiste ni se exporta.
+  const searchResultsOrdenables = useMemo(
+    () => searchResults.map(d => ({ ...d, __sigla: normalizarSigla(siglaDeReferencia(d["Sigla Compañía"], companias)) })),
+    [searchResults, companias]
+  );
+
   const isSearching = filters.length > 0;
   const siglaSeleccionada = siglaDeReferencia(selectedCompId, companias);
   const companiaSeleccionada = resolverCompania(selectedCompId, companias);
@@ -169,7 +176,7 @@ export default function ManejoCaja() {
     : [];
 
   const { items: sortedFilteredCompanias, requestSort: sortComp, sortConfig: scComp } = useSortableTable(filteredCompanias);
-  const { items: sortedSearchResults, requestSort: sortSearch, sortConfig: scSearch } = useSortableTable(searchResults);
+  const { items: sortedSearchResults, requestSort: sortSearch, sortConfig: scSearch } = useSortableTable(searchResultsOrdenables);
   const { items: sortedDetailData } = useSortableTable(detailData);
 
   const SortIndicator = ({ column, sc }: { column: string, sc: any }) => {
@@ -209,7 +216,7 @@ export default function ManejoCaja() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => sortSearch('Sigla Compañía')} style={{ cursor: 'pointer' }}>Compañía <SortIndicator column="Sigla Compañía" sc={scSearch} /></th>
+                <th onClick={() => sortSearch('__sigla')} style={{ cursor: 'pointer' }}>Compañía <SortIndicator column="__sigla" sc={scSearch} /></th>
                 <th onClick={() => sortSearch('Ciudad')} style={{ cursor: 'pointer' }}>Ciudad <SortIndicator column="Ciudad" sc={scSearch} /></th>
                 <th onClick={() => sortSearch('Año')} style={{ cursor: 'pointer' }}>Año <SortIndicator column="Año" sc={scSearch} /></th>
                 <th>Documentos</th>
@@ -219,6 +226,8 @@ export default function ManejoCaja() {
             </thead>
             <tbody>
               {sortedSearchResults.map(row => {
+                const registro: any = { ...row };
+                delete registro.__sigla;
                 const comp = resolverCompania(row["Sigla Compañía"], companias);
                 const sigla = comp ? comp["Sigla Compañía"] : canonizarReferencia(row["Sigla Compañía"]);
                 const fullName = comp && comp["Nombre Compañía"] ? `${sigla} - ${comp["Nombre Compañía"]}` : sigla;
@@ -253,8 +262,8 @@ export default function ManejoCaja() {
                   </td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button onClick={() => setRecordToEdit(row)} style={{ background: 'var(--primary-color)' }}>Editar</button>
-                      <button onClick={() => attemptDelete(row)} style={{ background: '#ff4d4f' }}>Borrar</button>
+                      <button onClick={() => setRecordToEdit(registro)} style={{ background: 'var(--primary-color)' }}>Editar</button>
+                      <button onClick={() => attemptDelete(registro)} style={{ background: '#ff4d4f' }}>Borrar</button>
                     </td>
                   )}
                 </tr>
@@ -306,6 +315,8 @@ export default function ManejoCaja() {
             </tbody>
           </table>
         </div>
+      ) : !companiaSeleccionada ? (
+        <p style={{ color: 'var(--text-muted)' }}>Compañía no encontrada</p>
       ) : (
         <div style={{ overflowX: "auto" }}>
           <div style={{ marginBottom: '1rem' }}><p style={{ color: 'var(--text-muted)' }}>{sortedDetailData.length} registros para {siglaSeleccionada}</p></div>

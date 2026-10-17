@@ -13,6 +13,15 @@ interface Elemento {
   texto: string;
 }
 
+// Texto visible de una compañía resuelta: su sigla; si está vacía, su nombre; si tampoco hay,
+// un rótulo fijo. Nunca el número de registro.
+function textoDeCompania(compania: CompaniaRef): string {
+  const sigla = String(compania['Sigla Compañía'] ?? '').trim();
+  if (sigla) return sigla;
+  const nombre = String(compania['Nombre Compañía'] ?? '').trim();
+  return nombre || 'Compañía sin sigla';
+}
+
 // Muestra la sigla de cada compañía referenciada, como botón que abre el detalle.
 // Una compañía repetida entre varios campos del registro (p. ej. `Compañía` y `Cmp`) se
 // muestra una sola vez. Un valor que no resuelve a ninguna compañía se muestra atenuado,
@@ -29,7 +38,7 @@ export default function ListaSiglasCompania({ referencias, companias, onAbrir }:
       : `r:${ref}`;
     if (vistos.has(clave)) continue;
     vistos.add(clave);
-    elementos.push({ clave, compania, texto: compania ? String(compania['Sigla Compañía'] ?? '') : ref });
+    elementos.push({ clave, compania, texto: compania ? textoDeCompania(compania) : ref });
   }
 
   return (

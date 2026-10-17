@@ -63,7 +63,23 @@ describe('Corpus Christi: sigla en vez de número de registro', () => {
     expect(screen.getByText('Detalle de Compañía')).toBeTruthy();
     expect(screen.getByText('Compañía de Alarcón')).toBeTruthy();
     expect(screen.queryByText('Indicador de registro')).toBeNull();
+    expect(screen.queryByText('c7')).toBeNull();
     expect(lecturas.lista.length).toBe(antes);
+  });
+
+  it('una compañía con sigla vacía muestra su nombre, o «Compañía sin sigla», nunca el número', async () => {
+    colecciones.companias = [
+      ...companias,
+      { id: 'c20', 'Indicador de registro': 20, 'Sigla Compañía': '', 'Nombre Compañía': 'Compañía Sin Sigla Con Nombre' },
+      { id: 'c21', 'Indicador de registro': 21, 'Sigla Compañía': '  ' },
+    ];
+    colecciones.corpus_christi[0]['Compañía3'] = 20;
+    colecciones.corpus_christi[0]['Compañía4'] = 21;
+    await abrirTratoCorpus();
+    expect(await screen.findByRole('button', { name: 'Compañía Sin Sigla Con Nombre' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Compañía sin sigla' })).toBeTruthy();
+    expect(screen.queryByText('20')).toBeNull();
+    expect(screen.queryByText('21')).toBeNull();
   });
 
   it('un valor sin resolver se muestra como texto atenuado, sin botón', async () => {
@@ -116,5 +132,14 @@ describe('CompaniaModal sin la prop compania', () => {
     expect(await screen.findByText('Juan')).toBeTruthy();
     expect(lecturas.lista).toContain('companias');
     expect(screen.queryByText('Indicador de registro')).toBeNull();
+    expect(screen.queryByText('c12')).toBeNull();
+  });
+
+  it('consulta por sigla cuando la referencia es una sigla heredada', async () => {
+    render(<CompaniaModal sigla="JG" onClose={vi.fn()} />);
+    expect(await screen.findByText('Juan')).toBeTruthy();
+    expect(lecturas.lista).toContain('companias');
+    expect(screen.queryByText('Indicador de registro')).toBeNull();
+    expect(screen.queryByText('c12')).toBeNull();
   });
 });
