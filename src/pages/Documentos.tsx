@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { collection, getDocs, query, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../firebase";
 import { cleanFirebaseData } from "../utils";
@@ -9,6 +9,17 @@ import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
 import { updateDoc } from "firebase/firestore";
 import { useSortableTable } from "../hooks/useSortableTable";
+import SearchBar, { type SearchFilter } from "../components/SearchBar";
+import { filtrarRegistros } from "../utils/filtrarRegistros";
+
+const SEARCH_CATEGORIES = [
+  { id: 'doc', label: 'Nro. de documento' },
+  { id: 'all', label: 'Texto libre' },
+];
+const CAMPOS_BUSQUEDA: Record<string, string[]> = {
+  doc: ['Doc'],
+  all: ['Doc', 'Documento'],
+};
 
 export default function Documentos() {
   const [data, setData] = useState<any[]>([]);
@@ -20,7 +31,10 @@ export default function Documentos() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
 
-  const { items: sortedData, requestSort, sortConfig } = useSortableTable(data);
+  const [filters, setFilters] = useState<SearchFilter[]>([]);
+  const filteredData = useMemo(() => filtrarRegistros(data, filters, CAMPOS_BUSQUEDA), [data, filters]);
+
+  const { items: sortedData, requestSort, sortConfig } = useSortableTable(filteredData);
 
   const SortIndicator = ({ column }: { column: string }) => {
     if (!sortConfig || sortConfig.key !== column) return null;
@@ -106,17 +120,26 @@ export default function Documentos() {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
         <h1>Documentos</h1>
-        {isEditMode && (
-          <button 
-            onClick={() => setIsCreateOpen(true)}
-            style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-          >
-            Nuevo Registro
-          </button>
-        )}
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          {isEditMode && (
+            <button 
+              onClick={() => setIsCreateOpen(true)}
+              style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+            >
+              Nuevo Registro
+            </button>
+          )}
+          <SearchBar onSearch={setFilters} categories={SEARCH_CATEGORIES} />
+        </div>
       </div>
       
       {loading ? <p>Cargando datos...</p> : (
+        <>
+        <output style={{ display: 'block', margin: '0 0 0.5rem' }}>
+          {filteredData.length === 0 && filters.length > 0
+            ? 'No se encontraron registros con los filtros aplicados.'
+            : `Mostrando ${filteredData.length} de ${data.length} registros`}
+        </output>
         <div style={{ overflowX: "auto" }}>
           <table className="sortable">
             <thead>
@@ -142,6 +165,7 @@ export default function Documentos() {
             </tbody>
           </table>
         </div>
+        </>
       )}
 
       {isCreateOpen && (
