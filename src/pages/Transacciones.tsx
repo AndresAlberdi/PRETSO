@@ -157,9 +157,9 @@ export default function Transacciones() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => requestSort('Num')} style={{ cursor: 'pointer', width: '50px' }}>Num <SortIndicator column="Num" /></th>
-                <th onClick={() => requestSort('Noticia')} style={{ cursor: 'pointer' }}>Noticia <SortIndicator column="Noticia" /></th>
-                <th onClick={() => requestSort('Fuentes para la generación del dato')} style={{ cursor: 'pointer' }}>Fuentes <SortIndicator column="Fuentes para la generación del dato" /></th>
+                <th onClick={() => requestSort('Num')} style={{ cursor: 'pointer', width: '50px' }}>Nro. <SortIndicator column="Num" /></th>
+                <th scope="col">Noticia</th>
+                <th scope="col">Fuentes</th>
                 <th>Documentos</th>
                 {isEditMode && <th>Admin</th>}
               </tr>
