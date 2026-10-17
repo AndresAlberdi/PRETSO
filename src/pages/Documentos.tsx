@@ -122,7 +122,7 @@ export default function Documentos() {
             <thead>
               <tr>
                 <th onClick={() => requestSort('Doc')} style={{ width: '80px', textAlign: 'center', cursor: 'pointer' }}>Doc ID <SortIndicator column="Doc" /></th>
-                <th onClick={() => requestSort('Documento')} style={{ cursor: 'pointer' }}>Documento <SortIndicator column="Documento" /></th>
+                <th scope="col">Documento</th>
                 {isEditMode && <th>Admin</th>}
               </tr>
             </thead>

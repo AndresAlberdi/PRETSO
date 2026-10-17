@@ -251,9 +251,9 @@ export default function Indicadores() {
               <tr>
                 <th onClick={() => sortDetail('Ciudad')} style={{ cursor: 'pointer' }}>Ciudad <SortIndicator column="Ciudad" sc={scDetail} /></th>
                 <th onClick={() => sortDetail('Años')} style={{ cursor: 'pointer' }}>Años <SortIndicator column="Años" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Concepto')} style={{ cursor: 'pointer' }}>Concepto <SortIndicator column="Concepto" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Monto')} style={{ cursor: 'pointer' }}>Monto <SortIndicator column="Monto" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Nota')} style={{ cursor: 'pointer' }}>Nota <SortIndicator column="Nota" sc={scDetail} /></th>
+                <th scope="col">Concepto</th>
+                <th scope="col">Monto</th>
+                <th scope="col">Nota</th>
                 <th>Compañía</th>
                 <th>Documentos</th>
                 <th></th>
