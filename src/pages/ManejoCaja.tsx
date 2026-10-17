@@ -130,7 +130,9 @@ export default function ManejoCaja() {
     return map;
   }, [companias]);
 
-  const companiasInData = companias.filter(c => data.some(d => String(d["Sigla Compañía"]) === String(c["Indicador de registro"])));
+  // Misma regla que cuenta el índice de compañías (resolverCompania): número, "7.0" o sigla heredada.
+  const companiasReferenciadas = new Set<unknown>(data.map(d => resolverCompania(d["Sigla Compañía"], companias)).filter(Boolean));
+  const companiasInData = companias.filter(c => companiasReferenciadas.has(c));
   const uniqueCompanias = Array.from(new Set(companiasInData.map(c => String(c["Indicador de registro"])))).filter(Boolean).sort();
   const uniqueTemporadas = Array.from(new Set(companiasInData.map(c => c["Temporadas teatrales"]))).filter(Boolean).sort();
   const uniqueAmbitos = Array.from(new Set(companiasInData.map(c => c["Ámbito"]))).filter(Boolean).sort();
@@ -161,7 +163,10 @@ export default function ManejoCaja() {
 
   const isSearching = filters.length > 0;
   const siglaSeleccionada = siglaDeReferencia(selectedCompId, companias);
-  const detailData = data.filter(d => String(d["Sigla Compañía"]) === selectedCompId);
+  const companiaSeleccionada = resolverCompania(selectedCompId, companias);
+  const detailData = companiaSeleccionada
+    ? data.filter(d => resolverCompania(d["Sigla Compañía"], [companiaSeleccionada]) !== null)
+    : [];
 
   const { items: sortedFilteredCompanias, requestSort: sortComp, sortConfig: scComp } = useSortableTable(filteredCompanias);
   const { items: sortedSearchResults, requestSort: sortSearch, sortConfig: scSearch } = useSortableTable(searchResults);

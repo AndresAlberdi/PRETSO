@@ -2,6 +2,7 @@ import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { render, screen, fireEvent, within, cleanup } from '@testing-library/react';
 import ManejoCaja from '../pages/ManejoCaja';
 import Salarios from '../pages/Salarios';
+import { contarReferenciasACompania } from '../utils/integridadCompanias';
 
 const companias = [
   { id: 'c7', 'Indicador de registro': 7, 'Sigla Compañía': 'GA-JR', 'Nombre Compañía': 'Compañía de Alarcón', Autores: 'Alarcón y Ramírez' },
@@ -93,5 +94,33 @@ describe('Remuneraciones: la búsqueda por persona también mira al beneficiario
     await screen.findByText(/Mostrando \d+ registros/);
     buscar('Autores', 'Ruiz');
     expect(await screen.findByText('Resultados de Búsqueda (1 registros)')).toBeTruthy();
+  });
+});
+
+describe.each([
+  ['Manejo de Caja', ManejoCaja, 'manejo_de_caja'],
+  ['Remuneraciones', Salarios, 'salarios'],
+])('%s: el filtro ?compania= muestra lo mismo que cuenta el índice de compañías', (_nombre, Pagina, coleccion) => {
+  it('incluye número, variante heredada «7.0», número en texto y sigla heredada; excluye otras compañías', async () => {
+    colecciones[coleccion] = [
+      { id: 'a', 'Sigla Compañía': 7, Ciudad: 'Potosí', 'Año': 1600 },
+      { id: 'b', 'Sigla Compañía': '7.0', Ciudad: 'Oruro', 'Año': 1601 },
+      { id: 'c', 'Sigla Compañía': '7', Ciudad: 'Cuzco', 'Año': 1602 },
+      { id: 'd', 'Sigla Compañía': ' ga-jr ', Ciudad: 'Quito', 'Año': 1603 },
+      { id: 'e', 'Sigla Compañía': 12, Ciudad: 'Lima', 'Año': 1610 },
+    ];
+    const contados = await contarReferenciasACompania(coleccion, companias[0]);
+    expect(contados).toBe(4);
+    ubicacion.search = '?compania=7';
+    render(<Pagina />);
+    expect(await screen.findByText(`${contados} registros para GA-JR`)).toBeTruthy();
+    for (const ciudad of ['Potosí', 'Oruro', 'Cuzco', 'Quito']) expect(screen.getByText(ciudad)).toBeTruthy();
+    expect(screen.queryByText('Lima')).toBeNull();
+  });
+
+  it('la lista de compañías incluye a la que solo tiene referencias heredadas', async () => {
+    colecciones[coleccion] = [{ id: 'b', 'Sigla Compañía': '7.0', Ciudad: 'Oruro', 'Año': 1601 }];
+    render(<Pagina />);
+    expect(await screen.findByText('Compañía de Alarcón', { exact: false })).toBeTruthy();
   });
 });

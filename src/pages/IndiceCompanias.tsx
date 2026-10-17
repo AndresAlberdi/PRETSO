@@ -67,6 +67,9 @@ export default function IndiceCompanias() {
   const MENSAJE_FALLO_VERIFICACION =
     'No se pudo verificar si la compañía tiene registros vinculados; no se borró. Intente de nuevo.';
 
+  const MENSAJE_FALLO_NAVEGACION =
+    'No se pudo comprobar los registros de la compañía. Intente de nuevo.';
+
   const checkRecordsAndNavigate = async (collectionName: string, path: string, item: any) => {
     setIsAnalyzing(true);
     try {
@@ -78,7 +81,7 @@ export default function IndiceCompanias() {
       }
     } catch (error) {
       console.error("Error verificando registros vinculados: ", error);
-      setAlertMessage(MENSAJE_FALLO_VERIFICACION);
+      setAlertMessage(MENSAJE_FALLO_NAVEGACION);
     } finally {
       setIsAnalyzing(false);
     }
