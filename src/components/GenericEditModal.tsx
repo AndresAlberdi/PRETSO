@@ -52,6 +52,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
   const [loading, setLoading] = useState(false);
   const [documents, setDocuments] = useState<any[]>([]);
   const [companias, setCompanias] = useState<any[]>([]);
+  const [companiasCargadas, setCompaniasCargadas] = useState(false);
 
   // Colecciones cuyo campo de compañía es una referencia (número de registro), no texto libre
   const referenciaCompania = (key: string) =>
@@ -78,6 +79,8 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
           setCompanias(snap.docs.map(cleanFirebaseData));
         } catch (error) {
           console.error("Error loading companies in GenericEditModal", error);
+        } finally {
+          setCompaniasCargadas(true);
         }
       }
     }
@@ -188,6 +191,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
                   <SelectorCompania
                     ariaLabel={displayLabel}
                     companias={companias}
+                    cargando={!companiasCargadas}
                     value={formData[key]}
                     onChange={v => handleChange(key, v)}
                     disabled={isReadOnly || loading}

@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   canonizarReferencia, normalizarSigla, resolverCompania, siglaDeReferencia,
   valorDeReferencia, etiquetaCompania, esCampoCompaniaCorpus,
+  camposReferenciaCompania, valoresDeBusquedaReferencia,
 } from '../utils/referenciaCompania';
 
 const companias = [
@@ -16,6 +17,9 @@ describe('canonizarReferencia', () => {
     expect(canonizarReferencia(undefined)).toBe('');
     expect(canonizarReferencia('')).toBe('');
     expect(canonizarReferencia('   ')).toBe('');
+    expect(canonizarReferencia('None')).toBe('');
+    expect(canonizarReferencia('nan')).toBe('');
+    expect(canonizarReferencia(NaN)).toBe('');
   });
   it('canoniza 7.0 y "7.0" como 7, y conserva el 0', () => {
     expect(canonizarReferencia(7.0)).toBe('7');
@@ -78,5 +82,30 @@ describe('esCampoCompaniaCorpus', () => {
   it('reconoce los campos de compañía de Corpus Christi', () => {
     for (const k of ['Compañía', 'Compañía2', 'Compañía10', 'Cmp', 'Cmp2']) expect(esCampoCompaniaCorpus(k)).toBe(true);
     for (const k of ['Ciudad', 'Sigla Compañía', 'Compañía Principal']) expect(esCampoCompaniaCorpus(k)).toBe(false);
+  });
+});
+
+describe('camposReferenciaCompania', () => {
+  it('Corpus Christi: Compañía, Compañía2…10, Cmp y Cmp2, todos reconocidos por esCampoCompaniaCorpus', () => {
+    const campos = camposReferenciaCompania('corpus_christi');
+    expect(campos).toHaveLength(12);
+    expect(campos).toEqual(expect.arrayContaining(['Compañía', 'Compañía2', 'Compañía10', 'Cmp', 'Cmp2']));
+    expect(campos.every(esCampoCompaniaCorpus)).toBe(true);
+  });
+  it('Caja, Remuneraciones e Indicadores usan Sigla Compañía; otras colecciones, ninguno', () => {
+    for (const c of ['manejo_de_caja', 'salarios', 'indicadores']) expect(camposReferenciaCompania(c)).toEqual(['Sigla Compañía']);
+    expect(camposReferenciaCompania('documentos')).toEqual([]);
+  });
+});
+
+describe('valoresDeBusquedaReferencia', () => {
+  it('incluye número, texto del número y sigla', () => {
+    expect(valoresDeBusquedaReferencia(companias[0])).toEqual([7, '7', 'GA-JR']);
+  });
+  it('conserva el número 0', () => {
+    expect(valoresDeBusquedaReferencia(companias[1])).toEqual([0, '0', 'Ñandú']);
+  });
+  it('sin número de registro, solo la sigla', () => {
+    expect(valoresDeBusquedaReferencia({ 'Sigla Compañía': 'X' })).toEqual(['X']);
   });
 });

@@ -4,7 +4,8 @@ import { db } from "../firebase";
 import { cleanFirebaseData } from "../utils";
 import { useAdmin } from "../context/AdminContext";
 import ConfirmModal from "../components/ConfirmModal";
-import { deleteDoc, doc, where, updateDoc } from "firebase/firestore";
+import { deleteDoc, doc, updateDoc } from "firebase/firestore";
+import { contarReferenciasACompania } from "../utils/integridadCompanias";
 import { logAction } from "../utils/audit";
 import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
@@ -38,7 +39,7 @@ export default function IndiceCompanias() {
     fetchData();
   }, []);
 
-  const checkReferentialIntegrity = async (sigla: string) => {
+  const checkReferentialIntegrity = async (compania: any) => {
     const collectionsToCheck = [
       { name: 'manejo_de_caja', label: 'Caja' },
       { name: 'salarios', label: 'Remuneraciones' },
@@ -50,11 +51,10 @@ export default function IndiceCompanias() {
     let messageParts = [];
 
     for (const coll of collectionsToCheck) {
-      const q = query(collection(db, coll.name), where("Sigla Compañía", "==", sigla));
-      const snap = await getDocs(q);
-      if (!snap.empty) {
-        totalLinks += snap.size;
-        messageParts.push(`${snap.size} en ${coll.label}`);
+      const count = await contarReferenciasACompania(coll.name, compania);
+      if (count > 0) {
+        totalLinks += count;
+        messageParts.push(`${count} en ${coll.label}`);
       }
     }
 
@@ -66,10 +66,9 @@ export default function IndiceCompanias() {
 
   const checkRecordsAndNavigate = async (collectionName: string, path: string, item: any) => {
     setIsAnalyzing(true);
-    const q = query(collection(db, collectionName), where("Sigla Compañía", "==", item["Indicador de registro"]));
-    const snap = await getDocs(q);
+    const count = await contarReferenciasACompania(collectionName, item);
     setIsAnalyzing(false);
-    if (snap.empty) {
+    if (count === 0) {
       setAlertMessage(`No existen registros en esta sección para la compañía seleccionada.`);
     } else {
       navigate(`${path}?compania=${item["Indicador de registro"]}`);
@@ -79,7 +78,7 @@ export default function IndiceCompanias() {
   const attemptDelete = async (row: any) => {
     setIsAnalyzing(true);
     const [error] = await Promise.all([
-      checkReferentialIntegrity(row["Indicador de registro"] || row["Sigla Compañía"]),
+      checkReferentialIntegrity(row),
       new Promise(resolve => setTimeout(resolve, 1000))
     ]);
     setIsAnalyzing(false);

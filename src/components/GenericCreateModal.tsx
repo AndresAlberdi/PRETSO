@@ -3,7 +3,7 @@ import { collection, getDocs, query, addDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { cleanFirebaseData } from '../utils';
 import { logAction } from '../utils/audit';
-import { canonizarReferencia, valorDeReferencia } from '../utils/referenciaCompania';
+import { canonizarReferencia } from '../utils/referenciaCompania';
 import SelectorCompania from './SelectorCompania';
 
 const COLLECTION_LABELS: Record<string, string> = {
@@ -127,13 +127,6 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
           }));
           if (cities.length === 0) setCityType('input');
           if (years.length === 0) setYearType('input');
-        }
-
-        // Set default values for other inputs
-        if (collectionName === 'salarios' || collectionName === 'manejo_de_caja') {
-          // Pre-populate with first company
-          const defaultComp = compList[0] ? valorDeReferencia(compList[0]) : '';
-          setFormData((prev: any) => ({ ...prev, 'Sigla Compañía': defaultComp }));
         }
 
       } catch (err: any) {
@@ -457,6 +450,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                     id="selector-compania"
                     required
                     companias={companies}
+                    cargando={loading}
                     value={formData['Sigla Compañía']}
                     onChange={v => handleChange('Sigla Compañía', v ?? '')}
                     textoVacio="Seleccione una compañía..."
@@ -537,6 +531,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                     id="selector-compania"
                     required
                     companias={companies}
+                    cargando={loading}
                     value={formData['Sigla Compañía']}
                     onChange={v => handleChange('Sigla Compañía', v ?? '')}
                     textoVacio="Seleccione una compañía..."
@@ -754,6 +749,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <SelectorCompania
                     id="selector-compania"
                     companias={companies}
+                    cargando={loading}
                     value={formData['Compañía']}
                     onChange={v => handleChange('Compañía', v)}
                   />
@@ -853,6 +849,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <SelectorCompania
                     id="selector-compania"
                     companias={companies}
+                    cargando={loading}
                     value={formData['Sigla Compañía']}
                     onChange={v => handleChange('Sigla Compañía', v)}
                   />

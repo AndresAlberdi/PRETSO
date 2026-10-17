@@ -8,12 +8,19 @@ export interface CompaniaRef {
 
 const NUMERICO = /^-?\d+(\.\d+)?$/;
 
-/** Canoniza una referencia: None/vacío → '', 7.0 → '7', "7.0" → '7', otro texto → recortado. */
+/**
+ * Canoniza una referencia. Regla (alineada con `canon` de
+ * scripts/diagnostico_referencias_companias.py): null/undefined/vacío/'None'/'nan'/'NaN' → '';
+ * 7.0 → '7' y "7.0" → '7' (en Python: `^\d+\.0+$` → entero); otro texto → recortado.
+ * Diferencia deliberada: aquí también se canoniza cualquier decimal numérico
+ * ("7.50" → '7.5'), porque el valor numérico guardado puede ser float; en la práctica
+ * las referencias son enteros, por lo que ambas reglas coinciden.
+ */
 export function canonizarReferencia(valor: unknown): string {
   if (valor === null || valor === undefined) return '';
   if (typeof valor === 'number') return Number.isFinite(valor) ? String(valor) : '';
   const texto = String(valor).trim();
-  if (texto === '') return '';
+  if (texto === '' || texto === 'None' || texto === 'nan' || texto === 'NaN') return '';
   if (NUMERICO.test(texto)) return String(Number(texto));
   return texto;
 }
@@ -21,7 +28,7 @@ export function canonizarReferencia(valor: unknown): string {
 /** Normaliza una sigla para comparar: sin tildes, sin mayúsculas ni espacios en los extremos. */
 export function normalizarSigla(valor: unknown): string {
   if (valor === null || valor === undefined) return '';
-  return String(valor).normalize('NFD').replace(/[̀-ͯ]/g, '').trim().toLowerCase();
+  return String(valor).normalize('NFD').replace(/\p{M}/gu, '').trim().toLowerCase();
 }
 
 /**
@@ -62,4 +69,31 @@ export function etiquetaCompania(compania: CompaniaRef): string {
 /** Campos de Corpus Christi que referencian compañías (Compañía, Compañía2…, Cmp, Cmp2…). */
 export function esCampoCompaniaCorpus(clave: string): boolean {
   return /^(Compañía|Cmp)\d*$/.test(clave);
+}
+
+const CAMPOS_CORPUS = [
+  'Compañía', ...Array.from({ length: 9 }, (_, i) => `Compañía${i + 2}`), 'Cmp', 'Cmp2',
+];
+
+/** Campos de referencia a compañía de cada colección (según COLUMN_ORDERS de xlsxExport). */
+export function camposReferenciaCompania(coleccion: string): string[] {
+  if (coleccion === 'corpus_christi') return CAMPOS_CORPUS;
+  if (['manejo_de_caja', 'salarios', 'indicadores'].includes(coleccion)) return ['Sigla Compañía'];
+  return [];
+}
+
+/**
+ * Valores con los que un registro puede referenciar a la compañía: el número de
+ * registro (numérico y su texto, por datos heredados) y, como respaldo, la sigla.
+ */
+export function valoresDeBusquedaReferencia(compania: CompaniaRef): Array<number | string> {
+  const valores: Array<number | string> = [];
+  const canon = canonizarReferencia(compania['Indicador de registro']);
+  if (canon !== '') {
+    if (NUMERICO.test(canon)) valores.push(Number(canon));
+    valores.push(canon);
+  }
+  const sigla = String(compania['Sigla Compañía'] ?? '').trim();
+  if (sigla !== '' && !valores.includes(sigla)) valores.push(sigla);
+  return valores;
 }

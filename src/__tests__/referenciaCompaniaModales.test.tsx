@@ -41,8 +41,8 @@ describe('alta: la compañía se guarda por número de registro', () => {
     const { form } = await abrirAlta('manejo_de_caja');
     expect(screen.getByRole('option', { name: 'JG - Juan' })).toBeTruthy();
     const [selCompania, selTransaccion] = screen.getAllByRole('combobox');
-    // Valor por defecto: la primera compañía, por número
-    expect((selCompania as HTMLSelectElement).value).toBe('7');
+    // Sin compañía preseleccionada: el usuario debe elegirla
+    expect((selCompania as HTMLSelectElement).value).toBe('');
     fireEvent.change(selCompania, { target: { value: '12' } });
     fireEvent.change(selTransaccion, { target: { value: '3' } });
     fireEvent.submit(form);
@@ -52,13 +52,41 @@ describe('alta: la compañía se guarda por número de registro', () => {
     expect(typeof guardado['Sigla Compañía']).toBe('number');
   });
 
-  it('Remuneraciones guarda el número por defecto', async () => {
+  it('Remuneraciones guarda el número elegido', async () => {
     const { form } = await abrirAlta('salarios');
-    const [, selTransaccion] = screen.getAllByRole('combobox');
+    const [selCompania, selTransaccion] = screen.getAllByRole('combobox');
+    fireEvent.change(selCompania, { target: { value: '7' } });
     fireEvent.change(selTransaccion, { target: { value: '3' } });
     fireEvent.submit(form);
     await waitFor(() => expect(addDoc).toHaveBeenCalled());
     expect(addDoc.mock.calls[0][1]['Sigla Compañía']).toBe(7);
+  });
+
+  it.each(['manejo_de_caja', 'salarios'])('%s: no preselecciona compañía y bloquea el envío sin elegirla', async (coleccion) => {
+    const { form, onCreated } = await abrirAlta(coleccion);
+    const [selCompania, selTransaccion] = screen.getAllByRole('combobox') as HTMLSelectElement[];
+    expect(selCompania.value).toBe('');
+    expect(selCompania.required).toBe(true);
+    expect(screen.getByRole('option', { name: 'Seleccione una compañía...' })).toBeTruthy();
+    fireEvent.change(selTransaccion, { target: { value: '3' } });
+    fireEvent.submit(form);
+    expect(await screen.findByText('Debe elegir una compañía existente.')).toBeTruthy();
+    expect(addDoc).not.toHaveBeenCalled();
+    expect(onCreated).not.toHaveBeenCalled();
+  });
+
+  it('Indicadores: elegir «Ninguna» después de una compañía guarda null', async () => {
+    const { form } = await abrirAlta('indicadores');
+    const combos = screen.getAllByRole('combobox') as HTMLSelectElement[];
+    const selCompania = combos.find(s => Array.from(s.options).some(o => o.text === 'GA-JR - Alarcón y Ramírez'))!;
+    const selTransaccion = combos.find(s => Array.from(s.options).some(o => o.text.startsWith('Transacción 3')))!;
+    fireEvent.change(selCompania, { target: { value: '7' } });
+    fireEvent.change(selCompania, { target: { value: '' } });
+    fireEvent.change(selTransaccion, { target: { value: '3' } });
+    fireEvent.submit(form);
+    await waitFor(() => expect(addDoc).toHaveBeenCalled());
+    const guardado = addDoc.mock.calls[0][1];
+    expect(guardado['Sigla Compañía']).toBeNull();
   });
 
   it('Indicadores guarda el número elegido', async () => {
@@ -105,6 +133,32 @@ describe('edición: la compañía es un selector', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Guardar Cambios' }));
     await waitFor(() => expect(onSave).toHaveBeenCalled());
     expect(onSave.mock.calls[0][0]['Sigla Compañía']).toBe(12);
+  });
+
+  it('«Ninguna» guarda null y no 0', async () => {
+    const { onSave, selector } = await abrirEdicion('manejo_de_caja', { id: 'r4', 'Indicador de registro': 2, 'Sigla Compañía': 7 });
+    expect(selector.value).toBe('7');
+    fireEvent.change(selector, { target: { value: '' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar Cambios' }));
+    await waitFor(() => expect(onSave).toHaveBeenCalled());
+    expect(onSave.mock.calls[0][0]['Sigla Compañía']).toBeNull();
+  });
+
+  it('Corpus Christi: guarda el número de Compañía elegido', async () => {
+    const { onSave, selector } = await abrirEdicion('corpus_christi', { id: 'r5', Ciudad: 'Potosí', 'Compañía': 12.0 });
+    fireEvent.change(selector, { target: { value: '7' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar Cambios' }));
+    await waitFor(() => expect(onSave).toHaveBeenCalled());
+    const guardado = onSave.mock.calls[0][0];
+    expect(guardado['Compañía']).toBe(7);
+    expect(typeof guardado['Compañía']).toBe('number');
+  });
+
+  it('Corpus Christi: sin tocar la compañía conserva su valor original', async () => {
+    const { onSave } = await abrirEdicion('corpus_christi', { id: 'r6', Ciudad: 'Potosí', 'Compañía': 12.0 });
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar Cambios' }));
+    await waitFor(() => expect(onSave).toHaveBeenCalled());
+    expect(onSave.mock.calls[0][0]['Compañía']).toBe(12);
   });
 
   it('conserva un valor sin resolver si no se cambia', async () => {
