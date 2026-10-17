@@ -12,8 +12,8 @@ import { updateDoc } from "firebase/firestore";
 import { useSortableTable } from "../hooks/useSortableTable";
 import SearchBar, { type SearchFilter } from "../components/SearchBar";
 import { filtrarRegistros } from "../utils/filtrarRegistros";
+import { CAMPOS_BUSQUEDA_TRANSACCIONES } from "../utils/camposBusqueda";
 
-const CAMPOS_DOC = Array.from({ length: 10 }, (_, i) => `Doc${i + 1}`);
 const SEARCH_CATEGORIES = [
   { id: 'num', label: 'Nro.' },
   { id: 'noticia', label: 'Noticia' },
@@ -21,13 +21,6 @@ const SEARCH_CATEGORIES = [
   { id: 'doc', label: 'Documento vinculado' },
   { id: 'all', label: 'Texto libre' },
 ];
-const CAMPOS_BUSQUEDA: Record<string, string[]> = {
-  num: ['Num'],
-  noticia: ['Noticia'],
-  fuentes: ['Fuentes para la generación del dato'],
-  doc: CAMPOS_DOC,
-  all: ['Num', 'Noticia', 'Fuentes para la generación del dato', ...CAMPOS_DOC],
-};
 
 export default function Transacciones() {
   const [data, setData] = useState<any[]>([]);
@@ -41,7 +34,7 @@ export default function Transacciones() {
   const [activeDoc, setActiveDoc] = useState<string | number | null>(null);
 
   const [filters, setFilters] = useState<SearchFilter[]>([]);
-  const filteredData = useMemo(() => filtrarRegistros(data, filters, CAMPOS_BUSQUEDA), [data, filters]);
+  const filteredData = useMemo(() => filtrarRegistros(data, filters, CAMPOS_BUSQUEDA_TRANSACCIONES), [data, filters]);
 
   const { items: sortedData, requestSort, sortConfig } = useSortableTable(filteredData);
 
@@ -161,7 +154,7 @@ export default function Transacciones() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', marginBottom: "1rem" }}>
         <h1>Transacciones</h1>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           {isEditMode && (
@@ -178,7 +171,7 @@ export default function Transacciones() {
       
       {loading ? <p>Cargando datos...</p> : (
         <>
-        <output style={{ display: 'block', margin: '0 0 0.5rem' }}>
+        <output aria-live="polite" style={{ display: 'block', margin: '0 0 0.5rem' }}>
           {filteredData.length === 0 && filters.length > 0
             ? 'No se encontraron registros con los filtros aplicados.'
             : `Mostrando ${filteredData.length} de ${data.length} registros`}

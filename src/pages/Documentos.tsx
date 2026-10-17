@@ -11,15 +11,12 @@ import { updateDoc } from "firebase/firestore";
 import { useSortableTable } from "../hooks/useSortableTable";
 import SearchBar, { type SearchFilter } from "../components/SearchBar";
 import { filtrarRegistros } from "../utils/filtrarRegistros";
+import { CAMPOS_BUSQUEDA_DOCUMENTOS } from "../utils/camposBusqueda";
 
 const SEARCH_CATEGORIES = [
-  { id: 'doc', label: 'Nro. de documento' },
+  { id: 'doc', label: 'Doc ID' },
   { id: 'all', label: 'Texto libre' },
 ];
-const CAMPOS_BUSQUEDA: Record<string, string[]> = {
-  doc: ['Doc'],
-  all: ['Doc', 'Documento'],
-};
 
 export default function Documentos() {
   const [data, setData] = useState<any[]>([]);
@@ -32,7 +29,7 @@ export default function Documentos() {
   const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
 
   const [filters, setFilters] = useState<SearchFilter[]>([]);
-  const filteredData = useMemo(() => filtrarRegistros(data, filters, CAMPOS_BUSQUEDA), [data, filters]);
+  const filteredData = useMemo(() => filtrarRegistros(data, filters, CAMPOS_BUSQUEDA_DOCUMENTOS), [data, filters]);
 
   const { items: sortedData, requestSort, sortConfig } = useSortableTable(filteredData);
 
@@ -118,7 +115,7 @@ export default function Documentos() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', marginBottom: "1rem" }}>
         <h1>Documentos</h1>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           {isEditMode && (
@@ -135,7 +132,7 @@ export default function Documentos() {
       
       {loading ? <p>Cargando datos...</p> : (
         <>
-        <output style={{ display: 'block', margin: '0 0 0.5rem' }}>
+        <output aria-live="polite" style={{ display: 'block', margin: '0 0 0.5rem' }}>
           {filteredData.length === 0 && filters.length > 0
             ? 'No se encontraron registros con los filtros aplicados.'
             : `Mostrando ${filteredData.length} de ${data.length} registros`}

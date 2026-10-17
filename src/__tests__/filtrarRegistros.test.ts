@@ -2,11 +2,12 @@ import { describe, it, expect } from 'vitest';
 import { filtrarRegistros, normalizarTexto } from '../utils/filtrarRegistros';
 
 const CAMPOS = {
-  num: ['Num'],
+  num: { campos: ['Num'], modo: 'exacto' as const },
   noticia: ['Noticia'],
   fuentes: ['Fuentes para la generación del dato'],
-  doc: ['Doc1', 'Doc2'],
+  doc: { campos: ['Doc1', 'Doc2'], modo: 'exacto' as const },
   all: ['Num', 'Noticia', 'Fuentes para la generación del dato', 'Doc1', 'Doc2'],
+  libre: { campos: ['Num', 'Noticia'], modo: 'contiene' as const },
 };
 
 const datos = [
@@ -50,8 +51,35 @@ describe('filtrarRegistros', () => {
     expect(ids(filtrarRegistros(datos, [{ category: 'noticia', query: 'tela' }], CAMPOS))).toEqual(['b']);
     expect(ids(filtrarRegistros(datos, [{ category: 'fuentes', query: 'generacion' }], CAMPOS))).toEqual([]);
   });
-  it('compara valores numéricos como cadena', () => {
-    expect(ids(filtrarRegistros(datos, [{ category: 'num', query: '1' }], CAMPOS))).toEqual(['a', 'b']);
+  it('los identificadores numéricos se buscan por igualdad exacta', () => {
+    expect(ids(filtrarRegistros(datos, [{ category: 'num', query: '1' }], CAMPOS))).toEqual(['a']);
+  });
+  it('«5» no trae 15, 50 ni 105', () => {
+    const n = [5, 15, 50, 105].map(Num => ({ id: String(Num), Num }));
+    expect(ids(filtrarRegistros(n, [{ category: 'num', query: '5' }], CAMPOS))).toEqual(['5']);
+  });
+  it('acepta el prefijo Doc, Doc., Nro. o N° delante del número', () => {
+    const n = [5, 15].map(Num => ({ id: String(Num), Num }));
+    for (const q of ['Doc 5', 'Doc. 5', 'doc5', 'Nro. 5', 'N° 5', 'nro 5']) {
+      expect(ids(filtrarRegistros(n, [{ category: 'num', query: q }], CAMPOS))).toEqual(['5']);
+    }
+  });
+  it('«7.0» y «7» son iguales cuando ambos lados son numéricos', () => {
+    const n = [{ id: 'x', Num: 7 }, { id: 'y', Num: '7.0' }, { id: 'z', Num: 17 }];
+    expect(ids(filtrarRegistros(n, [{ category: 'num', query: '7.0' }], CAMPOS))).toEqual(['x', 'y']);
+    expect(ids(filtrarRegistros(n, [{ category: 'num', query: '7' }], CAMPOS))).toEqual(['x', 'y']);
+  });
+  it('el modo exacto no encuentra con consulta vacía tras quitar el prefijo', () => {
+    expect(filtrarRegistros(datos, [{ category: 'num', query: 'Doc' }], CAMPOS)).toEqual([]);
+  });
+  it('«Texto libre» y el modo por defecto siguen siendo «contiene»', () => {
+    expect(ids(filtrarRegistros(datos, [{ category: 'libre', query: '1' }], CAMPOS))).toEqual(['a', 'b']);
+    expect(ids(filtrarRegistros(datos, [{ category: 'all', query: '1' }], CAMPOS))).toEqual(['a', 'b']);
+  });
+  it('colapsa espacios y saltos de línea', () => {
+    const d = [{ id: 'k', Noticia: 'Carta\nde García' }];
+    expect(ids(filtrarRegistros(d, [{ category: 'noticia', query: 'carta de' }], CAMPOS))).toEqual(['k']);
+    expect(normalizarTexto('  a \n\t b ')).toBe('a b');
   });
   it('tolera campos ausentes y categorías desconocidas', () => {
     expect(ids(filtrarRegistros(datos, [{ category: 'fuentes', query: 'x' }], CAMPOS))).toEqual([]);
