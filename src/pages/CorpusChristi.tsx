@@ -143,7 +143,7 @@ export default function CorpusChristi() {
 
   const { items: sortedFilteredGroups, requestSort: sortGroup, sortConfig: scGroup } = useSortableTable(filteredGroups);
   const { items: sortedSearchResults, requestSort: sortSearch, sortConfig: scSearch } = useSortableTable(searchResults);
-  const { items: sortedDetailData, requestSort: sortDetail, sortConfig: scDetail } = useSortableTable(detailData);
+  const { items: sortedDetailData } = useSortableTable(detailData);
 
   const SortIndicator = ({ column, sc }: { column: string, sc: any }) => {
     if (!sc || sc.key !== column) return null;
@@ -271,11 +271,11 @@ export default function CorpusChristi() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => sortDetail('Encargo')} style={{ cursor: 'pointer' }}>Encargo <SortIndicator column="Encargo" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Encargado ')} style={{ cursor: 'pointer' }}>Encargado <SortIndicator column="Encargado " sc={scDetail} /></th>
+                <th scope="col">Encargo</th>
+                <th scope="col">Encargado</th>
                 <th>Compañías</th>
-                <th onClick={() => sortDetail('Monto a pagar')} style={{ cursor: 'pointer' }}>Monto a pagar <SortIndicator column="Monto a pagar" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Fondos')} style={{ cursor: 'pointer' }}>Fondos <SortIndicator column="Fondos" sc={scDetail} /></th>
+                <th scope="col">Monto a pagar</th>
+                <th scope="col">Fondos</th>
                 <th>Documentos</th>
                 <th></th>
                 {isEditMode && <th>Admin</th>}

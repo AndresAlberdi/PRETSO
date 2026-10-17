@@ -164,7 +164,7 @@ export default function Salarios() {
 
   const { items: sortedFilteredCompanias, requestSort: sortComp, sortConfig: scComp } = useSortableTable(filteredCompanias);
   const { items: sortedSearchResults, requestSort: sortSearch, sortConfig: scSearch } = useSortableTable(searchResults);
-  const { items: sortedDetailData, requestSort: sortDetail, sortConfig: scDetail } = useSortableTable(detailData);
+  const { items: sortedDetailData } = useSortableTable(detailData);
 
   const SortIndicator = ({ column, sc }: { column: string, sc: any }) => {
     if (!sc || sc.key !== column) return null;
@@ -305,11 +305,11 @@ export default function Salarios() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => sortDetail('Ciudad')} style={{ cursor: 'pointer' }}>Ciudad <SortIndicator column="Ciudad" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Año')} style={{ cursor: 'pointer' }}>Año <SortIndicator column="Año" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Beneficiario ')} style={{ cursor: 'pointer' }}>Personas <SortIndicator column="Beneficiario " sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Encargo')} style={{ cursor: 'pointer' }}>Ocupación <SortIndicator column="Encargo" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Monto a pagar')} style={{ cursor: 'pointer' }}>Remuneración <SortIndicator column="Monto a pagar" sc={scDetail} /></th>
+                <th scope="col">Ciudad</th>
+                <th scope="col">Año</th>
+                <th scope="col">Personas</th>
+                <th scope="col">Ocupación</th>
+                <th scope="col">Remuneración</th>
                 <th>Documentos</th>
                 <th></th>
                 {isEditMode && <th>Admin</th>}

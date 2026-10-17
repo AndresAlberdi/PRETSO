@@ -22,6 +22,7 @@ const COLLECTION_LABELS: Record<string, string> = {
 };
 
 const FIELD_LABEL_MAP: Record<string, string> = {
+  'Num': 'Nro.',
   'Sigla Compañía': 'Compañía',
   'Año': 'Año',
   'Años': 'Años',

@@ -163,7 +163,7 @@ export default function ManejoCaja() {
 
   const { items: sortedFilteredCompanias, requestSort: sortComp, sortConfig: scComp } = useSortableTable(filteredCompanias);
   const { items: sortedSearchResults, requestSort: sortSearch, sortConfig: scSearch } = useSortableTable(searchResults);
-  const { items: sortedDetailData, requestSort: sortDetail, sortConfig: scDetail } = useSortableTable(detailData);
+  const { items: sortedDetailData } = useSortableTable(detailData);
 
   const SortIndicator = ({ column, sc }: { column: string, sc: any }) => {
     if (!sc || sc.key !== column) return null;
@@ -304,11 +304,11 @@ export default function ManejoCaja() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => sortDetail('Ciudad')} style={{ cursor: 'pointer' }}>Ciudad <SortIndicator column="Ciudad" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Año')} style={{ cursor: 'pointer' }}>Año <SortIndicator column="Año" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Ingresos')} style={{ cursor: 'pointer' }}>Ingresos <SortIndicator column="Ingresos" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Egresos')} style={{ cursor: 'pointer' }}>Egresos <SortIndicator column="Egresos" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Otros bienes de la compañía')} style={{ cursor: 'pointer' }}>Otros bienes <SortIndicator column="Otros bienes de la compañía" sc={scDetail} /></th>
+                <th scope="col">Ciudad</th>
+                <th scope="col">Año</th>
+                <th scope="col">Ingresos</th>
+                <th scope="col">Egresos</th>
+                <th scope="col">Otros bienes</th>
                 <th>Documentos</th>
                 <th></th>
                 {isEditMode && <th>Admin</th>}
