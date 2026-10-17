@@ -64,28 +64,43 @@ export default function IndiceCompanias() {
     return null;
   };
 
+  const MENSAJE_FALLO_VERIFICACION =
+    'No se pudo verificar si la compañía tiene registros vinculados; no se borró. Intente de nuevo.';
+
   const checkRecordsAndNavigate = async (collectionName: string, path: string, item: any) => {
     setIsAnalyzing(true);
-    const count = await contarReferenciasACompania(collectionName, item);
-    setIsAnalyzing(false);
-    if (count === 0) {
-      setAlertMessage(`No existen registros en esta sección para la compañía seleccionada.`);
-    } else {
-      navigate(`${path}?compania=${item["Indicador de registro"]}`);
+    try {
+      const count = await contarReferenciasACompania(collectionName, item);
+      if (count === 0) {
+        setAlertMessage(`No existen registros en esta sección para la compañía seleccionada.`);
+      } else {
+        navigate(`${path}?compania=${item["Indicador de registro"]}`);
+      }
+    } catch (error) {
+      console.error("Error verificando registros vinculados: ", error);
+      setAlertMessage(MENSAJE_FALLO_VERIFICACION);
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 
   const attemptDelete = async (row: any) => {
     setIsAnalyzing(true);
-    const [error] = await Promise.all([
-      checkReferentialIntegrity(row),
-      new Promise(resolve => setTimeout(resolve, 1000))
-    ]);
-    setIsAnalyzing(false);
-    if (error) {
-      setAlertMessage(error);
-    } else {
-      setRecordToDelete(row);
+    try {
+      const [error] = await Promise.all([
+        checkReferentialIntegrity(row),
+        new Promise(resolve => setTimeout(resolve, 1000))
+      ]);
+      if (error) {
+        setAlertMessage(error);
+      } else {
+        setRecordToDelete(row);
+      }
+    } catch (error) {
+      console.error("Error verificando integridad referencial: ", error);
+      setAlertMessage(MENSAJE_FALLO_VERIFICACION);
+    } finally {
+      setIsAnalyzing(false);
     }
   };
 

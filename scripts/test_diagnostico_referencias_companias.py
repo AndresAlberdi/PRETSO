@@ -84,7 +84,8 @@ class _Db:
     }
 
     def collection(self, nombre):
-        return mock.Mock(stream=lambda: [_Doc(d) for d in self.DATOS[nombre]])
+        # Solo lectura de verdad: cualquier .set()/.add()/.document() hace fallar la prueba
+        return mock.Mock(spec=['stream'], stream=lambda: [_Doc(d) for d in self.DATOS[nombre]])
 
 
 class SalidaTest(unittest.TestCase):

@@ -10,6 +10,7 @@ const companias = [
 
 let colecciones: Record<string, any[]> = {};
 const deleteDoc = vi.hoisted(() => vi.fn());
+const fallo = vi.hoisted(() => ({ coleccion: null as string | null }));
 
 vi.mock('../firebase', () => ({ db: {} }));
 vi.mock('../utils/audit', () => ({ logAction: vi.fn() }));
@@ -26,6 +27,7 @@ vi.mock('firebase/firestore', () => ({
   addDoc: vi.fn(),
   getDocs: async (q: string | { nombre: string; filtros: any[] }) => {
     const nombre = typeof q === 'string' ? q : q.nombre;
+    if (fallo.coleccion === nombre) throw new Error('fallo simulado de lectura');
     const filtros = typeof q === 'string' ? [] : q.filtros;
     const docs = (colecciones[nombre] ?? []).filter(d => filtros.every(f => d[f.campo] === f.valor));
     return { empty: docs.length === 0, size: docs.length, docs: docs.map(d => ({ id: d.id, data: () => d })) };
@@ -34,6 +36,7 @@ vi.mock('firebase/firestore', () => ({
 
 beforeEach(() => {
   deleteDoc.mockReset().mockResolvedValue(undefined);
+  fallo.coleccion = null;
   colecciones = { companias, manejo_de_caja: [], salarios: [], corpus_christi: [], indicadores: [] };
 });
 afterEach(cleanup);
@@ -94,5 +97,33 @@ describe('borrado de compañías: integridad referencial', () => {
     colecciones.corpus_christi = [{ id: 'k1', 'Compañía': 7, Cmp: 7 }];
     await intentarBorrar('GA-JR');
     expect(await screen.findByText(/vinculada a 1 registro\(s\)/, {}, { timeout: 4000 })).toBeTruthy();
+  });
+
+  it.each([
+    ['ga-jr', 'sigla heredada en minúsculas'],
+    ['GA-JR ', 'sigla heredada con espacio'],
+    ['7.0', 'número en texto'],
+  ])('referencia heredada %j (%s) bloquea el borrado', async (valor) => {
+    colecciones.salarios = [{ id: 'r1', 'Sigla Compañía': valor }];
+    await intentarBorrar('GA-JR');
+    expect(await screen.findByText(/1 en Remuneraciones/, {}, { timeout: 4000 })).toBeTruthy();
+    expect(screen.queryByText('Confirmar Borrado')).toBeNull();
+  });
+
+  it('una compañía sin referencias no se confunde con otra distinta referenciada', async () => {
+    colecciones.manejo_de_caja = [{ id: 'r1', 'Sigla Compañía': 12 }, { id: 'r2', 'Sigla Compañía': 'jg' }];
+    colecciones.corpus_christi = [{ id: 'k1', Cmp2: 12, 'Compañía10': 'JG' }];
+    await intentarBorrar('GA-JR');
+    expect(await screen.findByText('Confirmar Borrado', {}, { timeout: 4000 })).toBeTruthy();
+    expect(screen.queryByText(/vinculada/)).toBeNull();
+  });
+
+  it('si una lectura falla: avisa, no pide confirmación, no borra y cierra la capa de análisis', async () => {
+    fallo.coleccion = 'corpus_christi';
+    await intentarBorrar('GA-JR');
+    expect(await screen.findByText(/No se pudo verificar si la compañía tiene registros vinculados; no se borró/, {}, { timeout: 4000 })).toBeTruthy();
+    expect(screen.queryByText('Confirmar Borrado')).toBeNull();
+    expect(deleteDoc).not.toHaveBeenCalled();
+    expect(screen.queryByText(/analizando/i)).toBeNull();
   });
 });

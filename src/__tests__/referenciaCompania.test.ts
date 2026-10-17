@@ -4,6 +4,7 @@ import {
   valorDeReferencia, etiquetaCompania, esCampoCompaniaCorpus,
   camposReferenciaCompania, valoresDeBusquedaReferencia,
 } from '../utils/referenciaCompania';
+import { COLUMN_ORDERS } from '../utils/xlsxExport';
 
 const companias = [
   { id: 'a', 'Indicador de registro': 7.0, 'Sigla Compañía': 'GA-JR', Autores: 'Alarcón y Ramírez' },
@@ -88,6 +89,7 @@ describe('esCampoCompaniaCorpus', () => {
 describe('camposReferenciaCompania', () => {
   it('Corpus Christi: Compañía, Compañía2…10, Cmp y Cmp2, todos reconocidos por esCampoCompaniaCorpus', () => {
     const campos = camposReferenciaCompania('corpus_christi');
+    expect(campos).toEqual(COLUMN_ORDERS.corpus_christi.filter(esCampoCompaniaCorpus));
     expect(campos).toHaveLength(12);
     expect(campos).toEqual(expect.arrayContaining(['Compañía', 'Compañía2', 'Compañía10', 'Cmp', 'Cmp2']));
     expect(campos.every(esCampoCompaniaCorpus)).toBe(true);
