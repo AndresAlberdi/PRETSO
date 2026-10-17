@@ -20,7 +20,7 @@ const COLUMN_ORDERS: Record<string, string[]> = {
   companias: ['Indicador de registro', 'Sigla Compañía', 'Autores', 'Temporadas teatrales', 'Índice de compañías', 'Ámbito'],
   transacciones: ['Num', 'Noticia', 'Fuentes para la generación del dato', 'Doc1', 'Doc2', 'Doc3', 'Doc4', 'Doc5', 'Doc6', 'Doc7', 'Doc8', 'Doc9', 'Doc10'],
   manejo_de_caja: ['Indicador de registro', 'Sigla Compañía', 'Año', 'Ciudad', 'Ingresos', 'Egresos', 'Otros bienes de la compañía', 'Transacción', 'Datos sobre normativa de manejo de caja'],
-  salarios: ['Indicador de registro', 'Sigla Compañía', 'Año', 'Ciudad', 'Beneficiario ', 'Encargo', 'Monto a pagar', 'Transacción', 'Ración diaria', 'Pago por representación', 'Días de ración en un año', 'Número estimado de representaciones por año', 'Número de representaciones  por año '],
+  salarios: ['Indicador de registro', 'Sigla Compañía', 'Año', 'Ciudad', 'Beneficiario ', 'Encargo', 'Monto a pagar', 'Transacción', 'Ración diaria', 'Pago por representación'],
   corpus_christi: ['Indicador de registro', 'Ciudad', 'Año', 'Encargado ', 'Encargo', 'Monto a pagar', 'Fondos', 'Transacción', 'Compañía', 'Compañía2', 'Compañía3', 'Compañía4', 'Compañía5', 'Compañía6', 'Compañía7', 'Compañía8', 'Compañía9', 'Compañía10', 'Cmp', 'Cmp2'],
   indicadores: ['Indicador de registro', 'Ciudad', 'Años', 'Concepto', 'Monto', 'Nota', 'Categorías', 'Transacción', 'Sigla Compañía'],
   bibliografia: ['Autores', 'Referencias bibliográficas']
@@ -30,7 +30,6 @@ const COLUMN_ORDERS: Record<string, string[]> = {
 const HEADER_CLEANUPS: Record<string, string> = {
   'Beneficiario ': 'Beneficiario',
   'Encargado ': 'Encargado',
-  'Número de representaciones  por año ': 'Número de representaciones por año',
 };
 
 export async function generateDatabaseXlsx(): Promise<Blob> {
