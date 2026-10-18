@@ -260,7 +260,7 @@ export default function Salarios() {
                       );
                     })()}
                   </td>
-                  <td style={{ display: 'flex', gap: '0.5rem' }}>
+                  <td><div className="acciones-celda">
                     {row["Transacción"] && (
                       isBroken ? 
                         <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
@@ -268,12 +268,12 @@ export default function Salarios() {
                         <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
                       )
                     )}
-                  </td>
+                  </div></td>
                   {isEditMode && (
-                    <td style={{ display: 'flex', gap: '0.5rem' }}>
+                    <td><div className="acciones-celda">
                       <button onClick={() => setRecordToEdit(registro)} style={{ background: 'var(--primary-color)' }}>Editar</button>
                       <button onClick={() => attemptDelete(registro)} style={{ background: '#ff4d4f' }}>Borrar</button>
-                    </td>
+                    </div></td>
                   )}
                 </tr>
               )})}
@@ -380,7 +380,7 @@ export default function Salarios() {
                       );
                     })()}
                   </td>
-                  <td style={{ display: 'flex', gap: '0.5rem' }}>
+                  <td><div className="acciones-celda">
                     {row["Transacción"] && (
                       isBroken ? 
                         <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
@@ -388,12 +388,12 @@ export default function Salarios() {
                         <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
                       )
                     )}
-                  </td>
+                  </div></td>
                   {isEditMode && (
-                    <td style={{ display: 'flex', gap: '0.5rem' }}>
+                    <td><div className="acciones-celda">
                       <button onClick={() => setRecordToEdit(row)} style={{ background: 'var(--primary-color)' }}>Editar</button>
                       <button onClick={() => attemptDelete(row)} style={{ background: '#ff4d4f' }}>Borrar</button>
-                    </td>
+                    </div></td>
                   )}
                 </tr>
               )})}

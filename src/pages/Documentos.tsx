@@ -150,10 +150,10 @@ export default function Documentos() {
                   <td style={{ textAlign: 'center' }}>{row["Doc"]}</td>
                   <td style={{ maxWidth: '600px' }}>{row["Documento"]}</td>
                   {isEditMode && (
-                    <td style={{ display: 'flex', gap: '0.5rem' }}>
+                    <td><div className="acciones-celda">
                       <button onClick={() => setRecordToEdit(row)} style={{ background: 'var(--primary-color)' }}>Editar</button>
                       <button onClick={() => attemptDelete(row)} style={{ background: '#ff4d4f' }}>Borrar</button>
-                    </td>
+                    </div></td>
                   )}
                 </tr>
               ))}

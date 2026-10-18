@@ -228,6 +228,12 @@ td {
   border-bottom: 1px solid var(--border-color);
 }
 
+/* Botones dentro de una celda: el flex va en un div para no romper la semántica del td (WCAG 1.3.1) */
+.acciones-celda {
+  display: flex;
+  gap: 0.5rem;
+}
+
 tr {
   transition: background-color 0.15s ease-in-out;
 }
