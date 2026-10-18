@@ -47,6 +47,15 @@ const panelStyle: React.CSSProperties = {
   boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
 };
 
+// Error de validación del formulario: indica el campo inválido para marcarlo y enlazarlo con el mensaje.
+class ValidationError extends Error {
+  readonly field: string;
+  constructor(field: string, message: string) {
+    super(message);
+    this.field = field;
+  }
+}
+
 const fieldsetStyle: React.CSSProperties = { border: 0, padding: 0, margin: 0, minWidth: 0 };
 const legendStyle: React.CSSProperties = { padding: 0, fontWeight: 'bold', marginBottom: '0.5rem' };
 
@@ -54,12 +63,14 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorField, setErrorField] = useState<string | null>(null);
   // Se activa con cualquier edición del usuario (no con los valores por defecto precargados);
   // decide si Escape pide confirmar el descarte.
   const [touched, setTouched] = useState(false);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
   const titleId = useId();
   const fieldId = useId();
+  const errorId = `${fieldId}-error`;
   const closeRef = useRef<HTMLButtonElement>(null);
 
   // Integridad del alta: la protección contra doble envío es síncrona (el estado `saving` se
@@ -184,6 +195,9 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
     loadFormContext();
   }, [collectionName]);
 
+  const invalidProps = (field: string): { 'aria-invalid'?: true; 'aria-describedby'?: string } =>
+    errorField === field ? { 'aria-invalid': true, 'aria-describedby': errorId } : {};
+
   const handleChange = (key: string, value: any) => {
     setTouched(true);
     setFormData((prev: any) => ({ ...prev, [key]: value }));
@@ -203,6 +217,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
     if (enviandoRef.current) return;
     enviandoRef.current = true;
     setError(null);
+    setErrorField(null);
     setSaving(true);
 
     try {
@@ -225,7 +240,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
       if (collectionName === 'transacciones') {
         const docCount = selectedDocs.filter(Boolean).length;
         if (docCount === 0) {
-          throw new Error("Debe asociar al menos un documento a la transacción.");
+          throw new ValidationError('Doc', "Debe asociar al menos un documento a la transacción.");
         }
         for (let i = 0; i < 10; i++) {
           recordToSave[`Doc${i + 1}`] = selectedDocs[i] ? Number(selectedDocs[i]) : null;
@@ -235,10 +250,10 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
       // Indicadores
       if (collectionName === 'indicadores') {
         if (!recordToSave['Categorías'] || !recordToSave['Categorías'].trim()) {
-          throw new Error("Debe ingresar o seleccionar una categoría.");
+          throw new ValidationError('Categorías', "Debe ingresar o seleccionar una categoría.");
         }
         if (!recordToSave['Transacción']) {
-          throw new Error("Debe asociar obligatoriamente una transacción existente.");
+          throw new ValidationError('Transacción', "Debe asociar obligatoriamente una transacción existente.");
         }
         recordToSave['Transacción'] = Number(recordToSave['Transacción']);
         recordToSave['Años'] = recordToSave['Años'] ? String(recordToSave['Años']).trim() : '';
@@ -247,13 +262,13 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
       // Corpus Christi
       if (collectionName === 'corpus_christi') {
         if (!recordToSave['Ciudad'] || !recordToSave['Ciudad'].trim()) {
-          throw new Error("Debe ingresar o seleccionar una ciudad.");
+          throw new ValidationError('Ciudad', "Debe ingresar o seleccionar una ciudad.");
         }
         if (!recordToSave['Año']) {
-          throw new Error("Debe ingresar o seleccionar un año.");
+          throw new ValidationError('Año', "Debe ingresar o seleccionar un año.");
         }
         if (!recordToSave['Transacción']) {
-          throw new Error("Debe asociar obligatoriamente una transacción existente.");
+          throw new ValidationError('Transacción', "Debe asociar obligatoriamente una transacción existente.");
         }
         recordToSave['Transacción'] = Number(recordToSave['Transacción']);
         recordToSave['Año'] = Number(recordToSave['Año']);
@@ -262,10 +277,10 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
       // Salarios
       if (collectionName === 'salarios') {
         if (canonizarReferencia(recordToSave['Sigla Compañía']) === '') {
-          throw new Error("Debe elegir una compañía existente.");
+          throw new ValidationError('Sigla Compañía', "Debe elegir una compañía existente.");
         }
         if (!recordToSave['Transacción']) {
-          throw new Error("Debe asociar obligatoriamente una transacción existente.");
+          throw new ValidationError('Transacción', "Debe asociar obligatoriamente una transacción existente.");
         }
         recordToSave['Transacción'] = Number(recordToSave['Transacción']);
         recordToSave['Año'] = Number(recordToSave['Año']);
@@ -276,10 +291,10 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
       // Manejo de Caja
       if (collectionName === 'manejo_de_caja') {
         if (canonizarReferencia(recordToSave['Sigla Compañía']) === '') {
-          throw new Error("Debe elegir una compañía existente.");
+          throw new ValidationError('Sigla Compañía', "Debe elegir una compañía existente.");
         }
         if (!recordToSave['Transacción']) {
-          throw new Error("Debe asociar obligatoriamente una transacción existente.");
+          throw new ValidationError('Transacción', "Debe asociar obligatoriamente una transacción existente.");
         }
         recordToSave['Transacción'] = Number(recordToSave['Transacción']);
         recordToSave['Año'] = Number(recordToSave['Año']);
@@ -288,10 +303,10 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
       // Bibliografía validation
       if (collectionName === 'bibliografia') {
         if (!recordToSave['Autores'] || !recordToSave['Autores'].trim()) {
-          throw new Error("Debe completar el campo 'Autores'.");
+          throw new ValidationError('Autores', "Debe completar el campo 'Autores'.");
         }
         if (!recordToSave['Referencias bibliográficas'] || !recordToSave['Referencias bibliográficas'].trim()) {
-          throw new Error("Debe completar las 'Referencias bibliográficas'.");
+          throw new ValidationError('Referencias bibliográficas', "Debe completar las 'Referencias bibliográficas'.");
         }
       }
 
@@ -325,8 +340,10 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
       if (escritoRef.current) {
         // El documento ya existe: el error es posterior a la escritura y los cambios nuevos no se reescriben.
         setError("El registro ya se guardó; ciérrelo con «Cerrar».");
+        setErrorField(null);
       } else {
         setError(err.message || "Error al guardar el nuevo registro.");
+        setErrorField(err instanceof ValidationError ? err.field : null);
       }
     } finally {
       enviandoRef.current = false;
@@ -408,6 +425,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                         <label htmlFor={`${fieldId}-doc-${i}`} style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Documento {i + 1}</label>
                         <select
                           id={`${fieldId}-doc-${i}`}
+                          {...(i === 0 ? invalidProps('Doc') : {})}
                           value={selectedDocs[i]}
                           onChange={e => handleDocChange(i, e.target.value)}
                         >
@@ -483,6 +501,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <input
                     type="text"
                     required
+                    {...invalidProps('Autores')}
                     value={formData['Autores'] || ''}
                     onChange={e => handleChange('Autores', e.target.value)}
                     placeholder="Autores del documento..."
@@ -493,6 +512,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <textarea
                     required
                     rows={4}
+                    {...invalidProps('Referencias bibliográficas')}
                     value={formData['Referencias bibliográficas'] || ''}
                     onChange={e => handleChange('Referencias bibliográficas', e.target.value)}
                     placeholder="Detalles bibliográficos..."
@@ -509,6 +529,8 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <SelectorCompania
                     id={`${fieldId}-compania`}
                     required
+                    ariaInvalid={errorField === 'Sigla Compañía'}
+                    ariaDescribedBy={errorField === 'Sigla Compañía' ? errorId : undefined}
                     companias={companies}
                     cargando={loading}
                     value={formData['Sigla Compañía']}
@@ -520,6 +542,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Transacción Relacionada (Obligatorio)</strong>
                   <select
                     required
+                    {...invalidProps('Transacción')}
                     value={formData['Transacción'] || ''}
                     onChange={e => handleChange('Transacción', e.target.value)}
                   >
@@ -590,6 +613,8 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <SelectorCompania
                     id={`${fieldId}-compania`}
                     required
+                    ariaInvalid={errorField === 'Sigla Compañía'}
+                    ariaDescribedBy={errorField === 'Sigla Compañía' ? errorId : undefined}
                     companias={companies}
                     cargando={loading}
                     value={formData['Sigla Compañía']}
@@ -601,6 +626,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Transacción Relacionada (Obligatorio)</strong>
                   <select
                     required
+                    {...invalidProps('Transacción')}
                     value={formData['Transacción'] || ''}
                     onChange={e => handleChange('Transacción', e.target.value)}
                   >
@@ -714,6 +740,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                       <select
                         required
                         aria-labelledby={`${fieldId}-ciudad-leyenda`}
+                        {...invalidProps('Ciudad')}
                         value={formData['Ciudad'] || ''}
                         onChange={e => handleChange('Ciudad', e.target.value)}
                       >
@@ -723,6 +750,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                       <input
                         type="text"
                         aria-labelledby={`${fieldId}-ciudad-leyenda`}
+                        {...invalidProps('Ciudad')}
                         required
                         placeholder="Nombre de la nueva ciudad"
                         value={formData['Ciudad'] || ''}
@@ -749,6 +777,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                       <select
                         required
                         aria-labelledby={`${fieldId}-anio-leyenda`}
+                        {...invalidProps('Año')}
                         value={formData['Año'] || ''}
                         onChange={e => handleChange('Año', e.target.value)}
                       >
@@ -758,6 +787,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                       <input
                         type="number"
                         aria-labelledby={`${fieldId}-anio-leyenda`}
+                        {...invalidProps('Año')}
                         required
                         placeholder="Año (numérico)"
                         value={formData['Año'] || ''}
@@ -771,6 +801,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Transacción Relacionada (Obligatorio)</strong>
                   <select
                     required
+                    {...invalidProps('Transacción')}
                     value={formData['Transacción'] || ''}
                     onChange={e => handleChange('Transacción', e.target.value)}
                   >
@@ -845,6 +876,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                       <select
                         required
                         aria-labelledby={`${fieldId}-categoria-leyenda`}
+                        {...invalidProps('Categorías')}
                         value={formData['Categorías'] || ''}
                         onChange={e => handleChange('Categorías', e.target.value)}
                       >
@@ -854,6 +886,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                       <input
                         type="text"
                         aria-labelledby={`${fieldId}-categoria-leyenda`}
+                        {...invalidProps('Categorías')}
                         required
                         placeholder="Nombre de la nueva categoría"
                         value={formData['Categorías'] || ''}
@@ -867,6 +900,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Transacción Relacionada (Obligatorio)</strong>
                   <select
                     required
+                    {...invalidProps('Transacción')}
                     value={formData['Transacción'] || ''}
                     onChange={e => handleChange('Transacción', e.target.value)}
                   >
@@ -929,7 +963,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
               </>
             )}
 
-            {error && <div style={{ color: '#ff4d4f', background: 'rgba(255,77,79,0.1)', padding: '0.8rem', borderRadius: '4px', textAlign: 'center', fontSize: '0.95rem' }}>{error}</div>}
+            {error && <div id={errorId} role="alert" style={{ color: '#ff4d4f', background: 'rgba(255,77,79,0.1)', padding: '0.8rem', borderRadius: '4px', textAlign: 'center', fontSize: '0.95rem' }}>{error}</div>}
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
               <button
