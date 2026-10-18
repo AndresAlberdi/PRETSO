@@ -62,6 +62,7 @@ export default function Login() {
             Correo Electrónico
             <input
               type="email"
+              autoComplete="username"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -72,6 +73,7 @@ export default function Login() {
             Contraseña
             <input
               type="password"
+              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -79,7 +81,7 @@ export default function Login() {
             />
           </label>
           
-          {error && <div style={{ color: '#ff6b6b', fontSize: '0.9rem', textAlign: 'center', background: 'rgba(255, 107, 107, 0.1)', padding: '0.5rem', borderRadius: '4px' }}>{error}</div>}
+          {error && <div role="alert" style={{ color: '#ff6b6b', fontSize: '0.9rem', textAlign: 'center', background: 'rgba(255, 107, 107, 0.1)', padding: '0.5rem', borderRadius: '4px' }}>{error}</div>}
           
           <button type="submit" disabled={loading} style={{ marginTop: '0.5rem' }}>
             {loading ? 'Cargando...' : 'Entrar'}
