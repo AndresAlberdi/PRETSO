@@ -191,6 +191,7 @@ export default function CorpusChristi() {
         <div>
           <h2>Resultados de Búsqueda ({sortedSearchResults.length} registros)</h2>
           <table className="sortable">
+            <caption className="visually-hidden">Resultados de búsqueda en Corpus Christi</caption>
             <thead>
               <tr>
                 <SortableTh label="Ciudad" sortKey="Ciudad" sortConfig={scSearch} onSort={sortSearch} />
@@ -198,7 +199,7 @@ export default function CorpusChristi() {
                 <SortableTh label="Encargado" sortKey="Encargado " sortConfig={scSearch} onSort={sortSearch} />
                 <SortableTh label="Monto a pagar" sortKey="Monto a pagar" sortConfig={scSearch} onSort={sortSearch} />
                 <th scope="col">Documentos</th>
-                <th></th>
+                <th scope="col"><span className="visually-hidden">Transacción</span></th>
                 {isEditMode && <th scope="col">Admin</th>}
               </tr>
             </thead>
@@ -225,7 +226,7 @@ export default function CorpusChristi() {
                       );
                     })()}
                   </td>
-                  <td style={{ display: 'flex', gap: '0.5rem' }}>
+                  <td><div className="acciones-celda">
                     {row["Transacción"] && (
                       isBroken ? 
                         <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
@@ -233,12 +234,12 @@ export default function CorpusChristi() {
                         <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
                       )
                     )}
-                  </td>
+                  </div></td>
                   {isEditMode && (
-                    <td style={{ display: 'flex', gap: '0.5rem' }}>
+                    <td><div className="acciones-celda">
                       <button onClick={() => setRecordToEdit(row)} style={{ background: 'var(--primary-color)' }}>Editar</button>
                       <button onClick={() => attemptDelete(row)} style={{ background: '#ff4d4f' }}>Borrar</button>
-                    </td>
+                    </div></td>
                   )}
                 </tr>
               )})}
@@ -266,11 +267,12 @@ export default function CorpusChristi() {
             </select>
           </div>
           <table className="sortable">
+            <caption className="visually-hidden">Ciudades y años de Corpus Christi</caption>
             <thead>
               <tr>
                 <SortableTh label="Ciudad" sortKey="ciudad" sortConfig={scGroup} onSort={sortGroup} />
                 <SortableTh label="Año" sortKey="año" sortConfig={scGroup} onSort={sortGroup} />
-                <th></th>
+                <th scope="col"><span className="visually-hidden">Detalle</span></th>
               </tr>
             </thead>
             <tbody>
@@ -288,6 +290,7 @@ export default function CorpusChristi() {
         <div style={{ overflowX: "auto" }}>
           <div style={{ marginBottom: '1rem' }}><p style={{ color: 'var(--text-muted)' }}>{sortedDetailData.length} transacciones registradas</p></div>
           <table className="sortable">
+            <caption className="visually-hidden">{`Transacciones de Corpus Christi en ${selectedCityYear.ciudad}, ${selectedCityYear.año}`}</caption>
             <thead>
               <tr>
                 <th scope="col">Encargo</th>
@@ -296,7 +299,7 @@ export default function CorpusChristi() {
                 <th scope="col">Monto a pagar</th>
                 <th scope="col">Fondos</th>
                 <th scope="col">Documentos</th>
-                <th></th>
+                <th scope="col"><span className="visually-hidden">Transacción</span></th>
                 {isEditMode && <th scope="col">Admin</th>}
               </tr>
             </thead>
@@ -328,7 +331,7 @@ export default function CorpusChristi() {
                       );
                     })()}
                   </td>
-                  <td style={{ display: 'flex', gap: '0.5rem' }}>
+                  <td><div className="acciones-celda">
                     {row["Transacción"] && (
                       isBroken ? 
                         <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
@@ -336,12 +339,12 @@ export default function CorpusChristi() {
                         <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
                       )
                     )}
-                  </td>
+                  </div></td>
                   {isEditMode && (
-                    <td style={{ display: 'flex', gap: '0.5rem' }}>
+                    <td><div className="acciones-celda">
                       <button onClick={() => setRecordToEdit(row)} style={{ background: 'var(--primary-color)' }}>Editar</button>
                       <button onClick={() => attemptDelete(row)} style={{ background: '#ff4d4f' }}>Borrar</button>
-                    </td>
+                    </div></td>
                   )}
                 </tr>
               )})}

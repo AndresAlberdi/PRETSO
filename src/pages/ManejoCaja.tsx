@@ -221,13 +221,14 @@ export default function ManejoCaja() {
         <div>
           <h2>Resultados de Búsqueda ({sortedSearchResults.length} registros)</h2>
           <table className="sortable">
+            <caption className="visually-hidden">Resultados de búsqueda en Manejo de Caja</caption>
             <thead>
               <tr>
                 <SortableTh label="Compañía" sortKey="__sigla" sortConfig={scSearch} onSort={sortSearch} />
                 <SortableTh label="Ciudad" sortKey="Ciudad" sortConfig={scSearch} onSort={sortSearch} />
                 <SortableTh label="Año" sortKey="Año" sortConfig={scSearch} onSort={sortSearch} />
                 <th scope="col">Documentos</th>
-                <th></th>
+                <th scope="col"><span className="visually-hidden">Transacción</span></th>
                 {isEditMode && <th scope="col">Admin</th>}
               </tr>
             </thead>
@@ -258,7 +259,7 @@ export default function ManejoCaja() {
                       );
                     })()}
                   </td>
-                  <td style={{ display: 'flex', gap: '0.5rem' }}>
+                  <td><div className="acciones-celda">
                     {row["Transacción"] && (
                       isBroken ? 
                         <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
@@ -266,12 +267,12 @@ export default function ManejoCaja() {
                         <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
                       )
                     )}
-                  </td>
+                  </div></td>
                   {isEditMode && (
-                    <td style={{ display: 'flex', gap: '0.5rem' }}>
+                    <td><div className="acciones-celda">
                       <button onClick={() => setRecordToEdit(registro)} style={{ background: 'var(--primary-color)' }}>Editar</button>
                       <button onClick={() => attemptDelete(registro)} style={{ background: '#ff4d4f' }}>Borrar</button>
-                    </td>
+                    </div></td>
                   )}
                 </tr>
               )})}
@@ -310,13 +311,14 @@ export default function ManejoCaja() {
             </select>
           </div>
           <table className="sortable">
+            <caption className="visually-hidden">Compañías de Manejo de Caja</caption>
             <thead>
               <tr>
                 <SortableTh label="Compañía" sortKey="Sigla Compañía" sortConfig={scComp} onSort={sortComp} />
                 <SortableTh label="Autores" sortKey="Autores" sortConfig={scComp} onSort={sortComp} />
                 <SortableTh label="Temporadas" sortKey="Temporadas teatrales" sortConfig={scComp} onSort={sortComp} />
                 <SortableTh label="Ámbito" sortKey="Ámbito" sortConfig={scComp} onSort={sortComp} />
-                <th></th>
+                <th scope="col"><span className="visually-hidden">Detalle</span></th>
               </tr>
             </thead>
             <tbody>
@@ -340,6 +342,7 @@ export default function ManejoCaja() {
         <div style={{ overflowX: "auto" }}>
           <div style={{ marginBottom: '1rem' }}><p style={{ color: 'var(--text-muted)' }}>{sortedDetailData.length} registros para {siglaSeleccionada}</p></div>
           <table className="sortable">
+            <caption className="visually-hidden">{`Registros de caja de ${siglaSeleccionada}`}</caption>
             <thead>
               <tr>
                 <th scope="col">Ciudad</th>
@@ -348,7 +351,7 @@ export default function ManejoCaja() {
                 <th scope="col">Egresos</th>
                 <th scope="col">Otros bienes</th>
                 <th scope="col">Documentos</th>
-                <th></th>
+                <th scope="col"><span className="visually-hidden">Transacción</span></th>
                 {isEditMode && <th scope="col">Admin</th>}
               </tr>
             </thead>
@@ -376,7 +379,7 @@ export default function ManejoCaja() {
                       );
                     })()}
                   </td>
-                  <td style={{ display: 'flex', gap: '0.5rem' }}>
+                  <td><div className="acciones-celda">
                     {row["Transacción"] && (
                       isBroken ? 
                         <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
@@ -384,12 +387,12 @@ export default function ManejoCaja() {
                         <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
                       )
                     )}
-                  </td>
+                  </div></td>
                   {isEditMode && (
-                    <td style={{ display: 'flex', gap: '0.5rem' }}>
+                    <td><div className="acciones-celda">
                       <button onClick={() => setRecordToEdit(row)} style={{ background: 'var(--primary-color)' }}>Editar</button>
                       <button onClick={() => attemptDelete(row)} style={{ background: '#ff4d4f' }}>Borrar</button>
-                    </td>
+                    </div></td>
                   )}
                 </tr>
               )})}

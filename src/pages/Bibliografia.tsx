@@ -89,6 +89,7 @@ export default function Bibliografia() {
       {loading ? <p>Cargando datos...</p> : (
         <div style={{ overflowX: "auto" }}>
           <table className="sortable">
+            <caption className="visually-hidden">Bibliografía</caption>
             <thead>
               <tr>
                 <SortableTh label="Autores" sortKey="Autores" sortConfig={sortConfig} onSort={requestSort} />
@@ -102,10 +103,10 @@ export default function Bibliografia() {
                   <td>{item["Autores"]}</td>
                   <td>{item["Referencias bibliográficas"]}</td>
                   {isEditMode && (
-                    <td style={{ display: 'flex', gap: '0.5rem' }}>
+                    <td><div className="acciones-celda">
                       <button onClick={() => setRecordToEdit(item)} style={{ background: 'var(--primary-color)' }}>Editar</button>
                       <button onClick={() => attemptDelete(item)} style={{ background: '#ff4d4f' }}>Borrar</button>
-                    </td>
+                    </div></td>
                   )}
                 </tr>
               ))}

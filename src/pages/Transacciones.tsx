@@ -175,6 +175,7 @@ export default function Transacciones() {
         </output>
         <div style={{ overflowX: "auto" }}>
           <table className="sortable">
+            <caption className="visually-hidden">Transacciones</caption>
             <thead>
               <tr>
                 <SortableTh label="Nro." sortKey="Num" sortConfig={sortConfig} onSort={requestSort} style={{ width: '50px' }} />
@@ -192,10 +193,10 @@ export default function Transacciones() {
                   <td style={{ maxWidth: '200px' }}>{row["Fuentes para la generación del dato"]}</td>
                   <td>{renderDocsForTransaction(row)}</td>
                   {isEditMode && (
-                    <td style={{ display: 'flex', gap: '0.5rem' }}>
+                    <td><div className="acciones-celda">
                       <button onClick={() => setRecordToEdit(row)} style={{ background: 'var(--primary-color)' }}>Editar</button>
                       <button onClick={() => attemptDelete(row)} style={{ background: '#ff4d4f' }}>Borrar</button>
-                    </td>
+                    </div></td>
                   )}
                 </tr>
               ))}

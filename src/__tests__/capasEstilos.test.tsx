@@ -10,7 +10,7 @@ vi.mock('../utils/backup', () => ({
 }));
 vi.mock('../utils/xlsxExport', () => ({ generateDatabaseXlsx: vi.fn(), downloadXlsx: vi.fn() }));
 vi.mock('react-router', () => ({
-  Link: ({ children }: { children: React.ReactNode }) => <a>{children}</a>,
+  Link: ({ children, to }: { children: React.ReactNode; to: string }) => <a href={to}>{children}</a>,
   useNavigate: () => vi.fn(),
 }));
 vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isEditMode: true }) }));

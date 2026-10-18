@@ -203,6 +203,7 @@ export default function IndiceCompanias() {
       {loading ? <p>Cargando datos...</p> : (
         <div style={{ overflowX: "auto" }}>
           <table className="sortable">
+            <caption className="visually-hidden">Índice de compañías</caption>
             <thead>
               <tr>
                 <SortableTh label="Sigla (Compañías)" sortKey="Sigla Compañía" sortConfig={sortConfig} onSort={requestSort} />
@@ -210,7 +211,7 @@ export default function IndiceCompanias() {
                 <SortableTh label="Temporadas Teatrales" sortKey="Temporadas teatrales" sortConfig={sortConfig} onSort={requestSort} />
                 <SortableTh label="Ámbito" sortKey="Ámbito" sortConfig={sortConfig} onSort={requestSort} />
                 <th scope="col">Vínculos Rápidos</th>
-                {isEditMode && <th></th>}
+                {isEditMode && <th scope="col"><span className="visually-hidden">Admin</span></th>}
               </tr>
             </thead>
             <tbody>
@@ -220,16 +221,16 @@ export default function IndiceCompanias() {
                   <td>{item["Autores"]}</td>
                   <td>{item["Temporadas teatrales"]}</td>
                   <td>{item["Ámbito"]}</td>
-                  <td style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <td><div className="acciones-celda" style={{ flexWrap: 'wrap' }}>
                     <button onClick={() => checkRecordsAndNavigate('manejo_de_caja', '/caja', item)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Caja</button>
                     <button onClick={() => checkRecordsAndNavigate('salarios', '/salarios', item)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Remuneraciones</button>
                     <button onClick={() => checkRecordsAndNavigate('corpus_christi', '/corpus', item)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Corpus Christi</button>
-                  </td>
+                  </div></td>
                   {isEditMode && (
-                    <td style={{ display: 'flex', gap: '0.5rem' }}>
+                    <td><div className="acciones-celda">
                       <button onClick={() => setRecordToEdit(item)} style={{ background: 'var(--primary-color)' }}>Editar</button>
                       <button onClick={() => attemptDelete(item)} style={{ background: '#ff4d4f' }}>Borrar</button>
-                    </td>
+                    </div></td>
                   )}
                 </tr>
               ))}

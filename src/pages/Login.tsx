@@ -30,7 +30,7 @@ export default function Login() {
   }
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '1rem' }}>
+    <main id="contenido" tabIndex={-1} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', padding: '1rem' }}>
       
       {/* HEADER ORIGINAL DE PRETSO V1 */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '3rem', gap: '2rem', flexWrap: 'wrap', width: '100%', maxWidth: '1200px' }}>
@@ -39,15 +39,15 @@ export default function Login() {
           <h1 style={{ whiteSpace: 'pre-line', margin: '0 0 1rem 0', color: 'var(--primary-color)' }}>
             {"PRETSO\nPrecios del Teatro del Siglo de Oro"}
           </h1>
-          <h2 style={{ fontSize: '1.2rem', fontWeight: 500, margin: '0 0 0.5rem 0' }}>
+          <p className="titulo-secundario" style={{ fontSize: '1.2rem', fontWeight: 500, margin: '0 0 0.5rem 0' }}>
             Base de datos para el estudio de las dinámicas económicas del teatro comercial en los territorios hispanos (siglos XVI-XVII)
-          </h2>
-          <h3 style={{ fontSize: '1rem', fontWeight: 400, margin: 0, opacity: 0.8 }}>
+          </p>
+          <p className="titulo-secundario" style={{ fontSize: '1rem', fontWeight: 400, margin: 0, opacity: 0.8 }}>
             Proyecto: [101150056] — [THIS] — [HORIZON-MSCA-2023-PF-01]
-          </h3>
-          <h3 style={{ fontSize: '1rem', fontWeight: 400, margin: 0, opacity: 0.8 }}>
+          </p>
+          <p className="titulo-secundario" style={{ fontSize: '1rem', fontWeight: 400, margin: 0, opacity: 0.8 }}>
             IP: Laura Paz Rescala
-          </h3>
+          </p>
         </div>
         <img src="/logo_ue.png?v=2" alt="Logo UE" style={{ width: '220px', objectFit: 'contain' }} />
       </div>
@@ -55,7 +55,7 @@ export default function Login() {
       {/* FORMULARIO DE LOGIN */}
       <div style={{ background: 'var(--bg-card)', padding: '3rem', borderRadius: '12px', width: '100%', maxWidth: '400px', border: '1px solid var(--border-color)', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' }}>
         
-        <h1 style={{ textAlign: 'center', fontSize: '2rem', marginBottom: '1.5rem' }}>Iniciar Sesión</h1>
+        <h2 style={{ textAlign: 'center', fontSize: '2rem', marginTop: '0.67em', marginBottom: '1.5rem' }}>Iniciar Sesión</h2>
         
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem' }}>
           <label style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', fontWeight: 600 }}>
@@ -88,6 +88,6 @@ export default function Login() {
           </button>
         </form>
       </div>
-    </div>
+    </main>
   );
 }
