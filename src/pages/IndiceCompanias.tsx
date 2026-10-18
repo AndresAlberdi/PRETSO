@@ -151,20 +151,26 @@ export default function IndiceCompanias() {
 
   // Anuncio de la búsqueda con retraso, para no leer cada pulsación de tecla.
   // Se guarda junto a la consulta que lo originó para no mostrar un anuncio caduco.
-  const [anuncio, setAnuncio] = useState({ consulta: "", texto: "" });
+  const [anuncio, setAnuncio] = useState({ consulta: "", total: -1, texto: "" });
   const consultaActual = searchQuery.trim();
   const totalEncontrados = sortedData.length;
   useEffect(() => {
-    if (loading || !consultaActual) return;
+    if (loading) return;
+    if (!consultaActual) {
+      // Al vaciar la búsqueda se descarta el anuncio previo para que no reaparezca al retipear.
+      const limpieza = setTimeout(() => setAnuncio({ consulta: "", total: -1, texto: "" }), 0);
+      return () => clearTimeout(limpieza);
+    }
     const temporizador = setTimeout(() => {
       setAnuncio({
         consulta: consultaActual,
+        total: totalEncontrados,
         texto: `Búsqueda: ${contar(totalEncontrados, 'compañía encontrada', 'compañías encontradas')}`,
       });
     }, 800);
     return () => clearTimeout(temporizador);
   }, [loading, consultaActual, totalEncontrados]);
-  const anuncioBusqueda = consultaActual && anuncio.consulta === consultaActual ? anuncio.texto : "";
+  const anuncioBusqueda = consultaActual && anuncio.consulta === consultaActual && anuncio.total === totalEncontrados ? anuncio.texto : "";
 
   return (
     <div>

@@ -157,7 +157,7 @@ export default function CorpusChristi() {
     ? `Búsqueda: ${contar(sortedSearchResults.length, 'registro encontrado', 'registros encontrados')}`
     : !selectedCityYear
     ? `Listado: ${contar(sortedFilteredGroups.length, 'registro', 'registros')}`
-    : `Detalle de ${selectedCityYear.ciudad} ${selectedCityYear.año}: ${contar(sortedDetailData.length, 'transacción registrada', 'transacciones registradas')}`;
+    : `Detalle de ${selectedCityYear.ciudad} ${selectedCityYear.año}: ${contar(sortedDetailData.length, 'transacción', 'transacciones')}`;
 
   return (
     <div>

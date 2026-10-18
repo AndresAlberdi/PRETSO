@@ -142,7 +142,7 @@ export default function Indicadores() {
     ? `Búsqueda: ${contar(sortedSearchResults.length, 'registro encontrado', 'registros encontrados')}`
     : !selectedCategoria
     ? `Listado: ${contar(sortedFilteredCategorias.length, 'categoría', 'categorías')}`
-    : `Detalle de ${selectedCategoria}: ${contar(sortedDetailData.length, 'transacción registrada', 'transacciones registradas')}`;
+    : `Detalle de ${selectedCategoria}: ${contar(sortedDetailData.length, 'transacción', 'transacciones')}`;
 
   return (
     <div>

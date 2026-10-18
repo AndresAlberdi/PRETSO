@@ -103,6 +103,17 @@ describe.each([
   });
 });
 
+describe('Remuneraciones: el filtro de compañía actualiza el anuncio', () => {
+  it('«Listado: 1 registro» en el mismo nodo', async () => {
+    render(<Salarios />);
+    await screen.findByText(/Mostrando \d+ registros/);
+    const nodo = region();
+    fireEvent.change(screen.getByRole('combobox', { name: 'Filtrar por compañía' }), { target: { value: '7' } });
+    await vi.waitFor(() => expect(nodo.textContent).toBe('Listado: 1 registro'));
+    expect(region()).toBe(nodo);
+  });
+});
+
 describe('Corpus Christi e Indicadores: anuncios', () => {
   it('Corpus Christi: listado y búsqueda', async () => {
     render(<CorpusChristi />);
@@ -117,7 +128,7 @@ describe('Corpus Christi e Indicadores: anuncios', () => {
     render(<CorpusChristi />);
     await screen.findByText(/Mostrando \d+ registros/);
     fireEvent.click(screen.getAllByRole('button', { name: 'TRATO' })[0]);
-    expect(region().textContent).toMatch(/^Detalle de \S+ \d+: 1 transacción registrada$/);
+    expect(region().textContent).toBe('Detalle de Potosí 1600: 1 transacción');
   });
 
   it('Indicadores: listado y búsqueda', async () => {
@@ -133,7 +144,7 @@ describe('Corpus Christi e Indicadores: anuncios', () => {
     render(<Indicadores />);
     await screen.findByText(/Mostrando \d+ categorías/);
     fireEvent.click(screen.getAllByRole('button', { name: 'LISTA' })[0]);
-    expect(region().textContent).toMatch(/^Detalle de \S+: \d+ transacci(ón registrada|ones registradas)$/);
+    expect(region().textContent).toBe('Detalle de Aceite: 1 transacción');
   });
 });
 
@@ -157,6 +168,16 @@ describe('Índice de compañías: anuncio con retraso', () => {
     await screen.findByText('GA-JR');
     vi.useFakeTimers();
     fireEvent.change(screen.getByRole('textbox', { name: 'Buscar por nombre o autores' }), { target: { value: 'gar' } });
+    act(() => { vi.advanceTimersByTime(799); });
+    expect(region().textContent).toBe('');
+    act(() => { vi.advanceTimersByTime(1); });
+    expect(region().textContent).toBe('Búsqueda: 1 compañía encontrada');
+
+    const campo = screen.getByRole('textbox', { name: 'Buscar por nombre o autores' });
+    fireEvent.change(campo, { target: { value: '' } });
+    act(() => { vi.advanceTimersByTime(800); });
+    expect(region().textContent).toBe('');
+    fireEvent.change(campo, { target: { value: 'gar' } });
     act(() => { vi.advanceTimersByTime(799); });
     expect(region().textContent).toBe('');
     act(() => { vi.advanceTimersByTime(1); });
