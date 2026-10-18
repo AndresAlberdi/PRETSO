@@ -21,7 +21,9 @@ vi.mock('../utils/audit', () => ({ logAction: vi.fn() }));
 vi.mock('firebase/firestore', () => ({
   collection: (_db: unknown, nombre: string) => nombre,
   query: (c: string) => c,
-  addDoc: (...a: unknown[]) => addDoc(...a),
+  doc: (coleccion: string) => ({ id: 'nuevo', coleccion }),
+  // El alta escribe con setDoc (ID del cliente); se registra en el mismo simulado de escritura.
+  setDoc: (...a: unknown[]) => addDoc(...a),
   getDocs: async (nombre: string) => ({
     docs: colecciones[nombre].map(d => ({ id: d.id, data: () => d })),
   }),
