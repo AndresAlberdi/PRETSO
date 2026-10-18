@@ -2,11 +2,22 @@ import { useEffect, useState } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 
-export default function CompaniaModal({ sigla, onClose }: { sigla: string, onClose: () => void }) {
-  const [compania, setCompania] = useState<any | null>(null);
-  const [loading, setLoading] = useState(true);
+interface CompaniaModalProps {
+  // Referencia a consultar (número de registro o sigla). Se ignora si llega `compania`.
+  sigla?: string;
+  // Compañía ya resuelta: con ella no se consulta Firestore.
+  compania?: any;
+  onClose: () => void;
+}
+
+export default function CompaniaModal({ sigla = '', compania: companiaDada, onClose }: CompaniaModalProps) {
+  const [consultada, setConsultada] = useState<any | null>(null);
+  const [loadingConsulta, setLoadingConsulta] = useState(true);
+  const compania = companiaDada ?? consultada;
+  const loading = companiaDada ? false : loadingConsulta;
 
   useEffect(() => {
+    if (companiaDada) return;
     async function fetchCompania() {
       if (!sigla) return;
       let snap = await getDocs(query(collection(db, 'companias'), where('Indicador de registro', '==', Number(sigla))));
@@ -17,12 +28,12 @@ export default function CompaniaModal({ sigla, onClose }: { sigla: string, onClo
         snap = await getDocs(query(collection(db, 'companias'), where('Sigla Compañía', '==', sigla)));
       }
       if (!snap.empty) {
-        setCompania(snap.docs[0].data());
+        setConsultada(snap.docs[0].data());
       }
-      setLoading(false);
+      setLoadingConsulta(false);
     }
     fetchCompania();
-  }, [sigla]);
+  }, [sigla, companiaDada]);
 
   return (
     <div style={{
@@ -44,6 +55,7 @@ export default function CompaniaModal({ sigla, onClose }: { sigla: string, onClo
           <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
             <tbody>
               {Object.keys(compania).map((key) => {
+                if (key === 'Indicador de registro' || key === 'id') return null;
                 if (!compania[key] || compania[key] === '') return null;
                 return (
                   <tr key={key} style={{ borderBottom: '1px solid var(--border-color)' }}>

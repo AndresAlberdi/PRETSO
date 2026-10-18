@@ -7,6 +7,8 @@ import DocumentModal from "../components/DocumentModal";
 import SearchBar, { type SearchFilter } from "../components/SearchBar";
 import { cleanFirebaseData } from "../utils";
 import CompaniaModal from "../components/CompaniaModal";
+import ListaSiglasCompania from "../components/ListaSiglasCompania";
+import { camposReferenciaCompania } from "../utils/referenciaCompania";
 import { useAdmin } from "../context/AdminContext";
 import ConfirmModal from "../components/ConfirmModal";
 import { logAction } from "../utils/audit";
@@ -18,6 +20,7 @@ import DetailsModal from "../components/DetailsModal";
 
 export default function CorpusChristi() {
   const [data, setData] = useState<any[]>([]);
+  const [companias, setCompanias] = useState<any[]>([]);
   const [transaccionesMap, setTransaccionesMap] = useState<Map<number, any>>(new Map());
   const [loading, setLoading] = useState(true);
   const { isEditMode } = useAdmin();
@@ -34,7 +37,7 @@ export default function CorpusChristi() {
   const [selectedCityYear, setSelectedCityYear] = useState<{ ciudad: string, año: string } | null>(null);
   const [activeTransaction, setActiveTransaction] = useState<string | number | null>(null);
   const [activeDocuments, setActiveDocuments] = useState<string | number | null>(null);
-  const [activeCompania, setActiveCompania] = useState<string | null>(null);
+  const [activeCompania, setActiveCompania] = useState<any | null>(null);
   const [recordToView, setRecordToView] = useState<any | null>(null);
 
   const [filters, setFilters] = useState<SearchFilter[]>([]);
@@ -64,6 +67,9 @@ export default function CorpusChristi() {
         (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
       );
       setData(docsData);
+
+      const snapComp = await getDocs(query(collection(db, "companias")));
+      setCompanias(snapComp.docs.map(cleanFirebaseData));
 
       const qTrans = query(collection(db, "transacciones"));
       const snapTrans = await getDocs(qTrans);
@@ -284,24 +290,14 @@ export default function CorpusChristi() {
             <tbody>
               {sortedDetailData.map(row => {
                 const isBroken = row["Transacción"] && !transaccionesMap.has(Number(row["Transacción"]));
-                const companiasList = [];
-                if (row["Compañía"]) companiasList.push(row["Compañía"]);
-                for (let i = 2; i <= 10; i++) {
-                  if (row[`Compañía${i}`] || row[`Cmp${i}`]) {
-                    companiasList.push(row[`Compañía${i}`] || row[`Cmp${i}`]);
-                  }
-                }
+                const referenciasCompania = camposReferenciaCompania('corpus_christi').map(campo => row[campo]);
                 
                 return (
                 <tr key={row.id}>
                   <td>{row["Encargo"]}</td>
                   <td>{row["Encargado "]}</td>
                   <td>
-                    {companiasList.map((c, idx) => (
-                      <div key={idx} style={{ marginBottom: '4px' }}>
-                        <button onClick={() => setActiveCompania(c)} style={{ padding: '0.2rem 0.5rem', background: 'var(--accent-color)', color: 'var(--on-accent)', borderRadius: '4px', border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}>{c}</button>
-                      </div>
-                    ))}
+                    <ListaSiglasCompania referencias={referenciasCompania} companias={companias} onAbrir={setActiveCompania} />
                   </td>
                   <td>{row["Monto a pagar"]}</td>
                   <td>{row["Fondos"]}</td>
@@ -365,7 +361,7 @@ export default function CorpusChristi() {
         />
       )}
 
-      {activeCompania && <CompaniaModal sigla={activeCompania} onClose={() => setActiveCompania(null)} />}
+      {activeCompania && <CompaniaModal compania={activeCompania} onClose={() => setActiveCompania(null)} />}
       
       {recordToDelete && (
         <ConfirmModal 

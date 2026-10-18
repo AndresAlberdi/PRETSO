@@ -13,6 +13,7 @@ import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
 import { useSortableTable } from "../hooks/useSortableTable";
 import Tooltip from "../components/Tooltip";
+import { canonizarReferencia, normalizarSigla, resolverCompania, siglaDeReferencia } from "../utils/referenciaCompania";
 import DetailsModal from "../components/DetailsModal";
 
 export default function Salarios() {
@@ -129,7 +130,9 @@ export default function Salarios() {
     return map;
   }, [companias]);
 
-  const companiasInData = companias.filter(c => data.some(d => String(d["Sigla Compañía"]) === String(c["Indicador de registro"])));
+  // Misma regla que cuenta el índice de compañías (resolverCompania): número, "7.0" o sigla heredada.
+  const companiasReferenciadas = new Set<unknown>(data.map(d => resolverCompania(d["Sigla Compañía"], companias)).filter(Boolean));
+  const companiasInData = companias.filter(c => companiasReferenciadas.has(c));
   const uniqueCompanias = Array.from(new Set(companiasInData.map(c => String(c["Indicador de registro"])))).filter(Boolean).sort();
   const uniqueTemporadas = Array.from(new Set(companiasInData.map(c => c["Temporadas teatrales"]))).filter(Boolean).sort();
   const uniqueAmbitos = Array.from(new Set(companiasInData.map(c => c["Ámbito"]))).filter(Boolean).sort();
@@ -150,20 +153,31 @@ export default function Salarios() {
           return Object.values(d).some(v => String(v).toLowerCase().includes(q));
         }
         if (f.category === 'Autores') {
-          const comp = companiasMap.get(d["Sigla Compañía"]);
+          const comp = resolverCompania(d["Sigla Compañía"], companias);
           return (comp && comp["Autores"] && String(comp["Autores"]).toLowerCase().includes(q)) || 
                  (d["Beneficiario "] && String(d["Beneficiario "]).toLowerCase().includes(q));
         }
         return d[f.category] && String(d[f.category]).toLowerCase().includes(q);
       });
     });
-  }, [data, filters, companiasMap]);
+  }, [data, filters, companias]);
+
+  // Campo derivado solo de presentación: la sigla resuelta, para que la columna «Compañía»
+  // ordene por lo que se ve y no por el número guardado. Nunca se persiste ni se exporta.
+  const searchResultsOrdenables = useMemo(
+    () => searchResults.map(d => ({ ...d, __sigla: normalizarSigla(siglaDeReferencia(d["Sigla Compañía"], companias)) })),
+    [searchResults, companias]
+  );
 
   const isSearching = filters.length > 0;
-  const detailData = data.filter(d => String(d["Sigla Compañía"]) === selectedCompId);
+  const siglaSeleccionada = siglaDeReferencia(selectedCompId, companias);
+  const companiaSeleccionada = resolverCompania(selectedCompId, companias);
+  const detailData = companiaSeleccionada
+    ? data.filter(d => resolverCompania(d["Sigla Compañía"], [companiaSeleccionada]) !== null)
+    : [];
 
   const { items: sortedFilteredCompanias, requestSort: sortComp, sortConfig: scComp } = useSortableTable(filteredCompanias);
-  const { items: sortedSearchResults, requestSort: sortSearch, sortConfig: scSearch } = useSortableTable(searchResults);
+  const { items: sortedSearchResults, requestSort: sortSearch, sortConfig: scSearch } = useSortableTable(searchResultsOrdenables);
   const { items: sortedDetailData } = useSortableTable(detailData);
 
   const SortIndicator = ({ column, sc }: { column: string, sc: any }) => {
@@ -203,7 +217,7 @@ export default function Salarios() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => sortSearch('Sigla Compañía')} style={{ cursor: 'pointer' }}>Compañía <SortIndicator column="Sigla Compañía" sc={scSearch} /></th>
+                <th onClick={() => sortSearch('__sigla')} style={{ cursor: 'pointer' }}>Compañía <SortIndicator column="__sigla" sc={scSearch} /></th>
                 <th onClick={() => sortSearch('Ciudad')} style={{ cursor: 'pointer' }}>Ciudad <SortIndicator column="Ciudad" sc={scSearch} /></th>
                 <th onClick={() => sortSearch('Año')} style={{ cursor: 'pointer' }}>Año <SortIndicator column="Año" sc={scSearch} /></th>
                 <th>Documentos</th>
@@ -213,8 +227,11 @@ export default function Salarios() {
             </thead>
             <tbody>
               {sortedSearchResults.map(row => {
-                const comp = companiasMap.get(row["Sigla Compañía"]);
-                const fullName = comp && comp["Nombre Compañía"] ? `${row["Sigla Compañía"]} - ${comp["Nombre Compañía"]}` : row["Sigla Compañía"];
+                const registro: any = { ...row };
+                delete registro.__sigla;
+                const comp = resolverCompania(row["Sigla Compañía"], companias);
+                const sigla = comp ? comp["Sigla Compañía"] : canonizarReferencia(row["Sigla Compañía"]);
+                const fullName = comp && comp["Nombre Compañía"] ? `${sigla} - ${comp["Nombre Compañía"]}` : sigla;
                 const isBroken = row["Transacción"] && !transaccionesMap.has(Number(row["Transacción"]));
                 return (
                 <tr key={row.id}>
@@ -246,8 +263,8 @@ export default function Salarios() {
                   </td>
                   {isEditMode && (
                     <td style={{ display: 'flex', gap: '0.5rem' }}>
-                      <button onClick={() => setRecordToEdit(row)} style={{ background: 'var(--primary-color)' }}>Editar</button>
-                      <button onClick={() => attemptDelete(row)} style={{ background: '#ff4d4f' }}>Borrar</button>
+                      <button onClick={() => setRecordToEdit(registro)} style={{ background: 'var(--primary-color)' }}>Editar</button>
+                      <button onClick={() => attemptDelete(registro)} style={{ background: '#ff4d4f' }}>Borrar</button>
                     </td>
                   )}
                 </tr>
@@ -299,9 +316,11 @@ export default function Salarios() {
             </tbody>
           </table>
         </div>
+      ) : !companiaSeleccionada ? (
+        <p style={{ color: 'var(--text-muted)' }}>Compañía no encontrada</p>
       ) : (
         <div style={{ overflowX: "auto" }}>
-          <div style={{ marginBottom: '1rem' }}><p style={{ color: 'var(--text-muted)' }}>{sortedDetailData.length} registros para {selectedCompId}</p></div>
+          <div style={{ marginBottom: '1rem' }}><p style={{ color: 'var(--text-muted)' }}>{sortedDetailData.length} registros para {siglaSeleccionada}</p></div>
           <table className="sortable">
             <thead>
               <tr>

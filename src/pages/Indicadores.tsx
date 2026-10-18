@@ -7,6 +7,7 @@ import DocumentModal from "../components/DocumentModal";
 import SearchBar, { type SearchFilter } from "../components/SearchBar";
 import { cleanFirebaseData } from "../utils";
 import CompaniaModal from "../components/CompaniaModal";
+import ListaSiglasCompania from "../components/ListaSiglasCompania";
 import { useAdmin } from "../context/AdminContext";
 import ConfirmModal from "../components/ConfirmModal";
 import { logAction } from "../utils/audit";
@@ -17,6 +18,7 @@ import Tooltip from "../components/Tooltip";
 
 export default function Indicadores() {
   const [data, setData] = useState<any[]>([]);
+  const [companias, setCompanias] = useState<any[]>([]);
   const [transaccionesMap, setTransaccionesMap] = useState<Map<number, any>>(new Map());
   const [loading, setLoading] = useState(true);
   const { isEditMode } = useAdmin();
@@ -33,7 +35,7 @@ export default function Indicadores() {
   const [selectedCategoria, setSelectedCategoria] = useState<string | null>(null);
   const [activeTransaction, setActiveTransaction] = useState<string | number | null>(null);
   const [activeDocuments, setActiveDocuments] = useState<string | number | null>(null);
-  const [activeCompania, setActiveCompania] = useState<string | null>(null);
+  const [activeCompania, setActiveCompania] = useState<any | null>(null);
 
   const [filters, setFilters] = useState<SearchFilter[]>([]);
 
@@ -61,6 +63,9 @@ export default function Indicadores() {
         (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
       );
       setData(docsInd);
+
+      const snapComp = await getDocs(query(collection(db, "companias")));
+      setCompanias(snapComp.docs.map(cleanFirebaseData));
 
       const qTrans = query(collection(db, "transacciones"));
       const snapTrans = await getDocs(qTrans);
@@ -271,9 +276,7 @@ export default function Indicadores() {
                   <td>{row["Monto"]}</td>
                   <td>{row["Nota"]}</td>
                   <td>
-                    {row["Sigla Compañía"] && (
-                      <button onClick={() => setActiveCompania(row["Sigla Compañía"])} style={{ padding: '0.2rem 0.5rem', background: 'var(--accent-color)', color: 'var(--on-accent)', borderRadius: '4px', border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}>{row["Sigla Compañía"]}</button>
-                    )}
+                    <ListaSiglasCompania referencias={[row["Sigla Compañía"]]} companias={companias} onAbrir={setActiveCompania} />
                   </td>
                   <td>
                     {row["Transacción"] && !isBroken && (() => {
@@ -332,7 +335,7 @@ export default function Indicadores() {
         />
       )}
 
-      {activeCompania && <CompaniaModal sigla={activeCompania} onClose={() => setActiveCompania(null)} />}
+      {activeCompania && <CompaniaModal compania={activeCompania} onClose={() => setActiveCompania(null)} />}
       
       {recordToDelete && (
         <ConfirmModal 
