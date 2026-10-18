@@ -1,5 +1,5 @@
 import React, { useEffect, useId, useRef, useState } from 'react';
-import { collection, getDocs, query, addDoc } from 'firebase/firestore';
+import { collection, doc, getDocs, query, setDoc, type DocumentReference } from 'firebase/firestore';
 import { db } from '../firebase';
 import { cleanFirebaseData } from '../utils';
 import { logAction } from '../utils/audit';
@@ -57,6 +57,15 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
   const [confirmDiscard, setConfirmDiscard] = useState(false);
   const titleId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
+
+  // Integridad del alta: la protección contra doble envío es síncrona (el estado `saving` se
+  // actualiza de forma asíncrona y no basta). El ID y el registro preparado se fijan en el primer
+  // envío y los reintentos los reutilizan, de modo que repetir el envío nunca crea un segundo documento.
+  const enviandoRef = useRef(false);
+  const docRefRef = useRef<DocumentReference | null>(null);
+  const registroRef = useRef<any>(null);
+  const escritoRef = useRef(false);
+  const notificadoRef = useRef(false);
 
   // Auto-calculated sequential index
   const [nextIndex, setNextIndex] = useState<number | null>(null);
@@ -186,6 +195,8 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (enviandoRef.current) return;
+    enviandoRef.current = true;
     setError(null);
     setSaving(true);
 
@@ -279,19 +290,32 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
         }
       }
 
-      // 2. Save in Firestore
-      const docRef = await addDoc(collection(db, collectionName), recordToSave);
-      
-      // 3. Log Action
-      await logAction('CREATE', collectionName, docRef.id, recordToSave);
+      // 2. Save in Firestore: ID generado en el cliente una sola vez y registro preparado fijado
+      // en el primer envío; un reintento reescribe el mismo documento en lugar de crear otro.
+      if (!registroRef.current) registroRef.current = recordToSave;
+      if (!docRefRef.current) docRefRef.current = doc(collection(db, collectionName));
+      const docRef = docRefRef.current;
+      const registro = registroRef.current;
+      if (!escritoRef.current) {
+        await setDoc(docRef, registro);
+        escritoRef.current = true;
+      }
 
-      // 4. Return to parent
-      onCreated({ id: docRef.id, ...recordToSave });
+      // 3. Return to parent (una sola vez, aunque el cierre posterior falle)
+      if (!notificadoRef.current) {
+        notificadoRef.current = true;
+        onCreated({ id: docRef.id, ...registro });
+      }
+
+      // 4. Log Action
+      await logAction('CREATE', collectionName, docRef.id, registro);
+
       onClose();
 
     } catch (err: any) {
       setError(err.message || "Error al guardar el nuevo registro.");
     } finally {
+      enviandoRef.current = false;
       setSaving(false);
     }
   };
