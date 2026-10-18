@@ -13,6 +13,7 @@ import GenericEditModal from "../components/GenericEditModal";
 import { useNavigate } from "react-router";
 import { useSortableTable } from "../hooks/useSortableTable";
 import SortableTh from "../components/SortableTh";
+import { contar } from "../utils/anuncios";
 
 export default function IndiceCompanias() {
   const [data, setData] = useState<any[]>([]);
@@ -148,6 +149,23 @@ export default function IndiceCompanias() {
 
   const { items: sortedData, requestSort, sortConfig } = useSortableTable(filteredData);
 
+  // Anuncio de la búsqueda con retraso, para no leer cada pulsación de tecla.
+  // Se guarda junto a la consulta que lo originó para no mostrar un anuncio caduco.
+  const [anuncio, setAnuncio] = useState({ consulta: "", texto: "" });
+  const consultaActual = searchQuery.trim();
+  const totalEncontrados = sortedData.length;
+  useEffect(() => {
+    if (loading || !consultaActual) return;
+    const temporizador = setTimeout(() => {
+      setAnuncio({
+        consulta: consultaActual,
+        texto: `Búsqueda: ${contar(totalEncontrados, 'compañía encontrada', 'compañías encontradas')}`,
+      });
+    }, 800);
+    return () => clearTimeout(temporizador);
+  }, [loading, consultaActual, totalEncontrados]);
+  const anuncioBusqueda = consultaActual && anuncio.consulta === consultaActual ? anuncio.texto : "";
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
@@ -172,6 +190,8 @@ export default function IndiceCompanias() {
         </div>
       </div>
       
+      {!loading && <output aria-live="polite" className="visually-hidden">{anuncioBusqueda}</output>}
+
       {!loading && <p style={{ color: 'var(--text-muted)' }}>Total registros: {sortedData.length}</p>}
       
       {loading ? <p>Cargando datos...</p> : (

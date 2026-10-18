@@ -16,6 +16,7 @@ import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
 import { useSortableTable } from "../hooks/useSortableTable";
 import SortableTh from "../components/SortableTh";
+import { contar } from "../utils/anuncios";
 import Tooltip from "../components/Tooltip";
 import DetailsModal from "../components/DetailsModal";
 
@@ -152,6 +153,12 @@ export default function CorpusChristi() {
   const { items: sortedSearchResults, requestSort: sortSearch, sortConfig: scSearch } = useSortableTable(searchResults);
   const { items: sortedDetailData } = useSortableTable(detailData);
 
+  const anuncioResultados = isSearching
+    ? `Búsqueda: ${contar(sortedSearchResults.length, 'registro encontrado', 'registros encontrados')}`
+    : !selectedCityYear
+    ? `Listado: ${contar(sortedFilteredGroups.length, 'registro', 'registros')}`
+    : `Detalle de ${selectedCityYear.ciudad} ${selectedCityYear.año}: ${contar(sortedDetailData.length, 'transacción registrada', 'transacciones registradas')}`;
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
@@ -171,6 +178,8 @@ export default function CorpusChristi() {
           <SearchBar onSearch={(f) => { setFilters(f); setSelectedCityYear(null); }} categories={searchCategories} />
         </div>
       </div>
+
+      {!loading && <output aria-live="polite" className="visually-hidden">{anuncioResultados}</output>}
       
       {(selectedCityYear || isSearching) && (
         <button onClick={() => { setSelectedCityYear(null); setFilters([]); navigate(location.pathname, { replace: true }); }} style={{ padding: '0.5rem 1rem', marginBottom: '1rem' }}>Volver a listado inicial</button>

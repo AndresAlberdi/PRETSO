@@ -4,6 +4,7 @@ import { db } from "../firebase";
 import { cleanFirebaseData } from "../utils";
 import SearchBar, { type SearchFilter } from "../components/SearchBar";
 import { useNavigate } from "react-router";
+import { contar } from "../utils/anuncios";
 
 type SearchResultItem = {
   id: string;
@@ -173,6 +174,14 @@ export default function Inicio() {
           />
         </div>
       </div>
+
+      <output aria-live="polite" className="visually-hidden">
+        {!loading && filters.length > 0
+          ? (searchResults.length === 0
+            ? 'Búsqueda sin resultados'
+            : `Búsqueda: ${contar(searchResults.length, 'resultado', 'resultados')}`)
+          : ''}
+      </output>
 
       {loading && <div style={{ textAlign: 'center', marginTop: '2rem' }}>Cargando base de datos para búsqueda...</div>}
 

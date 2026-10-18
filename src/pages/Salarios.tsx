@@ -13,6 +13,7 @@ import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
 import { useSortableTable } from "../hooks/useSortableTable";
 import SortableTh from "../components/SortableTh";
+import { contar } from "../utils/anuncios";
 import Tooltip from "../components/Tooltip";
 import { canonizarReferencia, normalizarSigla, resolverCompania, siglaDeReferencia } from "../utils/referenciaCompania";
 import DetailsModal from "../components/DetailsModal";
@@ -181,6 +182,14 @@ export default function Salarios() {
   const { items: sortedSearchResults, requestSort: sortSearch, sortConfig: scSearch } = useSortableTable(searchResultsOrdenables);
   const { items: sortedDetailData } = useSortableTable(detailData);
 
+  const anuncioResultados = isSearching
+    ? `Búsqueda: ${contar(sortedSearchResults.length, 'registro encontrado', 'registros encontrados')}`
+    : !selectedCompId
+    ? `Listado: ${contar(sortedFilteredCompanias.length, 'registro', 'registros')}`
+    : !companiaSeleccionada
+    ? 'No se encontró la compañía seleccionada'
+    : `Detalle de ${siglaSeleccionada}: ${contar(sortedDetailData.length, 'registro', 'registros')}`;
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
@@ -200,6 +209,8 @@ export default function Salarios() {
           <SearchBar onSearch={(f) => { setFilters(f); setSelectedCompId(null); }} categories={searchCategories} />
         </div>
       </div>
+
+      {!loading && <output aria-live="polite" className="visually-hidden">{anuncioResultados}</output>}
       
       {(selectedCompId || isSearching) && (
         <button onClick={() => { setSelectedCompId(null); setFilters([]); navigate(location.pathname, { replace: true }); }} style={{ padding: '0.5rem 1rem', marginBottom: '1rem' }}>Volver a listado inicial</button>
