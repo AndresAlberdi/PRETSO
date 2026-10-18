@@ -192,7 +192,7 @@ export default function Administracion() {
 
           <div style={{ marginTop: '2rem' }}>
             <button 
-              onClick={() => setConfiguringClientId(!configuringClientId)}
+              onClick={() => setConfiguringClientId(true)}
               style={{ padding: '0.5rem 1rem', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px', cursor: 'pointer' }}
             >
               ⚙ Configurar Client ID de Google
@@ -225,7 +225,12 @@ export default function Administracion() {
               defaultValue={clientId}
               style={{ width: '100%', padding: '0.8rem', marginBottom: '1.5rem', background: 'var(--bg-body, #222)', border: '1px solid var(--input-border)', color: 'var(--text-primary)', borderRadius: '4px' }}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') saveClientId(e.currentTarget.value);
+                if (e.key === 'Enter') {
+                  // Sin preventDefault, al cerrarse el diálogo el foco vuelve al botón de origen durante este
+                  // mismo keydown y el navegador activa ese botón con el Enter, reabriendo el diálogo.
+                  e.preventDefault();
+                  saveClientId(e.currentTarget.value);
+                }
               }}
             />
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>

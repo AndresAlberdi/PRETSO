@@ -40,12 +40,40 @@ describe('diálogo del Client ID de Google', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
-  it('Enter en el campo guarda y cierra', () => {
+  it('Enter en el campo guarda y cierra, y el evento queda prevenido para no reactivar el botón de origen', () => {
     const { campo } = abrir();
     fireEvent.change(campo, { target: { value: 'otro-id' } });
-    fireEvent.keyDown(campo, { key: 'Enter' });
+    // fireEvent devuelve false si el evento fue cancelado con preventDefault. Sin esa cancelación, el foco que
+    // vuelve al botón de origen durante este keydown haría que el navegador lo activara y reabriera el diálogo.
+    const noCancelado = fireEvent.keyDown(campo, { key: 'Enter' });
+    expect(noCancelado).toBe(false);
     expect(localStorage.getItem(GOOGLE_CLIENT_ID_STORAGE_KEY)).toBe('otro-id');
     expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('el botón de origen solo abre: pulsarlo otra vez no alterna el diálogo', () => {
+    const { abrirBtn } = abrir();
+    // El diálogo está abierto y el botón de origen queda inerte; si se activara de nuevo no debe cerrarlo.
+    fireEvent.click(abrirBtn);
+    expect(screen.getByRole('dialog', { name: 'Configurar Google Client ID' })).toBeTruthy();
+  });
+
+  it('«Guardar» con el campo vacío o solo con espacios borra el Client ID guardado', () => {
+    localStorage.setItem(GOOGLE_CLIENT_ID_STORAGE_KEY, 'viejo-id');
+    const { campo } = abrir();
+    fireEvent.change(campo, { target: { value: '   ' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar' }));
+    expect(localStorage.getItem(GOOGLE_CLIENT_ID_STORAGE_KEY)).toBeNull();
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('«Cancelar» cierra sin guardar y devuelve el foco al botón de origen', () => {
+    const { abrirBtn, campo } = abrir();
+    fireEvent.change(campo, { target: { value: 'no-guardar' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(localStorage.getItem(GOOGLE_CLIENT_ID_STORAGE_KEY)).toBeNull();
+    expect(document.activeElement).toBe(abrirBtn);
   });
 
   it('Escape cierra sin guardar y devuelve el foco al botón de origen', () => {

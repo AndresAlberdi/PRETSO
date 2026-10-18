@@ -50,7 +50,7 @@ function tieneFondoDeVentana(texto: string): boolean {
   const re = /position:\s*['"]fixed['"]/g;
   let m: RegExpExecArray | null;
   while ((m = re.exec(texto))) {
-    if (/\btop:\s*0\b/.test(objetoQueRodea(texto, m.index))) return true;
+    if (/\btop:\s*0(?![.\w])/.test(objetoQueRodea(texto, m.index))) return true;
   }
   return false;
 }
