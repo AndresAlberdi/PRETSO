@@ -312,12 +312,12 @@ main {
 .barra-busqueda { display: flex; gap: 0.5rem; align-items: center; }
 .fila-filtros { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
 .fila-filtros select { max-width: 100%; }
-h1, h2, h3 { overflow-wrap: anywhere; }
 
 @media (max-width: 64em) {
   .cabecera-pagina, .acciones-cabecera, .barra-busqueda { flex-wrap: wrap; }
   .cabecera-pagina { gap: 1rem; }
   .barra-busqueda { justify-content: flex-end; }
+  h1, h2, h3 { overflow-wrap: anywhere; }
 }
 
 @media (max-width: 30em) {

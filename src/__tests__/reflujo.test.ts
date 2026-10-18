@@ -44,12 +44,33 @@ describe('reflujo: CSS', () => {
     expect(m![1]).toMatch(/max-width:\s*100%/);
   });
 
+  function reglaBase(selector: string): string {
+    const esc = selector.replace(/\./g, '\\.');
+    const m = css.match(new RegExp(`^${esc}\\s*\\{([^}]*)\\}`, 'm'));
+    expect(m, `falta la regla base ${selector}`).not.toBeNull();
+    return m![1];
+  }
+
   it('el salto de línea de la cabecera vive solo en @media (max-width: 64em)', () => {
     const media = bloqueMedia('max-width: 64em');
     expect(media).toMatch(/\.cabecera-pagina,\s*\.acciones-cabecera,\s*\.barra-busqueda\s*\{\s*flex-wrap:\s*wrap;\s*\}/);
-    const base = css.match(/^\.cabecera-pagina\s*\{([^}]*)\}/m);
-    expect(base).not.toBeNull();
-    expect(base![1]).not.toMatch(/flex-wrap/);
+    for (const sel of ['.cabecera-pagina', '.acciones-cabecera', '.barra-busqueda']) {
+      expect(reglaBase(sel), sel).not.toMatch(/flex-wrap/);
+    }
+  });
+
+  it('por encima de 1024 px las reglas base equivalen a los estilos en línea previos', () => {
+    expect(reglaBase('.contenido-principal')).toMatch(/padding:\s*2rem;/);
+    const acc = reglaBase('.acciones-cabecera');
+    expect(acc).toMatch(/gap:\s*1rem;/);
+    expect(acc).toMatch(/align-items:\s*center;/);
+    const barra = reglaBase('.barra-busqueda');
+    expect(barra).toMatch(/gap:\s*0\.5rem;/);
+    expect(barra).toMatch(/align-items:\s*center;/);
+    const cab = reglaBase('.cabecera-pagina');
+    expect(cab).toMatch(/margin-bottom:\s*1rem;/);
+    expect(cab).toMatch(/justify-content:\s*space-between;/);
+    expect(cab).toMatch(/align-items:\s*center;/);
   });
 
   it('el teléfono (30em) reduce el relleno de main y el h1', () => {
@@ -58,8 +79,10 @@ describe('reflujo: CSS', () => {
     expect(media).toMatch(/h1\s*\{\s*font-size:\s*1\.75rem;\s*\}/);
   });
 
-  it('los encabezados parten palabras largas', () => {
-    expect(css).toMatch(/overflow-wrap:\s*anywhere/);
+  it('los encabezados parten palabras largas solo en @media (max-width: 64em)', () => {
+    expect(bloqueMedia('max-width: 64em')).toMatch(/h1,\s*h2,\s*h3\s*\{\s*overflow-wrap:\s*anywhere;\s*\}/);
+    const fuera = css.replace(bloqueMedia('max-width: 64em'), '');
+    expect(fuera).not.toMatch(/h[123][^{}]*\{[^}]*overflow-wrap/);
   });
 });
 
@@ -74,6 +97,11 @@ describe('reflujo: tablas y cabeceras de página', () => {
         const contenedor = antes.lastIndexOf('className="tabla-desplazable"');
         const cierre = antes.lastIndexOf('</table>');
         expect(contenedor, `${archivo}: tabla en ${i} sin contenedor`).toBeGreaterThan(cierre);
+        // El contenedor debe encerrar la tabla: no puede cerrarse antes de ella.
+        const tramo = antes.slice(antes.lastIndexOf("<div", contenedor));
+        const abiertos = (tramo.match(/<div\b/g) ?? []).length;
+        const cerrados = (tramo.match(/<\/div>/g) ?? []).length;
+        expect(cerrados, `${archivo}: el contenedor se cierra antes de la tabla en ${i}`).toBeLessThan(abiertos);
       }
     }
   });
