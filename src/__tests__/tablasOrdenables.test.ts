@@ -19,11 +19,20 @@ const ESPERADO: Record<string, string[]> = {
   'Transacciones.tsx': ['Nro.'],
 };
 
+// Páginas ya migradas al componente SortableTh (C1): en ellas no puede reaparecer un <th onClick>.
+const MIGRADAS = ['Bibliografia.tsx', 'Documentos.tsx', 'Transacciones.tsx'];
+
 // Analiza el texto completo (no línea por línea): cada bloque <th ...>...</th> es ordenable si
 // contiene onClick o SortIndicator (también cuando hay un <button> dentro), aunque esté en varias líneas.
+// Un <SortableTh label="..." /> también es ordenable; su etiqueta es el valor de «label».
 function etiquetasOrdenablesEnTexto(texto: string): string[] {
   const resultado: string[] = [];
-  for (const [bloque] of texto.matchAll(/<th\b[\s\S]*?<\/th>/g)) {
+  for (const [bloque] of texto.matchAll(/<th\b[\s\S]*?<\/th>|<SortableTh\b[\s\S]*?\/>/g)) {
+    if (bloque.startsWith('<SortableTh')) {
+      const etiqueta = bloque.match(/\blabel="([^"]*)"/);
+      resultado.push(etiqueta ? etiqueta[1].trim() || '?' : '?');
+      continue;
+    }
     if (!/onClick|<SortIndicator/.test(bloque)) continue;
     // El «>» de «=>» dentro del atributo no cierra la etiqueta de apertura.
     const m = bloque.match(/(?<!=)>([^<>]*)<SortIndicator/);
@@ -31,6 +40,11 @@ function etiquetasOrdenablesEnTexto(texto: string): string[] {
     resultado.push(visible.replace(/\s+/g, ' ').trim() || '?');
   }
   return resultado;
+}
+
+// Hay un <th> con onClick (el patrón inaccesible que SortableTh reemplaza).
+function tieneThConOnClick(texto: string): boolean {
+  return [...texto.matchAll(/<th\b[\s\S]*?<\/th>/g)].some(([bloque]) => /onClick/.test(bloque));
 }
 
 function etiquetasOrdenables(archivo: string): string[] {
@@ -52,6 +66,30 @@ describe('detector de encabezados ordenables', () => {
   it('detecta un <th> con <button> dentro', () => {
     const texto = `<th scope="col"><button type="button" onClick={() => requestSort('Año')}>Año <SortIndicator column="Año" /></button></th>`;
     expect(etiquetasOrdenablesEnTexto(texto)).toEqual(['Año']);
+  });
+
+  it('detecta un <SortableTh> en una o varias líneas', () => {
+    const texto = `<SortableTh label="Doc ID" sortKey="Doc" sortConfig={sortConfig} onSort={requestSort} style={{ width: '80px' }} />
+    <SortableTh
+      label="Referencias bibliográficas"
+      sortKey="Referencias bibliográficas"
+      sortConfig={sortConfig}
+      onSort={requestSort}
+    />`;
+    expect(etiquetasOrdenablesEnTexto(texto)).toEqual(['Doc ID', 'Referencias bibliográficas']);
+  });
+
+  it('conserva el orden de aparición entre <th onClick> y <SortableTh>', () => {
+    const texto = `<th onClick={() => requestSort('A')}>Uno <SortIndicator column="A" /></th>
+    <SortableTh label="Dos" sortKey="B" sortConfig={null} onSort={f} />`;
+    expect(etiquetasOrdenablesEnTexto(texto)).toEqual(['Uno', 'Dos']);
+  });
+
+  it('tieneThConOnClick distingue el <th onClick> del <SortableTh>', () => {
+    expect(tieneThConOnClick(`<th onClick={() => x()}>A</th>`)).toBe(true);
+    expect(tieneThConOnClick(`<th\n onClick={() => x()}\n>A</th>`)).toBe(true);
+    expect(tieneThConOnClick(`<SortableTh label="A" sortKey="a" sortConfig={null} onSort={f} />`)).toBe(false);
+    expect(tieneThConOnClick(`<th scope="col">A</th>`)).toBe(false);
   });
 
   it('no marca como ordenable un <th scope="col"> sin onClick', () => {
@@ -82,6 +120,16 @@ describe('tablas: encabezados que ordenan', () => {
     expect(total).toBe(35);
   });
 
+  for (const archivo of MIGRADAS) {
+    it(`${archivo} (migrada) usa SortableTh y no tiene <th onClick>`, () => {
+      expect(archivo in ESPERADO, `${archivo} debe estar en ESPERADO`).toBe(true);
+      const texto = readFileSync(join(PAGINAS, archivo), 'utf-8');
+      expect(tieneThConOnClick(texto), `${archivo}: reapareció un <th onClick>`).toBe(false);
+      expect(texto).toContain('<SortableTh');
+      expect(texto).not.toContain('<SortIndicator');
+    });
+  }
+
   it('los encabezados sin orden de las tablas de detalle llevan scope="col"', () => {
     const sinOrden: Record<string, string[]> = {
       'Documentos.tsx': ['Documento'],
@@ -103,9 +151,9 @@ describe('tablas: encabezados que ordenan', () => {
 describe('«Num» se muestra como «Nro.»', () => {
   it('el encabezado de Transacciones dice «Nro.» y no «Num»', () => {
     const texto = readFileSync(join(PAGINAS, 'Transacciones.tsx'), 'utf-8');
-    expect(texto).toMatch(/>Nro\. <SortIndicator column="Num" \/>/);
-    expect(texto).not.toMatch(/>Num <SortIndicator/);
-    expect(texto).toContain("requestSort('Num')");
+    expect(texto).toMatch(/<SortableTh label="Nro\." sortKey="Num"/);
+    expect(texto).not.toMatch(/label="Num"/);
+    expect(texto).toContain('sortKey="Num"');
   });
 
   it('FIELD_LABEL_MAP de GenericEditModal mapea Num a Nro.', () => {
