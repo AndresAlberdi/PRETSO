@@ -222,7 +222,11 @@ export default function Indicadores() {
       ) : !selectedCategoria ? (
         <div>
           <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-            <select value={filterCategoria} onChange={e => setFilterCategoria(e.target.value)}>
+            <select
+              value={filterCategoria}
+              onChange={e => setFilterCategoria(e.target.value)}
+              aria-label="Filtrar por categoría"
+            >
               <option value="">Todas las Categorías</option>
               {uniqueCategorias.map(opt => <option key={String(opt)} value={String(opt)}>{String(opt)}</option>)}
             </select>

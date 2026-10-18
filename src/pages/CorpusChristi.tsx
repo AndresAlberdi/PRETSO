@@ -239,11 +239,19 @@ export default function CorpusChristi() {
       ) : !selectedCityYear ? (
         <div>
           <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-            <select value={filterCiudad} onChange={e => setFilterCiudad(e.target.value)}>
+            <select
+              value={filterCiudad}
+              onChange={e => setFilterCiudad(e.target.value)}
+              aria-label="Filtrar por ciudad"
+            >
               <option value="">Todas las Ciudades</option>
               {uniqueCiudades.map(opt => <option key={String(opt)} value={String(opt)}>{String(opt)}</option>)}
             </select>
-            <select value={filterAno} onChange={e => setFilterAno(e.target.value)}>
+            <select
+              value={filterAno}
+              onChange={e => setFilterAno(e.target.value)}
+              aria-label="Filtrar por año"
+            >
               <option value="">Todos los Años</option>
               {uniqueAnos.map(opt => <option key={String(opt)} value={String(opt)}>{String(opt)}</option>)}
             </select>

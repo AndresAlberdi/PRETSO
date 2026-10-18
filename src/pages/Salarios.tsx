@@ -271,18 +271,30 @@ export default function Salarios() {
       ) : !selectedCompId ? (
         <div>
           <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-            <select value={filterCompania} onChange={e => setFilterCompania(e.target.value)}>
+            <select
+              value={filterCompania}
+              onChange={e => setFilterCompania(e.target.value)}
+              aria-label="Filtrar por compañía"
+            >
               <option value="">Todas las Compañías</option>
               {uniqueCompanias.map(opt => {
                 const c = companiasMap.get(opt);
                 return <option key={opt} value={opt}>{c ? c["Sigla Compañía"] : opt}</option>;
               })}
             </select>
-            <select value={filterTemporada} onChange={e => setFilterTemporada(e.target.value)}>
+            <select
+              value={filterTemporada}
+              onChange={e => setFilterTemporada(e.target.value)}
+              aria-label="Filtrar por temporada"
+            >
               <option value="">Todas las Temporadas</option>
               {uniqueTemporadas.map(opt => <option key={opt} value={opt}>{opt}</option>)}
             </select>
-            <select value={filterAmbito} onChange={e => setFilterAmbito(e.target.value)}>
+            <select
+              value={filterAmbito}
+              onChange={e => setFilterAmbito(e.target.value)}
+              aria-label="Filtrar por ámbito"
+            >
               <option value="">Todos los Ámbitos</option>
               {uniqueAmbitos.map(opt => <option key={opt} value={opt}>{opt}</option>)}
             </select>
