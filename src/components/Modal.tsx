@@ -48,12 +48,14 @@ export default function Modal({
     const overlay = overlayRef.current;
     const panel = panelRef.current;
     if (!overlay || !panel) return;
+    // Safari y Firefox en macOS no enfocan los botones al hacer clic: <body> equivale a "sin origen".
+    const activo = document.activeElement;
     const entry: ModalEntry = {
       host,
       panel,
       overlay,
       zIndex: zIndexRef.current,
-      opener: document.activeElement,
+      opener: activo === document.body ? null : activo,
       getOnEscape: () => onEscapeRef.current,
     };
     document.body.appendChild(host);

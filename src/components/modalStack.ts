@@ -20,10 +20,40 @@ const pila: ModalEntry[] = [];
 // Elementos a los que la pila les puso `inert` (uno que ya lo tenía antes no se toca).
 const marcadosPorPila = new Set<Element>();
 let escuchando = false;
+// Observa los nodos que se agregan a <body> mientras hay alguna modal abierta, para volverlos inertes.
+let observador: MutationObserver | null = null;
+
+// Un control dentro de un fieldset[disabled] está deshabilitado, salvo que esté en su primer <legend>.
+function enFieldsetDeshabilitado(el: HTMLElement): boolean {
+  let actual: Element | null = el;
+  while (actual) {
+    const fs: HTMLFieldSetElement | null = actual.closest('fieldset[disabled]');
+    if (!fs) return false;
+    const legend = Array.from(fs.children).find(c => c.tagName === 'LEGEND');
+    if (!(legend && legend.contains(el))) return true;
+    actual = fs.parentElement;
+  }
+  return false;
+}
+
+// Un radio no marcado queda fuera del orden de Tab cuando su grupo ya tiene uno marcado.
+function radioFueraDelOrden(el: HTMLElement): boolean {
+  if (!(el instanceof HTMLInputElement) || el.type !== 'radio' || el.checked || !el.name) return false;
+  const raiz = el.getRootNode() as Document | ShadowRoot;
+  return Array.from(raiz.querySelectorAll<HTMLInputElement>('input[type="radio"]')).some(
+    r => r.name === el.name && r.form === el.form && r.checked,
+  );
+}
 
 export function getFocusable(root: HTMLElement): HTMLElement[] {
   return Array.from(root.querySelectorAll<HTMLElement>(SELECTOR_ENFOCABLES)).filter(
-    el => el !== root && !el.closest('[hidden]'),
+    el =>
+      el !== root &&
+      !el.closest('[hidden]') &&
+      // checkVisibility no existe en todos los entornos (p. ej. jsdom): ahí no se filtra.
+      el.checkVisibility?.({ visibilityProperty: true }) !== false &&
+      !enFieldsetDeshabilitado(el) &&
+      !radioFueraDelOrden(el),
   );
 }
 
@@ -99,6 +129,8 @@ function alFocusin(e: FocusEvent) {
 export function registerModal(entry: ModalEntry): () => boolean {
   const debajo = superior();
   if (debajo) {
+    // El zIndex se escribe directo en el DOM (no por React) porque el estilo de la capa es constante
+    // y React no vuelve a escribir `style.zIndex` mientras sus props no cambian; por eso no se pisa.
     const propio = Number(entry.overlay.style.zIndex) || entry.zIndex;
     entry.overlay.style.zIndex = String(Math.max(propio, (Number(debajo.overlay.style.zIndex) || debajo.zIndex) + 1));
   }
@@ -108,6 +140,8 @@ export function registerModal(entry: ModalEntry): () => boolean {
     document.addEventListener('keydown', alKeydown, true);
     document.addEventListener('keydown', alEscape);
     document.addEventListener('focusin', alFocusin);
+    observador = new MutationObserver(recalcularInert);
+    observador.observe(document.body, { childList: true });
     escuchando = true;
   }
   return () => {
@@ -126,6 +160,8 @@ export function registerModal(entry: ModalEntry): () => boolean {
       document.removeEventListener('keydown', alKeydown, true);
       document.removeEventListener('keydown', alEscape);
       document.removeEventListener('focusin', alFocusin);
+      observador?.disconnect();
+      observador = null;
       escuchando = false;
     }
     return eraSuperior;

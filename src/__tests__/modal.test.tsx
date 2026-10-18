@@ -1,11 +1,14 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { StrictMode, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
-import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import { render, screen, fireEvent, cleanup, waitFor } from '@testing-library/react';
 import Modal from '../components/Modal';
 import ConfirmModal from '../components/ConfirmModal';
 import DetailsModal from '../components/DetailsModal';
 import CompaniaModal from '../components/CompaniaModal';
+import DocumentModal from '../components/DocumentModal';
+import TransactionModal from '../components/TransactionModal';
+import { getFocusable } from '../components/modalStack';
 
 vi.mock('../firebase', () => ({ db: {} }));
 vi.mock('firebase/firestore', () => ({
@@ -249,6 +252,45 @@ describe('Modal: retorno del foco', () => {
   });
 });
 
+describe('Modal: retorno del foco, casos límite', () => {
+  it('si el origen se desconectó con la ventana abierta, va a #contenido de inmediato', () => {
+    function Con() {
+      const [origen, setOrigen] = useState(true);
+      const [abierta, setAbierta] = useState(false);
+      return (
+        <>
+          <main id="contenido" tabIndex={-1}>
+            {origen && <button onClick={() => setAbierta(true)}>origen</button>}
+          </main>
+          {abierta && (
+            <Ventana titulo="V" onEscape={() => setAbierta(false)}>
+              <button onClick={() => setOrigen(false)}>quitar origen</button>
+            </Ventana>
+          )}
+        </>
+      );
+    }
+    render(<Con />);
+    abrir();
+    fireEvent.click(screen.getByRole('button', { name: 'quitar origen' }));
+    expect(screen.queryByRole('button', { name: 'origen' })).toBeNull();
+    fireEvent.keyDown(document.activeElement as Element, { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(document.activeElement).toBe(document.getElementById('contenido'));
+  });
+
+  it('si el origen es <body> (el navegador no enfocó el botón), va a #contenido', () => {
+    render(<Arnes>{cerrar => <Ventana titulo="V" onEscape={cerrar}><button>uno</button></Ventana>}</Arnes>);
+    const origen = screen.getByRole('button', { name: 'origen' });
+    expect(document.activeElement).toBe(document.body);
+    fireEvent.click(origen);
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'uno' }));
+    fireEvent.keyDown(document.activeElement as Element, { key: 'Escape' });
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(document.activeElement).toBe(document.getElementById('contenido'));
+  });
+});
+
 describe('Modal: fondo inerte', () => {
   it('el resto del documento es inerte mientras está abierta y deja de serlo al cerrar', () => {
     const { container, rerender } = render(<Ventana titulo="V"><button>uno</button></Ventana>);
@@ -258,6 +300,37 @@ describe('Modal: fondo inerte', () => {
     expect(host.hasAttribute('inert')).toBe(false);
     rerender(<div />);
     expect(raiz.hasAttribute('inert')).toBe(false);
+  });
+
+  it('un nodo agregado a <body> con la ventana abierta queda inerte, y deja de estarlo al cerrar', async () => {
+    const { rerender } = render(<Ventana titulo="V"><button>uno</button></Ventana>);
+    const tardio = document.createElement('div');
+    document.body.appendChild(tardio);
+    await waitFor(() => expect(tardio.hasAttribute('inert')).toBe(true));
+    rerender(<div />);
+    expect(tardio.hasAttribute('inert')).toBe(false);
+    tardio.remove();
+  });
+
+  it('al vaciarse la pila se quitan todos los listeners y el observador', () => {
+    const agregados = vi.spyOn(document, 'addEventListener');
+    const quitados = vi.spyOn(document, 'removeEventListener');
+    const { unmount } = render(<Ventana titulo="V"><button>uno</button></Ventana>);
+    const propios = agregados.mock.calls.filter(([tipo]) => tipo === 'keydown' || tipo === 'focusin');
+    expect(propios.length).toBeGreaterThan(0);
+    unmount();
+    for (const [tipo, fn, opciones] of propios) {
+      expect(quitados.mock.calls.some(c => c[0] === tipo && c[1] === fn && c[2] === opciones)).toBe(true);
+    }
+    agregados.mockRestore();
+    quitados.mockRestore();
+    // Sin pila, un nodo nuevo ya no se vuelve inerte.
+    const nuevo = document.createElement('div');
+    document.body.appendChild(nuevo);
+    return Promise.resolve().then(() => {
+      expect(nuevo.hasAttribute('inert')).toBe(false);
+      nuevo.remove();
+    });
   });
 
   it('un inert previo se conserva', () => {
@@ -324,7 +397,6 @@ describe('Modal: cadena de una capa sin controles a una confirmación en el mism
   it('la confirmación toma el foco en «Cancelar» y al cancelar vuelve al botón de origen', () => {
     function Cadena() {
       const [paso, setPaso] = useState<'cerrada' | 'espera' | 'confirma'>('cerrada');
-      const cancelar = useRef<HTMLButtonElement>(null);
       return (
         <>
           <main id="contenido" tabIndex={-1}>
@@ -332,10 +404,7 @@ describe('Modal: cadena de una capa sin controles a una confirmación en el mism
           </main>
           {paso === 'espera' && <Ventana titulo="Espera" busy />}
           {paso === 'confirma' && (
-            <Ventana titulo="Confirmar" role="alertdialog" initialFocus={cancelar} onEscape={() => setPaso('cerrada')}>
-              <button onClick={() => setPaso('cerrada')}>Borrar</button>
-              <button ref={cancelar} onClick={() => setPaso('cerrada')}>Cancelar</button>
-            </Ventana>
+            <ConfirmModal title="Confirmar" message="¿Seguro?" confirmText="Borrar" onConfirm={() => setPaso('cerrada')} onCancel={() => setPaso('cerrada')} />
           )}
           {paso === 'espera' && <button hidden onClick={() => setPaso('confirma')}>pasar</button>}
         </>
@@ -409,6 +478,48 @@ describe('Modal: ventanas apiladas que se cierran en el mismo commit', () => {
   });
 });
 
+describe('getFocusable: controles que no reciben foco', () => {
+  function montar(html: string) {
+    const raiz = document.createElement('div');
+    raiz.innerHTML = html;
+    document.body.appendChild(raiz);
+    return raiz;
+  }
+
+  it('excluye los controles dentro de un fieldset deshabilitado, salvo su primer legend', () => {
+    const raiz = montar(
+      '<fieldset disabled><legend><button id="leg">leg</button></legend><button id="dentro">x</button></fieldset><button id="libre">y</button>',
+    );
+    expect(getFocusable(raiz).map(e => e.id)).toEqual(['leg', 'libre']);
+    raiz.remove();
+  });
+
+  it('excluye los radios no marcados cuando el grupo tiene uno marcado', () => {
+    const raiz = montar(
+      '<input type="radio" name="g" id="r1"><input type="radio" name="g" id="r2" checked><input type="radio" name="g" id="r3">' +
+        '<input type="radio" name="h" id="h1"><input type="radio" name="h" id="h2">',
+    );
+    expect(getFocusable(raiz).map(e => e.id)).toEqual(['r2', 'h1', 'h2']);
+    raiz.remove();
+  });
+
+  it('excluye los controles que checkVisibility reporta invisibles', () => {
+    const raiz = montar('<button id="visible">a</button><button id="oculto" data-oculto>b</button>');
+    const proto = Element.prototype as unknown as { checkVisibility?: () => boolean };
+    const original = proto.checkVisibility;
+    proto.checkVisibility = function (this: HTMLElement) {
+      return !this.hasAttribute('data-oculto');
+    };
+    try {
+      expect(getFocusable(raiz).map(e => e.id)).toEqual(['visible']);
+    } finally {
+      if (original) proto.checkVisibility = original;
+      else delete proto.checkVisibility;
+      raiz.remove();
+    }
+  });
+});
+
 describe('ventanas de lectura y confirmación', () => {
   it('ConfirmModal de confirmación: alertdialog, foco en «Cancelar» y Escape cancela', () => {
     const onCancel = vi.fn();
@@ -447,5 +558,23 @@ describe('ventanas de lectura y confirmación', () => {
     render(<CompaniaModal compania={{ 'Sigla Compañía': 'JG' }} onClose={() => {}} />);
     expect(screen.getByRole('dialog', { name: 'Detalle de Compañía' })).toBeTruthy();
     expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Cerrar' }));
+  });
+
+  it('DocumentModal: nombre accesible y Escape cierra', async () => {
+    const onClose = vi.fn();
+    render(<DocumentModal documentCode="D-1" onClose={onClose} />);
+    expect(screen.getByRole('dialog', { name: 'Documento D-1' })).toBeTruthy();
+    await screen.findByText(/No se encontró información/);
+    fireEvent.keyDown(document.activeElement as Element, { key: 'Escape' });
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('TransactionModal: nombre accesible y Escape cierra', async () => {
+    const onClose = vi.fn();
+    render(<TransactionModal transactionCode={7} onClose={onClose} />);
+    expect(screen.getByRole('dialog', { name: 'Detalle de Transacción 7' })).toBeTruthy();
+    await screen.findByText(/No se encontró información/);
+    fireEvent.keyDown(document.activeElement as Element, { key: 'Escape' });
+    expect(onClose).toHaveBeenCalledTimes(1);
   });
 });
