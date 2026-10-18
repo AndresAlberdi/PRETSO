@@ -6,6 +6,8 @@ export interface ModalEntry {
   panel: HTMLElement;
   overlay: HTMLElement;
   zIndex: number;
+  // Elemento que tenía el foco al abrirse; la ventana superior puede heredar el de una inferior que se cierra antes.
+  opener: Element | null;
   getOnEscape: () => (() => void) | undefined;
 }
 
@@ -49,20 +51,20 @@ function recalcularInert() {
   }
 }
 
+// Escape se atiende en la fase de burbuja: los controles internos (React delega también en el
+// contenedor del portal) pueden manejar su propio Escape y marcarlo con preventDefault.
+function alEscape(e: KeyboardEvent) {
+  if (e.key !== 'Escape' || e.defaultPrevented || e.isComposing || e.repeat) return;
+  const alEscapar = superior()?.getOnEscape();
+  if (alEscapar) {
+    e.preventDefault();
+    alEscapar();
+  }
+}
+
 function alKeydown(e: KeyboardEvent) {
   const top = superior();
-  if (!top) return;
-  if (e.key === 'Escape') {
-    if (e.isComposing) return;
-    const alEscapar = top.getOnEscape();
-    if (alEscapar) {
-      e.preventDefault();
-      e.stopPropagation();
-      alEscapar();
-    }
-    return;
-  }
-  if (e.key !== 'Tab') return;
+  if (!top || e.key !== 'Tab') return;
   const enfocables = getFocusable(top.panel);
   if (enfocables.length === 0) {
     e.preventDefault();
@@ -92,8 +94,9 @@ function alFocusin(e: FocusEvent) {
   (getFocusable(top.panel)[0] ?? top.panel).focus();
 }
 
-// Agrega la modal a la pila y devuelve la función que la retira.
-export function registerModal(entry: ModalEntry): () => void {
+// Agrega la modal a la pila y devuelve la función que la retira. Esa función devuelve `true` si la
+// modal era la superior: solo entonces quien llama debe devolver el foco a `entry.opener`.
+export function registerModal(entry: ModalEntry): () => boolean {
   const debajo = superior();
   if (debajo) {
     const propio = Number(entry.overlay.style.zIndex) || entry.zIndex;
@@ -103,17 +106,28 @@ export function registerModal(entry: ModalEntry): () => void {
   recalcularInert();
   if (!escuchando) {
     document.addEventListener('keydown', alKeydown, true);
+    document.addEventListener('keydown', alEscape);
     document.addEventListener('focusin', alFocusin);
     escuchando = true;
   }
   return () => {
     const i = pila.indexOf(entry);
+    const eraSuperior = i !== -1 && i === pila.length - 1;
     if (i !== -1) pila.splice(i, 1);
+    // Si se cierra una inferior antes que las de arriba (mismo commit), las que se abrieron desde
+    // dentro de ella heredan su origen, que es adonde debe volver el foco al final.
+    if (i !== -1 && !eraSuperior) {
+      for (const encima of pila.slice(i)) {
+        if (encima.opener && entry.host.contains(encima.opener)) encima.opener = entry.opener;
+      }
+    }
     recalcularInert();
     if (pila.length === 0 && escuchando) {
       document.removeEventListener('keydown', alKeydown, true);
+      document.removeEventListener('keydown', alEscape);
       document.removeEventListener('focusin', alFocusin);
       escuchando = false;
     }
+    return eraSuperior;
   };
 }

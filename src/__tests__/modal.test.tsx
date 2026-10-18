@@ -182,6 +182,27 @@ describe('Modal: Escape', () => {
     expect(onEscape).not.toHaveBeenCalled();
   });
 
+  it('un control interno que maneja su propio Escape (preventDefault) evita el cierre', () => {
+    const onEscape = vi.fn();
+    render(
+      <Ventana titulo="V" onEscape={onEscape}>
+        <input aria-label="campo" onKeyDown={e => { if (e.key === 'Escape') e.preventDefault(); }} />
+        <button>uno</button>
+      </Ventana>,
+    );
+    fireEvent.keyDown(screen.getByLabelText('campo'), { key: 'Escape' });
+    expect(onEscape).not.toHaveBeenCalled();
+    fireEvent.keyDown(screen.getByRole('button', { name: 'uno' }), { key: 'Escape' });
+    expect(onEscape).toHaveBeenCalledTimes(1);
+  });
+
+  it('se ignora el Escape repetido (tecla mantenida)', () => {
+    const onEscape = vi.fn();
+    render(<Ventana titulo="V" onEscape={onEscape}><button>uno</button></Ventana>);
+    fireEvent.keyDown(document.activeElement as Element, { key: 'Escape', repeat: true });
+    expect(onEscape).not.toHaveBeenCalled();
+  });
+
   it('usa el onEscape más reciente', () => {
     const a = vi.fn();
     const b = vi.fn();
@@ -328,6 +349,63 @@ describe('Modal: cadena de una capa sin controles a una confirmación en el mism
     fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
     expect(screen.queryByRole('alertdialog')).toBeNull();
     expect(document.activeElement).toBe(origen);
+  });
+});
+
+describe('Modal: ventanas apiladas que se cierran en el mismo commit', () => {
+  // Formulario (A) que abre una confirmación REAL (B) dentro de sí; «Descartar» cierra ambas a la vez.
+  function Anidada() {
+    const [a, setA] = useState(false);
+    const [b, setB] = useState(false);
+    return (
+      <>
+        <main id="contenido" tabIndex={-1}>
+          <button onClick={() => setA(true)}>Editar</button>
+        </main>
+        {a && (
+          <Ventana titulo="Formulario" onEscape={() => setA(false)}>
+            <input aria-label="campo" />
+            <button onClick={() => setB(true)}>Descartar cambios</button>
+            {b && (
+              <ConfirmModal
+                title="¿Descartar?"
+                message="Se perderán los cambios"
+                confirmText="Descartar"
+                onConfirm={() => { setA(false); setB(false); }}
+                onCancel={() => setB(false)}
+              />
+            )}
+          </Ventana>
+        )}
+      </>
+    );
+  }
+
+  function abrirConfirmacion() {
+    render(<Anidada />);
+    const editar = screen.getByRole('button', { name: 'Editar' });
+    editar.focus();
+    fireEvent.click(editar);
+    const descartar = screen.getByRole('button', { name: 'Descartar cambios' });
+    descartar.focus();
+    fireEvent.click(descartar);
+    expect(screen.getByRole('alertdialog', { name: '¿Descartar?' })).toBeTruthy();
+    return { editar, descartar };
+  }
+
+  it('al cerrar ambas a la vez, el foco vuelve al origen de la primera', () => {
+    const { editar } = abrirConfirmacion();
+    fireEvent.click(screen.getByRole('button', { name: 'Descartar' }));
+    expect(screen.queryByRole('dialog')).toBeNull();
+    expect(screen.queryByRole('alertdialog')).toBeNull();
+    expect(document.activeElement).toBe(editar);
+  });
+
+  it('al cerrar solo la superior, el foco vuelve dentro de la inferior', () => {
+    const { descartar } = abrirConfirmacion();
+    fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
+    expect(screen.queryByRole('alertdialog')).toBeNull();
+    expect(document.activeElement).toBe(descartar);
   });
 });
 

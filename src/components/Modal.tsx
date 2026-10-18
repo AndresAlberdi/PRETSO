@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, useState } from 'react';
 import type { CSSProperties, ReactNode, RefObject } from 'react';
 import { createPortal } from 'react-dom';
 import { getFocusable, registerModal } from './modalStack';
+import type { ModalEntry } from './modalStack';
 
 interface ModalProps {
   labelledBy: string;
@@ -47,19 +48,23 @@ export default function Modal({
     const overlay = overlayRef.current;
     const panel = panelRef.current;
     if (!overlay || !panel) return;
-    const opener = document.activeElement;
-    document.body.appendChild(host);
-    const release = registerModal({
+    const entry: ModalEntry = {
       host,
       panel,
       overlay,
       zIndex: zIndexRef.current,
+      opener: document.activeElement,
       getOnEscape: () => onEscapeRef.current,
-    });
+    };
+    document.body.appendChild(host);
+    const release = registerModal(entry);
     (initialFocusRef.current?.current ?? getFocusable(panel)[0] ?? panel).focus();
     return () => {
-      release();
+      const eraSuperior = release();
       host.remove();
+      // Una ventana inferior que se cierra con otras encima no toca el foco: lo restaura la superior.
+      if (!eraSuperior) return;
+      const opener = entry.opener;
       const alContenido = () => document.getElementById('contenido')?.focus({ preventScroll: true });
       if (opener instanceof HTMLElement && opener.isConnected) {
         opener.focus();
