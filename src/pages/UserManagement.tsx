@@ -45,7 +45,7 @@ export default function UserManagement() {
 
   return (
     <div style={{ maxWidth: '600px', margin: '2rem auto', padding: '2rem', background: 'var(--bg-card)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-      <h2 style={{ marginTop: 0, color: 'var(--primary-color)' }}>Gestión de Usuarios Lectores</h2>
+      <h1 style={{ marginTop: 0, marginBottom: '0.83em', fontSize: '1.5em', color: 'var(--primary-color)' }}>Gestión de Usuarios Lectores</h1>
       <p style={{ color: 'var(--text-secondary)', lineHeight: 1.5 }}>
         Crea usuarios con acceso de solo lectura. Estos usuarios podrán acceder a la plataforma pero no podrán modificar ni borrar ningún registro, dado que la Base de Datos solo permite escrituras al administrador.
       </p>

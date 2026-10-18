@@ -48,7 +48,7 @@ body {
 }
 
 /* Typography */
-h1, h2, h3 {
+h1, h2, h3, .titulo-secundario {
   font-family: var(--font-serif);
   color: #ffffff;
   font-weight: 700;
@@ -68,7 +68,7 @@ h1 {
   margin-bottom: 1.5rem;
 }
 
-h1, h2, h3, .page-title, .marca {
+h1, h2, h3, .page-title, .marca, .titulo-secundario {
   background: linear-gradient(135deg, #ffffff 0%, #e5a93b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

@@ -153,19 +153,19 @@ export default function Inicio() {
             <h1 style={{ whiteSpace: 'pre-line', margin: '0 0 1rem 0', color: 'var(--primary-color)' }}>
               {"PRETSO\nPrecios del Teatro del Siglo de Oro"}
             </h1>
-            <h2 style={{ fontSize: '1.2rem', fontWeight: 500, margin: '0 0 0.5rem 0' }}>
+            <p className="titulo-secundario" style={{ fontSize: '1.2rem', fontWeight: 500, margin: '0 0 0.5rem 0' }}>
               Base de datos para el estudio de las dinámicas económicas del teatro comercial en los territorios hispanos (siglos XVI-XVII)
-            </h2>
-            <h3 style={{ fontSize: '1rem', fontWeight: 400, margin: 0, opacity: 0.8 }}>
+            </p>
+            <p className="titulo-secundario" style={{ fontSize: '1rem', fontWeight: 400, margin: 0, opacity: 0.8 }}>
               Proyecto: [101150056] — [THIS] — [HORIZON-MSCA-2023-PF-01]
-            </h3>
-            <h3 style={{ fontSize: '1rem', fontWeight: 400, margin: 0, opacity: 0.8 }}>
+            </p>
+            <p className="titulo-secundario" style={{ fontSize: '1rem', fontWeight: 400, margin: 0, opacity: 0.8 }}>
               IP: Laura Paz Rescala
-            </h3>
+            </p>
           </div>
           <img src="/logo_ue.png?v=2" alt="Logo UE" style={{ width: '150px', objectFit: 'contain' }} />
         </div>
-        <h3 style={{ textAlign: 'center', fontSize: '1.5rem', fontWeight: 'bold', margin: '1rem 0 2rem 0' }}>Búsqueda general</h3>
+        <h2 style={{ textAlign: 'center', fontSize: '1.5rem', fontWeight: 'bold', margin: '1rem 0 2rem 0' }}>Búsqueda general</h2>
         
         <div style={{ display: 'inline-block', textAlign: 'left', minWidth: '300px', maxWidth: '600px', width: '100%' }}>
           <SearchBar 
