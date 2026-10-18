@@ -32,6 +32,7 @@ describe('Login', () => {
     expect((await screen.findByRole('alert')).textContent).toContain('fallo');
     await waitFor(() => expect(screen.getByRole('button', { name: 'Entrar' })).toBeTruthy());
     fireEvent.submit(form);
+    expect(screen.queryByRole('alert')).toBeNull();
     await waitFor(() => expect(signInWithEmailAndPassword).toHaveBeenCalledTimes(2));
     expect((await screen.findByRole('alert')).textContent).toContain('fallo');
   });

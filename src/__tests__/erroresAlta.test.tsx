@@ -96,4 +96,68 @@ describe('errores del alta anunciados y enlazados', () => {
     expect(alerta.textContent).toBe('Error al cargar los datos del formulario.');
     expect(document.querySelectorAll('[aria-invalid="true"]').length).toBe(0);
   });
+
+  it('un error de validación marca el campo y uno posterior a la escritura lo desmarca', async () => {
+    logAction.mockRejectedValue(new Error('auditoría caída'));
+    const form = await abrirAlta('bibliografia');
+    const autores = screen.getByPlaceholderText('Autores del documento...');
+    fireEvent.change(autores, { target: { value: ' ' } });
+    fireEvent.change(screen.getByPlaceholderText('Detalles bibliográficos...'), { target: { value: 'Ref 1' } });
+    fireEvent.submit(form);
+    await screen.findByRole('alert');
+    expect(autores.getAttribute('aria-invalid')).toBe('true');
+    fireEvent.change(autores, { target: { value: 'Ana' } });
+    fireEvent.submit(form);
+    await waitFor(() => expect(screen.getByRole('alert').textContent).toBe('El registro ya se guardó; ciérrelo con «Cerrar».'));
+    expect(document.querySelectorAll('[aria-invalid="true"]').length).toBe(0);
+  });
+});
+
+// Una fila por cada clave de ValidationError: colección, preparación que deja solo ese campo inválido,
+// y el control que debe quedar marcado.
+const porNombre = (rol: string, nombre: string | RegExp) => () => screen.getByRole(rol, { name: nombre });
+const casos: Array<[string, string, string, () => void, () => HTMLElement]> = [
+  ['Doc', 'transacciones', 'sin documentos', () => undefined, () => screen.getByLabelText('Documento 1')],
+  ['Categorías', 'indicadores', 'sin categoría', () => undefined, porNombre('textbox', 'Categoría / Indicador (Obligatorio)')],
+  ['Transacción', 'indicadores', 'sin transacción', () => {
+    fireEvent.change(screen.getByPlaceholderText('Nombre de la nueva categoría'), { target: { value: 'Pagos' } });
+  }, () => screen.getByLabelText(/Transacción Relacionada/)],
+  ['Ciudad', 'corpus_christi', 'sin ciudad', () => undefined, porNombre('textbox', 'Ciudad (Obligatorio)')],
+  ['Año', 'corpus_christi', 'sin año', () => {
+    fireEvent.change(screen.getByPlaceholderText('Nombre de la nueva ciudad'), { target: { value: 'Potosí' } });
+  }, porNombre('spinbutton', 'Año (Obligatorio)')],
+  ['Transacción', 'corpus_christi', 'sin transacción', () => {
+    fireEvent.change(screen.getByPlaceholderText('Nombre de la nueva ciudad'), { target: { value: 'Potosí' } });
+    fireEvent.change(screen.getByPlaceholderText('Año (numérico)'), { target: { value: '1600' } });
+  }, () => screen.getByLabelText(/Transacción Relacionada/)],
+  ['Sigla Compañía', 'salarios', 'sin compañía', () => {
+    fireEvent.change(screen.getByLabelText(/Transacción Relacionada/), { target: { value: '3' } });
+  }, () => screen.getByLabelText(/Sigla Compañía \(Obligatorio\)/)],
+  ['Transacción', 'salarios', 'sin transacción', () => {
+    fireEvent.change(screen.getByLabelText(/Sigla Compañía \(Obligatorio\)/), { target: { value: '7' } });
+  }, () => screen.getByLabelText(/Transacción Relacionada/)],
+  ['Sigla Compañía', 'manejo_de_caja', 'sin compañía', () => {
+    fireEvent.change(screen.getByLabelText(/Transacción Relacionada/), { target: { value: '3' } });
+  }, () => screen.getByLabelText(/Sigla Compañía \(Obligatorio\)/)],
+  ['Transacción', 'manejo_de_caja', 'sin transacción', () => {
+    fireEvent.change(screen.getByLabelText(/Sigla Compañía \(Obligatorio\)/), { target: { value: '7' } });
+  }, () => screen.getByLabelText(/Transacción Relacionada/)],
+  ['Autores', 'bibliografia', 'sin autores', () => {
+    fireEvent.change(screen.getByPlaceholderText('Detalles bibliográficos...'), { target: { value: 'Ref' } });
+  }, () => screen.getByPlaceholderText('Autores del documento...')],
+  ['Referencias bibliográficas', 'bibliografia', 'sin referencias', () => {
+    fireEvent.change(screen.getByPlaceholderText('Autores del documento...'), { target: { value: 'Ana' } });
+  }, () => screen.getByPlaceholderText('Detalles bibliográficos...')],
+];
+
+describe('cada clave de ValidationError marca su control', () => {
+  it.each(casos)('%s en %s (%s)', async (_campo, coleccion, _caso, preparar, control) => {
+    const form = await abrirAlta(coleccion);
+    preparar();
+    fireEvent.submit(form);
+    const alerta = await screen.findByRole('alert');
+    const marcados = Array.from(document.querySelectorAll('[aria-invalid="true"]'));
+    expect(marcados).toEqual([control()]);
+    expect(control().getAttribute('aria-describedby')).toBe(alerta.id);
+  });
 });

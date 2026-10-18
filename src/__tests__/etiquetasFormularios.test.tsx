@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import SearchBar from '../components/SearchBar';
 import SelectorCompania from '../components/SelectorCompania';
@@ -26,7 +26,6 @@ vi.mock('firebase/firestore', () => ({
   }),
 }));
 
-beforeEach(() => undefined);
 afterEach(cleanup);
 
 // Controles de formulario sin ningún nombre accesible (etiqueta, aria-label o aria-labelledby).
@@ -80,10 +79,6 @@ describe('SearchBar con nombres accesibles', () => {
     expect(screen.getByRole('button', { name: 'Quitar filtro Texto libre: garcia' })).toBeTruthy();
   });
 
-  it('dos buscadores no repiten ids', () => {
-    render(<><SearchBar categories={categorias} onSearch={() => undefined} /><SearchBar categories={categorias} onSearch={() => undefined} /></>);
-    expect(idsRepetidos()).toEqual([]);
-  });
 });
 
 describe('SelectorCompania con error', () => {

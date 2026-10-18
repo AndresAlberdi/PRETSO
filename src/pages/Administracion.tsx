@@ -175,7 +175,7 @@ export default function Administracion() {
           </div>
 
           {/* Contenedores persistentes: un lector de pantalla solo anuncia cambios en regiones ya montadas. */}
-          <div role="status">
+          <output style={{ display: 'block' }}>
             {(backupStatus === 'loading' || backupStatus === 'success') && (
               <div style={{ 
                 marginTop: '1rem', 
@@ -190,7 +190,7 @@ export default function Administracion() {
                 {statusMessage}
               </div>
             )}
-          </div>
+          </output>
           <div role="alert">
             {backupStatus === 'error' && (
               <div style={{ 

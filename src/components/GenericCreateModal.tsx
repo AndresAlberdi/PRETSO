@@ -57,7 +57,7 @@ class ValidationError extends Error {
 }
 
 const fieldsetStyle: React.CSSProperties = { border: 0, padding: 0, margin: 0, minWidth: 0 };
-const legendStyle: React.CSSProperties = { padding: 0, fontWeight: 'bold', marginBottom: '0.5rem' };
+const legendStyle: React.CSSProperties = { padding: '0 0 0.5rem', fontWeight: 'bold' };
 
 export default function GenericCreateModal({ collectionName, onClose, onCreated }: GenericCreateModalProps) {
   const [loading, setLoading] = useState(true);
@@ -110,6 +110,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
       try {
         setLoading(true);
         setError(null);
+        setErrorField(null);
 
         // 1. Calculate next sequential index
         let indexField = '';
