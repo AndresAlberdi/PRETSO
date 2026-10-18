@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import { collection, getDocs, query, addDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { cleanFirebaseData } from '../utils';
 import { logAction } from '../utils/audit';
 import { canonizarReferencia } from '../utils/referenciaCompania';
 import SelectorCompania from './SelectorCompania';
+import Modal from './Modal';
+import ConfirmModal from './ConfirmModal';
 
 const COLLECTION_LABELS: Record<string, string> = {
   documentos: 'Documentos',
@@ -23,10 +25,38 @@ interface GenericCreateModalProps {
   onCreated: (newRecord: any) => void;
 }
 
+const overlayStyle: React.CSSProperties = {
+  position: 'fixed',
+  top: 0, left: 0, right: 0, bottom: 0,
+  backgroundColor: 'rgba(0,0,0,0.6)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 2000
+};
+
+const panelStyle: React.CSSProperties = {
+  background: 'var(--bg-card)',
+  padding: '2.5rem',
+  borderRadius: '12px',
+  maxWidth: '700px',
+  width: '90%',
+  maxHeight: '90vh',
+  overflowY: 'auto',
+  border: '1px solid var(--border-color)',
+  boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
+};
+
 export default function GenericCreateModal({ collectionName, onClose, onCreated }: GenericCreateModalProps) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Se activa con cualquier edición del usuario (no con los valores por defecto precargados);
+  // decide si Escape pide confirmar el descarte.
+  const [touched, setTouched] = useState(false);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
+  const titleId = useId();
+  const closeRef = useRef<HTMLButtonElement>(null);
 
   // Auto-calculated sequential index
   const [nextIndex, setNextIndex] = useState<number | null>(null);
@@ -141,10 +171,12 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
   }, [collectionName]);
 
   const handleChange = (key: string, value: any) => {
+    setTouched(true);
     setFormData((prev: any) => ({ ...prev, [key]: value }));
   };
 
   const handleDocChange = (index: number, value: string) => {
+    setTouched(true);
     setSelectedDocs(prev => {
       const next = [...prev];
       next[index] = value;
@@ -264,30 +296,19 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
     }
   };
 
+  // Escape no hace nada mientras guarda; sin cambios cierra; con cambios pide confirmar el descarte.
+  const handleEscape = () => {
+    if (saving) return;
+    if (touched) setConfirmDiscard(true);
+    else onClose();
+  };
+
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0, left: 0, right: 0, bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.6)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 2000
-    }}>
-      <div style={{
-        background: 'var(--bg-card)',
-        padding: '2.5rem',
-        borderRadius: '12px',
-        maxWidth: '700px',
-        width: '90%',
-        maxHeight: '90vh',
-        overflowY: 'auto',
-        border: '1px solid var(--border-color)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
-      }}>
+    <>
+      <Modal labelledBy={titleId} onEscape={handleEscape} initialFocus={closeRef} overlayStyle={overlayStyle} panelStyle={panelStyle}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
-          <h2 style={{ marginTop: 0, color: 'var(--primary-color)' }}>Nuevo Registro - {(COLLECTION_LABELS[collectionName] || collectionName).toUpperCase()}</h2>
-          <button onClick={onClose} style={{ padding: '0.4rem 0.8rem', background: '#ccc', color: '#333', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Cerrar</button>
+          <h2 id={titleId} style={{ marginTop: 0, color: 'var(--primary-color)' }}>Nuevo Registro - {(COLLECTION_LABELS[collectionName] || collectionName).toUpperCase()}</h2>
+          <button ref={closeRef} onClick={onClose} disabled={saving} style={{ padding: '0.4rem 0.8rem', background: '#ccc', color: '#333', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Cerrar</button>
         </div>
 
         {loading ? <p>Cargando opciones...</p> : (
@@ -879,7 +900,17 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
 
           </form>
         )}
-      </div>
-    </div>
+      </Modal>
+      {confirmDiscard && (
+        <ConfirmModal
+          title="Descartar cambios"
+          message="Hay cambios sin guardar. ¿Desea cerrar el formulario y descartarlos?"
+          confirmText="Descartar"
+          cancelText="Seguir editando"
+          onConfirm={() => { setConfirmDiscard(false); onClose(); }}
+          onCancel={() => setConfirmDiscard(false)}
+        />
+      )}
+    </>
   );
 }

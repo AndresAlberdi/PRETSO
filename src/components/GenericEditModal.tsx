@@ -1,9 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useId, useState } from 'react';
 import { collection, query, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { cleanFirebaseData } from '../utils';
 import { esCampoCompaniaCorpus } from '../utils/referenciaCompania';
 import SelectorCompania from './SelectorCompania';
+import Modal from './Modal';
+import ConfirmModal from './ConfirmModal';
 
 interface GenericEditModalProps {
   collectionName: string;
@@ -47,9 +49,35 @@ const READONLY_FIELDS = [
   'Indicador de registro'
 ];
 
+const overlayStyle: React.CSSProperties = {
+  position: 'fixed',
+  top: 0, left: 0, right: 0, bottom: 0,
+  backgroundColor: 'rgba(0,0,0,0.6)',
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  zIndex: 2000
+};
+
+const panelStyle: React.CSSProperties = {
+  background: 'var(--bg-card)',
+  padding: '2rem',
+  borderRadius: '12px',
+  maxWidth: '600px',
+  width: '90%',
+  maxHeight: '90vh',
+  overflowY: 'auto',
+  border: '1px solid var(--border-color)',
+  boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
+};
+
 export default function GenericEditModal({ collectionName, record, onSave, onClose }: GenericEditModalProps) {
   const [formData, setFormData] = useState<any>({ ...record });
   const [loading, setLoading] = useState(false);
+  // Se activa con cualquier edición del usuario; decide si Escape pide confirmar el descarte.
+  const [touched, setTouched] = useState(false);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
+  const titleId = useId();
   const [documents, setDocuments] = useState<any[]>([]);
   const [companias, setCompanias] = useState<any[]>([]);
   const [companiasCargadas, setCompaniasCargadas] = useState(false);
@@ -89,6 +117,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
   }, [collectionName]);
 
   const handleChange = (key: string, value: any) => {
+    setTouched(true);
     setFormData((prev: any) => ({ ...prev, [key]: value }));
   };
 
@@ -150,28 +179,17 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
     return keys;
   };
 
+  // Escape no hace nada mientras guarda; sin cambios cierra; con cambios pide confirmar el descarte.
+  const handleEscape = () => {
+    if (loading) return;
+    if (touched) setConfirmDiscard(true);
+    else onClose();
+  };
+
   return (
-    <div style={{
-      position: 'fixed',
-      top: 0, left: 0, right: 0, bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.6)',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      zIndex: 2000
-    }}>
-      <div style={{
-        background: 'var(--bg-card)',
-        padding: '2rem',
-        borderRadius: '12px',
-        maxWidth: '600px',
-        width: '90%',
-        maxHeight: '90vh',
-        overflowY: 'auto',
-        border: '1px solid var(--border-color)',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
-      }}>
-        <h2 style={{ marginTop: 0, color: 'var(--primary-color)' }}>
+    <>
+      <Modal labelledBy={titleId} onEscape={handleEscape} overlayStyle={overlayStyle} panelStyle={panelStyle}>
+        <h2 id={titleId} style={{ marginTop: 0, color: 'var(--primary-color)' }}>
           Editar Registro - {(COLLECTION_LABELS[collectionName] || collectionName).toUpperCase()}
         </h2>
         <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', marginTop: '1.5rem' }}>
@@ -279,7 +297,17 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
             </button>
           </div>
         </form>
-      </div>
-    </div>
+      </Modal>
+      {confirmDiscard && (
+        <ConfirmModal
+          title="Descartar cambios"
+          message="Hay cambios sin guardar. ¿Desea cerrar el formulario y descartarlos?"
+          confirmText="Descartar"
+          cancelText="Seguir editando"
+          onConfirm={() => { setConfirmDiscard(false); onClose(); }}
+          onCancel={() => setConfirmDiscard(false)}
+        />
+      )}
+    </>
   );
 }

@@ -31,9 +31,9 @@ afterEach(cleanup);
 
 async function abrirAlta(coleccion: string) {
   const onCreated = vi.fn();
-  const { container } = render(<GenericCreateModal collectionName={coleccion} onClose={vi.fn()} onCreated={onCreated} />);
+  render(<GenericCreateModal collectionName={coleccion} onClose={vi.fn()} onCreated={onCreated} />);
   await waitFor(() => expect(screen.queryByText('Cargando opciones...')).toBeNull());
-  return { form: container.querySelector('form') as HTMLFormElement, onCreated };
+  return { form: document.querySelector('form') as HTMLFormElement, onCreated };
 }
 
 describe('alta: la compañía se guarda por número de registro', () => {
