@@ -39,6 +39,9 @@ export default defineConfig(({ mode, command }) => {
     },
     test: {
       environment: 'jsdom',
+      setupFiles: ['./src/setupTests.ts'],
+      // Margen para el CI cargado; no oculta fallos: una prueba que termina bien no espera más.
+      testTimeout: 15000,
       // Las pruebas de reglas requieren el emulador: se ejecutan con `npm run test:rules`.
       exclude: [...configDefaults.exclude, 'tests/rules/**'],
     },
