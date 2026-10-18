@@ -19,8 +19,17 @@ const ESPERADO: Record<string, string[]> = {
   'Transacciones.tsx': ['Nro.'],
 };
 
-// Páginas ya migradas al componente SortableTh (C1): en ellas no puede reaparecer un <th onClick>.
-const MIGRADAS = ['Bibliografia.tsx', 'Documentos.tsx', 'Transacciones.tsx'];
+// Páginas ya migradas al componente SortableTh (C1 y C2): en ellas no puede reaparecer un <th onClick>.
+const MIGRADAS = [
+  'Bibliografia.tsx',
+  'Documentos.tsx',
+  'Transacciones.tsx',
+  'CorpusChristi.tsx',
+  'Indicadores.tsx',
+  'ManejoCaja.tsx',
+  'Salarios.tsx',
+  'IndiceCompanias.tsx',
+];
 
 // Analiza el texto completo (no línea por línea): cada bloque <th ...>...</th> es ordenable si
 // contiene onClick o SortIndicator (también cuando hay un <button> dentro), aunque esté en varias líneas.
@@ -127,6 +136,40 @@ describe('tablas: encabezados que ordenan', () => {
       expect(tieneThConOnClick(texto), `${archivo}: reapareció un <th onClick>`).toBe(false);
       expect(texto).toContain('<SortableTh');
       expect(texto).not.toContain('<SortIndicator');
+    });
+  }
+
+  // Par sortConfig/onSort esperado por cada <thead> que contiene SortableTh, en orden de aparición.
+  const PARES: Record<string, string[]> = {
+    'Bibliografia.tsx': ['sortConfig/requestSort'],
+    'Documentos.tsx': ['sortConfig/requestSort'],
+    'Transacciones.tsx': ['sortConfig/requestSort'],
+    'CorpusChristi.tsx': ['scSearch/sortSearch', 'scGroup/sortGroup'],
+    'Indicadores.tsx': ['scSearch/sortSearch', 'scCat/sortCat', 'scDetail/sortDetail'],
+    'ManejoCaja.tsx': ['scSearch/sortSearch', 'scComp/sortComp'],
+    'Salarios.tsx': ['scSearch/sortSearch', 'scComp/sortComp'],
+    'IndiceCompanias.tsx': ['sortConfig/requestSort'],
+  };
+
+  for (const archivo of MIGRADAS) {
+    it(`${archivo}: cada <thead> con SortableTh usa el par sortConfig/onSort que le corresponde`, () => {
+      expect(archivo in PARES, `${archivo} debe estar en PARES`).toBe(true);
+      const texto = readFileSync(join(PAGINAS, archivo), 'utf-8');
+      const bloques = [...texto.matchAll(/<thead\b[^>]*>[\s\S]*?<\/thead>/g)]
+        .map(([b]) => b)
+        .filter((b) => b.includes('<SortableTh'));
+      const obtenidos = bloques.map((bloque) => {
+        const pares = [...bloque.matchAll(/<SortableTh\b[\s\S]*?\/>/g)].map(([s]) => {
+          const sc = s.match(/\bsortConfig=\{(\w+)\}/);
+          const os = s.match(/\bonSort=\{(\w+)\}/);
+          expect(sc, `${archivo}: SortableTh sin sortConfig`).not.toBeNull();
+          expect(os, `${archivo}: SortableTh sin onSort`).not.toBeNull();
+          return `${sc![1]}/${os![1]}`;
+        });
+        expect(new Set(pares).size, `${archivo}: pares mezclados ${[...new Set(pares)].join(', ')}`).toBe(1);
+        return pares[0];
+      });
+      expect(obtenidos).toEqual(PARES[archivo]);
     });
   }
 

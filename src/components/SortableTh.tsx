@@ -5,17 +5,17 @@ export interface SortConfigLike {
   direction: 'asc' | 'desc';
 }
 
-interface SortableThProps {
+interface SortableThProps<K extends PropertyKey> {
   label: string;
-  sortKey: string;
+  sortKey: K;
   sortConfig: SortConfigLike | null;
-  onSort: (key: string) => void;
+  onSort: (key: K) => void;
   style?: CSSProperties;
 }
 
 // Encabezado de columna ordenable: un botón nativo dentro del <th> (operable con teclado, WCAG 2.1.1)
 // y aria-sort solo en la columna activa (WCAG 4.1.2). El nombre accesible es la etiqueta visible.
-export default function SortableTh({ label, sortKey, sortConfig, onSort, style }: SortableThProps) {
+export default function SortableTh<K extends PropertyKey>({ label, sortKey, sortConfig, onSort, style }: SortableThProps<K>) {
   const activo = sortConfig !== null && sortConfig.key === sortKey;
   const ariaSort = activo ? (sortConfig.direction === 'asc' ? 'ascending' : 'descending') : undefined;
 

@@ -12,6 +12,7 @@ import { logAction } from "../utils/audit";
 import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
 import { useSortableTable } from "../hooks/useSortableTable";
+import SortableTh from "../components/SortableTh";
 import Tooltip from "../components/Tooltip";
 import { canonizarReferencia, normalizarSigla, resolverCompania, siglaDeReferencia } from "../utils/referenciaCompania";
 import DetailsModal from "../components/DetailsModal";
@@ -179,11 +180,6 @@ export default function ManejoCaja() {
   const { items: sortedSearchResults, requestSort: sortSearch, sortConfig: scSearch } = useSortableTable(searchResultsOrdenables);
   const { items: sortedDetailData } = useSortableTable(detailData);
 
-  const SortIndicator = ({ column, sc }: { column: string, sc: any }) => {
-    if (!sc || sc.key !== column) return null;
-    return <span>{sc.direction === 'asc' ? ' ▲' : ' ▼'}</span>;
-  };
-
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
@@ -216,12 +212,12 @@ export default function ManejoCaja() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => sortSearch('__sigla')} style={{ cursor: 'pointer' }}>Compañía <SortIndicator column="__sigla" sc={scSearch} /></th>
-                <th onClick={() => sortSearch('Ciudad')} style={{ cursor: 'pointer' }}>Ciudad <SortIndicator column="Ciudad" sc={scSearch} /></th>
-                <th onClick={() => sortSearch('Año')} style={{ cursor: 'pointer' }}>Año <SortIndicator column="Año" sc={scSearch} /></th>
-                <th>Documentos</th>
+                <SortableTh label="Compañía" sortKey="__sigla" sortConfig={scSearch} onSort={sortSearch} />
+                <SortableTh label="Ciudad" sortKey="Ciudad" sortConfig={scSearch} onSort={sortSearch} />
+                <SortableTh label="Año" sortKey="Año" sortConfig={scSearch} onSort={sortSearch} />
+                <th scope="col">Documentos</th>
                 <th></th>
-                {isEditMode && <th>Admin</th>}
+                {isEditMode && <th scope="col">Admin</th>}
               </tr>
             </thead>
             <tbody>
@@ -293,10 +289,10 @@ export default function ManejoCaja() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => sortComp('Sigla Compañía')} style={{ cursor: 'pointer' }}>Compañía <SortIndicator column="Sigla Compañía" sc={scComp} /></th>
-                <th onClick={() => sortComp('Autores')} style={{ cursor: 'pointer' }}>Autores <SortIndicator column="Autores" sc={scComp} /></th>
-                <th onClick={() => sortComp('Temporadas teatrales')} style={{ cursor: 'pointer' }}>Temporadas <SortIndicator column="Temporadas teatrales" sc={scComp} /></th>
-                <th onClick={() => sortComp('Ámbito')} style={{ cursor: 'pointer' }}>Ámbito <SortIndicator column="Ámbito" sc={scComp} /></th>
+                <SortableTh label="Compañía" sortKey="Sigla Compañía" sortConfig={scComp} onSort={sortComp} />
+                <SortableTh label="Autores" sortKey="Autores" sortConfig={scComp} onSort={sortComp} />
+                <SortableTh label="Temporadas" sortKey="Temporadas teatrales" sortConfig={scComp} onSort={sortComp} />
+                <SortableTh label="Ámbito" sortKey="Ámbito" sortConfig={scComp} onSort={sortComp} />
                 <th></th>
               </tr>
             </thead>
@@ -328,9 +324,9 @@ export default function ManejoCaja() {
                 <th scope="col">Ingresos</th>
                 <th scope="col">Egresos</th>
                 <th scope="col">Otros bienes</th>
-                <th>Documentos</th>
+                <th scope="col">Documentos</th>
                 <th></th>
-                {isEditMode && <th>Admin</th>}
+                {isEditMode && <th scope="col">Admin</th>}
               </tr>
             </thead>
             <tbody>

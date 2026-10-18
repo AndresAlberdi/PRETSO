@@ -14,6 +14,7 @@ import { logAction } from "../utils/audit";
 import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
 import { useSortableTable } from "../hooks/useSortableTable";
+import SortableTh from "../components/SortableTh";
 import Tooltip from "../components/Tooltip";
 
 export default function Indicadores() {
@@ -136,11 +137,6 @@ export default function Indicadores() {
   const { items: sortedSearchResults, requestSort: sortSearch, sortConfig: scSearch } = useSortableTable(searchResults);
   const { items: sortedDetailData, requestSort: sortDetail, sortConfig: scDetail } = useSortableTable(detailData);
 
-  const SortIndicator = ({ column, sc }: { column: string, sc: any }) => {
-    if (!sc || sc.key !== column) return null;
-    return <span>{sc.direction === 'asc' ? ' ▲' : ' ▼'}</span>;
-  };
-
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
@@ -173,13 +169,13 @@ export default function Indicadores() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => sortSearch('Ciudad')} style={{ cursor: 'pointer' }}>Ciudad <SortIndicator column="Ciudad" sc={scSearch} /></th>
-                <th onClick={() => sortSearch('Años')} style={{ cursor: 'pointer' }}>Año <SortIndicator column="Años" sc={scSearch} /></th>
-                <th onClick={() => sortSearch('Concepto')} style={{ cursor: 'pointer' }}>Concepto <SortIndicator column="Concepto" sc={scSearch} /></th>
-                <th onClick={() => sortSearch('Monto')} style={{ cursor: 'pointer' }}>Monto <SortIndicator column="Monto" sc={scSearch} /></th>
-                <th>Documentos</th>
+                <SortableTh label="Ciudad" sortKey="Ciudad" sortConfig={scSearch} onSort={sortSearch} />
+                <SortableTh label="Año" sortKey="Años" sortConfig={scSearch} onSort={sortSearch} />
+                <SortableTh label="Concepto" sortKey="Concepto" sortConfig={scSearch} onSort={sortSearch} />
+                <SortableTh label="Monto" sortKey="Monto" sortConfig={scSearch} onSort={sortSearch} />
+                <th scope="col">Documentos</th>
                 <th></th>
-                {isEditMode && <th>Admin</th>}
+                {isEditMode && <th scope="col">Admin</th>}
               </tr>
             </thead>
             <tbody>
@@ -234,7 +230,7 @@ export default function Indicadores() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => sortCat('Categoría')} style={{ cursor: 'pointer' }}>Categoría <SortIndicator column="Categoría" sc={scCat} /></th>
+                <SortableTh label="Categoría" sortKey="Categoría" sortConfig={scCat} onSort={sortCat} />
                 <th></th>
               </tr>
             </thead>
@@ -254,15 +250,15 @@ export default function Indicadores() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => sortDetail('Ciudad')} style={{ cursor: 'pointer' }}>Ciudad <SortIndicator column="Ciudad" sc={scDetail} /></th>
-                <th onClick={() => sortDetail('Años')} style={{ cursor: 'pointer' }}>Años <SortIndicator column="Años" sc={scDetail} /></th>
+                <SortableTh label="Ciudad" sortKey="Ciudad" sortConfig={scDetail} onSort={sortDetail} />
+                <SortableTh label="Años" sortKey="Años" sortConfig={scDetail} onSort={sortDetail} />
                 <th scope="col">Concepto</th>
                 <th scope="col">Monto</th>
                 <th scope="col">Nota</th>
-                <th>Compañía</th>
-                <th>Documentos</th>
+                <th scope="col">Compañía</th>
+                <th scope="col">Documentos</th>
                 <th></th>
-                {isEditMode && <th>Admin</th>}
+                {isEditMode && <th scope="col">Admin</th>}
               </tr>
             </thead>
             <tbody>

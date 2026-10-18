@@ -12,6 +12,7 @@ import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
 import { useNavigate } from "react-router";
 import { useSortableTable } from "../hooks/useSortableTable";
+import SortableTh from "../components/SortableTh";
 
 export default function IndiceCompanias() {
   const [data, setData] = useState<any[]>([]);
@@ -147,11 +148,6 @@ export default function IndiceCompanias() {
 
   const { items: sortedData, requestSort, sortConfig } = useSortableTable(filteredData);
 
-  const SortIndicator = ({ column }: { column: string }) => {
-    if (!sortConfig || sortConfig.key !== column) return null;
-    return <span>{sortConfig.direction === 'asc' ? ' ▲' : ' ▼'}</span>;
-  };
-
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
@@ -182,11 +178,11 @@ export default function IndiceCompanias() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => requestSort('Sigla Compañía')} style={{ cursor: 'pointer' }}>Sigla (Compañías) <SortIndicator column="Sigla Compañía" /></th>
-                <th onClick={() => requestSort('Autores')} style={{ cursor: 'pointer' }}>Autores <SortIndicator column="Autores" /></th>
-                <th onClick={() => requestSort('Temporadas teatrales')} style={{ cursor: 'pointer' }}>Temporadas Teatrales <SortIndicator column="Temporadas teatrales" /></th>
-                <th onClick={() => requestSort('Ámbito')} style={{ cursor: 'pointer' }}>Ámbito <SortIndicator column="Ámbito" /></th>
-                <th>Vínculos Rápidos</th>
+                <SortableTh label="Sigla (Compañías)" sortKey="Sigla Compañía" sortConfig={sortConfig} onSort={requestSort} />
+                <SortableTh label="Autores" sortKey="Autores" sortConfig={sortConfig} onSort={requestSort} />
+                <SortableTh label="Temporadas Teatrales" sortKey="Temporadas teatrales" sortConfig={sortConfig} onSort={requestSort} />
+                <SortableTh label="Ámbito" sortKey="Ámbito" sortConfig={sortConfig} onSort={requestSort} />
+                <th scope="col">Vínculos Rápidos</th>
                 {isEditMode && <th></th>}
               </tr>
             </thead>

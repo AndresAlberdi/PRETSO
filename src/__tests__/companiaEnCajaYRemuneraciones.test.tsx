@@ -148,10 +148,13 @@ describe.each([
     buscar('Año', '16');
     await screen.findByText('Resultados de Búsqueda (3 registros)');
     const columna = () => screen.getAllByRole('row').slice(1).map(r => within(r).getAllByRole('cell')[0].textContent);
-    fireEvent.click(screen.getByRole('columnheader', { name: /Compañía/ }));
+    const encabezado = () => screen.getByRole('columnheader', { name: /Compañía/ });
+    fireEvent.click(screen.getByRole('button', { name: /Compañía/ }));
     expect(columna()).toEqual(['AA', 'mm', 'ZZ']);
-    fireEvent.click(screen.getByRole('columnheader', { name: /Compañía/ }));
+    expect(encabezado().getAttribute('aria-sort')).toBe('ascending');
+    fireEvent.click(screen.getByRole('button', { name: /Compañía/ }));
     expect(columna()).toEqual(['ZZ', 'mm', 'AA']);
+    expect(encabezado().getAttribute('aria-sort')).toBe('descending');
   });
 
   it('el campo derivado de orden no llega al registro que se edita', async () => {
