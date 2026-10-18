@@ -197,6 +197,22 @@ th {
   text-align: left;
 }
 
+/* Botón de encabezado ordenable: sin outline propio, el foco visible global sigue aplicando */
+th > button.sort-header-button {
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+  color: inherit;
+  text-align: inherit;
+  cursor: pointer;
+  width: 100%;
+  display: block;
+}
+
 td {
   padding: 0.5rem 1rem;
   font-size: 1.05rem;
