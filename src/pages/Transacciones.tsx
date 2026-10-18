@@ -151,9 +151,9 @@ export default function Transacciones() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', marginBottom: "1rem" }}>
+      <div className="cabecera-pagina" style={{ flexWrap: 'wrap' }}>
         <h1>Transacciones</h1>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <div className="acciones-cabecera">
           {isEditMode && (
             <button 
               onClick={() => setIsCreateOpen(true)}
@@ -173,7 +173,7 @@ export default function Transacciones() {
             ? 'No se encontraron registros con los filtros aplicados.'
             : `Mostrando ${filteredData.length} de ${data.length} registros`}
         </output>
-        <div style={{ overflowX: "auto" }}>
+        <div className="tabla-desplazable">
           <table className="sortable">
             <caption className="visually-hidden">Transacciones</caption>
             <thead>

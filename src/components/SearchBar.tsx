@@ -45,7 +45,7 @@ export default function SearchBar({ onSearch, categories }: SearchBarProps) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', alignItems: 'flex-end' }}>
-      <form onSubmit={handleAddFilter} style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+      <form onSubmit={handleAddFilter} className="barra-busqueda">
         <select 
           value={category} 
           onChange={e => setCategory(e.target.value)}

@@ -73,7 +73,7 @@ export default function Bibliografia() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
+      <div className="cabecera-pagina">
         <h1>Bibliografía</h1>
         {isEditMode && (
           <button 
@@ -87,7 +87,7 @@ export default function Bibliografia() {
       
       {!loading && <p style={{ color: 'var(--text-muted)' }}>Total registros: {data.length}</p>}
       {loading ? <p>Cargando datos...</p> : (
-        <div style={{ overflowX: "auto" }}>
+        <div className="tabla-desplazable">
           <table className="sortable">
             <caption className="visually-hidden">Bibliografía</caption>
             <thead>

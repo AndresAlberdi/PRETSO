@@ -25,7 +25,7 @@ function Layout({ children }: { children: React.ReactNode }) {
       <SkipLink />
       <MainNav />
 
-      <main id="contenido" tabIndex={-1} style={{ padding: '2rem' }}>
+      <main id="contenido" tabIndex={-1} className="contenido-principal">
         {children}
       </main>
     </div>

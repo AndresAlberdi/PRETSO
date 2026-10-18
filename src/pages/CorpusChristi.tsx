@@ -161,12 +161,12 @@ export default function CorpusChristi() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
+      <div className="cabecera-pagina">
         <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           Corpus Christi
           <Tooltip content="Muestra los registros financieros y labores encargadas para la celebración del Corpus Christi por diversas ciudades en años específicos, detallando el pago y los fondos." />
         </h1>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <div className="acciones-cabecera">
           {isEditMode && (
             <button 
               onClick={() => setIsCreateOpen(true)}
@@ -190,65 +190,67 @@ export default function CorpusChristi() {
       {loading ? <p>Cargando datos...</p> : isSearching ? (
         <div>
           <h2>Resultados de Búsqueda ({sortedSearchResults.length} registros)</h2>
-          <table className="sortable">
-            <caption className="visually-hidden">Resultados de búsqueda en Corpus Christi</caption>
-            <thead>
-              <tr>
-                <SortableTh label="Ciudad" sortKey="Ciudad" sortConfig={scSearch} onSort={sortSearch} />
-                <SortableTh label="Año" sortKey="Año" sortConfig={scSearch} onSort={sortSearch} />
-                <SortableTh label="Encargado" sortKey="Encargado " sortConfig={scSearch} onSort={sortSearch} />
-                <SortableTh label="Monto a pagar" sortKey="Monto a pagar" sortConfig={scSearch} onSort={sortSearch} />
-                <th scope="col">Documentos</th>
-                <th scope="col"><span className="visually-hidden">Transacción</span></th>
-                {isEditMode && <th scope="col">Admin</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {sortedSearchResults.map(row => {
-                const isBroken = row["Transacción"] && !transaccionesMap.has(Number(row["Transacción"]));
-                return (
-                <tr key={row.id}>
-                  <td>{row["Ciudad"]}</td>
-                  <td>{row["Año"]}</td>
-                  <td>{row["Encargado "]}</td>
-                  <td>{row["Monto a pagar"]}</td>
-                  <td>
-                    {row["Transacción"] && !isBroken && (() => {
-                      const trans = transaccionesMap.get(Number(row["Transacción"]));
-                      if (!trans) return null;
-                      const docs = [1,2,3,4,5,6,7,8,9,10].map(i => trans[`Doc${i}`]).filter(Boolean);
-                      return (
-                        <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
-                          {docs.map((docCode, idx) => (
-                            <button key={idx} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.85rem', padding: '0.1rem 0.4rem', cursor: 'pointer', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px' }}>Doc. {docCode}</button>
-                          ))}
-                        </div>
-                      );
-                    })()}
-                  </td>
-                  <td><div className="acciones-celda">
-                    {row["Transacción"] && (
-                      isBroken ? 
-                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
-                      : (
-                        <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
-                      )
-                    )}
-                  </div></td>
-                  {isEditMode && (
-                    <td><div className="acciones-celda">
-                      <button onClick={() => setRecordToEdit(row)} style={{ background: 'var(--primary-color)' }}>Editar</button>
-                      <button onClick={() => attemptDelete(row)} style={{ background: '#ff4d4f' }}>Borrar</button>
-                    </div></td>
-                  )}
+          <div className="tabla-desplazable">
+            <table className="sortable">
+              <caption className="visually-hidden">Resultados de búsqueda en Corpus Christi</caption>
+              <thead>
+                <tr>
+                  <SortableTh label="Ciudad" sortKey="Ciudad" sortConfig={scSearch} onSort={sortSearch} />
+                  <SortableTh label="Año" sortKey="Año" sortConfig={scSearch} onSort={sortSearch} />
+                  <SortableTh label="Encargado" sortKey="Encargado " sortConfig={scSearch} onSort={sortSearch} />
+                  <SortableTh label="Monto a pagar" sortKey="Monto a pagar" sortConfig={scSearch} onSort={sortSearch} />
+                  <th scope="col">Documentos</th>
+                  <th scope="col"><span className="visually-hidden">Transacción</span></th>
+                  {isEditMode && <th scope="col">Admin</th>}
                 </tr>
-              )})}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {sortedSearchResults.map(row => {
+                  const isBroken = row["Transacción"] && !transaccionesMap.has(Number(row["Transacción"]));
+                  return (
+                  <tr key={row.id}>
+                    <td>{row["Ciudad"]}</td>
+                    <td>{row["Año"]}</td>
+                    <td>{row["Encargado "]}</td>
+                    <td>{row["Monto a pagar"]}</td>
+                    <td>
+                      {row["Transacción"] && !isBroken && (() => {
+                        const trans = transaccionesMap.get(Number(row["Transacción"]));
+                        if (!trans) return null;
+                        const docs = [1,2,3,4,5,6,7,8,9,10].map(i => trans[`Doc${i}`]).filter(Boolean);
+                        return (
+                          <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
+                            {docs.map((docCode, idx) => (
+                              <button key={idx} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.85rem', padding: '0.1rem 0.4rem', cursor: 'pointer', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px' }}>Doc. {docCode}</button>
+                            ))}
+                          </div>
+                        );
+                      })()}
+                    </td>
+                    <td><div className="acciones-celda">
+                      {row["Transacción"] && (
+                        isBroken ? 
+                          <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
+                        : (
+                          <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
+                        )
+                      )}
+                    </div></td>
+                    {isEditMode && (
+                      <td><div className="acciones-celda">
+                        <button onClick={() => setRecordToEdit(row)} style={{ background: 'var(--primary-color)' }}>Editar</button>
+                        <button onClick={() => attemptDelete(row)} style={{ background: '#ff4d4f' }}>Borrar</button>
+                      </div></td>
+                    )}
+                  </tr>
+                )})}
+              </tbody>
+            </table>
+          </div>
         </div>
       ) : !selectedCityYear ? (
         <div>
-          <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+          <div className="fila-filtros">
             <select
               value={filterCiudad}
               onChange={e => setFilterCiudad(e.target.value)}
@@ -266,28 +268,30 @@ export default function CorpusChristi() {
               {uniqueAnos.map(opt => <option key={String(opt)} value={String(opt)}>{String(opt)}</option>)}
             </select>
           </div>
-          <table className="sortable">
-            <caption className="visually-hidden">Ciudades y años de Corpus Christi</caption>
-            <thead>
-              <tr>
-                <SortableTh label="Ciudad" sortKey="ciudad" sortConfig={scGroup} onSort={sortGroup} />
-                <SortableTh label="Año" sortKey="año" sortConfig={scGroup} onSort={sortGroup} />
-                <th scope="col"><span className="visually-hidden">Detalle</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedFilteredGroups.map((g, i) => (
-                <tr key={i}>
-                  <td>{g.ciudad}</td>
-                  <td>{g.año}</td>
-                  <td><button onClick={() => setSelectedCityYear(g)}>TRATO</button></td>
+          <div className="tabla-desplazable">
+            <table className="sortable">
+              <caption className="visually-hidden">Ciudades y años de Corpus Christi</caption>
+              <thead>
+                <tr>
+                  <SortableTh label="Ciudad" sortKey="ciudad" sortConfig={scGroup} onSort={sortGroup} />
+                  <SortableTh label="Año" sortKey="año" sortConfig={scGroup} onSort={sortGroup} />
+                  <th scope="col"><span className="visually-hidden">Detalle</span></th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {sortedFilteredGroups.map((g, i) => (
+                  <tr key={i}>
+                    <td>{g.ciudad}</td>
+                    <td>{g.año}</td>
+                    <td><button onClick={() => setSelectedCityYear(g)}>TRATO</button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         </div>
       ) : (
-        <div style={{ overflowX: "auto" }}>
+        <div className="tabla-desplazable">
           <div style={{ marginBottom: '1rem' }}><p style={{ color: 'var(--text-muted)' }}>{sortedDetailData.length} transacciones registradas</p></div>
           <table className="sortable">
             <caption className="visually-hidden">{`Transacciones de Corpus Christi en ${selectedCityYear.ciudad}, ${selectedCityYear.año}`}</caption>

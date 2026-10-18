@@ -174,9 +174,9 @@ export default function IndiceCompanias() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
+      <div className="cabecera-pagina">
         <h1>Índice de Compañías</h1>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <div className="acciones-cabecera">
           {isEditMode && (
             <button 
               onClick={() => setIsCreateOpen(true)}
@@ -191,7 +191,7 @@ export default function IndiceCompanias() {
             aria-label="Buscar por nombre o autores"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--input-border)', background: 'rgba(255,255,255,0.05)', color: 'white', minWidth: '250px' }}
+            style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--input-border)', background: 'rgba(255,255,255,0.05)', color: 'white', minWidth: 'min(250px, 100%)' }}
           />
         </div>
       </div>
@@ -201,7 +201,7 @@ export default function IndiceCompanias() {
       {!loading && <p style={{ color: 'var(--text-muted)' }}>Total registros: {sortedData.length}</p>}
       
       {loading ? <p>Cargando datos...</p> : (
-        <div style={{ overflowX: "auto" }}>
+        <div className="tabla-desplazable">
           <table className="sortable">
             <caption className="visually-hidden">Índice de compañías</caption>
             <thead>
