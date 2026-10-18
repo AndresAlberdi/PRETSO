@@ -11,6 +11,7 @@ import GenericEditModal from "../components/GenericEditModal";
 import DocumentModal from "../components/DocumentModal";
 import { updateDoc } from "firebase/firestore";
 import { useSortableTable } from "../hooks/useSortableTable";
+import SortableTh from "../components/SortableTh";
 import SearchBar, { type SearchFilter } from "../components/SearchBar";
 import { filtrarRegistros } from "../utils/filtrarRegistros";
 import { CAMPOS_BUSQUEDA_TRANSACCIONES } from "../utils/camposBusqueda";
@@ -38,11 +39,6 @@ export default function Transacciones() {
   const filteredData = useMemo(() => filtrarRegistros(data, filters, CAMPOS_BUSQUEDA_TRANSACCIONES), [data, filters]);
 
   const { items: sortedData, requestSort, sortConfig } = useSortableTable(filteredData);
-
-  const SortIndicator = ({ column }: { column: string }) => {
-    if (!sortConfig || sortConfig.key !== column) return null;
-    return <span>{sortConfig.direction === 'asc' ? ' ▲' : ' ▼'}</span>;
-  };
 
   useEffect(() => {
     async function fetchData() {
@@ -181,11 +177,11 @@ export default function Transacciones() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => requestSort('Num')} style={{ cursor: 'pointer', width: '50px' }}>Nro. <SortIndicator column="Num" /></th>
+                <SortableTh label="Nro." sortKey="Num" sortConfig={sortConfig} onSort={requestSort} style={{ width: '50px' }} />
                 <th scope="col">Noticia</th>
                 <th scope="col">Fuentes</th>
-                <th>Documentos</th>
-                {isEditMode && <th>Admin</th>}
+                <th scope="col">Documentos</th>
+                {isEditMode && <th scope="col">Admin</th>}
               </tr>
             </thead>
             <tbody>

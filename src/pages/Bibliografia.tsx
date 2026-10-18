@@ -11,6 +11,7 @@ import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
 import { updateDoc } from "firebase/firestore";
 import { useSortableTable } from "../hooks/useSortableTable";
+import SortableTh from "../components/SortableTh";
 
 export default function Bibliografia() {
   const [data, setData] = useState<any[]>([]);
@@ -22,11 +23,6 @@ export default function Bibliografia() {
   const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
 
   const { items: sortedData, requestSort, sortConfig } = useSortableTable(data);
-
-  const SortIndicator = ({ column }: { column: string }) => {
-    if (!sortConfig || sortConfig.key !== column) return null;
-    return <span>{sortConfig.direction === 'asc' ? ' ▲' : ' ▼'}</span>;
-  };
 
   useEffect(() => {
     async function fetchData() {
@@ -95,9 +91,9 @@ export default function Bibliografia() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => requestSort('Autores')} style={{ cursor: 'pointer' }}>Autores <SortIndicator column="Autores" /></th>
-                <th onClick={() => requestSort('Referencias bibliográficas')} style={{ cursor: 'pointer' }}>Referencias bibliográficas <SortIndicator column="Referencias bibliográficas" /></th>
-                {isEditMode && <th>Admin</th>}
+                <SortableTh label="Autores" sortKey="Autores" sortConfig={sortConfig} onSort={requestSort} />
+                <SortableTh label="Referencias bibliográficas" sortKey="Referencias bibliográficas" sortConfig={sortConfig} onSort={requestSort} />
+                {isEditMode && <th scope="col">Admin</th>}
               </tr>
             </thead>
             <tbody>

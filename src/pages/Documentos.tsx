@@ -10,6 +10,7 @@ import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
 import { updateDoc } from "firebase/firestore";
 import { useSortableTable } from "../hooks/useSortableTable";
+import SortableTh from "../components/SortableTh";
 import SearchBar, { type SearchFilter } from "../components/SearchBar";
 import { filtrarRegistros } from "../utils/filtrarRegistros";
 import { CAMPOS_BUSQUEDA_DOCUMENTOS } from "../utils/camposBusqueda";
@@ -33,11 +34,6 @@ export default function Documentos() {
   const filteredData = useMemo(() => filtrarRegistros(data, filters, CAMPOS_BUSQUEDA_DOCUMENTOS), [data, filters]);
 
   const { items: sortedData, requestSort, sortConfig } = useSortableTable(filteredData);
-
-  const SortIndicator = ({ column }: { column: string }) => {
-    if (!sortConfig || sortConfig.key !== column) return null;
-    return <span>{sortConfig.direction === 'asc' ? ' ▲' : ' ▼'}</span>;
-  };
 
   useEffect(() => {
     async function fetchData() {
@@ -142,9 +138,9 @@ export default function Documentos() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => requestSort('Doc')} style={{ width: '80px', textAlign: 'center', cursor: 'pointer' }}>Doc ID <SortIndicator column="Doc" /></th>
+                <SortableTh label="Doc ID" sortKey="Doc" sortConfig={sortConfig} onSort={requestSort} style={{ width: '80px', textAlign: 'center' }} />
                 <th scope="col">Documento</th>
-                {isEditMode && <th>Admin</th>}
+                {isEditMode && <th scope="col">Admin</th>}
               </tr>
             </thead>
             <tbody>
