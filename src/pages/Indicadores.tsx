@@ -133,9 +133,7 @@ export default function Indicadores() {
   const isSearching = filters.length > 0;
   const detailData = data.filter(d => d["Categorías"] === selectedCategoria);
 
-  const { items: sortedFilteredCategorias, requestSort: requestSortCat, sortConfig: scCat } = useSortableTable(filteredCategorias);
-  // Las claves de esta tabla son literales; SortableTh entrega un string que proviene de esas mismas claves.
-  const sortCat = requestSortCat as (key: string) => void;
+  const { items: sortedFilteredCategorias, requestSort: sortCat, sortConfig: scCat } = useSortableTable(filteredCategorias);
   const { items: sortedSearchResults, requestSort: sortSearch, sortConfig: scSearch } = useSortableTable(searchResults);
   const { items: sortedDetailData, requestSort: sortDetail, sortConfig: scDetail } = useSortableTable(detailData);
 

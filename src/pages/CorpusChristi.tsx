@@ -148,9 +148,7 @@ export default function CorpusChristi() {
     selectedCityYear && d["Ciudad"] === selectedCityYear.ciudad && String(d["Año"]) === String(selectedCityYear.año)
   );
 
-  const { items: sortedFilteredGroups, requestSort: requestSortGroup, sortConfig: scGroup } = useSortableTable(filteredGroups);
-  // Las claves de esta tabla son literales; SortableTh entrega un string que proviene de esas mismas claves.
-  const sortGroup = requestSortGroup as (key: string) => void;
+  const { items: sortedFilteredGroups, requestSort: sortGroup, sortConfig: scGroup } = useSortableTable(filteredGroups);
   const { items: sortedSearchResults, requestSort: sortSearch, sortConfig: scSearch } = useSortableTable(searchResults);
   const { items: sortedDetailData } = useSortableTable(detailData);
 

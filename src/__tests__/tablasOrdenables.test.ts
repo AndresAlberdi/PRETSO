@@ -139,11 +139,26 @@ describe('tablas: encabezados que ordenan', () => {
     });
   }
 
+  // Par sortConfig/onSort esperado por cada <thead> que contiene SortableTh, en orden de aparición.
+  const PARES: Record<string, string[]> = {
+    'Bibliografia.tsx': ['sortConfig/requestSort'],
+    'Documentos.tsx': ['sortConfig/requestSort'],
+    'Transacciones.tsx': ['sortConfig/requestSort'],
+    'CorpusChristi.tsx': ['scSearch/sortSearch', 'scGroup/sortGroup'],
+    'Indicadores.tsx': ['scSearch/sortSearch', 'scCat/sortCat', 'scDetail/sortDetail'],
+    'ManejoCaja.tsx': ['scSearch/sortSearch', 'scComp/sortComp'],
+    'Salarios.tsx': ['scSearch/sortSearch', 'scComp/sortComp'],
+    'IndiceCompanias.tsx': ['sortConfig/requestSort'],
+  };
+
   for (const archivo of MIGRADAS) {
-    it(`${archivo}: en cada <thead> todos los SortableTh usan el mismo sortConfig y onSort`, () => {
+    it(`${archivo}: cada <thead> con SortableTh usa el par sortConfig/onSort que le corresponde`, () => {
+      expect(archivo in PARES, `${archivo} debe estar en PARES`).toBe(true);
       const texto = readFileSync(join(PAGINAS, archivo), 'utf-8');
-      const bloques = [...texto.matchAll(/<thead>[\s\S]*?<\/thead>/g)].map(([b]) => b);
-      for (const bloque of bloques) {
+      const bloques = [...texto.matchAll(/<thead\b[^>]*>[\s\S]*?<\/thead>/g)]
+        .map(([b]) => b)
+        .filter((b) => b.includes('<SortableTh'));
+      const obtenidos = bloques.map((bloque) => {
         const pares = [...bloque.matchAll(/<SortableTh\b[\s\S]*?\/>/g)].map(([s]) => {
           const sc = s.match(/\bsortConfig=\{(\w+)\}/);
           const os = s.match(/\bonSort=\{(\w+)\}/);
@@ -151,8 +166,10 @@ describe('tablas: encabezados que ordenan', () => {
           expect(os, `${archivo}: SortableTh sin onSort`).not.toBeNull();
           return `${sc![1]}/${os![1]}`;
         });
-        expect(new Set(pares).size, `${archivo}: pares mezclados ${[...new Set(pares)].join(', ')}`).toBeLessThanOrEqual(1);
-      }
+        expect(new Set(pares).size, `${archivo}: pares mezclados ${[...new Set(pares)].join(', ')}`).toBe(1);
+        return pares[0];
+      });
+      expect(obtenidos).toEqual(PARES[archivo]);
     });
   }
 
