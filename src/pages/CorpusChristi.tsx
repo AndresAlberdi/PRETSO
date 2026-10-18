@@ -16,6 +16,7 @@ import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
 import { useSortableTable } from "../hooks/useSortableTable";
 import SortableTh from "../components/SortableTh";
+import { contar } from "../utils/anuncios";
 import Tooltip from "../components/Tooltip";
 import DetailsModal from "../components/DetailsModal";
 
@@ -152,6 +153,12 @@ export default function CorpusChristi() {
   const { items: sortedSearchResults, requestSort: sortSearch, sortConfig: scSearch } = useSortableTable(searchResults);
   const { items: sortedDetailData } = useSortableTable(detailData);
 
+  const anuncioResultados = isSearching
+    ? `Búsqueda: ${contar(sortedSearchResults.length, 'registro encontrado', 'registros encontrados')}`
+    : !selectedCityYear
+    ? `Listado: ${contar(sortedFilteredGroups.length, 'registro', 'registros')}`
+    : `Detalle de ${selectedCityYear.ciudad} ${selectedCityYear.año}: ${contar(sortedDetailData.length, 'transacción', 'transacciones')}`;
+
   return (
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
@@ -171,6 +178,8 @@ export default function CorpusChristi() {
           <SearchBar onSearch={(f) => { setFilters(f); setSelectedCityYear(null); }} categories={searchCategories} />
         </div>
       </div>
+
+      {!loading && <output aria-live="polite" className="visually-hidden">{anuncioResultados}</output>}
       
       {(selectedCityYear || isSearching) && (
         <button onClick={() => { setSelectedCityYear(null); setFilters([]); navigate(location.pathname, { replace: true }); }} style={{ padding: '0.5rem 1rem', marginBottom: '1rem' }}>Volver a listado inicial</button>
@@ -239,11 +248,19 @@ export default function CorpusChristi() {
       ) : !selectedCityYear ? (
         <div>
           <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
-            <select value={filterCiudad} onChange={e => setFilterCiudad(e.target.value)}>
+            <select
+              value={filterCiudad}
+              onChange={e => setFilterCiudad(e.target.value)}
+              aria-label="Filtrar por ciudad"
+            >
               <option value="">Todas las Ciudades</option>
               {uniqueCiudades.map(opt => <option key={String(opt)} value={String(opt)}>{String(opt)}</option>)}
             </select>
-            <select value={filterAno} onChange={e => setFilterAno(e.target.value)}>
+            <select
+              value={filterAno}
+              onChange={e => setFilterAno(e.target.value)}
+              aria-label="Filtrar por año"
+            >
               <option value="">Todos los Años</option>
               {uniqueAnos.map(opt => <option key={String(opt)} value={String(opt)}>{String(opt)}</option>)}
             </select>
@@ -369,9 +386,9 @@ export default function CorpusChristi() {
       )}
 
       {brokenLinkAlert && (
-        <div style={{ position: 'fixed', bottom: '2rem', right: '2rem', background: '#ff4d4f', color: 'var(--on-danger)', padding: '1rem', borderRadius: '8px', zIndex: 1000, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-          <p style={{ margin: 0 }}>{brokenLinkAlert}</p>
-          <button onClick={() => setBrokenLinkAlert(null)} style={{ marginTop: '0.5rem', background: 'white', color: '#ff4d4f', border: 'none', padding: '0.2rem 0.5rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Cerrar</button>
+        <div style={{ position: 'fixed', bottom: '2rem', right: '2rem', background: 'var(--danger-color)', color: 'var(--on-danger)', padding: '1rem', borderRadius: '8px', zIndex: 1000, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
+          <p role="alert" style={{ margin: 0 }}>{brokenLinkAlert}</p>
+          <button onClick={() => setBrokenLinkAlert(null)} style={{ marginTop: '0.5rem', background: 'var(--on-danger)', color: 'var(--danger-color)', border: 'none', padding: '0.2rem 0.5rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Cerrar</button>
         </div>
       )}
     </div>

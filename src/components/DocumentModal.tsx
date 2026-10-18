@@ -47,7 +47,8 @@ export default function DocumentModal({ documentCode, onClose }: DocumentModalPr
         <button onClick={onClose} style={{ padding: '0.4rem 1rem', background: '#e74c3c', color: 'var(--on-danger)', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Cerrar</button>
       </div>
 
-      {loading ? <p>Cargando información...</p> : !document ? <p>No se encontró información para el documento {documentCode}.</p> : (
+      <div role="status">{loading ? <p>Cargando información...</p> : !document ? <p>No se encontró información para el documento {documentCode}.</p> : null}</div>
+      {!loading && document && (
         <div style={{ background: 'rgba(255,255,255,0.05)', padding: '1.5rem', borderRadius: '8px' }}>
           <p style={{ fontSize: '1.1rem', lineHeight: '1.6', whiteSpace: 'pre-wrap', margin: 0 }}>
             {document['Documento'] || 'No hay texto registrado.'}

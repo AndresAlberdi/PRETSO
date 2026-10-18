@@ -72,7 +72,8 @@ export default function TransactionModal({ transactionCode, onClose }: Transacti
         <button onClick={onClose} style={{ padding: '0.4rem 1rem', background: '#e74c3c', color: 'var(--on-danger)', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Cerrar</button>
       </div>
 
-      {loading ? <p>Cargando información...</p> : !transaction ? <p>No se encontró información para la transacción {transactionCode}.</p> : (
+      <div role="status">{loading ? <p>Cargando información...</p> : !transaction ? <p>No se encontró información para la transacción {transactionCode}.</p> : null}</div>
+      {!loading && transaction && (
         <div>
           <div style={{ marginBottom: '2rem' }}>
             <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>Información General</h3>

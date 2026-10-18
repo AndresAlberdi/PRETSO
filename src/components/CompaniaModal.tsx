@@ -56,7 +56,8 @@ export default function CompaniaModal({ sigla = '', compania: companiaDada, onCl
         <button onClick={onClose} style={{ padding: '0.5rem 1rem' }}>Cerrar</button>
       </div>
       
-      {loading ? <p>Cargando compañía...</p> : !compania ? <p>No se encontró información para la compañía '{sigla}'</p> : (
+      <div role="status">{loading ? <p>Cargando compañía...</p> : !compania ? <p>No se encontró información para la compañía '{sigla}'</p> : null}</div>
+      {!loading && compania && (
         <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
           <tbody>
             {Object.keys(compania).map((key) => {
