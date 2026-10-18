@@ -1,15 +1,19 @@
-import { useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { auth } from '../firebase';
 import { generateDatabaseXml, downloadXml, generateZipBlob, uploadToGoogleDrive } from '../utils/backup';
 import { generateDatabaseXlsx, downloadXlsx } from '../utils/xlsxExport';
 import { GOOGLE_CLIENT_ID_STORAGE_KEY, resolveGoogleClientId } from '../utils/googleClientId';
+import Modal from '../components/Modal';
 
 export default function Administracion() {
   const [configuringClientId, setConfiguringClientId] = useState(false);
   const [clientId, setClientId] = useState(() => resolveGoogleClientId(localStorage.getItem(GOOGLE_CLIENT_ID_STORAGE_KEY)));
   const [backupStatus, setBackupStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [statusMessage, setStatusMessage] = useState('');
+  const clientIdTitleId = useId();
+  const clientIdDescId = useId();
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleDownloadXml = async () => {
     try {
@@ -188,7 +192,7 @@ export default function Administracion() {
 
           <div style={{ marginTop: '2rem' }}>
             <button 
-              onClick={() => setConfiguringClientId(!configuringClientId)}
+              onClick={() => setConfiguringClientId(true)}
               style={{ padding: '0.5rem 1rem', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px', cursor: 'pointer' }}
             >
               ⚙ Configurar Client ID de Google
@@ -198,40 +202,47 @@ export default function Administracion() {
       </div>
 
       {configuringClientId && (
-        <div style={{
-          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-          background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
-        }}>
-          <div style={{ background: 'var(--bg-card)', padding: '2rem', borderRadius: '8px', maxWidth: '500px', width: '90%' }}>
-            <h2>Configurar Google Client ID</h2>
-            <p style={{ color: 'var(--text-secondary, #aaa)', marginBottom: '1.5rem' }}>
+        <Modal
+          labelledBy={clientIdTitleId}
+          describedBy={clientIdDescId}
+          onEscape={() => setConfiguringClientId(false)}
+          initialFocus={inputRef}
+          overlayStyle={{
+            position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+            background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000
+          }}
+          panelStyle={{ background: 'var(--bg-card)', padding: '2rem', borderRadius: '8px', maxWidth: '500px', width: '90%' }}
+        >
+            <h2 id={clientIdTitleId}>Configurar Google Client ID</h2>
+            <p id={clientIdDescId} style={{ color: 'var(--text-secondary, #aaa)', marginBottom: '1.5rem' }}>
               Para hacer copias en Google Drive, necesita proporcionar un Client ID de Google Cloud Console
               configurado para aplicaciones web con acceso a Google Drive API.
             </p>
             <input 
+              ref={inputRef}
               type="text" 
               placeholder="Ingrese su Client ID (ej: 123...apps.googleusercontent.com)"
               defaultValue={clientId}
               style={{ width: '100%', padding: '0.8rem', marginBottom: '1.5rem', background: 'var(--bg-body, #222)', border: '1px solid var(--input-border)', color: 'var(--text-primary)', borderRadius: '4px' }}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') saveClientId(e.currentTarget.value);
+                if (e.key === 'Enter') {
+                  // Sin preventDefault, al cerrarse el diálogo el foco vuelve al botón de origen durante este
+                  // mismo keydown y el navegador activa ese botón con el Enter, reabriendo el diálogo.
+                  e.preventDefault();
+                  saveClientId(e.currentTarget.value);
+                }
               }}
-              autoFocus
             />
             <div style={{ display: 'flex', gap: '1rem', justifyContent: 'flex-end' }}>
               <button onClick={() => setConfiguringClientId(false)} style={{ padding: '0.5rem 1rem', background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-primary)', borderRadius: '4px', cursor: 'pointer' }}>Cancelar</button>
               <button 
-                onClick={(e) => {
-                  const input = e.currentTarget.parentElement?.previousSibling as HTMLInputElement;
-                  saveClientId(input.value);
-                }} 
+                onClick={() => saveClientId(inputRef.current?.value ?? '')}
                 style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
               >
                 Guardar
               </button>
             </div>
-          </div>
-        </div>
+        </Modal>
       )}
     </div>
   );
