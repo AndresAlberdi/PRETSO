@@ -16,11 +16,14 @@ interface SelectorCompaniaProps {
   style?: React.CSSProperties;
   ariaLabel?: string;
   id?: string;
+  ariaInvalid?: boolean;
+  ariaDescribedBy?: string;
 }
 
 // Selector de compañía: muestra «sigla - autores» y entrega el número de registro.
 export default function SelectorCompania({
   companias, value, onChange, required, disabled, cargando, textoVacio = 'Ninguna', style, ariaLabel, id,
+  ariaInvalid, ariaDescribedBy,
 }: SelectorCompaniaProps) {
   // Solo se pueden elegir compañías con número de registro (la llave de la referencia)
   const opciones = companias.filter(c => canonizarReferencia(c['Indicador de registro']) !== '');
@@ -36,6 +39,8 @@ export default function SelectorCompania({
     <select
       id={id}
       aria-label={ariaLabel}
+      aria-invalid={ariaInvalid || undefined}
+      aria-describedby={ariaDescribedBy}
       required={required}
       disabled={disabled}
       style={style}

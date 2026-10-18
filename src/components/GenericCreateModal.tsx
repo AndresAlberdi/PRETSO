@@ -47,15 +47,30 @@ const panelStyle: React.CSSProperties = {
   boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
 };
 
+// Error de validación del formulario: indica el campo inválido para marcarlo y enlazarlo con el mensaje.
+class ValidationError extends Error {
+  readonly field: string;
+  constructor(field: string, message: string) {
+    super(message);
+    this.field = field;
+  }
+}
+
+const fieldsetStyle: React.CSSProperties = { border: 0, padding: 0, margin: 0, minWidth: 0 };
+const legendStyle: React.CSSProperties = { padding: '0 0 0.5rem', fontWeight: 'bold' };
+
 export default function GenericCreateModal({ collectionName, onClose, onCreated }: GenericCreateModalProps) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [errorField, setErrorField] = useState<string | null>(null);
   // Se activa con cualquier edición del usuario (no con los valores por defecto precargados);
   // decide si Escape pide confirmar el descarte.
   const [touched, setTouched] = useState(false);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
   const titleId = useId();
+  const fieldId = useId();
+  const errorId = `${fieldId}-error`;
   const closeRef = useRef<HTMLButtonElement>(null);
 
   // Integridad del alta: la protección contra doble envío es síncrona (el estado `saving` se
@@ -95,6 +110,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
       try {
         setLoading(true);
         setError(null);
+        setErrorField(null);
 
         // 1. Calculate next sequential index
         let indexField = '';
@@ -180,6 +196,9 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
     loadFormContext();
   }, [collectionName]);
 
+  const invalidProps = (field: string): { 'aria-invalid'?: true; 'aria-describedby'?: string } =>
+    errorField === field ? { 'aria-invalid': true, 'aria-describedby': errorId } : {};
+
   const handleChange = (key: string, value: any) => {
     setTouched(true);
     setFormData((prev: any) => ({ ...prev, [key]: value }));
@@ -199,6 +218,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
     if (enviandoRef.current) return;
     enviandoRef.current = true;
     setError(null);
+    setErrorField(null);
     setSaving(true);
 
     try {
@@ -221,7 +241,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
       if (collectionName === 'transacciones') {
         const docCount = selectedDocs.filter(Boolean).length;
         if (docCount === 0) {
-          throw new Error("Debe asociar al menos un documento a la transacción.");
+          throw new ValidationError('Doc', "Debe asociar al menos un documento a la transacción.");
         }
         for (let i = 0; i < 10; i++) {
           recordToSave[`Doc${i + 1}`] = selectedDocs[i] ? Number(selectedDocs[i]) : null;
@@ -231,10 +251,10 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
       // Indicadores
       if (collectionName === 'indicadores') {
         if (!recordToSave['Categorías'] || !recordToSave['Categorías'].trim()) {
-          throw new Error("Debe ingresar o seleccionar una categoría.");
+          throw new ValidationError('Categorías', "Debe ingresar o seleccionar una categoría.");
         }
         if (!recordToSave['Transacción']) {
-          throw new Error("Debe asociar obligatoriamente una transacción existente.");
+          throw new ValidationError('Transacción', "Debe asociar obligatoriamente una transacción existente.");
         }
         recordToSave['Transacción'] = Number(recordToSave['Transacción']);
         recordToSave['Años'] = recordToSave['Años'] ? String(recordToSave['Años']).trim() : '';
@@ -243,13 +263,13 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
       // Corpus Christi
       if (collectionName === 'corpus_christi') {
         if (!recordToSave['Ciudad'] || !recordToSave['Ciudad'].trim()) {
-          throw new Error("Debe ingresar o seleccionar una ciudad.");
+          throw new ValidationError('Ciudad', "Debe ingresar o seleccionar una ciudad.");
         }
         if (!recordToSave['Año']) {
-          throw new Error("Debe ingresar o seleccionar un año.");
+          throw new ValidationError('Año', "Debe ingresar o seleccionar un año.");
         }
         if (!recordToSave['Transacción']) {
-          throw new Error("Debe asociar obligatoriamente una transacción existente.");
+          throw new ValidationError('Transacción', "Debe asociar obligatoriamente una transacción existente.");
         }
         recordToSave['Transacción'] = Number(recordToSave['Transacción']);
         recordToSave['Año'] = Number(recordToSave['Año']);
@@ -258,10 +278,10 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
       // Salarios
       if (collectionName === 'salarios') {
         if (canonizarReferencia(recordToSave['Sigla Compañía']) === '') {
-          throw new Error("Debe elegir una compañía existente.");
+          throw new ValidationError('Sigla Compañía', "Debe elegir una compañía existente.");
         }
         if (!recordToSave['Transacción']) {
-          throw new Error("Debe asociar obligatoriamente una transacción existente.");
+          throw new ValidationError('Transacción', "Debe asociar obligatoriamente una transacción existente.");
         }
         recordToSave['Transacción'] = Number(recordToSave['Transacción']);
         recordToSave['Año'] = Number(recordToSave['Año']);
@@ -272,10 +292,10 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
       // Manejo de Caja
       if (collectionName === 'manejo_de_caja') {
         if (canonizarReferencia(recordToSave['Sigla Compañía']) === '') {
-          throw new Error("Debe elegir una compañía existente.");
+          throw new ValidationError('Sigla Compañía', "Debe elegir una compañía existente.");
         }
         if (!recordToSave['Transacción']) {
-          throw new Error("Debe asociar obligatoriamente una transacción existente.");
+          throw new ValidationError('Transacción', "Debe asociar obligatoriamente una transacción existente.");
         }
         recordToSave['Transacción'] = Number(recordToSave['Transacción']);
         recordToSave['Año'] = Number(recordToSave['Año']);
@@ -284,10 +304,10 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
       // Bibliografía validation
       if (collectionName === 'bibliografia') {
         if (!recordToSave['Autores'] || !recordToSave['Autores'].trim()) {
-          throw new Error("Debe completar el campo 'Autores'.");
+          throw new ValidationError('Autores', "Debe completar el campo 'Autores'.");
         }
         if (!recordToSave['Referencias bibliográficas'] || !recordToSave['Referencias bibliográficas'].trim()) {
-          throw new Error("Debe completar las 'Referencias bibliográficas'.");
+          throw new ValidationError('Referencias bibliográficas', "Debe completar las 'Referencias bibliográficas'.");
         }
       }
 
@@ -321,8 +341,10 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
       if (escritoRef.current) {
         // El documento ya existe: el error es posterior a la escritura y los cambios nuevos no se reescriben.
         setError("El registro ya se guardó; ciérrelo con «Cerrar».");
+        setErrorField(null);
       } else {
         setError(err.message || "Error al guardar el nuevo registro.");
+        setErrorField(err instanceof ValidationError ? err.field : null);
       }
     } finally {
       enviandoRef.current = false;
@@ -396,13 +418,15 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   />
                 </label>
                 
-                <div>
-                  <strong style={{ display: 'block', marginBottom: '0.5rem' }}>Asociar Documentos (Hasta 10)</strong>
+                <fieldset style={fieldsetStyle}>
+                  <legend style={legendStyle}>Asociar Documentos (Hasta 10)</legend>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.8rem' }}>
                     {Array.from({ length: 10 }).map((_, i) => (
                       <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                        <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Documento {i + 1}</span>
+                        <label htmlFor={`${fieldId}-doc-${i}`} style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Documento {i + 1}</label>
                         <select
+                          id={`${fieldId}-doc-${i}`}
+                          {...(i === 0 ? invalidProps('Doc') : {})}
                           value={selectedDocs[i]}
                           onChange={e => handleDocChange(i, e.target.value)}
                         >
@@ -414,7 +438,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                       </div>
                     ))}
                   </div>
-                </div>
+                </fieldset>
               </>
             )}
 
@@ -478,6 +502,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <input
                     type="text"
                     required
+                    {...invalidProps('Autores')}
                     value={formData['Autores'] || ''}
                     onChange={e => handleChange('Autores', e.target.value)}
                     placeholder="Autores del documento..."
@@ -488,6 +513,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <textarea
                     required
                     rows={4}
+                    {...invalidProps('Referencias bibliográficas')}
                     value={formData['Referencias bibliográficas'] || ''}
                     onChange={e => handleChange('Referencias bibliográficas', e.target.value)}
                     placeholder="Detalles bibliográficos..."
@@ -499,11 +525,13 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
             {/* --- MANEJO DE CAJA --- */}
             {collectionName === 'manejo_de_caja' && (
               <>
-                <label htmlFor="selector-compania" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label htmlFor={`${fieldId}-compania`} style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <strong>Sigla Compañía (Obligatorio)</strong>
                   <SelectorCompania
-                    id="selector-compania"
+                    id={`${fieldId}-compania`}
                     required
+                    ariaInvalid={errorField === 'Sigla Compañía'}
+                    ariaDescribedBy={errorField === 'Sigla Compañía' ? errorId : undefined}
                     companias={companies}
                     cargando={loading}
                     value={formData['Sigla Compañía']}
@@ -515,6 +543,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Transacción Relacionada (Obligatorio)</strong>
                   <select
                     required
+                    {...invalidProps('Transacción')}
                     value={formData['Transacción'] || ''}
                     onChange={e => handleChange('Transacción', e.target.value)}
                   >
@@ -580,11 +609,13 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
             {/* --- SALARIOS --- */}
             {collectionName === 'salarios' && (
               <>
-                <label htmlFor="selector-compania" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label htmlFor={`${fieldId}-compania`} style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <strong>Sigla Compañía (Obligatorio)</strong>
                   <SelectorCompania
-                    id="selector-compania"
+                    id={`${fieldId}-compania`}
                     required
+                    ariaInvalid={errorField === 'Sigla Compañía'}
+                    ariaDescribedBy={errorField === 'Sigla Compañía' ? errorId : undefined}
                     companias={companies}
                     cargando={loading}
                     value={formData['Sigla Compañía']}
@@ -596,6 +627,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Transacción Relacionada (Obligatorio)</strong>
                   <select
                     required
+                    {...invalidProps('Transacción')}
                     value={formData['Transacción'] || ''}
                     onChange={e => handleChange('Transacción', e.target.value)}
                   >
@@ -692,72 +724,85 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
             {/* --- CORPUS CHRISTI --- */}
             {collectionName === 'corpus_christi' && (
               <>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <strong>Ciudad (Obligatorio)</strong>
-                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                    <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
-                      <input type="radio" checked={cityType === 'select'} onChange={() => setCityType('select')} disabled={existingCities.length === 0} />
-                      Elegir previa
-                    </label>
-                    <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
-                      <input type="radio" checked={cityType === 'input'} onChange={() => setCityType('input')} />
-                      Nueva ciudad
-                    </label>
+                <fieldset style={fieldsetStyle}>
+                  <legend id={`${fieldId}-ciudad-leyenda`} style={legendStyle}>Ciudad (Obligatorio)</legend>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                      <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
+                        <input type="radio" name={`${fieldId}-ciudad-modo`} checked={cityType === 'select'} onChange={() => setCityType('select')} disabled={existingCities.length === 0} />
+                        Elegir previa
+                      </label>
+                      <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
+                        <input type="radio" name={`${fieldId}-ciudad-modo`} checked={cityType === 'input'} onChange={() => setCityType('input')} />
+                        Nueva ciudad
+                      </label>
+                    </div>
+                    {cityType === 'select' ? (
+                      <select
+                        required
+                        aria-labelledby={`${fieldId}-ciudad-leyenda`}
+                        {...invalidProps('Ciudad')}
+                        value={formData['Ciudad'] || ''}
+                        onChange={e => handleChange('Ciudad', e.target.value)}
+                      >
+                        {existingCities.map(c => <option key={c} value={c}>{c}</option>)}
+                      </select>
+                    ) : (
+                      <input
+                        type="text"
+                        aria-labelledby={`${fieldId}-ciudad-leyenda`}
+                        {...invalidProps('Ciudad')}
+                        required
+                        placeholder="Nombre de la nueva ciudad"
+                        value={formData['Ciudad'] || ''}
+                        onChange={e => handleChange('Ciudad', e.target.value)}
+                      />
+                    )}
                   </div>
-                  {cityType === 'select' ? (
-                    <select
-                      required
-                      value={formData['Ciudad'] || ''}
-                      onChange={e => handleChange('Ciudad', e.target.value)}
-                    >
-                      {existingCities.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                  ) : (
-                    <input
-                      type="text"
-                      required
-                      placeholder="Nombre de la nueva ciudad"
-                      value={formData['Ciudad'] || ''}
-                      onChange={e => handleChange('Ciudad', e.target.value)}
-                    />
-                  )}
-                </div>
+                </fieldset>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <strong>Año (Obligatorio)</strong>
-                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                    <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
-                      <input type="radio" checked={yearType === 'select'} onChange={() => setYearType('select')} disabled={existingYears.length === 0} />
-                      Elegir previo
-                    </label>
-                    <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
-                      <input type="radio" checked={yearType === 'input'} onChange={() => setYearType('input')} />
-                      Nuevo año
-                    </label>
+                <fieldset style={fieldsetStyle}>
+                  <legend id={`${fieldId}-anio-leyenda`} style={legendStyle}>Año (Obligatorio)</legend>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                      <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
+                        <input type="radio" name={`${fieldId}-anio-modo`} checked={yearType === 'select'} onChange={() => setYearType('select')} disabled={existingYears.length === 0} />
+                        Elegir previo
+                      </label>
+                      <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
+                        <input type="radio" name={`${fieldId}-anio-modo`} checked={yearType === 'input'} onChange={() => setYearType('input')} />
+                        Nuevo año
+                      </label>
+                    </div>
+                    {yearType === 'select' ? (
+                      <select
+                        required
+                        aria-labelledby={`${fieldId}-anio-leyenda`}
+                        {...invalidProps('Año')}
+                        value={formData['Año'] || ''}
+                        onChange={e => handleChange('Año', e.target.value)}
+                      >
+                        {existingYears.map(y => <option key={y} value={y}>{y}</option>)}
+                      </select>
+                    ) : (
+                      <input
+                        type="number"
+                        aria-labelledby={`${fieldId}-anio-leyenda`}
+                        {...invalidProps('Año')}
+                        required
+                        placeholder="Año (numérico)"
+                        value={formData['Año'] || ''}
+                        onChange={e => handleChange('Año', e.target.value)}
+                      />
+                    )}
                   </div>
-                  {yearType === 'select' ? (
-                    <select
-                      required
-                      value={formData['Año'] || ''}
-                      onChange={e => handleChange('Año', e.target.value)}
-                    >
-                      {existingYears.map(y => <option key={y} value={y}>{y}</option>)}
-                    </select>
-                  ) : (
-                    <input
-                      type="number"
-                      required
-                      placeholder="Año (numérico)"
-                      value={formData['Año'] || ''}
-                      onChange={e => handleChange('Año', e.target.value)}
-                    />
-                  )}
-                </div>
+                </fieldset>
 
                 <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <strong>Transacción Relacionada (Obligatorio)</strong>
                   <select
                     required
+                    {...invalidProps('Transacción')}
                     value={formData['Transacción'] || ''}
                     onChange={e => handleChange('Transacción', e.target.value)}
                   >
@@ -799,10 +844,10 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                     onChange={e => handleChange('Fondos', e.target.value)}
                   />
                 </label>
-                <label htmlFor="selector-compania" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label htmlFor={`${fieldId}-compania`} style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <strong>Compañía Principal</strong>
                   <SelectorCompania
-                    id="selector-compania"
+                    id={`${fieldId}-compania`}
                     companias={companies}
                     cargando={loading}
                     value={formData['Compañía']}
@@ -815,41 +860,48 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
             {/* --- INDICADORES --- */}
             {collectionName === 'indicadores' && (
               <>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <strong>Categoría / Indicador (Obligatorio)</strong>
-                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                    <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
-                      <input type="radio" checked={categoryType === 'select'} onChange={() => setCategoryType('select')} disabled={existingCategories.length === 0} />
-                      Elegir previa
-                    </label>
-                    <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
-                      <input type="radio" checked={categoryType === 'input'} onChange={() => setCategoryType('input')} />
-                      Nueva categoría
-                    </label>
+                <fieldset style={fieldsetStyle}>
+                  <legend id={`${fieldId}-categoria-leyenda`} style={legendStyle}>Categoría / Indicador (Obligatorio)</legend>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                      <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
+                        <input type="radio" name={`${fieldId}-categoria-modo`} checked={categoryType === 'select'} onChange={() => setCategoryType('select')} disabled={existingCategories.length === 0} />
+                        Elegir previa
+                      </label>
+                      <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
+                        <input type="radio" name={`${fieldId}-categoria-modo`} checked={categoryType === 'input'} onChange={() => setCategoryType('input')} />
+                        Nueva categoría
+                      </label>
+                    </div>
+                    {categoryType === 'select' ? (
+                      <select
+                        required
+                        aria-labelledby={`${fieldId}-categoria-leyenda`}
+                        {...invalidProps('Categorías')}
+                        value={formData['Categorías'] || ''}
+                        onChange={e => handleChange('Categorías', e.target.value)}
+                      >
+                        {existingCategories.map(c => <option key={c} value={c}>{c}</option>)}
+                      </select>
+                    ) : (
+                      <input
+                        type="text"
+                        aria-labelledby={`${fieldId}-categoria-leyenda`}
+                        {...invalidProps('Categorías')}
+                        required
+                        placeholder="Nombre de la nueva categoría"
+                        value={formData['Categorías'] || ''}
+                        onChange={e => handleChange('Categorías', e.target.value)}
+                      />
+                    )}
                   </div>
-                  {categoryType === 'select' ? (
-                    <select
-                      required
-                      value={formData['Categorías'] || ''}
-                      onChange={e => handleChange('Categorías', e.target.value)}
-                    >
-                      {existingCategories.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                  ) : (
-                    <input
-                      type="text"
-                      required
-                      placeholder="Nombre de la nueva categoría"
-                      value={formData['Categorías'] || ''}
-                      onChange={e => handleChange('Categorías', e.target.value)}
-                    />
-                  )}
-                </div>
+                </fieldset>
 
                 <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <strong>Transacción Relacionada (Obligatorio)</strong>
                   <select
                     required
+                    {...invalidProps('Transacción')}
                     value={formData['Transacción'] || ''}
                     onChange={e => handleChange('Transacción', e.target.value)}
                   >
@@ -899,10 +951,10 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                     onChange={e => handleChange('Nota', e.target.value)}
                   />
                 </label>
-                <label htmlFor="selector-compania" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label htmlFor={`${fieldId}-compania`} style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <strong>Compañía</strong>
                   <SelectorCompania
-                    id="selector-compania"
+                    id={`${fieldId}-compania`}
                     companias={companies}
                     cargando={loading}
                     value={formData['Sigla Compañía']}
@@ -912,7 +964,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
               </>
             )}
 
-            {error && <div style={{ color: '#ff4d4f', background: 'rgba(255,77,79,0.1)', padding: '0.8rem', borderRadius: '4px', textAlign: 'center', fontSize: '0.95rem' }}>{error}</div>}
+            {error && <div id={errorId} role="alert" style={{ color: '#ff4d4f', background: 'rgba(255,77,79,0.1)', padding: '0.8rem', borderRadius: '4px', textAlign: 'center', fontSize: '0.95rem' }}>{error}</div>}
 
             <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1rem' }}>
               <button

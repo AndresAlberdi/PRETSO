@@ -32,6 +32,11 @@ describe('diálogo del Client ID de Google', () => {
     expect(document.activeElement).toBe(campo);
   });
 
+  it('el campo tiene etiqueta visible y recibe el foco al abrir', () => {
+    abrir();
+    expect(document.activeElement).toBe(screen.getByLabelText('Client ID de Google'));
+  });
+
   it('«Guardar» usa el valor del campo y cierra', () => {
     const { campo } = abrir();
     fireEvent.change(campo, { target: { value: '  mi-id.apps.googleusercontent.com ' } });

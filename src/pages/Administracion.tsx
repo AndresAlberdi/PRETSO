@@ -13,6 +13,7 @@ export default function Administracion() {
   const [statusMessage, setStatusMessage] = useState('');
   const clientIdTitleId = useId();
   const clientIdDescId = useId();
+  const clientIdInputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleDownloadXml = async () => {
@@ -173,22 +174,37 @@ export default function Administracion() {
             </button>
           </div>
 
-          {backupStatus !== 'idle' && (
-            <div style={{ 
-              marginTop: '1rem', 
-              padding: '1rem', 
-              borderRadius: '4px',
-              background: backupStatus === 'error' ? 'rgba(255, 77, 79, 0.1)' : 
-                          backupStatus === 'success' ? 'rgba(76, 175, 80, 0.1)' : 
-                          'rgba(52, 152, 219, 0.1)',
-              color: backupStatus === 'error' ? '#ff4d4f' : 
-                     backupStatus === 'success' ? '#4caf50' : 
-                     'var(--primary-color)',
-              fontWeight: 'bold'
-            }}>
-              {statusMessage}
-            </div>
-          )}
+          {/* Contenedores persistentes: un lector de pantalla solo anuncia cambios en regiones ya montadas. */}
+          <output style={{ display: 'block' }}>
+            {(backupStatus === 'loading' || backupStatus === 'success') && (
+              <div style={{ 
+                marginTop: '1rem', 
+                padding: '1rem', 
+                borderRadius: '4px',
+                background: backupStatus === 'success' ? 'rgba(76, 175, 80, 0.1)' : 
+                            'rgba(52, 152, 219, 0.1)',
+                color: backupStatus === 'success' ? '#4caf50' : 
+                       'var(--primary-color)',
+                fontWeight: 'bold'
+              }}>
+                {statusMessage}
+              </div>
+            )}
+          </output>
+          <div role="alert">
+            {backupStatus === 'error' && (
+              <div style={{ 
+                marginTop: '1rem', 
+                padding: '1rem', 
+                borderRadius: '4px',
+                background: 'rgba(255, 77, 79, 0.1)',
+                color: '#ff4d4f',
+                fontWeight: 'bold'
+              }}>
+                {statusMessage}
+              </div>
+            )}
+          </div>
 
           <div style={{ marginTop: '2rem' }}>
             <button 
@@ -218,8 +234,10 @@ export default function Administracion() {
               Para hacer copias en Google Drive, necesita proporcionar un Client ID de Google Cloud Console
               configurado para aplicaciones web con acceso a Google Drive API.
             </p>
+            <label htmlFor={clientIdInputId} style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Client ID de Google</label>
             <input 
               ref={inputRef}
+              id={clientIdInputId}
               type="text" 
               placeholder="Ingrese su Client ID (ej: 123...apps.googleusercontent.com)"
               defaultValue={clientId}

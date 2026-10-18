@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useId, useState } from 'react';
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { firebaseConfig } from "../firebase";
@@ -13,6 +13,8 @@ try {
 }
 
 export default function UserManagement() {
+  const emailId = useId();
+  const passwordId = useId();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [status, setStatus] = useState({ message: '', type: '' });
@@ -50,8 +52,10 @@ export default function UserManagement() {
       
       <form onSubmit={handleCreateUser} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '2rem' }}>
         <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Correo Electrónico (Lector)</label>
+          <label htmlFor={emailId} style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Correo Electrónico (Lector)</label>
           <input 
+            id={emailId}
+            autoComplete="off"
             type="email" 
             value={email}
             onChange={e => setEmail(e.target.value)}
@@ -62,8 +66,10 @@ export default function UserManagement() {
         </div>
         
         <div>
-          <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Contraseña</label>
+          <label htmlFor={passwordId} style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Contraseña</label>
           <input 
+            id={passwordId}
+            autoComplete="new-password"
             type="password" 
             value={password}
             onChange={e => setPassword(e.target.value)}
@@ -75,7 +81,7 @@ export default function UserManagement() {
         </div>
 
         {status.message && (
-          <div style={{ padding: '1rem', borderRadius: '4px', background: status.type === 'error' ? 'rgba(231,76,60,0.2)' : 'rgba(46,204,113,0.2)', color: status.type === 'error' ? '#ff6b6b' : '#2ecc71', border: `1px solid ${status.type === 'error' ? '#e74c3c' : '#2ecc71'}` }}>
+          <div role="alert" style={{ padding: '1rem', borderRadius: '4px', background: status.type === 'error' ? 'rgba(231,76,60,0.2)' : 'rgba(46,204,113,0.2)', color: status.type === 'error' ? '#ff6b6b' : '#2ecc71', border: `1px solid ${status.type === 'error' ? '#e74c3c' : '#2ecc71'}` }}>
             {status.message}
           </div>
         )}
