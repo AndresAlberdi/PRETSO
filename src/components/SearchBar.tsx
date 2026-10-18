@@ -49,6 +49,7 @@ export default function SearchBar({ onSearch, categories }: SearchBarProps) {
         <select 
           value={category} 
           onChange={e => setCategory(e.target.value)}
+          aria-label="Buscar en"
           style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--input-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }}
         >
           {categories.map(c => (
@@ -60,6 +61,7 @@ export default function SearchBar({ onSearch, categories }: SearchBarProps) {
           value={query} 
           onChange={e => setQuery(e.target.value)} 
           placeholder="Añadir filtro..."
+          aria-label="Añadir filtro"
           style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--input-border)', background: 'rgba(255,255,255,0.05)', color: 'white' }}
         />
         <button type="submit" style={{ padding: '0.5rem 1rem', background: 'transparent', color: 'var(--primary-color)', border: '1px solid var(--primary-color)', borderRadius: '4px', fontWeight: 'bold' }}>
@@ -77,19 +79,23 @@ export default function SearchBar({ onSearch, categories }: SearchBarProps) {
       
       {filters.length > 0 && (
         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', justifyContent: 'flex-end', marginTop: '0.2rem' }}>
-          {filters.map((f, i) => (
+          {filters.map((f, i) => {
+            const catLabel = categories.find(c => c.id === f.category)?.label || f.category;
+            return (
             <div key={i} style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.1)', padding: '0.2rem 0.5rem', borderRadius: '16px', fontSize: '0.85rem' }}>
-              <span style={{ color: 'var(--primary-color)', marginRight: '4px' }}>{categories.find(c => c.id === f.category)?.label || f.category}:</span>
+              <span style={{ color: 'var(--primary-color)', marginRight: '4px' }}>{catLabel}:</span>
               <span>{f.query}</span>
-              <button 
-                type="button" 
+              <button
+                type="button"
                 onClick={() => handleRemoveFilter(i)}
+                aria-label={`Quitar filtro ${catLabel}: ${f.query}`}
                 style={{ background: 'transparent', border: 'none', color: '#ff6b6b', marginLeft: '4px', cursor: 'pointer', fontWeight: 'bold' }}
               >
                 ×
               </button>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
