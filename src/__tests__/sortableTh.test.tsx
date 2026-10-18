@@ -94,3 +94,17 @@ describe('SortableTh', () => {
     expect(screen.getByRole('columnheader', { name: 'Año' }).style.width).toBe('80px');
   });
 });
+
+describe('estilos del botón de encabezado', () => {
+  it('neutraliza el :hover global de los botones (fondo, desplazamiento y sombra)', async () => {
+    const { readFileSync } = await import('node:fs');
+    const { resolve } = await import('node:path');
+    const css = readFileSync(resolve(__dirname, '..', 'index.css'), 'utf-8');
+    const m = css.match(/th > button\.sort-header-button:hover\s*\{([^}]*)\}/);
+    expect(m).not.toBeNull();
+    expect(m![1]).toMatch(/background:\s*none/);
+    expect(m![1]).toMatch(/transform:\s*none/);
+    expect(m![1]).toMatch(/box-shadow:\s*none/);
+    expect(css).not.toMatch(/sort-header-button[^{]*\{[^}]*outline/);
+  });
+});

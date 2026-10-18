@@ -197,7 +197,7 @@ th {
   text-align: left;
 }
 
-/* Botón de encabezado ordenable: sin outline propio, el foco visible global sigue aplicando */
+/* Botón de encabezado ordenable: no redefine outline, así que aplica el :focus-visible global */
 th > button.sort-header-button {
   background: none;
   border: 0;
@@ -211,6 +211,15 @@ th > button.sort-header-button {
   cursor: pointer;
   width: 100%;
   display: block;
+  border-radius: 0;
+}
+
+/* Gana a button:not([disabled]):hover (especificidad 0,2,1): el encabezado no cambia de aspecto al pasar el ratón */
+th > button.sort-header-button:hover {
+  background: none;
+  transform: none;
+  box-shadow: none;
+  text-decoration: underline;
 }
 
 td {
