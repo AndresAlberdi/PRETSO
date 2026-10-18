@@ -3,6 +3,15 @@ import { StrictMode, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import Modal from '../components/Modal';
+import ConfirmModal from '../components/ConfirmModal';
+import DetailsModal from '../components/DetailsModal';
+import CompaniaModal from '../components/CompaniaModal';
+
+vi.mock('../firebase', () => ({ db: {} }));
+vi.mock('firebase/firestore', () => ({
+  collection: vi.fn(), where: vi.fn(), query: vi.fn(),
+  getDocs: async () => ({ empty: true, docs: [] }),
+}));
 
 afterEach(cleanup);
 
@@ -319,5 +328,46 @@ describe('Modal: cadena de una capa sin controles a una confirmación en el mism
     fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
     expect(screen.queryByRole('alertdialog')).toBeNull();
     expect(document.activeElement).toBe(origen);
+  });
+});
+
+describe('ventanas de lectura y confirmación', () => {
+  it('ConfirmModal de confirmación: alertdialog, foco en «Cancelar» y Escape cancela', () => {
+    const onCancel = vi.fn();
+    const onConfirm = vi.fn();
+    render(<ConfirmModal title="Borrar registro" message="¿Seguro?" onConfirm={onConfirm} onCancel={onCancel} />);
+    const d = screen.getByRole('alertdialog', { name: 'Borrar registro' });
+    expect(d.getAttribute('aria-describedby')).toBeTruthy();
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Cancelar' }));
+    fireEvent.keyDown(document.activeElement as Element, { key: 'Escape' });
+    expect(onCancel).toHaveBeenCalledTimes(1);
+    expect(onConfirm).not.toHaveBeenCalled();
+  });
+
+  it('ConfirmModal de solo aviso: el foco inicial va a «Entendido»', () => {
+    render(<ConfirmModal title="Aviso" message="Texto" onCancel={() => {}} isAlertOnly />);
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Entendido' }));
+  });
+
+  it('DetailsModal: nombre accesible, «×» con nombre y Escape cierra', () => {
+    const onClose = vi.fn();
+    render(<DetailsModal record={{ id: 'a', Campo: 'valor' }} onClose={onClose} />);
+    expect(screen.getByRole('dialog', { name: 'Detalles del Registro' })).toBeTruthy();
+    const botones = screen.getAllByRole('button', { name: 'Cerrar' });
+    expect(botones).toHaveLength(2);
+    expect(document.activeElement).toBe(botones[0]);
+    fireEvent.keyDown(document.activeElement as Element, { key: 'Escape' });
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('DetailsModal sin registro no se muestra', () => {
+    render(<DetailsModal record={null} onClose={() => {}} />);
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('CompaniaModal: nombre accesible y foco en «Cerrar»', () => {
+    render(<CompaniaModal compania={{ 'Sigla Compañía': 'JG' }} onClose={() => {}} />);
+    expect(screen.getByRole('dialog', { name: 'Detalle de Compañía' })).toBeTruthy();
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Cerrar' }));
   });
 });
