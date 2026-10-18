@@ -2,6 +2,16 @@ import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import SearchBar from '../components/SearchBar';
 import SelectorCompania from '../components/SelectorCompania';
+import GenericCreateModal from '../components/GenericCreateModal';
+
+const colecciones: Record<string, any[]> = {
+  companias: [{ id: 'c1', 'Indicador de registro': 7, 'Sigla Compañía': 'GA-JR', Autores: 'Alarcón' }],
+  transacciones: [{ id: 't1', Num: 3, Noticia: 'Pago' }],
+  documentos: [{ id: 'd1', Doc: 1, Documento: 'Escritura' }],
+  manejo_de_caja: [], salarios: [], bibliografia: [],
+  indicadores: [{ id: 'i1', 'Categorías': 'Pagos' }],
+  corpus_christi: [{ id: 'k0', 'Indicador de registro': 2, Ciudad: 'Potosí', 'Año': 1600 }],
+};
 
 vi.mock('../firebase', () => ({ db: {} }));
 vi.mock('../utils/audit', () => ({ logAction: vi.fn() }));
@@ -10,7 +20,9 @@ vi.mock('firebase/firestore', () => ({
   query: (c: string) => c,
   doc: (coleccion: string) => ({ id: 'nuevo', coleccion }),
   setDoc: vi.fn().mockResolvedValue(undefined),
-  getDocs: async () => ({ docs: [] }),
+  getDocs: async (nombre: string) => ({
+    docs: colecciones[nombre].map(d => ({ id: d.id, data: () => d })),
+  }),
 }));
 
 beforeEach(() => undefined);
@@ -49,8 +61,11 @@ function idsRepetidos(): string[] {
   return Array.from(repetidos);
 }
 
-// Evita que las utilidades queden sin uso en pasos posteriores.
-void sinNombre; void referenciasRotas; void waitFor;
+async function abrirAlta(coleccion: string) {
+  render(<GenericCreateModal collectionName={coleccion} onClose={() => undefined} onCreated={() => undefined} />);
+  await waitFor(() => expect(screen.queryByText('Cargando opciones...')).toBeNull());
+  return screen.getByRole('dialog');
+}
 
 describe('SearchBar con nombres accesibles', () => {
   const categorias = [{ id: 'todo', label: 'Texto libre' }, { id: 'autor', label: 'Autor' }];
@@ -83,5 +98,47 @@ describe('SelectorCompania con error', () => {
     const s = screen.getByRole('combobox', { name: 'Compañía' });
     expect(s.hasAttribute('aria-invalid')).toBe(false);
     expect(s.hasAttribute('aria-describedby')).toBe(false);
+  });
+});
+
+describe('formularios de alta etiquetados', () => {
+  it.each(['documentos', 'transacciones', 'companias', 'bibliografia', 'manejo_de_caja', 'salarios', 'corpus_christi', 'indicadores'])(
+    'el alta de %s no deja controles sin nombre ni referencias rotas',
+    async (coleccion) => {
+      const dialogo = await abrirAlta(coleccion);
+      expect(sinNombre(dialogo)).toEqual([]);
+      expect(referenciasRotas(dialogo)).toEqual([]);
+      expect(document.getElementById('selector-compania')).toBeNull();
+    },
+  );
+
+  it('transacciones: cada documento tiene su etiqueta dentro de un grupo', async () => {
+    await abrirAlta('transacciones');
+    expect(screen.getByLabelText('Documento 1').tagName).toBe('SELECT');
+    expect(screen.getByRole('group', { name: 'Asociar Documentos (Hasta 10)' })).toBeTruthy();
+  });
+
+  it('corpus: los grupos Ciudad y Año tienen radios con name propio y control con nombre de grupo', async () => {
+    await abrirAlta('corpus_christi');
+    expect(screen.getByRole('group', { name: 'Ciudad (Obligatorio)' })).toBeTruthy();
+    expect(screen.getByRole('combobox', { name: 'Ciudad (Obligatorio)' })).toBeTruthy();
+    const nombreCiudad = (screen.getByLabelText('Elegir previa') as HTMLInputElement).name;
+    expect(nombreCiudad).not.toBe('');
+    expect((screen.getByLabelText('Nueva ciudad') as HTMLInputElement).name).toBe(nombreCiudad);
+    const nombreAnio = (screen.getByLabelText('Elegir previo') as HTMLInputElement).name;
+    expect(nombreAnio).not.toBe('');
+    expect((screen.getByLabelText('Nuevo año') as HTMLInputElement).name).toBe(nombreAnio);
+    expect(nombreAnio).not.toBe(nombreCiudad);
+    fireEvent.click(screen.getByLabelText('Nueva ciudad'));
+    expect(screen.getByRole('textbox', { name: 'Ciudad (Obligatorio)' })).toBeTruthy();
+  });
+
+  it('dos altas de remuneraciones apiladas no repiten ids', async () => {
+    render(<>
+      <GenericCreateModal collectionName="salarios" onClose={() => undefined} onCreated={() => undefined} />
+      <GenericCreateModal collectionName="salarios" onClose={() => undefined} onCreated={() => undefined} />
+    </>);
+    await waitFor(() => expect(screen.queryByText('Cargando opciones...')).toBeNull());
+    expect(idsRepetidos()).toEqual([]);
   });
 });

@@ -47,6 +47,9 @@ const panelStyle: React.CSSProperties = {
   boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
 };
 
+const fieldsetStyle: React.CSSProperties = { border: 0, padding: 0, margin: 0, minWidth: 0 };
+const legendStyle: React.CSSProperties = { padding: 0, fontWeight: 'bold', marginBottom: '0.5rem' };
+
 export default function GenericCreateModal({ collectionName, onClose, onCreated }: GenericCreateModalProps) {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -56,6 +59,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
   const [touched, setTouched] = useState(false);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
   const titleId = useId();
+  const fieldId = useId();
   const closeRef = useRef<HTMLButtonElement>(null);
 
   // Integridad del alta: la protección contra doble envío es síncrona (el estado `saving` se
@@ -396,13 +400,14 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   />
                 </label>
                 
-                <div>
-                  <strong style={{ display: 'block', marginBottom: '0.5rem' }}>Asociar Documentos (Hasta 10)</strong>
+                <fieldset style={fieldsetStyle}>
+                  <legend style={legendStyle}>Asociar Documentos (Hasta 10)</legend>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.8rem' }}>
                     {Array.from({ length: 10 }).map((_, i) => (
                       <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
-                        <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Documento {i + 1}</span>
+                        <label htmlFor={`${fieldId}-doc-${i}`} style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Documento {i + 1}</label>
                         <select
+                          id={`${fieldId}-doc-${i}`}
                           value={selectedDocs[i]}
                           onChange={e => handleDocChange(i, e.target.value)}
                         >
@@ -414,7 +419,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                       </div>
                     ))}
                   </div>
-                </div>
+                </fieldset>
               </>
             )}
 
@@ -499,10 +504,10 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
             {/* --- MANEJO DE CAJA --- */}
             {collectionName === 'manejo_de_caja' && (
               <>
-                <label htmlFor="selector-compania" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label htmlFor={`${fieldId}-compania`} style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <strong>Sigla Compañía (Obligatorio)</strong>
                   <SelectorCompania
-                    id="selector-compania"
+                    id={`${fieldId}-compania`}
                     required
                     companias={companies}
                     cargando={loading}
@@ -580,10 +585,10 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
             {/* --- SALARIOS --- */}
             {collectionName === 'salarios' && (
               <>
-                <label htmlFor="selector-compania" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label htmlFor={`${fieldId}-compania`} style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <strong>Sigla Compañía (Obligatorio)</strong>
                   <SelectorCompania
-                    id="selector-compania"
+                    id={`${fieldId}-compania`}
                     required
                     companias={companies}
                     cargando={loading}
@@ -692,67 +697,75 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
             {/* --- CORPUS CHRISTI --- */}
             {collectionName === 'corpus_christi' && (
               <>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <strong>Ciudad (Obligatorio)</strong>
-                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                    <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
-                      <input type="radio" checked={cityType === 'select'} onChange={() => setCityType('select')} disabled={existingCities.length === 0} />
-                      Elegir previa
-                    </label>
-                    <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
-                      <input type="radio" checked={cityType === 'input'} onChange={() => setCityType('input')} />
-                      Nueva ciudad
-                    </label>
+                <fieldset style={fieldsetStyle}>
+                  <legend id={`${fieldId}-ciudad-leyenda`} style={legendStyle}>Ciudad (Obligatorio)</legend>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                      <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
+                        <input type="radio" name={`${fieldId}-ciudad-modo`} checked={cityType === 'select'} onChange={() => setCityType('select')} disabled={existingCities.length === 0} />
+                        Elegir previa
+                      </label>
+                      <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
+                        <input type="radio" name={`${fieldId}-ciudad-modo`} checked={cityType === 'input'} onChange={() => setCityType('input')} />
+                        Nueva ciudad
+                      </label>
+                    </div>
+                    {cityType === 'select' ? (
+                      <select
+                        required
+                        aria-labelledby={`${fieldId}-ciudad-leyenda`}
+                        value={formData['Ciudad'] || ''}
+                        onChange={e => handleChange('Ciudad', e.target.value)}
+                      >
+                        {existingCities.map(c => <option key={c} value={c}>{c}</option>)}
+                      </select>
+                    ) : (
+                      <input
+                        type="text"
+                        aria-labelledby={`${fieldId}-ciudad-leyenda`}
+                        required
+                        placeholder="Nombre de la nueva ciudad"
+                        value={formData['Ciudad'] || ''}
+                        onChange={e => handleChange('Ciudad', e.target.value)}
+                      />
+                    )}
                   </div>
-                  {cityType === 'select' ? (
-                    <select
-                      required
-                      value={formData['Ciudad'] || ''}
-                      onChange={e => handleChange('Ciudad', e.target.value)}
-                    >
-                      {existingCities.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                  ) : (
-                    <input
-                      type="text"
-                      required
-                      placeholder="Nombre de la nueva ciudad"
-                      value={formData['Ciudad'] || ''}
-                      onChange={e => handleChange('Ciudad', e.target.value)}
-                    />
-                  )}
-                </div>
+                </fieldset>
 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <strong>Año (Obligatorio)</strong>
-                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                    <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
-                      <input type="radio" checked={yearType === 'select'} onChange={() => setYearType('select')} disabled={existingYears.length === 0} />
-                      Elegir previo
-                    </label>
-                    <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
-                      <input type="radio" checked={yearType === 'input'} onChange={() => setYearType('input')} />
-                      Nuevo año
-                    </label>
+                <fieldset style={fieldsetStyle}>
+                  <legend id={`${fieldId}-anio-leyenda`} style={legendStyle}>Año (Obligatorio)</legend>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                      <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
+                        <input type="radio" name={`${fieldId}-anio-modo`} checked={yearType === 'select'} onChange={() => setYearType('select')} disabled={existingYears.length === 0} />
+                        Elegir previo
+                      </label>
+                      <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
+                        <input type="radio" name={`${fieldId}-anio-modo`} checked={yearType === 'input'} onChange={() => setYearType('input')} />
+                        Nuevo año
+                      </label>
+                    </div>
+                    {yearType === 'select' ? (
+                      <select
+                        required
+                        aria-labelledby={`${fieldId}-anio-leyenda`}
+                        value={formData['Año'] || ''}
+                        onChange={e => handleChange('Año', e.target.value)}
+                      >
+                        {existingYears.map(y => <option key={y} value={y}>{y}</option>)}
+                      </select>
+                    ) : (
+                      <input
+                        type="number"
+                        aria-labelledby={`${fieldId}-anio-leyenda`}
+                        required
+                        placeholder="Año (numérico)"
+                        value={formData['Año'] || ''}
+                        onChange={e => handleChange('Año', e.target.value)}
+                      />
+                    )}
                   </div>
-                  {yearType === 'select' ? (
-                    <select
-                      required
-                      value={formData['Año'] || ''}
-                      onChange={e => handleChange('Año', e.target.value)}
-                    >
-                      {existingYears.map(y => <option key={y} value={y}>{y}</option>)}
-                    </select>
-                  ) : (
-                    <input
-                      type="number"
-                      required
-                      placeholder="Año (numérico)"
-                      value={formData['Año'] || ''}
-                      onChange={e => handleChange('Año', e.target.value)}
-                    />
-                  )}
-                </div>
+                </fieldset>
 
                 <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <strong>Transacción Relacionada (Obligatorio)</strong>
@@ -799,10 +812,10 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                     onChange={e => handleChange('Fondos', e.target.value)}
                   />
                 </label>
-                <label htmlFor="selector-compania" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label htmlFor={`${fieldId}-compania`} style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <strong>Compañía Principal</strong>
                   <SelectorCompania
-                    id="selector-compania"
+                    id={`${fieldId}-compania`}
                     companias={companies}
                     cargando={loading}
                     value={formData['Compañía']}
@@ -815,36 +828,40 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
             {/* --- INDICADORES --- */}
             {collectionName === 'indicadores' && (
               <>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                  <strong>Categoría / Indicador (Obligatorio)</strong>
-                  <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                    <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
-                      <input type="radio" checked={categoryType === 'select'} onChange={() => setCategoryType('select')} disabled={existingCategories.length === 0} />
-                      Elegir previa
-                    </label>
-                    <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
-                      <input type="radio" checked={categoryType === 'input'} onChange={() => setCategoryType('input')} />
-                      Nueva categoría
-                    </label>
+                <fieldset style={fieldsetStyle}>
+                  <legend id={`${fieldId}-categoria-leyenda`} style={legendStyle}>Categoría / Indicador (Obligatorio)</legend>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                      <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
+                        <input type="radio" name={`${fieldId}-categoria-modo`} checked={categoryType === 'select'} onChange={() => setCategoryType('select')} disabled={existingCategories.length === 0} />
+                        Elegir previa
+                      </label>
+                      <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
+                        <input type="radio" name={`${fieldId}-categoria-modo`} checked={categoryType === 'input'} onChange={() => setCategoryType('input')} />
+                        Nueva categoría
+                      </label>
+                    </div>
+                    {categoryType === 'select' ? (
+                      <select
+                        required
+                        aria-labelledby={`${fieldId}-categoria-leyenda`}
+                        value={formData['Categorías'] || ''}
+                        onChange={e => handleChange('Categorías', e.target.value)}
+                      >
+                        {existingCategories.map(c => <option key={c} value={c}>{c}</option>)}
+                      </select>
+                    ) : (
+                      <input
+                        type="text"
+                        aria-labelledby={`${fieldId}-categoria-leyenda`}
+                        required
+                        placeholder="Nombre de la nueva categoría"
+                        value={formData['Categorías'] || ''}
+                        onChange={e => handleChange('Categorías', e.target.value)}
+                      />
+                    )}
                   </div>
-                  {categoryType === 'select' ? (
-                    <select
-                      required
-                      value={formData['Categorías'] || ''}
-                      onChange={e => handleChange('Categorías', e.target.value)}
-                    >
-                      {existingCategories.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                  ) : (
-                    <input
-                      type="text"
-                      required
-                      placeholder="Nombre de la nueva categoría"
-                      value={formData['Categorías'] || ''}
-                      onChange={e => handleChange('Categorías', e.target.value)}
-                    />
-                  )}
-                </div>
+                </fieldset>
 
                 <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <strong>Transacción Relacionada (Obligatorio)</strong>
@@ -899,10 +916,10 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                     onChange={e => handleChange('Nota', e.target.value)}
                   />
                 </label>
-                <label htmlFor="selector-compania" style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                <label htmlFor={`${fieldId}-compania`} style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <strong>Compañía</strong>
                   <SelectorCompania
-                    id="selector-compania"
+                    id={`${fieldId}-compania`}
                     companias={companies}
                     cargando={loading}
                     value={formData['Sigla Compañía']}
