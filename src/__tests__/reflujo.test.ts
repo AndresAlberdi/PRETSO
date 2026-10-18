@@ -45,7 +45,8 @@ describe('reflujo: CSS', () => {
   });
 
   function reglaBase(selector: string): string {
-    const esc = selector.replace(/\./g, '\\.');
+    // Escapa todos los caracteres especiales de expresión regular (incluida la barra invertida).
+    const esc = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const m = css.match(new RegExp(`^${esc}\\s*\\{([^}]*)\\}`, 'm'));
     expect(m, `falta la regla base ${selector}`).not.toBeNull();
     return m![1];
