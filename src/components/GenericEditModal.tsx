@@ -78,6 +78,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
   const [touched, setTouched] = useState(false);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
   const titleId = useId();
+  const fieldIdBase = useId();
   const [documents, setDocuments] = useState<any[]>([]);
   const [companias, setCompanias] = useState<any[]>([]);
   const [companiasCargadas, setCompaniasCargadas] = useState(false);
@@ -193,21 +194,22 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
           Editar Registro - {(COLLECTION_LABELS[collectionName] || collectionName).toUpperCase()}
         </h2>
         <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', marginTop: '1.5rem' }}>
-          {getSortedKeys().map(key => {
+          {getSortedKeys().map((key, i) => {
             const isReadOnly = READONLY_FIELDS.includes(key);
             const isTextarea = TEXTAREA_FIELDS.includes(key);
             const isDocField = /^Doc\d+$/.test(key);
             const displayLabel = FIELD_LABEL_MAP[key] || key;
+            const fieldId = `${fieldIdBase}-campo-${i}`;
 
             return (
               <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                <label style={{ fontWeight: 'bold', fontSize: '0.95rem' }}>
+                <label htmlFor={fieldId} style={{ fontWeight: 'bold', fontSize: '0.95rem' }}>
                   {displayLabel} {isReadOnly && <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>(No Editable)</span>}
                 </label>
                 
                 {referenciaCompania(key) ? (
                   <SelectorCompania
-                    ariaLabel={displayLabel}
+                    id={fieldId}
                     companias={companias}
                     cargando={!companiasCargadas}
                     value={formData[key]}
@@ -224,6 +226,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
                   />
                 ) : isDocField ? (
                   <select
+                    id={fieldId}
                     value={formData[key] !== null && formData[key] !== undefined ? formData[key] : ''}
                     onChange={e => handleChange(key, e.target.value === '' ? null : Number(e.target.value))}
                     disabled={isReadOnly || loading}
@@ -245,6 +248,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
                   </select>
                 ) : isTextarea ? (
                   <textarea
+                    id={fieldId}
                     value={formData[key] || ''}
                     onChange={e => handleChange(key, e.target.value)}
                     disabled={isReadOnly || loading}
@@ -261,6 +265,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
                   />
                 ) : (
                   <input
+                    id={fieldId}
                     type="text"
                     value={formData[key] !== null && formData[key] !== undefined ? formData[key] : ''}
                     onChange={e => handleChange(key, e.target.value)}

@@ -3,6 +3,7 @@ import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/re
 import SearchBar from '../components/SearchBar';
 import SelectorCompania from '../components/SelectorCompania';
 import GenericCreateModal from '../components/GenericCreateModal';
+import GenericEditModal from '../components/GenericEditModal';
 
 const colecciones: Record<string, any[]> = {
   companias: [{ id: 'c1', 'Indicador de registro': 7, 'Sigla Compañía': 'GA-JR', Autores: 'Alarcón' }],
@@ -140,5 +141,29 @@ describe('formularios de alta etiquetados', () => {
     </>);
     await waitFor(() => expect(screen.queryByText('Cargando opciones...')).toBeNull());
     expect(idsRepetidos()).toEqual([]);
+  });
+});
+
+describe('formulario de edición etiquetado', () => {
+  async function abrirEdicion(coleccion: string, record: any) {
+    render(<GenericEditModal collectionName={coleccion} record={record} onSave={async () => undefined} onClose={() => undefined} />);
+    await waitFor(() => expect(screen.getByRole('dialog')).toBeTruthy());
+    // Espera a que carguen las compañías y documentos antes de inspeccionar.
+    await waitFor(() => expect((screen.getByRole('button', { name: 'Guardar Cambios' }) as HTMLButtonElement).disabled).toBe(false));
+    return screen.getByRole('dialog');
+  }
+
+  it('remuneraciones: cada etiqueta queda asociada a su campo', async () => {
+    const dialogo = await abrirEdicion('salarios', { id: 'x', 'Indicador de registro': 3, 'Sigla Compañía': 7, 'Beneficiario ': 'Ana' });
+    expect(screen.getByLabelText('Compañía').tagName).toBe('SELECT');
+    expect((screen.getByLabelText('Indicador de registro (No Editable)') as HTMLInputElement).disabled).toBe(true);
+    expect((screen.getByLabelText('Beneficiario') as HTMLInputElement).value).toBe('Ana');
+    expect(sinNombre(dialogo)).toEqual([]);
+    expect(referenciasRotas(dialogo)).toEqual([]);
+  });
+
+  it('transacciones: el campo Doc1 es un selector con etiqueta', async () => {
+    await abrirEdicion('transacciones', { id: 't', Num: 3, Noticia: 'Pago', Doc1: 1 });
+    expect(screen.getByLabelText('Doc1').tagName).toBe('SELECT');
   });
 });
