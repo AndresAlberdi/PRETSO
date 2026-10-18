@@ -727,7 +727,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                 <fieldset style={fieldsetStyle}>
                   <legend id={`${fieldId}-ciudad-leyenda`} style={legendStyle}>Ciudad (Obligatorio)</legend>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
                       <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
                         <input type="radio" name={`${fieldId}-ciudad-modo`} checked={cityType === 'select'} onChange={() => setCityType('select')} disabled={existingCities.length === 0} />
                         Elegir previa
@@ -764,7 +764,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                 <fieldset style={fieldsetStyle}>
                   <legend id={`${fieldId}-anio-leyenda`} style={legendStyle}>Año (Obligatorio)</legend>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
                       <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
                         <input type="radio" name={`${fieldId}-anio-modo`} checked={yearType === 'select'} onChange={() => setYearType('select')} disabled={existingYears.length === 0} />
                         Elegir previo
@@ -863,7 +863,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                 <fieldset style={fieldsetStyle}>
                   <legend id={`${fieldId}-categoria-leyenda`} style={legendStyle}>Categoría / Indicador (Obligatorio)</legend>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                    <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                    <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
                       <label style={{ display: 'flex', gap: '0.3rem', alignItems: 'center' }}>
                         <input type="radio" name={`${fieldId}-categoria-modo`} checked={categoryType === 'select'} onChange={() => setCategoryType('select')} disabled={existingCategories.length === 0} />
                         Elegir previa

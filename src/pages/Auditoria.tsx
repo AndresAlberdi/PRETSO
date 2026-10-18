@@ -29,12 +29,12 @@ export default function Auditoria() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
+      <div className="cabecera-pagina">
         <h1>Auditoría (Logs)</h1>
       </div>
       
       {loading ? <p>Cargando logs...</p> : logs.length === 0 ? <p>No hay registros de auditoría.</p> : (
-        <div style={{ overflowX: "auto" }}>
+        <div className="tabla-desplazable">
           <table>
             <caption className="visually-hidden">Registro de auditoría</caption>
             <thead>

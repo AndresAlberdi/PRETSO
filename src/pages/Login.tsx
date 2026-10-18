@@ -34,8 +34,8 @@ export default function Login() {
       
       {/* HEADER ORIGINAL DE PRETSO V1 */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '3rem', gap: '2rem', flexWrap: 'wrap', width: '100%', maxWidth: '1200px' }}>
-        <img src="/logo_this.jpg?v=2" alt="Logo THIS" style={{ width: '320px', objectFit: 'contain' }} />
-        <div style={{ flex: 1, textAlign: 'center', minWidth: '280px' }}>
+        <img src="/logo_this.jpg?v=2" alt="Logo THIS" style={{ width: '320px', maxWidth: '100%', objectFit: 'contain' }} />
+        <div style={{ flex: 1, textAlign: 'center', minWidth: 'min(280px, 100%)' }}>
           <h1 style={{ whiteSpace: 'pre-line', margin: '0 0 1rem 0', color: 'var(--primary-color)' }}>
             {"PRETSO\nPrecios del Teatro del Siglo de Oro"}
           </h1>
@@ -49,7 +49,7 @@ export default function Login() {
             IP: Laura Paz Rescala
           </p>
         </div>
-        <img src="/logo_ue.png?v=2" alt="Logo UE" style={{ width: '220px', objectFit: 'contain' }} />
+        <img src="/logo_ue.png?v=2" alt="Logo UE" style={{ width: '220px', maxWidth: '100%', objectFit: 'contain' }} />
       </div>
 
       {/* FORMULARIO DE LOGIN */}

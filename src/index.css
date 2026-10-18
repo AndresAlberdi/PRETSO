@@ -303,3 +303,24 @@ main {
   white-space: nowrap;
   border: 0;
 }
+
+/* Reflujo a 320 px CSS (WCAG 1.4.10) */
+.contenido-principal { padding: 2rem; }
+.tabla-desplazable { overflow-x: auto; max-width: 100%; }
+.cabecera-pagina { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+.acciones-cabecera { display: flex; gap: 1rem; align-items: center; }
+.barra-busqueda { display: flex; gap: 0.5rem; align-items: center; }
+.fila-filtros { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
+.fila-filtros select { max-width: 100%; }
+h1, h2, h3 { overflow-wrap: anywhere; }
+
+@media (max-width: 64em) {
+  .cabecera-pagina, .acciones-cabecera, .barra-busqueda { flex-wrap: wrap; }
+  .cabecera-pagina { gap: 1rem; }
+  .barra-busqueda { justify-content: flex-end; }
+}
+
+@media (max-width: 30em) {
+  .contenido-principal { padding: 1rem; }
+  h1 { font-size: 1.75rem; }
+}

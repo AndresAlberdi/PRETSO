@@ -148,8 +148,8 @@ export default function Inicio() {
     <div>
       <div style={{ textAlign: 'center', margin: '2rem 0' }}>
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', gap: '2rem', flexWrap: 'wrap', width: '100%', maxWidth: '1200px', margin: '0 auto 2rem auto' }}>
-          <img src="/logo_this.jpg?v=2" alt="Logo THIS" style={{ width: '220px', objectFit: 'contain' }} />
-          <div style={{ flex: 1, textAlign: 'center', minWidth: '280px' }}>
+          <img src="/logo_this.jpg?v=2" alt="Logo THIS" style={{ width: '220px', maxWidth: '100%', objectFit: 'contain' }} />
+          <div style={{ flex: 1, textAlign: 'center', minWidth: 'min(280px, 100%)' }}>
             <h1 style={{ whiteSpace: 'pre-line', margin: '0 0 1rem 0', color: 'var(--primary-color)' }}>
               {"PRETSO\nPrecios del Teatro del Siglo de Oro"}
             </h1>
@@ -163,11 +163,11 @@ export default function Inicio() {
               IP: Laura Paz Rescala
             </p>
           </div>
-          <img src="/logo_ue.png?v=2" alt="Logo UE" style={{ width: '150px', objectFit: 'contain' }} />
+          <img src="/logo_ue.png?v=2" alt="Logo UE" style={{ width: '150px', maxWidth: '100%', objectFit: 'contain' }} />
         </div>
         <h2 style={{ textAlign: 'center', fontSize: '1.5rem', fontWeight: 'bold', margin: '1rem 0 2rem 0' }}>Búsqueda general</h2>
         
-        <div style={{ display: 'inline-block', textAlign: 'left', minWidth: '300px', maxWidth: '600px', width: '100%' }}>
+        <div style={{ display: 'inline-block', textAlign: 'left', minWidth: 'min(300px, 100%)', maxWidth: '600px', width: '100%' }}>
           <SearchBar 
             onSearch={(f) => setFilters(f)} 
             categories={searchCategories} 
@@ -200,9 +200,10 @@ export default function Inicio() {
                   borderRadius: '8px',
                   display: 'flex',
                   justifyContent: 'space-between',
-                  alignItems: 'center'
+                  alignItems: 'center',
+                  gap: '1rem'
                 }}>
-                  <div>
+                  <div style={{ minWidth: 0, overflowWrap: 'anywhere' }}>
                     <span style={{ 
                       background: 'var(--primary-color)', 
                       color: 'var(--on-primary)', 
@@ -218,7 +219,7 @@ export default function Inicio() {
                   </div>
                   <button 
                     onClick={() => navigate(res.path)}
-                    style={{ background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-primary)', padding: '0.4rem 1rem', borderRadius: '4px', cursor: 'pointer' }}
+                    style={{ background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-primary)', padding: '0.4rem 1rem', borderRadius: '4px', cursor: 'pointer', flexShrink: 0 }}
                   >
                     Ir a la sección
                   </button>

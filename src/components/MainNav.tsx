@@ -13,10 +13,10 @@ export function MainNav() {
   const { isAdmin, isEditMode, setIsEditMode, user } = useAdmin();
   return (
       <nav style={{ padding: '1rem', background: 'var(--bg-card)', borderBottom: '1px solid var(--border-color)', display: 'flex', gap: '1rem', flexWrap: 'wrap', alignItems: 'center' }}>
-        <p className="marca" style={{ margin: 0, marginRight: 'auto', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+        <p className="marca" style={{ margin: 0, marginRight: 'auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '0.5rem' }}>
           PRETSO
           {user && (
-            <span style={{ fontSize: '0.9rem', fontWeight: 'normal', color: 'var(--text-secondary, #aaa)' }}>
+            <span style={{ fontSize: '0.9rem', fontWeight: 'normal', color: 'var(--text-secondary, #aaa)', overflowWrap: 'anywhere' }}>
               ({user.email})
             </span>
           )}

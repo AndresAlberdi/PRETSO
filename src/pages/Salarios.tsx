@@ -192,12 +192,12 @@ export default function Salarios() {
 
   return (
     <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: "1rem" }}>
+      <div className="cabecera-pagina">
         <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
           Remuneraciones
           <Tooltip content="En esta sección se listan las remuneraciones y pagos específicos que la compañía efectuó a diversas personas (actores, músicos, tramoyistas, etc.) por su trabajo durante las diferentes temporadas." />
         </h1>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+        <div className="acciones-cabecera">
           {isEditMode && (
             <button 
               onClick={() => setIsCreateOpen(true)}
@@ -221,68 +221,70 @@ export default function Salarios() {
       {loading ? <p>Cargando datos...</p> : isSearching ? (
         <div>
           <h2>Resultados de Búsqueda ({sortedSearchResults.length} registros)</h2>
-          <table className="sortable">
-            <caption className="visually-hidden">Resultados de búsqueda en Remuneraciones</caption>
-            <thead>
-              <tr>
-                <SortableTh label="Compañía" sortKey="__sigla" sortConfig={scSearch} onSort={sortSearch} />
-                <SortableTh label="Ciudad" sortKey="Ciudad" sortConfig={scSearch} onSort={sortSearch} />
-                <SortableTh label="Año" sortKey="Año" sortConfig={scSearch} onSort={sortSearch} />
-                <th scope="col">Documentos</th>
-                <th scope="col"><span className="visually-hidden">Transacción</span></th>
-                {isEditMode && <th scope="col">Admin</th>}
-              </tr>
-            </thead>
-            <tbody>
-              {sortedSearchResults.map(row => {
-                const registro: any = { ...row };
-                delete registro.__sigla;
-                const comp = resolverCompania(row["Sigla Compañía"], companias);
-                const sigla = comp ? comp["Sigla Compañía"] : canonizarReferencia(row["Sigla Compañía"]);
-                const fullName = comp && comp["Nombre Compañía"] ? `${sigla} - ${comp["Nombre Compañía"]}` : sigla;
-                const isBroken = row["Transacción"] && !transaccionesMap.has(Number(row["Transacción"]));
-                return (
-                <tr key={row.id}>
-                  <td>{fullName}</td>
-                  <td>{row["Ciudad"]}</td>
-                  <td>{row["Año"]}</td>
-                  <td>
-                    {row["Transacción"] && !isBroken && (() => {
-                      const trans = transaccionesMap.get(Number(row["Transacción"]));
-                      if (!trans) return null;
-                      const docs = [1,2,3,4,5,6,7,8,9,10].map(i => trans[`Doc${i}`]).filter(Boolean);
-                      return (
-                        <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
-                          {docs.map((docCode, idx) => (
-                            <button key={idx} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.85rem', padding: '0.1rem 0.4rem', cursor: 'pointer', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px' }}>Doc. {docCode}</button>
-                          ))}
-                        </div>
-                      );
-                    })()}
-                  </td>
-                  <td><div className="acciones-celda">
-                    {row["Transacción"] && (
-                      isBroken ? 
-                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
-                      : (
-                        <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
-                      )
-                    )}
-                  </div></td>
-                  {isEditMode && (
-                    <td><div className="acciones-celda">
-                      <button onClick={() => setRecordToEdit(registro)} style={{ background: 'var(--primary-color)' }}>Editar</button>
-                      <button onClick={() => attemptDelete(registro)} style={{ background: '#ff4d4f' }}>Borrar</button>
-                    </div></td>
-                  )}
+          <div className="tabla-desplazable">
+            <table className="sortable">
+              <caption className="visually-hidden">Resultados de búsqueda en Remuneraciones</caption>
+              <thead>
+                <tr>
+                  <SortableTh label="Compañía" sortKey="__sigla" sortConfig={scSearch} onSort={sortSearch} />
+                  <SortableTh label="Ciudad" sortKey="Ciudad" sortConfig={scSearch} onSort={sortSearch} />
+                  <SortableTh label="Año" sortKey="Año" sortConfig={scSearch} onSort={sortSearch} />
+                  <th scope="col">Documentos</th>
+                  <th scope="col"><span className="visually-hidden">Transacción</span></th>
+                  {isEditMode && <th scope="col">Admin</th>}
                 </tr>
-              )})}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {sortedSearchResults.map(row => {
+                  const registro: any = { ...row };
+                  delete registro.__sigla;
+                  const comp = resolverCompania(row["Sigla Compañía"], companias);
+                  const sigla = comp ? comp["Sigla Compañía"] : canonizarReferencia(row["Sigla Compañía"]);
+                  const fullName = comp && comp["Nombre Compañía"] ? `${sigla} - ${comp["Nombre Compañía"]}` : sigla;
+                  const isBroken = row["Transacción"] && !transaccionesMap.has(Number(row["Transacción"]));
+                  return (
+                  <tr key={row.id}>
+                    <td>{fullName}</td>
+                    <td>{row["Ciudad"]}</td>
+                    <td>{row["Año"]}</td>
+                    <td>
+                      {row["Transacción"] && !isBroken && (() => {
+                        const trans = transaccionesMap.get(Number(row["Transacción"]));
+                        if (!trans) return null;
+                        const docs = [1,2,3,4,5,6,7,8,9,10].map(i => trans[`Doc${i}`]).filter(Boolean);
+                        return (
+                          <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
+                            {docs.map((docCode, idx) => (
+                              <button key={idx} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.85rem', padding: '0.1rem 0.4rem', cursor: 'pointer', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px' }}>Doc. {docCode}</button>
+                            ))}
+                          </div>
+                        );
+                      })()}
+                    </td>
+                    <td><div className="acciones-celda">
+                      {row["Transacción"] && (
+                        isBroken ? 
+                          <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
+                        : (
+                          <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
+                        )
+                      )}
+                    </div></td>
+                    {isEditMode && (
+                      <td><div className="acciones-celda">
+                        <button onClick={() => setRecordToEdit(registro)} style={{ background: 'var(--primary-color)' }}>Editar</button>
+                        <button onClick={() => attemptDelete(registro)} style={{ background: '#ff4d4f' }}>Borrar</button>
+                      </div></td>
+                    )}
+                  </tr>
+                )})}
+              </tbody>
+            </table>
+          </div>
         </div>
       ) : !selectedCompId ? (
         <div>
-          <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+          <div className="fila-filtros">
             <select
               value={filterCompania}
               onChange={e => setFilterCompania(e.target.value)}
@@ -311,36 +313,38 @@ export default function Salarios() {
               {uniqueAmbitos.map(opt => <option key={opt} value={opt}>{opt}</option>)}
             </select>
           </div>
-          <table className="sortable">
-            <caption className="visually-hidden">Compañías de Remuneraciones</caption>
-            <thead>
-              <tr>
-                <SortableTh label="Compañía" sortKey="Sigla Compañía" sortConfig={scComp} onSort={sortComp} />
-                <SortableTh label="Autores" sortKey="Autores" sortConfig={scComp} onSort={sortComp} />
-                <SortableTh label="Temporadas" sortKey="Temporadas teatrales" sortConfig={scComp} onSort={sortComp} />
-                <SortableTh label="Ámbito" sortKey="Ámbito" sortConfig={scComp} onSort={sortComp} />
-                <th scope="col"><span className="visually-hidden">Detalle</span></th>
-              </tr>
-            </thead>
-            <tbody>
-              {sortedFilteredCompanias.map((c, i) => {
-                const fullName = c["Nombre Compañía"] ? `${c["Sigla Compañía"]} - ${c["Nombre Compañía"]}` : c["Sigla Compañía"];
-                return (
-                <tr key={i}>
-                  <td>{fullName}</td>
-                  <td>{c["Autores"]}</td>
-                  <td>{c["Temporadas teatrales"]}</td>
-                  <td>{c["Ámbito"]}</td>
-                  <td><button onClick={() => setSelectedCompId(String(c["Indicador de registro"]))}>TRATO</button></td>
+          <div className="tabla-desplazable">
+            <table className="sortable">
+              <caption className="visually-hidden">Compañías de Remuneraciones</caption>
+              <thead>
+                <tr>
+                  <SortableTh label="Compañía" sortKey="Sigla Compañía" sortConfig={scComp} onSort={sortComp} />
+                  <SortableTh label="Autores" sortKey="Autores" sortConfig={scComp} onSort={sortComp} />
+                  <SortableTh label="Temporadas" sortKey="Temporadas teatrales" sortConfig={scComp} onSort={sortComp} />
+                  <SortableTh label="Ámbito" sortKey="Ámbito" sortConfig={scComp} onSort={sortComp} />
+                  <th scope="col"><span className="visually-hidden">Detalle</span></th>
                 </tr>
-              )})}
-            </tbody>
-          </table>
+              </thead>
+              <tbody>
+                {sortedFilteredCompanias.map((c, i) => {
+                  const fullName = c["Nombre Compañía"] ? `${c["Sigla Compañía"]} - ${c["Nombre Compañía"]}` : c["Sigla Compañía"];
+                  return (
+                  <tr key={i}>
+                    <td>{fullName}</td>
+                    <td>{c["Autores"]}</td>
+                    <td>{c["Temporadas teatrales"]}</td>
+                    <td>{c["Ámbito"]}</td>
+                    <td><button onClick={() => setSelectedCompId(String(c["Indicador de registro"]))}>TRATO</button></td>
+                  </tr>
+                )})}
+              </tbody>
+            </table>
+          </div>
         </div>
       ) : !companiaSeleccionada ? (
         <p style={{ color: 'var(--text-muted)' }}>Compañía no encontrada</p>
       ) : (
-        <div style={{ overflowX: "auto" }}>
+        <div className="tabla-desplazable">
           <div style={{ marginBottom: '1rem' }}><p style={{ color: 'var(--text-muted)' }}>{sortedDetailData.length} registros para {siglaSeleccionada}</p></div>
           <table className="sortable">
             <caption className="visually-hidden">{`Remuneraciones de ${siglaSeleccionada}`}</caption>
