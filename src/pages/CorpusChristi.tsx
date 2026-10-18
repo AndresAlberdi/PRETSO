@@ -191,6 +191,7 @@ export default function CorpusChristi() {
         <div>
           <h2>Resultados de Búsqueda ({sortedSearchResults.length} registros)</h2>
           <table className="sortable">
+            <caption className="visually-hidden">Resultados de búsqueda en Corpus Christi</caption>
             <thead>
               <tr>
                 <SortableTh label="Ciudad" sortKey="Ciudad" sortConfig={scSearch} onSort={sortSearch} />
@@ -266,6 +267,7 @@ export default function CorpusChristi() {
             </select>
           </div>
           <table className="sortable">
+            <caption className="visually-hidden">Ciudades y años de Corpus Christi</caption>
             <thead>
               <tr>
                 <SortableTh label="Ciudad" sortKey="ciudad" sortConfig={scGroup} onSort={sortGroup} />
@@ -288,6 +290,7 @@ export default function CorpusChristi() {
         <div style={{ overflowX: "auto" }}>
           <div style={{ marginBottom: '1rem' }}><p style={{ color: 'var(--text-muted)' }}>{sortedDetailData.length} transacciones registradas</p></div>
           <table className="sortable">
+            <caption className="visually-hidden">{`Transacciones de Corpus Christi en ${selectedCityYear.ciudad}, ${selectedCityYear.año}`}</caption>
             <thead>
               <tr>
                 <th scope="col">Encargo</th>

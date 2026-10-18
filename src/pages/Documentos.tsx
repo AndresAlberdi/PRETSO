@@ -136,6 +136,7 @@ export default function Documentos() {
         </output>
         <div style={{ overflowX: "auto" }}>
           <table className="sortable">
+            <caption className="visually-hidden">Documentos</caption>
             <thead>
               <tr>
                 <SortableTh label="Doc ID" sortKey="Doc" sortConfig={sortConfig} onSort={requestSort} style={{ width: '80px', textAlign: 'center' }} />

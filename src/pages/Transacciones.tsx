@@ -175,6 +175,7 @@ export default function Transacciones() {
         </output>
         <div style={{ overflowX: "auto" }}>
           <table className="sortable">
+            <caption className="visually-hidden">Transacciones</caption>
             <thead>
               <tr>
                 <SortableTh label="Nro." sortKey="Num" sortConfig={sortConfig} onSort={requestSort} style={{ width: '50px' }} />

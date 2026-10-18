@@ -203,6 +203,7 @@ export default function IndiceCompanias() {
       {loading ? <p>Cargando datos...</p> : (
         <div style={{ overflowX: "auto" }}>
           <table className="sortable">
+            <caption className="visually-hidden">Índice de compañías</caption>
             <thead>
               <tr>
                 <SortableTh label="Sigla (Compañías)" sortKey="Sigla Compañía" sortConfig={sortConfig} onSort={requestSort} />

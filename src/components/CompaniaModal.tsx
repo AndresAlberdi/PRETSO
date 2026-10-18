@@ -59,6 +59,7 @@ export default function CompaniaModal({ sigla = '', compania: companiaDada, onCl
       <div role="status">{loading ? <p>Cargando compañía...</p> : !compania ? <p>No se encontró información para la compañía '{sigla}'</p> : null}</div>
       {!loading && compania && (
         <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
+          <caption className="visually-hidden">Datos de la compañía</caption>
           <tbody>
             {Object.keys(compania).map((key) => {
               if (key === 'Indicador de registro' || key === 'id') return null;

@@ -222,6 +222,7 @@ export default function Salarios() {
         <div>
           <h2>Resultados de Búsqueda ({sortedSearchResults.length} registros)</h2>
           <table className="sortable">
+            <caption className="visually-hidden">Resultados de búsqueda en Remuneraciones</caption>
             <thead>
               <tr>
                 <SortableTh label="Compañía" sortKey="__sigla" sortConfig={scSearch} onSort={sortSearch} />
@@ -311,6 +312,7 @@ export default function Salarios() {
             </select>
           </div>
           <table className="sortable">
+            <caption className="visually-hidden">Compañías de Remuneraciones</caption>
             <thead>
               <tr>
                 <SortableTh label="Compañía" sortKey="Sigla Compañía" sortConfig={scComp} onSort={sortComp} />
@@ -341,6 +343,7 @@ export default function Salarios() {
         <div style={{ overflowX: "auto" }}>
           <div style={{ marginBottom: '1rem' }}><p style={{ color: 'var(--text-muted)' }}>{sortedDetailData.length} registros para {siglaSeleccionada}</p></div>
           <table className="sortable">
+            <caption className="visually-hidden">{`Remuneraciones de ${siglaSeleccionada}`}</caption>
             <thead>
               <tr>
                 <th scope="col">Ciudad</th>

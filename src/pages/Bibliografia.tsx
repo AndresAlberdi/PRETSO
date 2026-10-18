@@ -89,6 +89,7 @@ export default function Bibliografia() {
       {loading ? <p>Cargando datos...</p> : (
         <div style={{ overflowX: "auto" }}>
           <table className="sortable">
+            <caption className="visually-hidden">Bibliografía</caption>
             <thead>
               <tr>
                 <SortableTh label="Autores" sortKey="Autores" sortConfig={sortConfig} onSort={requestSort} />

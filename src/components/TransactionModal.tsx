@@ -85,6 +85,7 @@ export default function TransactionModal({ transactionCode, onClose }: Transacti
             <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>Documentos Asociados</h3>
             {documents.length === 0 ? <p>No hay documentos asociados.</p> : (
               <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
+                <caption className="visually-hidden">Documentos asociados</caption>
                 <thead>
                   <tr>
                     <th style={{ textAlign: 'left', padding: '0.5rem', borderBottom: '2px solid var(--border-color)' }}>Código</th>

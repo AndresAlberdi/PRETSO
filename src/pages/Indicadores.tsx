@@ -176,6 +176,7 @@ export default function Indicadores() {
         <div>
           <h2>Resultados de Búsqueda ({sortedSearchResults.length} registros)</h2>
           <table className="sortable">
+            <caption className="visually-hidden">Resultados de búsqueda en Identificación de Indicadores</caption>
             <thead>
               <tr>
                 <SortableTh label="Ciudad" sortKey="Ciudad" sortConfig={scSearch} onSort={sortSearch} />
@@ -241,6 +242,7 @@ export default function Indicadores() {
             </select>
           </div>
           <table className="sortable">
+            <caption className="visually-hidden">Categorías de indicadores</caption>
             <thead>
               <tr>
                 <SortableTh label="Categoría" sortKey="Categoría" sortConfig={scCat} onSort={sortCat} />
@@ -261,6 +263,7 @@ export default function Indicadores() {
         <div style={{ overflowX: "auto" }}>
           <div style={{ marginBottom: '1rem' }}><p style={{ color: 'var(--text-muted)' }}>{sortedDetailData.length} transacciones registradas</p></div>
           <table className="sortable">
+            <caption className="visually-hidden">{`Indicadores de la categoría ${selectedCategoria}`}</caption>
             <thead>
               <tr>
                 <SortableTh label="Ciudad" sortKey="Ciudad" sortConfig={scDetail} onSort={sortDetail} />
