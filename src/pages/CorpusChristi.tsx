@@ -15,6 +15,7 @@ import { logAction } from "../utils/audit";
 import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
 import { useSortableTable } from "../hooks/useSortableTable";
+import SortableTh from "../components/SortableTh";
 import Tooltip from "../components/Tooltip";
 import DetailsModal from "../components/DetailsModal";
 
@@ -147,14 +148,11 @@ export default function CorpusChristi() {
     selectedCityYear && d["Ciudad"] === selectedCityYear.ciudad && String(d["Año"]) === String(selectedCityYear.año)
   );
 
-  const { items: sortedFilteredGroups, requestSort: sortGroup, sortConfig: scGroup } = useSortableTable(filteredGroups);
+  const { items: sortedFilteredGroups, requestSort: requestSortGroup, sortConfig: scGroup } = useSortableTable(filteredGroups);
+  // Las claves de esta tabla son literales; SortableTh entrega un string que proviene de esas mismas claves.
+  const sortGroup = requestSortGroup as (key: string) => void;
   const { items: sortedSearchResults, requestSort: sortSearch, sortConfig: scSearch } = useSortableTable(searchResults);
   const { items: sortedDetailData } = useSortableTable(detailData);
-
-  const SortIndicator = ({ column, sc }: { column: string, sc: any }) => {
-    if (!sc || sc.key !== column) return null;
-    return <span>{sc.direction === 'asc' ? ' ▲' : ' ▼'}</span>;
-  };
 
   return (
     <div>
@@ -188,13 +186,13 @@ export default function CorpusChristi() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => sortSearch('Ciudad')} style={{ cursor: 'pointer' }}>Ciudad <SortIndicator column="Ciudad" sc={scSearch} /></th>
-                <th onClick={() => sortSearch('Año')} style={{ cursor: 'pointer' }}>Año <SortIndicator column="Año" sc={scSearch} /></th>
-                <th onClick={() => sortSearch('Encargado ')} style={{ cursor: 'pointer' }}>Encargado <SortIndicator column="Encargado " sc={scSearch} /></th>
-                <th onClick={() => sortSearch('Monto a pagar')} style={{ cursor: 'pointer' }}>Monto a pagar <SortIndicator column="Monto a pagar" sc={scSearch} /></th>
-                <th>Documentos</th>
+                <SortableTh label="Ciudad" sortKey="Ciudad" sortConfig={scSearch} onSort={sortSearch} />
+                <SortableTh label="Año" sortKey="Año" sortConfig={scSearch} onSort={sortSearch} />
+                <SortableTh label="Encargado" sortKey="Encargado " sortConfig={scSearch} onSort={sortSearch} />
+                <SortableTh label="Monto a pagar" sortKey="Monto a pagar" sortConfig={scSearch} onSort={sortSearch} />
+                <th scope="col">Documentos</th>
                 <th></th>
-                {isEditMode && <th>Admin</th>}
+                {isEditMode && <th scope="col">Admin</th>}
               </tr>
             </thead>
             <tbody>
@@ -255,8 +253,8 @@ export default function CorpusChristi() {
           <table className="sortable">
             <thead>
               <tr>
-                <th onClick={() => sortGroup('ciudad')} style={{ cursor: 'pointer' }}>Ciudad <SortIndicator column="ciudad" sc={scGroup} /></th>
-                <th onClick={() => sortGroup('año')} style={{ cursor: 'pointer' }}>Año <SortIndicator column="año" sc={scGroup} /></th>
+                <SortableTh label="Ciudad" sortKey="ciudad" sortConfig={scGroup} onSort={sortGroup} />
+                <SortableTh label="Año" sortKey="año" sortConfig={scGroup} onSort={sortGroup} />
                 <th></th>
               </tr>
             </thead>
@@ -279,12 +277,12 @@ export default function CorpusChristi() {
               <tr>
                 <th scope="col">Encargo</th>
                 <th scope="col">Encargado</th>
-                <th>Compañías</th>
+                <th scope="col">Compañías</th>
                 <th scope="col">Monto a pagar</th>
                 <th scope="col">Fondos</th>
-                <th>Documentos</th>
+                <th scope="col">Documentos</th>
                 <th></th>
-                {isEditMode && <th>Admin</th>}
+                {isEditMode && <th scope="col">Admin</th>}
               </tr>
             </thead>
             <tbody>

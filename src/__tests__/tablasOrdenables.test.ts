@@ -19,8 +19,17 @@ const ESPERADO: Record<string, string[]> = {
   'Transacciones.tsx': ['Nro.'],
 };
 
-// Páginas ya migradas al componente SortableTh (C1): en ellas no puede reaparecer un <th onClick>.
-const MIGRADAS = ['Bibliografia.tsx', 'Documentos.tsx', 'Transacciones.tsx'];
+// Páginas ya migradas al componente SortableTh (C1 y C2): en ellas no puede reaparecer un <th onClick>.
+const MIGRADAS = [
+  'Bibliografia.tsx',
+  'Documentos.tsx',
+  'Transacciones.tsx',
+  'CorpusChristi.tsx',
+  'Indicadores.tsx',
+  'ManejoCaja.tsx',
+  'Salarios.tsx',
+  'IndiceCompanias.tsx',
+];
 
 // Analiza el texto completo (no línea por línea): cada bloque <th ...>...</th> es ordenable si
 // contiene onClick o SortIndicator (también cuando hay un <button> dentro), aunque esté en varias líneas.
@@ -127,6 +136,23 @@ describe('tablas: encabezados que ordenan', () => {
       expect(tieneThConOnClick(texto), `${archivo}: reapareció un <th onClick>`).toBe(false);
       expect(texto).toContain('<SortableTh');
       expect(texto).not.toContain('<SortIndicator');
+    });
+  }
+
+  for (const archivo of MIGRADAS) {
+    it(`${archivo}: en cada <thead> todos los SortableTh usan el mismo sortConfig y onSort`, () => {
+      const texto = readFileSync(join(PAGINAS, archivo), 'utf-8');
+      const bloques = [...texto.matchAll(/<thead>[\s\S]*?<\/thead>/g)].map(([b]) => b);
+      for (const bloque of bloques) {
+        const pares = [...bloque.matchAll(/<SortableTh\b[\s\S]*?\/>/g)].map(([s]) => {
+          const sc = s.match(/\bsortConfig=\{(\w+)\}/);
+          const os = s.match(/\bonSort=\{(\w+)\}/);
+          expect(sc, `${archivo}: SortableTh sin sortConfig`).not.toBeNull();
+          expect(os, `${archivo}: SortableTh sin onSort`).not.toBeNull();
+          return `${sc![1]}/${os![1]}`;
+        });
+        expect(new Set(pares).size, `${archivo}: pares mezclados ${[...new Set(pares)].join(', ')}`).toBeLessThanOrEqual(1);
+      }
     });
   }
 
