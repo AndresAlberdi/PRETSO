@@ -23,7 +23,7 @@ vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isEditMode: true 
 const companias = [
   { id: 'c7', 'Indicador de registro': 7, 'Sigla Compañía': 'GA-JR', 'Nombre Compañía': 'Compañía de Alarcón', Autores: 'Alarcón y Ramírez' },
 ];
-let colecciones: Record<string, any[]> = {};
+let colecciones: Record<string, Array<{ id: string } & Record<string, unknown>>> = {};
 vi.mock('firebase/firestore', () => ({
   collection: (_db: unknown, nombre: string) => nombre,
   query: (nombre: string) => nombre,
@@ -62,7 +62,7 @@ describe('estructura semántica: análisis estático', () => {
   it('b) cada <table> lleva un caption oculto como primer hijo', () => {
     for (const [nombre, src] of TODOS) {
       const tablas = (src.match(/<table\b/g) ?? []).length;
-      const conCaption = (src.match(/<table\b[^>]*>\s*<caption className="visually-hidden">[^<]*<\/caption>/g) ?? []).length;
+      const conCaption = (src.match(/<table\b[^>]*>\s*<caption className="visually-hidden">[^<]*\S[^<]*<\/caption>/g) ?? []).length;
       expect(conCaption, nombre).toBe(tablas);
     }
   });
@@ -71,6 +71,8 @@ describe('estructura semántica: análisis estático', () => {
     for (const [nombre, src] of TODOS) {
       expect(src.match(/<td\b[^>]*display:\s*'flex'/), nombre).toBeNull();
     }
+    // El conteo es exacto a propósito: fija en qué páginas hay celdas de acciones. Si se añade una
+    // columna de acciones legítima (o se quita una), actualice el valor esperado de la página.
     const esperado: Record<string, number> = {
       'ManejoCaja.tsx': 4, 'Salarios.tsx': 4, 'CorpusChristi.tsx': 4, 'Indicadores.tsx': 4,
       'IndiceCompanias.tsx': 2, 'Bibliografia.tsx': 1, 'Documentos.tsx': 1, 'Transacciones.tsx': 1,
