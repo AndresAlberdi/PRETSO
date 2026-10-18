@@ -183,7 +183,7 @@ export default function Indicadores() {
                 <SortableTh label="Concepto" sortKey="Concepto" sortConfig={scSearch} onSort={sortSearch} />
                 <SortableTh label="Monto" sortKey="Monto" sortConfig={scSearch} onSort={sortSearch} />
                 <th scope="col">Documentos</th>
-                <th></th>
+                <th scope="col"><span className="visually-hidden">Transacción</span></th>
                 {isEditMode && <th scope="col">Admin</th>}
               </tr>
             </thead>
@@ -244,7 +244,7 @@ export default function Indicadores() {
             <thead>
               <tr>
                 <SortableTh label="Categoría" sortKey="Categoría" sortConfig={scCat} onSort={sortCat} />
-                <th></th>
+                <th scope="col"><span className="visually-hidden">Detalle</span></th>
               </tr>
             </thead>
             <tbody>
@@ -270,7 +270,7 @@ export default function Indicadores() {
                 <th scope="col">Nota</th>
                 <th scope="col">Compañía</th>
                 <th scope="col">Documentos</th>
-                <th></th>
+                <th scope="col"><span className="visually-hidden">Transacción</span></th>
                 {isEditMode && <th scope="col">Admin</th>}
               </tr>
             </thead>

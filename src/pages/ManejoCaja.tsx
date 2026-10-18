@@ -227,7 +227,7 @@ export default function ManejoCaja() {
                 <SortableTh label="Ciudad" sortKey="Ciudad" sortConfig={scSearch} onSort={sortSearch} />
                 <SortableTh label="Año" sortKey="Año" sortConfig={scSearch} onSort={sortSearch} />
                 <th scope="col">Documentos</th>
-                <th></th>
+                <th scope="col"><span className="visually-hidden">Transacción</span></th>
                 {isEditMode && <th scope="col">Admin</th>}
               </tr>
             </thead>
@@ -316,7 +316,7 @@ export default function ManejoCaja() {
                 <SortableTh label="Autores" sortKey="Autores" sortConfig={scComp} onSort={sortComp} />
                 <SortableTh label="Temporadas" sortKey="Temporadas teatrales" sortConfig={scComp} onSort={sortComp} />
                 <SortableTh label="Ámbito" sortKey="Ámbito" sortConfig={scComp} onSort={sortComp} />
-                <th></th>
+                <th scope="col"><span className="visually-hidden">Detalle</span></th>
               </tr>
             </thead>
             <tbody>
@@ -348,7 +348,7 @@ export default function ManejoCaja() {
                 <th scope="col">Egresos</th>
                 <th scope="col">Otros bienes</th>
                 <th scope="col">Documentos</th>
-                <th></th>
+                <th scope="col"><span className="visually-hidden">Transacción</span></th>
                 {isEditMode && <th scope="col">Admin</th>}
               </tr>
             </thead>

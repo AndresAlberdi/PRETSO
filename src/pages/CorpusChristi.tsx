@@ -198,7 +198,7 @@ export default function CorpusChristi() {
                 <SortableTh label="Encargado" sortKey="Encargado " sortConfig={scSearch} onSort={sortSearch} />
                 <SortableTh label="Monto a pagar" sortKey="Monto a pagar" sortConfig={scSearch} onSort={sortSearch} />
                 <th scope="col">Documentos</th>
-                <th></th>
+                <th scope="col"><span className="visually-hidden">Transacción</span></th>
                 {isEditMode && <th scope="col">Admin</th>}
               </tr>
             </thead>
@@ -270,7 +270,7 @@ export default function CorpusChristi() {
               <tr>
                 <SortableTh label="Ciudad" sortKey="ciudad" sortConfig={scGroup} onSort={sortGroup} />
                 <SortableTh label="Año" sortKey="año" sortConfig={scGroup} onSort={sortGroup} />
-                <th></th>
+                <th scope="col"><span className="visually-hidden">Detalle</span></th>
               </tr>
             </thead>
             <tbody>
@@ -296,7 +296,7 @@ export default function CorpusChristi() {
                 <th scope="col">Monto a pagar</th>
                 <th scope="col">Fondos</th>
                 <th scope="col">Documentos</th>
-                <th></th>
+                <th scope="col"><span className="visually-hidden">Transacción</span></th>
                 {isEditMode && <th scope="col">Admin</th>}
               </tr>
             </thead>

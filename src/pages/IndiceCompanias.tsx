@@ -210,7 +210,7 @@ export default function IndiceCompanias() {
                 <SortableTh label="Temporadas Teatrales" sortKey="Temporadas teatrales" sortConfig={sortConfig} onSort={requestSort} />
                 <SortableTh label="Ámbito" sortKey="Ámbito" sortConfig={sortConfig} onSort={requestSort} />
                 <th scope="col">Vínculos Rápidos</th>
-                {isEditMode && <th></th>}
+                {isEditMode && <th scope="col"><span className="visually-hidden">Admin</span></th>}
               </tr>
             </thead>
             <tbody>
