@@ -39,11 +39,11 @@ export default function Auditoria() {
             <caption className="visually-hidden">Registro de auditoría</caption>
             <thead>
               <tr>
-                <th>Fecha</th>
-                <th>Acción</th>
-                <th>Colección</th>
-                <th>ID Registro</th>
-                <th>Usuario</th>
+                <th scope="col">Fecha</th>
+                <th scope="col">Acción</th>
+                <th scope="col">Colección</th>
+                <th scope="col">ID Registro</th>
+                <th scope="col">Usuario</th>
               </tr>
             </thead>
             <tbody>

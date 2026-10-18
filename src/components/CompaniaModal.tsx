@@ -66,7 +66,7 @@ export default function CompaniaModal({ sigla = '', compania: companiaDada, onCl
               if (!compania[key] || compania[key] === '') return null;
               return (
                 <tr key={key} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                  <th style={{ padding: '0.75rem', textAlign: 'left', width: '30%', color: 'var(--accent-color)' }}>{key}</th>
+                  <th scope="row" style={{ padding: '0.75rem', textAlign: 'left', width: '30%', color: 'var(--accent-color)' }}>{key}</th>
                   <td style={{ padding: '0.75rem', textAlign: 'left' }}>{compania[key]}</td>
                 </tr>
               );
