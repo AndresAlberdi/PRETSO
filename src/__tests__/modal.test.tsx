@@ -481,7 +481,9 @@ describe('Modal: ventanas apiladas que se cierran en el mismo commit', () => {
 describe('getFocusable: controles que no reciben foco', () => {
   function montar(html: string) {
     const raiz = document.createElement('div');
-    raiz.innerHTML = html;
+    // DOMParser (y no innerHTML): HTML de ejemplo fijo de la prueba, sin asignar HTML dinámico al DOM.
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    raiz.append(...Array.from(doc.body.childNodes));
     document.body.appendChild(raiz);
     return raiz;
   }
