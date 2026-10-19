@@ -1,9 +1,11 @@
-import { useId, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 
 /**
  * Ayuda de sección: botón «?» que despliega un panel con la descripción.
  * - WCAG 1.4.13 (contenido al pasar el cursor o al enfocar): el contenido se muestra por acción
- *   explícita, se descarta con Escape y es persistente hasta que se cierra o se pierde el foco.
+ *   explícita y se cierra con Escape (desde cualquier punto), con un nuevo clic, al hacer clic fuera
+ *   o al mover el foco fuera; un clic dentro del panel NO lo cierra, de modo que el texto se puede leer
+ *   y copiar.
  * - WCAG 2.1.1 (teclado): se opera con clic, Enter y Espacio al ser un botón nativo.
  * - WCAG 4.1.2 (nombre, función, valor): nombre accesible por aria-label, estado por aria-expanded
  *   y relación con el panel por aria-controls. No se usa el atributo title.
@@ -11,22 +13,40 @@ import { useId, useState } from 'react';
 export default function Tooltip({ label, content }: { label: string; content: string }) {
   const panelId = useId();
   const [open, setOpen] = useState(false);
+  const rootRef = useRef<HTMLSpanElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
+  // Escuchadores en document solo mientras el panel está abierto; el setState va dentro de ellos.
+  useEffect(() => {
+    if (!open) return;
+    const fuera = (e: Event) => {
+      if (!rootRef.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const tecla = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      const dentro = rootRef.current?.contains(document.activeElement) ?? false;
+      setOpen(false);
+      if (dentro) buttonRef.current?.focus();
+    };
+    document.addEventListener('pointerdown', fuera);
+    document.addEventListener('focusin', fuera);
+    document.addEventListener('keydown', tecla);
+    return () => {
+      document.removeEventListener('pointerdown', fuera);
+      document.removeEventListener('focusin', fuera);
+      document.removeEventListener('keydown', tecla);
+    };
+  }, [open]);
 
   return (
-    <span className="ayuda-seccion">
+    <span className="ayuda-seccion" ref={rootRef}>
       <button
+        ref={buttonRef}
         type="button"
         aria-label={label}
         aria-expanded={open}
         aria-controls={panelId}
         onClick={() => setOpen((o) => !o)}
-        onKeyDown={(e) => {
-          if (e.key === 'Escape' && open) {
-            e.preventDefault();
-            setOpen(false);
-          }
-        }}
-        onBlur={() => setOpen(false)}
         style={{
           width: '24px',
           height: '24px',

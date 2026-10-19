@@ -37,7 +37,43 @@ describe('Ayuda de sección: comportamiento', () => {
     expect(panel.hidden).toBe(true);
   });
 
-  it('Escape la cierra y el foco sigue en el botón', () => {
+  it('un pointerdown dentro del panel no la cierra', () => {
+    const { boton, panel } = montar();
+    fireEvent.click(boton);
+    fireEvent.pointerDown(panel);
+    expect(boton.getAttribute('aria-expanded')).toBe('true');
+    expect(panel.hidden).toBe(false);
+  });
+
+  it('un pointerdown fuera la cierra', () => {
+    const { boton, panel } = montar();
+    fireEvent.click(boton);
+    fireEvent.pointerDown(document.body);
+    expect(boton.getAttribute('aria-expanded')).toBe('false');
+    expect(panel.hidden).toBe(true);
+  });
+
+  it('mover el foco a otro elemento la cierra', () => {
+    const { boton, panel } = montar();
+    const otro = document.createElement('button');
+    document.body.appendChild(otro);
+    fireEvent.click(boton);
+    fireEvent.focusIn(otro);
+    expect(boton.getAttribute('aria-expanded')).toBe('false');
+    expect(panel.hidden).toBe(true);
+    otro.remove();
+  });
+
+  it('Escape sobre document la cierra aunque el botón no tenga el foco', () => {
+    const { boton, panel } = montar();
+    fireEvent.click(boton);
+    boton.blur();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(boton.getAttribute('aria-expanded')).toBe('false');
+    expect(panel.hidden).toBe(true);
+  });
+
+  it('Escape con el foco en el botón la cierra y el foco sigue en el botón', () => {
     const { boton, panel } = montar();
     boton.focus();
     fireEvent.click(boton);
@@ -45,14 +81,6 @@ describe('Ayuda de sección: comportamiento', () => {
     expect(boton.getAttribute('aria-expanded')).toBe('false');
     expect(panel.hidden).toBe(true);
     expect(document.activeElement).toBe(boton);
-  });
-
-  it('al perder el foco se cierra', () => {
-    const { boton, panel } = montar();
-    fireEvent.click(boton);
-    fireEvent.blur(boton);
-    expect(boton.getAttribute('aria-expanded')).toBe('false');
-    expect(panel.hidden).toBe(true);
   });
 });
 
@@ -67,6 +95,8 @@ describe('Ayuda de sección: páginas y CSS (estático)', () => {
       expect(cierreH1).toBeGreaterThan(-1);
       expect(tooltip).toBeGreaterThan(cierreH1);
       expect(fuente.includes("<h1 style={{ display: 'flex'")).toBe(false);
+      expect(fuente.includes('<div className="titulo-pagina">')).toBe(true);
+      expect(fuente.indexOf('<h1>')).toBeGreaterThan(fuente.indexOf('<div className="titulo-pagina">'));
     });
   }
 
@@ -76,5 +106,13 @@ describe('Ayuda de sección: páginas y CSS (estático)', () => {
     expect(inicio).toBeGreaterThan(-1);
     const regla = css.slice(inicio, css.indexOf('}', inicio));
     expect(regla.includes('display')).toBe(false);
+  });
+
+  it('.titulo-pagina no declara min-width', () => {
+    const css = leer('index.css');
+    const inicio = css.indexOf('.titulo-pagina {');
+    expect(inicio).toBeGreaterThan(-1);
+    const regla = css.slice(inicio, css.indexOf('}', inicio));
+    expect(regla.includes('min-width')).toBe(false);
   });
 });
