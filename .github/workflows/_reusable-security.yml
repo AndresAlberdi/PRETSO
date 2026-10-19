@@ -843,7 +843,7 @@ jobs:
         run: cp excepciones-generadas/trivyignore.yaml .trivyignore.yaml
 
       - name: Checkov
-        uses: bridgecrewio/checkov-action@c13aafd679d3814a25067d10fcaf98c4f7594931 # master @ 2026-09-17 (sin release vigente)
+        uses: bridgecrewio/checkov-action@29be5868bfa968f099ae80169f61f42887494b8f # master @ 2026-09-17 (sin release vigente)
         with:
           directory: ${{ inputs.ruta }}
           # github_actions NO va aquí: lo analiza el job `workflows`, que corre siempre y sobre
