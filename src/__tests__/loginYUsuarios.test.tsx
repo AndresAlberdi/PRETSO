@@ -36,6 +36,39 @@ describe('Login', () => {
     await waitFor(() => expect(signInWithEmailAndPassword).toHaveBeenCalledTimes(2));
     expect((await screen.findByRole('alert')).textContent).toContain('fallo');
   });
+
+  it('no revela si la cuenta existe ni registra credenciales', async () => {
+    const correo = 'persona.prueba@example.com';
+    const clave = 'ClaveSecreta-123';
+    const errorSpy = vi.mocked(console.error);
+    errorSpy.mockClear();
+    vi.mocked(signInWithEmailAndPassword)
+      .mockRejectedValueOnce({ code: 'auth/user-not-found', message: 'Firebase: Error (auth/user-not-found).' })
+      .mockRejectedValueOnce({ code: 'auth/wrong-password', message: 'Firebase: Error (auth/wrong-password).' });
+    render(<Login />);
+    fireEvent.change(screen.getByLabelText('Correo Electrónico'), { target: { value: correo } });
+    fireEvent.change(screen.getByLabelText('Contraseña'), { target: { value: clave } });
+    const form = screen.getByLabelText('Correo Electrónico').closest('form') as HTMLFormElement;
+
+    fireEvent.submit(form);
+    const primera = (await screen.findByRole('alert')).textContent;
+    expect(primera).toBe('Correo o contraseña incorrectos.');
+    expect((primera ?? '').includes('auth/')).toBe(false);
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Entrar' })).toBeTruthy());
+
+    fireEvent.submit(form);
+    await waitFor(() => expect(signInWithEmailAndPassword).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(errorSpy).toHaveBeenCalledTimes(2));
+    expect((await screen.findByRole('alert')).textContent).toBe(primera);
+
+    const argumentos = errorSpy.mock.calls.flat().map(String);
+    expect(argumentos).toContain('auth/user-not-found');
+    expect(argumentos).toContain('auth/wrong-password');
+    for (const arg of argumentos) {
+      expect(arg.includes(correo)).toBe(false);
+      expect(arg.includes(clave)).toBe(false);
+    }
+  });
 });
 
 describe('UserManagement', () => {
