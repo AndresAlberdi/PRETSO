@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 
 interface SearchCategory {
   id: string;
@@ -18,26 +18,44 @@ interface SearchBarProps {
 export default function SearchBar({ onSearch, categories }: SearchBarProps) {
   const [category, setCategory] = useState(categories[0]?.id || '');
   const [query, setQuery] = useState('');
-  const [filters, setFilters] = useState<SearchFilter[]>([]);
+  // Cada ficha lleva un id estable (solo interno) para que React conserve su nodo al quitar otra.
+  const [filters, setFilters] = useState<(SearchFilter & { id: number })[]>([]);
+  const nextId = useRef(0);
+  const toPublic = (list: (SearchFilter & { id: number })[]): SearchFilter[] =>
+    list.map(({ category: c, query: q }) => ({ category: c, query: q }));
+  const inputRef = useRef<HTMLInputElement>(null);
+  const removeRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const pendingFocus = useRef<number | 'input' | null>(null);
+
+  // Tras quitar fichas, el foco pasa al filtro vecino o al campo (WCAG 2.4.3).
+  useLayoutEffect(() => {
+    const p = pendingFocus.current;
+    if (p === null) return;
+    pendingFocus.current = null;
+    if (p === 'input') inputRef.current?.focus();
+    else removeRefs.current[p]?.focus();
+  }, [filters]);
 
   const handleAddFilter = (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim()) return;
     
     const catToUse = category || categories[0]?.id || '';
-    const newFilters = [...filters, { category: catToUse, query: query.trim() }];
+    const newFilters = [...filters, { id: nextId.current++, category: catToUse, query: query.trim() }];
     setFilters(newFilters);
     setQuery('');
-    onSearch(newFilters);
+    onSearch(toPublic(newFilters));
   };
 
   const handleRemoveFilter = (index: number) => {
     const newFilters = filters.filter((_, i) => i !== index);
+    pendingFocus.current = newFilters.length > 0 ? Math.min(index, newFilters.length - 1) : 'input';
     setFilters(newFilters);
-    onSearch(newFilters);
+    onSearch(toPublic(newFilters));
   };
 
   const handleClearAll = () => {
+    pendingFocus.current = 'input';
     setFilters([]);
     setQuery('');
     onSearch([]);
@@ -57,6 +75,7 @@ export default function SearchBar({ onSearch, categories }: SearchBarProps) {
           ))}
         </select>
         <input 
+          ref={inputRef}
           type="text" 
           value={query} 
           onChange={e => setQuery(e.target.value)} 
@@ -82,11 +101,12 @@ export default function SearchBar({ onSearch, categories }: SearchBarProps) {
           {filters.map((f, i) => {
             const catLabel = categories.find(c => c.id === f.category)?.label || f.category;
             return (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.1)', padding: '0.2rem 0.5rem', borderRadius: '16px', fontSize: '0.85rem' }}>
+            <div key={f.id} style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.1)', padding: '0.2rem 0.5rem', borderRadius: '16px', fontSize: '0.85rem' }}>
               <span style={{ color: 'var(--primary-color)', marginRight: '4px' }}>{catLabel}:</span>
               <span>{f.query}</span>
               <button
                 type="button"
+                ref={el => { removeRefs.current[i] = el; }}
                 onClick={() => handleRemoveFilter(i)}
                 aria-label={`Quitar filtro ${catLabel}: ${f.query}`}
                 style={{ background: 'transparent', border: 'none', color: '#ff6b6b', marginLeft: '4px', cursor: 'pointer', fontWeight: 'bold' }}

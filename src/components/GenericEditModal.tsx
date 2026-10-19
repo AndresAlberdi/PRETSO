@@ -1,4 +1,4 @@
-import React, { useEffect, useId, useState } from 'react';
+import React, { useEffect, useId, useRef, useState } from 'react';
 import { collection, query, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { cleanFirebaseData } from '../utils';
@@ -74,6 +74,8 @@ const panelStyle: React.CSSProperties = {
 export default function GenericEditModal({ collectionName, record, onSave, onClose }: GenericEditModalProps) {
   const [formData, setFormData] = useState<any>({ ...record });
   const [loading, setLoading] = useState(false);
+  const submitRef = useRef<HTMLButtonElement>(null);
+  const savingRef = useRef(false);
   // Se activa con cualquier edición del usuario; decide si Escape pide confirmar el descarte.
   const [touched, setTouched] = useState(false);
   const [confirmDiscard, setConfirmDiscard] = useState(false);
@@ -124,28 +126,36 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (savingRef.current) return;
+    savingRef.current = true;
+    // El botón sigue enfocable mientras guarda: se le entrega el foco (WCAG 2.4.3).
+    submitRef.current?.focus();
     setLoading(true);
 
-    // Auto-convert fields back to their original types (number, boolean) before saving
-    const processedData = { ...formData };
-    for (const key of Object.keys(processedData)) {
-      if (key === 'id') continue;
-      // El selector de compañía ya entrega el número (o conserva el valor original)
-      if (referenciaCompania(key)) continue;
-      const originalValue = record[key];
+    try {
+      // Auto-convert fields back to their original types (number, boolean) before saving
+      const processedData = { ...formData };
+      for (const key of Object.keys(processedData)) {
+        if (key === 'id') continue;
+        // El selector de compañía ya entrega el número (o conserva el valor original)
+        if (referenciaCompania(key)) continue;
+        const originalValue = record[key];
 
-      // Handle number type conversions
-      if (typeof originalValue === 'number') {
-        processedData[key] = processedData[key] === '' ? null : Number(processedData[key]);
-      } 
-      // Handle boolean type conversions
-      else if (typeof originalValue === 'boolean') {
-        processedData[key] = processedData[key] === 'true' || processedData[key] === true;
+        // Handle number type conversions
+        if (typeof originalValue === 'number') {
+          processedData[key] = processedData[key] === '' ? null : Number(processedData[key]);
+        } 
+        // Handle boolean type conversions
+        else if (typeof originalValue === 'boolean') {
+          processedData[key] = processedData[key] === 'true' || processedData[key] === true;
+        }
       }
-    }
 
-    await onSave(processedData);
-    setLoading(false);
+      await onSave(processedData);
+    } finally {
+      savingRef.current = false;
+      setLoading(false);
+    }
   };
 
   // Sort keys custom function to place primary keys first and Doc1..Doc10 last
@@ -295,8 +305,9 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
             </button>
             <button 
               type="submit"
-              style={{ padding: '0.5rem 1.2rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-              disabled={loading}
+              ref={submitRef}
+              style={{ padding: '0.5rem 1.2rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: loading ? 'not-allowed' : 'pointer' }}
+              aria-disabled={loading || undefined}
             >
               {loading ? 'Guardando...' : 'Guardar Cambios'}
             </button>

@@ -15,6 +15,7 @@ import { logAction } from "../utils/audit";
 import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
 import { useSortableTable } from "../hooks/useSortableTable";
+import { useRestoreFocusOnViewChange } from "../hooks/useRestoreFocusOnViewChange";
 import SortableTh from "../components/SortableTh";
 import { contar } from "../utils/anuncios";
 import Tooltip from "../components/Tooltip";
@@ -145,6 +146,7 @@ export default function CorpusChristi() {
   }, [data, filters]);
 
   const isSearching = filters.length > 0;
+  useRestoreFocusOnViewChange(isSearching ? 'search' : selectedCityYear ? `detail:${selectedCityYear.ciudad}|${selectedCityYear.año}` : 'list');
   const detailData = data.filter(d => 
     selectedCityYear && d["Ciudad"] === selectedCityYear.ciudad && String(d["Año"]) === String(selectedCityYear.año)
   );
