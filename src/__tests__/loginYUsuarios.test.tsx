@@ -18,7 +18,10 @@ beforeEach(() => {
   vi.mocked(createUserWithEmailAndPassword).mockReset();
   vi.spyOn(console, 'error').mockImplementation(() => undefined);
 });
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
 
 describe('Login', () => {
   it('declara el autocompletado y anuncia cada fallo', async () => {
@@ -29,12 +32,12 @@ describe('Login', () => {
     expect(screen.queryByRole('alert')).toBeNull();
     const form = screen.getByLabelText('Correo Electrónico').closest('form') as HTMLFormElement;
     fireEvent.submit(form);
-    expect((await screen.findByRole('alert')).textContent).toContain('fallo');
+    expect((await screen.findByRole('alert')).textContent).toContain('No se pudo iniciar sesión. Inténtelo de nuevo.');
     await waitFor(() => expect(screen.getByRole('button', { name: 'Entrar' })).toBeTruthy());
     fireEvent.submit(form);
     expect(screen.queryByRole('alert')).toBeNull();
     await waitFor(() => expect(signInWithEmailAndPassword).toHaveBeenCalledTimes(2));
-    expect((await screen.findByRole('alert')).textContent).toContain('fallo');
+    expect((await screen.findByRole('alert')).textContent).toContain('No se pudo iniciar sesión. Inténtelo de nuevo.');
   });
 
   it('no revela si la cuenta existe ni registra credenciales', async () => {
@@ -52,7 +55,9 @@ describe('Login', () => {
 
     fireEvent.submit(form);
     const primera = (await screen.findByRole('alert')).textContent;
-    expect(primera).toBe('Correo o contraseña incorrectos.');
+    expect(primera).toBe(
+      'Correo o contraseña incorrectos. Si el problema persiste, comuníquese con la administración del proyecto.',
+    );
     expect((primera ?? '').includes('auth/')).toBe(false);
     await waitFor(() => expect(screen.getByRole('button', { name: 'Entrar' })).toBeTruthy());
 
@@ -61,13 +66,10 @@ describe('Login', () => {
     await waitFor(() => expect(errorSpy).toHaveBeenCalledTimes(2));
     expect((await screen.findByRole('alert')).textContent).toBe(primera);
 
-    const argumentos = errorSpy.mock.calls.flat().map(String);
-    expect(argumentos).toContain('auth/user-not-found');
-    expect(argumentos).toContain('auth/wrong-password');
-    for (const arg of argumentos) {
-      expect(arg.includes(correo)).toBe(false);
-      expect(arg.includes(clave)).toBe(false);
-    }
+    expect(errorSpy.mock.calls).toEqual([
+      ['Error al iniciar sesión:', 'auth/user-not-found'],
+      ['Error al iniciar sesión:', 'auth/wrong-password'],
+    ]);
   });
 });
 

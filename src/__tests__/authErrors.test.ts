@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { loginErrorMessage } from '../utils/authErrors';
+import { loginErrorCode, loginErrorMessage } from '../utils/authErrors';
 
-const CRED = 'Correo o contraseña incorrectos.';
+const CRED = 'Correo o contraseña incorrectos. Si el problema persiste, comuníquese con la administración del proyecto.';
+const GENERICO = 'No se pudo iniciar sesión. Inténtelo de nuevo.';
 
 describe('loginErrorMessage', () => {
   it('cada código produce su texto', () => {
@@ -49,10 +50,22 @@ describe('loginErrorMessage', () => {
     }
   });
 
-  it('sin código usa el mensaje o el genérico', () => {
-    expect(loginErrorMessage(new Error('fallo'))).toBe('fallo');
-    expect(loginErrorMessage({})).toBe('Error al iniciar sesión.');
-    expect(loginErrorMessage(null)).toBe('Error al iniciar sesión.');
-    expect(loginErrorMessage({ message: '' })).toBe('Error al iniciar sesión.');
+  it('sin código de auth nunca muestra el mensaje crudo', () => {
+    expect(loginErrorMessage(new Error('fallo'))).toBe(GENERICO);
+    expect(loginErrorMessage({})).toBe(GENERICO);
+    expect(loginErrorMessage(null)).toBe(GENERICO);
+    expect(loginErrorMessage({ message: '' })).toBe(GENERICO);
+    expect(loginErrorMessage('x')).toBe(GENERICO);
+    expect(loginErrorMessage({ code: 42, message: 'm' })).toBe(GENERICO);
+  });
+});
+
+describe('loginErrorCode', () => {
+  it('devuelve el code, el name del error o «sin código»', () => {
+    expect(loginErrorCode({ code: 'auth/user-not-found', message: 'a@b.c' })).toBe('auth/user-not-found');
+    expect(loginErrorCode(new TypeError('x'))).toBe('TypeError');
+    expect(loginErrorCode({})).toBe('sin código');
+    expect(loginErrorCode(null)).toBe('sin código');
+    expect(loginErrorCode('texto')).toBe('sin código');
   });
 });

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
-import { loginErrorMessage } from '../utils/authErrors';
+import { loginErrorCode, loginErrorMessage } from '../utils/authErrors';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -20,8 +20,7 @@ export default function Login() {
       navigate('/', { replace: true });
     } catch (err: unknown) {
       // Solo el código de Firebase al registro: nunca el correo, la contraseña ni el mensaje completo.
-      const code = typeof err === 'object' && err !== null && 'code' in err && typeof err.code === 'string' ? err.code : 'sin código';
-      console.error('Error al iniciar sesión:', code);
+      console.error('Error al iniciar sesión:', loginErrorCode(err));
       setError(loginErrorMessage(err));
     } finally {
       setLoading(false);
