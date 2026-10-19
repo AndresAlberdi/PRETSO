@@ -123,6 +123,16 @@ describe('useRestoreFocusOnViewChange', () => {
     expect(document.activeElement).toBe(campo);
   });
 
+  it('si el control enfocado sigue conectado aunque el foco esté en body, no se mueve a main', () => {
+    render(<ArnesHook conservar />);
+    const campo = screen.getByRole('textbox', { name: 'Campo' });
+    campo.focus();
+    campo.blur();
+    fireEvent.click(screen.getByRole('button', { name: 'Cambiar' }));
+    expect(screen.getByText('b')).toBeTruthy();
+    expect(document.activeElement).toBe(document.body);
+  });
+
   it('un cambio de vista tras el montaje sin foco previo no enfoca main', () => {
     render(<ArnesHook conservar inicial="a" cambiarEnEfecto />);
     expect(screen.getByText('b')).toBeTruthy();
