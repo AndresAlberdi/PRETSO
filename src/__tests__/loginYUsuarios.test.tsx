@@ -92,4 +92,37 @@ describe('UserManagement', () => {
     fireEvent.submit(correo.closest('form') as HTMLFormElement);
     await waitFor(() => expect(screen.getByRole('alert').textContent).toContain('creado exitosamente como lector'));
   });
+
+  it('no registra el correo ni muestra textos crudos al fallar el alta', async () => {
+    const errorSpy = vi.mocked(console.error);
+    errorSpy.mockClear();
+    vi.mocked(createUserWithEmailAndPassword)
+      .mockRejectedValueOnce({
+        code: 'auth/email-already-in-use',
+        message: 'Firebase: Error (auth/email-already-in-use).',
+        customData: { email: 'persona@example.com' },
+      })
+      .mockRejectedValueOnce({ code: 'auth/weak-password', message: 'Firebase: Error (auth/weak-password).' });
+    render(<UserManagement />);
+    const correo = screen.getByLabelText('Correo Electrónico (Lector)') as HTMLInputElement;
+    fireEvent.change(correo, { target: { value: 'persona@example.com' } });
+    fireEvent.change(screen.getByLabelText('Contraseña'), { target: { value: '123456' } });
+    const form = correo.closest('form') as HTMLFormElement;
+
+    fireEvent.submit(form);
+    const primera = (await screen.findByRole('alert')).textContent ?? '';
+    expect(primera).toBe('Error al crear usuario: Ya existe un usuario con ese correo.');
+    expect(primera.includes('auth/')).toBe(false);
+    expect(primera.includes('Firebase')).toBe(false);
+    await waitFor(() => expect(errorSpy).toHaveBeenCalledTimes(1));
+    expect(errorSpy.mock.calls).toEqual([['Error al crear usuario:', 'auth/email-already-in-use']]);
+
+    await waitFor(() => expect(screen.getByRole('button', { name: /crear/i })).toBeTruthy());
+    fireEvent.submit(form);
+    await waitFor(() =>
+      expect(screen.getByRole('alert').textContent).toBe(
+        'Error al crear usuario: La contraseña es demasiado débil; use al menos 6 caracteres.',
+      ),
+    );
+  });
 });
