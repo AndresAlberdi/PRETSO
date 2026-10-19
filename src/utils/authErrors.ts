@@ -50,3 +50,24 @@ export function loginErrorMessage(err: unknown): string {
   }
   return GENERIC;
 }
+
+const CREATE_USER_GENERIC = 'No se pudo crear el usuario. Inténtelo de nuevo.';
+
+/**
+ * Traduce un error de alta de usuario a un texto en español para la persona administradora.
+ * Nunca devuelve el mensaje crudo, los códigos ni los datos del error (`customData`).
+ */
+export function createUserErrorMessage(err: unknown): string {
+  switch (loginErrorCode(err)) {
+    case 'auth/email-already-in-use':
+      return 'Ya existe un usuario con ese correo.';
+    case 'auth/weak-password':
+      return 'La contraseña es demasiado débil; use al menos 6 caracteres.';
+    case 'auth/invalid-email':
+      return 'El correo no es válido.';
+    case 'auth/network-request-failed':
+      return 'No se pudo conectar. Revise su conexión e inténtelo de nuevo.';
+    default:
+      return CREATE_USER_GENERIC;
+  }
+}

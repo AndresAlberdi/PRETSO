@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { loginErrorCode, loginErrorMessage } from '../utils/authErrors';
+import { createUserErrorMessage, loginErrorCode, loginErrorMessage } from '../utils/authErrors';
 
 const CRED = 'Correo o contraseña incorrectos. Si el problema persiste, comuníquese con la administración del proyecto.';
 const GENERICO = 'No se pudo iniciar sesión. Inténtelo de nuevo.';
@@ -67,5 +67,48 @@ describe('loginErrorCode', () => {
     expect(loginErrorCode({})).toBe('sin código');
     expect(loginErrorCode(null)).toBe('sin código');
     expect(loginErrorCode('texto')).toBe('sin código');
+  });
+});
+
+describe('createUserErrorMessage', () => {
+  const GENERICO_ALTA = 'No se pudo crear el usuario. Inténtelo de nuevo.';
+
+  it('cada código produce su texto', () => {
+    expect(createUserErrorMessage({ code: 'auth/email-already-in-use' })).toBe('Ya existe un usuario con ese correo.');
+    expect(createUserErrorMessage({ code: 'auth/weak-password' })).toBe(
+      'La contraseña es demasiado débil; use al menos 6 caracteres.',
+    );
+    expect(createUserErrorMessage({ code: 'auth/invalid-email' })).toBe('El correo no es válido.');
+    expect(createUserErrorMessage({ code: 'auth/network-request-failed' })).toBe(
+      'No se pudo conectar. Revise su conexión e inténtelo de nuevo.',
+    );
+    expect(createUserErrorMessage({ code: 'auth/algo-raro' })).toBe(GENERICO_ALTA);
+  });
+
+  it('ningún texto contiene auth/ ni Firebase', () => {
+    const codes = [
+      'auth/email-already-in-use',
+      'auth/weak-password',
+      'auth/invalid-email',
+      'auth/network-request-failed',
+      'auth/algo-raro',
+    ];
+    for (const code of codes) {
+      const texto = createUserErrorMessage({ code, message: `Firebase: Error (${code}).` });
+      expect(texto.includes('auth/')).toBe(false);
+      expect(texto.includes('Firebase')).toBe(false);
+    }
+  });
+
+  it('sin código reconocido devuelve el genérico y nunca el mensaje crudo', () => {
+    expect(createUserErrorMessage(new Error('x'))).toBe(GENERICO_ALTA);
+    expect(createUserErrorMessage(null)).toBe(GENERICO_ALTA);
+    expect(createUserErrorMessage({})).toBe(GENERICO_ALTA);
+    expect(createUserErrorMessage('x')).toBe(GENERICO_ALTA);
+  });
+
+  it('no filtra el correo de customData', () => {
+    const texto = createUserErrorMessage({ code: 'auth/email-already-in-use', customData: { email: 'a@b.c' } });
+    expect(texto.includes('a@b.c')).toBe(false);
   });
 });
