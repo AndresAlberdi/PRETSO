@@ -1,10 +1,10 @@
 // Puerta de accesibilidad en CI: esta prueba impide que se debilite `.oxlintrc.json`.
 //
 // Decisión sobre `jsx-a11y/control-has-associated-label` con `depth: 3`:
-// el nombre accesible del botón se calcula de forma recursiva desde su contenido;
-// `td > div > button` con texto es un falso positivo con depth 2. Se verificó que
-// con depth 3 la regla sigue detectando `<button></button>`, `<button><span></span></button>`
-// y `<button><svg/></button>` sin nombre. Por eso se exige exactamente depth 3.
+// con depth 2 la regla marca la `<td>` (oxlint trata `td` como control y su texto
+// queda a profundidad 3: td > div > button > texto), no el botón. Con depth 3 esos
+// casos se aceptan y siguen detectándose los botones sin nombre y el texto a
+// profundidad 4. Por eso se exige exactamente depth 3.
 import { describe, it, expect } from 'vitest'
 import { readFileSync, readdirSync } from 'node:fs'
 import { resolve } from 'node:path'
@@ -66,6 +66,17 @@ describe('puerta de CI jsx-a11y', () => {
   it('declara 36 reglas y el plugin jsx-a11y activo', () => {
     expect(REGLAS_A11Y).toHaveLength(36)
     expect(config.plugins).toContain('jsx-a11y')
+  })
+
+  it('el JSON solo tiene las claves de primer nivel $schema, plugins y rules', () => {
+    expect(Object.keys(config).sort()).toEqual(['$schema', 'plugins', 'rules'])
+  })
+
+  it('toda clave de rules con "a11y" (guion o guion bajo) es una de las 36 reglas con prefijo jsx-a11y/', () => {
+    const permitidas = REGLAS_A11Y.map((r) => `jsx-a11y/${r}`)
+    const claves = Object.keys(config.rules).filter((k) => k.includes('a11y'))
+    expect(claves.filter((k) => !permitidas.includes(k))).toEqual([])
+    expect([...claves].sort()).toEqual([...permitidas].sort())
   })
 
   for (const regla of REGLAS_A11Y) {
