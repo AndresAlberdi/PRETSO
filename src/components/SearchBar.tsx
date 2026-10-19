@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 
 interface SearchCategory {
   id: string;
@@ -19,6 +19,18 @@ export default function SearchBar({ onSearch, categories }: SearchBarProps) {
   const [category, setCategory] = useState(categories[0]?.id || '');
   const [query, setQuery] = useState('');
   const [filters, setFilters] = useState<SearchFilter[]>([]);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const removeRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const pendingFocus = useRef<number | 'input' | null>(null);
+
+  // Tras quitar fichas, el foco pasa al filtro vecino o al campo (WCAG 2.4.3).
+  useLayoutEffect(() => {
+    const p = pendingFocus.current;
+    if (p === null) return;
+    pendingFocus.current = null;
+    if (p === 'input') inputRef.current?.focus();
+    else removeRefs.current[p]?.focus();
+  }, [filters]);
 
   const handleAddFilter = (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,11 +45,13 @@ export default function SearchBar({ onSearch, categories }: SearchBarProps) {
 
   const handleRemoveFilter = (index: number) => {
     const newFilters = filters.filter((_, i) => i !== index);
+    pendingFocus.current = newFilters.length > 0 ? Math.min(index, newFilters.length - 1) : 'input';
     setFilters(newFilters);
     onSearch(newFilters);
   };
 
   const handleClearAll = () => {
+    pendingFocus.current = 'input';
     setFilters([]);
     setQuery('');
     onSearch([]);
@@ -57,6 +71,7 @@ export default function SearchBar({ onSearch, categories }: SearchBarProps) {
           ))}
         </select>
         <input 
+          ref={inputRef}
           type="text" 
           value={query} 
           onChange={e => setQuery(e.target.value)} 
@@ -87,6 +102,7 @@ export default function SearchBar({ onSearch, categories }: SearchBarProps) {
               <span>{f.query}</span>
               <button
                 type="button"
+                ref={el => { removeRefs.current[i] = el; }}
                 onClick={() => handleRemoveFilter(i)}
                 aria-label={`Quitar filtro ${catLabel}: ${f.query}`}
                 style={{ background: 'transparent', border: 'none', color: '#ff6b6b', marginLeft: '4px', cursor: 'pointer', fontWeight: 'bold' }}
