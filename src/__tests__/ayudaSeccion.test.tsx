@@ -45,6 +45,15 @@ describe('Ayuda de sección: comportamiento', () => {
     expect(panel.hidden).toBe(false);
   });
 
+  it('perder el foco del botón hacia el panel no la cierra (sin onBlur)', () => {
+    const { boton, panel } = montar();
+    boton.focus();
+    fireEvent.click(boton);
+    fireEvent.blur(boton);
+    expect(boton.getAttribute('aria-expanded')).toBe('true');
+    expect(panel.hidden).toBe(false);
+  });
+
   it('un pointerdown fuera la cierra', () => {
     const { boton, panel } = montar();
     fireEvent.click(boton);
