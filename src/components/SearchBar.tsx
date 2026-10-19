@@ -101,9 +101,9 @@ export default function SearchBar({ onSearch, categories }: SearchBarProps) {
           {filters.map((f, i) => {
             const catLabel = categories.find(c => c.id === f.category)?.label || f.category;
             return (
-            <div key={f.id} style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.1)', padding: '0.2rem 0.5rem', borderRadius: '16px', fontSize: '0.85rem' }}>
+            <div key={f.id} style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.1)', padding: '0.2rem 0.5rem', borderRadius: '16px', fontSize: '0.85rem', maxWidth: '100%' }}>
               <span style={{ color: 'var(--primary-color)', marginRight: '4px' }}>{catLabel}:</span>
-              <span>{f.query}</span>
+              <span style={{ minWidth: 0, overflowWrap: 'anywhere' }}>{f.query}</span>
               <button
                 type="button"
                 ref={el => { removeRefs.current[i] = el; }}
