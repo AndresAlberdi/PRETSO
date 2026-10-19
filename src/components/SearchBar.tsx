@@ -18,7 +18,11 @@ interface SearchBarProps {
 export default function SearchBar({ onSearch, categories }: SearchBarProps) {
   const [category, setCategory] = useState(categories[0]?.id || '');
   const [query, setQuery] = useState('');
-  const [filters, setFilters] = useState<SearchFilter[]>([]);
+  // Cada ficha lleva un id estable (solo interno) para que React conserve su nodo al quitar otra.
+  const [filters, setFilters] = useState<(SearchFilter & { id: number })[]>([]);
+  const nextId = useRef(0);
+  const toPublic = (list: (SearchFilter & { id: number })[]): SearchFilter[] =>
+    list.map(({ category: c, query: q }) => ({ category: c, query: q }));
   const inputRef = useRef<HTMLInputElement>(null);
   const removeRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const pendingFocus = useRef<number | 'input' | null>(null);
@@ -37,17 +41,17 @@ export default function SearchBar({ onSearch, categories }: SearchBarProps) {
     if (!query.trim()) return;
     
     const catToUse = category || categories[0]?.id || '';
-    const newFilters = [...filters, { category: catToUse, query: query.trim() }];
+    const newFilters = [...filters, { id: nextId.current++, category: catToUse, query: query.trim() }];
     setFilters(newFilters);
     setQuery('');
-    onSearch(newFilters);
+    onSearch(toPublic(newFilters));
   };
 
   const handleRemoveFilter = (index: number) => {
     const newFilters = filters.filter((_, i) => i !== index);
     pendingFocus.current = newFilters.length > 0 ? Math.min(index, newFilters.length - 1) : 'input';
     setFilters(newFilters);
-    onSearch(newFilters);
+    onSearch(toPublic(newFilters));
   };
 
   const handleClearAll = () => {
@@ -97,7 +101,7 @@ export default function SearchBar({ onSearch, categories }: SearchBarProps) {
           {filters.map((f, i) => {
             const catLabel = categories.find(c => c.id === f.category)?.label || f.category;
             return (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.1)', padding: '0.2rem 0.5rem', borderRadius: '16px', fontSize: '0.85rem' }}>
+            <div key={f.id} style={{ display: 'flex', alignItems: 'center', background: 'rgba(255,255,255,0.1)', padding: '0.2rem 0.5rem', borderRadius: '16px', fontSize: '0.85rem' }}>
               <span style={{ color: 'var(--primary-color)', marginRight: '4px' }}>{catLabel}:</span>
               <span>{f.query}</span>
               <button

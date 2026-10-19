@@ -58,8 +58,10 @@ function montarBuscador() {
 describe('SearchBar: foco al quitar fichas', () => {
   it('quitar una ficha intermedia lleva el foco a la ficha vecina', () => {
     montarBuscador();
+    const antes = screen.getByRole('button', { name: 'Quitar filtro Texto libre: b' });
     quitar('b');
     expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Quitar filtro Texto libre: c' }));
+    expect(document.activeElement).not.toBe(antes);
   });
 
   it('quitar la última ficha lleva el foco a la anterior', () => {
@@ -207,5 +209,34 @@ describe('Botones de guardar', () => {
     expect(onSave).toHaveBeenCalledTimes(1);
     terminar();
     await screen.findByRole('button', { name: 'Guardar Cambios' });
+  });
+
+  it('edición: si onSave rechaza, vuelve «Guardar Cambios» sin aria-disabled y se puede reenviar', async () => {
+    const onSave = vi.fn().mockImplementation(() => ({ then: (_ok: unknown, ko: (e: Error) => void) => { ko(new Error('fallo')); } }));
+    render(
+      <GenericEditModal
+        collectionName="bibliografia"
+        record={{ id: 'b1', Autores: 'Autor', 'Referencias bibliográficas': 'Ref' }}
+        onSave={onSave}
+        onClose={vi.fn()}
+      />,
+    );
+    await screen.findByRole('dialog', { name: /Editar Registro/ });
+    const form = document.querySelector('form') as HTMLFormElement;
+    // El rechazo se propaga desde el manejador; se captura aquí para no ensuciar la ejecución.
+    const previos = process.listeners('unhandledRejection');
+    process.removeAllListeners('unhandledRejection');
+    const capturados: unknown[] = [];
+    process.on('unhandledRejection', motivo => { capturados.push(motivo); });
+    fireEvent.submit(form);
+    const boton = await screen.findByRole('button', { name: 'Guardar Cambios' });
+    expect(boton.getAttribute('aria-disabled')).toBeNull();
+    fireEvent.submit(form);
+    await screen.findByRole('button', { name: 'Guardar Cambios' });
+    expect(onSave).toHaveBeenCalledTimes(2);
+    await new Promise(r => setTimeout(r, 0));
+    process.removeAllListeners('unhandledRejection');
+    previos.forEach(f => process.on('unhandledRejection', f));
+    expect(capturados.length).toBe(2);
   });
 });

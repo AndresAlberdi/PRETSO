@@ -180,6 +180,7 @@ button:disabled {
 }
 
 button[aria-disabled="true"] { cursor: not-allowed; opacity: 0.5; }
+button[aria-disabled="true"]:focus-visible { opacity: 1; }
 button[aria-disabled="true"]:hover { transform: none; box-shadow: none; }
 
 /* Tables */

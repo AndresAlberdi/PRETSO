@@ -30,5 +30,7 @@ export function useRestoreFocusOnViewChange(view: string): void {
     if (last && !last.isConnected && (active === null || active === document.body)) {
       document.getElementById('contenido')?.focus({ preventScroll: true });
     }
+    // No retener el subárbol desconectado.
+    lastFocused.current = null;
   }, [view]);
 }

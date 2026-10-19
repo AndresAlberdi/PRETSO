@@ -132,25 +132,25 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
     submitRef.current?.focus();
     setLoading(true);
 
-    // Auto-convert fields back to their original types (number, boolean) before saving
-    const processedData = { ...formData };
-    for (const key of Object.keys(processedData)) {
-      if (key === 'id') continue;
-      // El selector de compañía ya entrega el número (o conserva el valor original)
-      if (referenciaCompania(key)) continue;
-      const originalValue = record[key];
-
-      // Handle number type conversions
-      if (typeof originalValue === 'number') {
-        processedData[key] = processedData[key] === '' ? null : Number(processedData[key]);
-      } 
-      // Handle boolean type conversions
-      else if (typeof originalValue === 'boolean') {
-        processedData[key] = processedData[key] === 'true' || processedData[key] === true;
-      }
-    }
-
     try {
+      // Auto-convert fields back to their original types (number, boolean) before saving
+      const processedData = { ...formData };
+      for (const key of Object.keys(processedData)) {
+        if (key === 'id') continue;
+        // El selector de compañía ya entrega el número (o conserva el valor original)
+        if (referenciaCompania(key)) continue;
+        const originalValue = record[key];
+
+        // Handle number type conversions
+        if (typeof originalValue === 'number') {
+          processedData[key] = processedData[key] === '' ? null : Number(processedData[key]);
+        } 
+        // Handle boolean type conversions
+        else if (typeof originalValue === 'boolean') {
+          processedData[key] = processedData[key] === 'true' || processedData[key] === true;
+        }
+      }
+
       await onSave(processedData);
     } finally {
       savingRef.current = false;
@@ -306,7 +306,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
             <button 
               type="submit"
               ref={submitRef}
-              style={{ padding: '0.5rem 1.2rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+              style={{ padding: '0.5rem 1.2rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: loading ? 'not-allowed' : 'pointer' }}
               aria-disabled={loading || undefined}
             >
               {loading ? 'Guardando...' : 'Guardar Cambios'}
