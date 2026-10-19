@@ -420,7 +420,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                 
                 <fieldset style={fieldsetStyle}>
                   <legend style={legendStyle}>Asociar Documentos (Hasta 10)</legend>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '0.8rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(200px, 100%), 1fr))', gap: '0.8rem' }}>
                     {Array.from({ length: 10 }).map((_, i) => (
                       <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
                         <label htmlFor={`${fieldId}-doc-${i}`} style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Documento {i + 1}</label>
