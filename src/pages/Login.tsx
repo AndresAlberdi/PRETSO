@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
+import { loginErrorCode, loginErrorMessage } from '../utils/authErrors';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -17,13 +18,10 @@ export default function Login() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       navigate('/', { replace: true });
-    } catch (err: any) {
-      // Handle missing auth error gracefully
-      if (err.message.includes('auth/configuration-not-found')) {
-         setError("Autenticación por Correo/Contraseña no está habilitada en Firebase Console. Por favor, habilítala.");
-      } else {
-         setError(err.message || "Error al iniciar sesión.");
-      }
+    } catch (err: unknown) {
+      // Solo el código de Firebase al registro: nunca el correo, la contraseña ni el mensaje completo.
+      console.error('Error al iniciar sesión:', loginErrorCode(err));
+      setError(loginErrorMessage(err));
     } finally {
       setLoading(false);
     }

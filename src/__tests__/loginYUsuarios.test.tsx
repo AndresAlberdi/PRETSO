@@ -18,7 +18,10 @@ beforeEach(() => {
   vi.mocked(createUserWithEmailAndPassword).mockReset();
   vi.spyOn(console, 'error').mockImplementation(() => undefined);
 });
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.restoreAllMocks();
+});
 
 describe('Login', () => {
   it('declara el autocompletado y anuncia cada fallo', async () => {
@@ -29,12 +32,44 @@ describe('Login', () => {
     expect(screen.queryByRole('alert')).toBeNull();
     const form = screen.getByLabelText('Correo Electrónico').closest('form') as HTMLFormElement;
     fireEvent.submit(form);
-    expect((await screen.findByRole('alert')).textContent).toContain('fallo');
+    expect((await screen.findByRole('alert')).textContent).toContain('No se pudo iniciar sesión. Inténtelo de nuevo.');
     await waitFor(() => expect(screen.getByRole('button', { name: 'Entrar' })).toBeTruthy());
     fireEvent.submit(form);
     expect(screen.queryByRole('alert')).toBeNull();
     await waitFor(() => expect(signInWithEmailAndPassword).toHaveBeenCalledTimes(2));
-    expect((await screen.findByRole('alert')).textContent).toContain('fallo');
+    expect((await screen.findByRole('alert')).textContent).toContain('No se pudo iniciar sesión. Inténtelo de nuevo.');
+  });
+
+  it('no revela si la cuenta existe ni registra credenciales', async () => {
+    const correo = 'persona.prueba@example.com';
+    const clave = 'ClaveSecreta-123';
+    const errorSpy = vi.mocked(console.error);
+    errorSpy.mockClear();
+    vi.mocked(signInWithEmailAndPassword)
+      .mockRejectedValueOnce({ code: 'auth/user-not-found', message: 'Firebase: Error (auth/user-not-found).' })
+      .mockRejectedValueOnce({ code: 'auth/wrong-password', message: 'Firebase: Error (auth/wrong-password).' });
+    render(<Login />);
+    fireEvent.change(screen.getByLabelText('Correo Electrónico'), { target: { value: correo } });
+    fireEvent.change(screen.getByLabelText('Contraseña'), { target: { value: clave } });
+    const form = screen.getByLabelText('Correo Electrónico').closest('form') as HTMLFormElement;
+
+    fireEvent.submit(form);
+    const primera = (await screen.findByRole('alert')).textContent;
+    expect(primera).toBe(
+      'Correo o contraseña incorrectos. Si el problema persiste, comuníquese con la administración del proyecto.',
+    );
+    expect((primera ?? '').includes('auth/')).toBe(false);
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Entrar' })).toBeTruthy());
+
+    fireEvent.submit(form);
+    await waitFor(() => expect(signInWithEmailAndPassword).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(errorSpy).toHaveBeenCalledTimes(2));
+    expect((await screen.findByRole('alert')).textContent).toBe(primera);
+
+    expect(errorSpy.mock.calls).toEqual([
+      ['Error al iniciar sesión:', 'auth/user-not-found'],
+      ['Error al iniciar sesión:', 'auth/wrong-password'],
+    ]);
   });
 });
 
