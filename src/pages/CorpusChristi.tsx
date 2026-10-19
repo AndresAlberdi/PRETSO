@@ -164,10 +164,10 @@ export default function CorpusChristi() {
   return (
     <div>
       <div className="cabecera-pagina">
-        <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          Corpus Christi
-          <Tooltip content="Muestra los registros financieros y labores encargadas para la celebración del Corpus Christi por diversas ciudades en años específicos, detallando el pago y los fondos." />
-        </h1>
+        <div className="titulo-pagina">
+          <h1>Corpus Christi</h1>
+          <Tooltip label="Acerca de Corpus Christi" content="Muestra los registros financieros y labores encargadas para la celebración del Corpus Christi por diversas ciudades en años específicos, detallando el pago y los fondos." />
+        </div>
         <div className="acciones-cabecera">
           {isEditMode && (
             <button 
