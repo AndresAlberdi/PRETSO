@@ -2,6 +2,7 @@ import { useId, useState } from 'react';
 import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { firebaseConfig } from "../firebase";
+import { createUserErrorMessage, loginErrorCode } from "../utils/authErrors";
 
 let secondaryApp: any;
 let secondaryAuth: any;
@@ -35,9 +36,9 @@ export default function UserManagement() {
       setStatus({ message: `Usuario ${email} creado exitosamente como lector.`, type: 'success' });
       setEmail('');
       setPassword('');
-    } catch (error: any) {
-      console.error(error);
-      setStatus({ message: `Error al crear usuario: ${error.message}`, type: 'error' });
+    } catch (error: unknown) {
+      console.error('Error al crear usuario:', loginErrorCode(error));
+      setStatus({ message: `Error al crear usuario: ${createUserErrorMessage(error)}`, type: 'error' });
     } finally {
       setLoading(false);
     }
