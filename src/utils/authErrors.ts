@@ -67,6 +67,11 @@ export function createUserErrorMessage(err: unknown): string {
       return 'El correo no es válido.';
     case 'auth/network-request-failed':
       return 'No se pudo conectar. Revise su conexión e inténtelo de nuevo.';
+    case 'auth/admin-restricted-operation':
+    case 'auth/operation-not-allowed':
+      return 'El alta de usuarios desde la aplicación está deshabilitada en este proyecto.';
+    case 'auth/too-many-requests':
+      return 'Demasiados intentos. Espere unos minutos e inténtelo de nuevo.';
     default:
       return CREATE_USER_GENERIC;
   }

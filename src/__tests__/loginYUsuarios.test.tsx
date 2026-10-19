@@ -124,5 +124,10 @@ describe('UserManagement', () => {
         'Error al crear usuario: La contraseña es demasiado débil; use al menos 6 caracteres.',
       ),
     );
+    await waitFor(() => expect(errorSpy).toHaveBeenCalledTimes(2));
+    expect(errorSpy.mock.calls).toEqual([
+      ['Error al crear usuario:', 'auth/email-already-in-use'],
+      ['Error al crear usuario:', 'auth/weak-password'],
+    ]);
   });
 });

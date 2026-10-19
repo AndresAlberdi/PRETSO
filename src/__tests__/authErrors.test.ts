@@ -85,12 +85,24 @@ describe('createUserErrorMessage', () => {
     expect(createUserErrorMessage({ code: 'auth/algo-raro' })).toBe(GENERICO_ALTA);
   });
 
+  it('el alta deshabilitada y el exceso de intentos tienen su texto', () => {
+    const deshabilitada = 'El alta de usuarios desde la aplicación está deshabilitada en este proyecto.';
+    expect(createUserErrorMessage({ code: 'auth/admin-restricted-operation' })).toBe(deshabilitada);
+    expect(createUserErrorMessage({ code: 'auth/operation-not-allowed' })).toBe(deshabilitada);
+    expect(createUserErrorMessage({ code: 'auth/too-many-requests' })).toBe(
+      'Demasiados intentos. Espere unos minutos e inténtelo de nuevo.',
+    );
+  });
+
   it('ningún texto contiene auth/ ni Firebase', () => {
     const codes = [
       'auth/email-already-in-use',
       'auth/weak-password',
       'auth/invalid-email',
       'auth/network-request-failed',
+      'auth/admin-restricted-operation',
+      'auth/operation-not-allowed',
+      'auth/too-many-requests',
       'auth/algo-raro',
     ];
     for (const code of codes) {
