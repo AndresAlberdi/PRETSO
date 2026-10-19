@@ -28,10 +28,15 @@ describe('reflujo a 320 px: pendientes F4', () => {
 
   it('las tarjetas de resultados de Inicio pasan a otra línea cuando no caben', () => {
     const fuente = leer('pages/Inicio.tsx');
-    expect(fuente.includes("flexWrap: 'wrap'")).toBe(true);
-    expect(fuente.includes("flex: '1 1 12rem'")).toBe(true);
-    expect(fuente.includes('flexShrink: 0')).toBe(true);
-    expect(fuente.includes("maxWidth: '100%'")).toBe(true);
+    const fin = fuente.indexOf('Ir a la sección');
+    const inicio = fuente.lastIndexOf("gap: '1rem'", fin);
+    expect(inicio).toBeGreaterThanOrEqual(0);
+    expect(fin).toBeGreaterThan(inicio);
+    const tarjeta = fuente.slice(inicio, fin);
+    expect(tarjeta.includes("flexWrap: 'wrap'")).toBe(true);
+    expect(tarjeta.includes("flex: '1 1 12rem'")).toBe(true);
+    expect(tarjeta.includes('flexShrink: 0')).toBe(true);
+    expect(tarjeta.includes("maxWidth: '100%'")).toBe(true);
   });
 
   it('una consulta larga sin espacios se renderiza con corte de palabra', () => {
