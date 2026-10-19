@@ -843,7 +843,7 @@ jobs:
         run: cp excepciones-generadas/trivyignore.yaml .trivyignore.yaml
 
       - name: Checkov
-        uses: bridgecrewio/checkov-action@29be5868bfa968f099ae80169f61f42887494b8f # master @ 2026-09-17 (sin release vigente)
+        uses: bridgecrewio/checkov-action@29be5868bfa968f099ae80169f61f42887494b8f # master @ 2026-10-12 = tag v12.3133.0 (sin release vigente)
         with:
           directory: ${{ inputs.ruta }}
           # github_actions NO va aquí: lo analiza el job `workflows`, que corre siempre y sobre
@@ -1056,7 +1056,7 @@ jobs:
         # docker...). El SHA fija el repositorio COMPLETO, por lo que el mismo
         # pin sirve para snyk/actions/setup o snyk/actions/python si se cambia
         # la subruta; el comentario de versión aplica a todo el repo.
-        uses: snyk/actions/node@11b673cfb4b0dc0d860a1323caa199d54950dcce # master @ 2026-09-29
+        uses: snyk/actions/node@11b673cfb4b0dc0d860a1323caa199d54950dcce # master @ 2026-10-07
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
