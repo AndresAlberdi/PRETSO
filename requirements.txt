@@ -10,7 +10,7 @@
 # ~/Documentos/PRETSO/Hacia PRETSO rev AA 1.ods.
 firebase-admin==7.7.0
 pandas==3.0.6
-numpy==2.5.3
+numpy==2.5.4
 # Motor de pandas para leer .ods (pd.read_excel(..., engine='odf')).
 odfpy==1.4.1
 
