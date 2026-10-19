@@ -14,6 +14,7 @@ import { logAction } from "../utils/audit";
 import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
 import { useSortableTable } from "../hooks/useSortableTable";
+import { useRestoreFocusOnViewChange } from "../hooks/useRestoreFocusOnViewChange";
 import SortableTh from "../components/SortableTh";
 import { contar } from "../utils/anuncios";
 import Tooltip from "../components/Tooltip";
@@ -132,6 +133,7 @@ export default function Indicadores() {
   }, [data, filters]);
 
   const isSearching = filters.length > 0;
+  useRestoreFocusOnViewChange(isSearching ? 'search' : selectedCategoria ? `detail:${selectedCategoria}` : 'list');
   const detailData = data.filter(d => d["Categorías"] === selectedCategoria);
 
   const { items: sortedFilteredCategorias, requestSort: sortCat, sortConfig: scCat } = useSortableTable(filteredCategorias);

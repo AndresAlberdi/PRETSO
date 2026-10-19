@@ -12,6 +12,7 @@ import { logAction } from "../utils/audit";
 import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
 import { useSortableTable } from "../hooks/useSortableTable";
+import { useRestoreFocusOnViewChange } from "../hooks/useRestoreFocusOnViewChange";
 import SortableTh from "../components/SortableTh";
 import { contar } from "../utils/anuncios";
 import Tooltip from "../components/Tooltip";
@@ -172,6 +173,7 @@ export default function Salarios() {
   );
 
   const isSearching = filters.length > 0;
+  useRestoreFocusOnViewChange(isSearching ? 'search' : selectedCompId ? `detail:${selectedCompId}` : 'list');
   const siglaSeleccionada = siglaDeReferencia(selectedCompId, companias);
   const companiaSeleccionada = resolverCompania(selectedCompId, companias);
   const detailData = companiaSeleccionada
