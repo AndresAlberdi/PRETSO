@@ -194,10 +194,10 @@ export default function ManejoCaja() {
   return (
     <div>
       <div className="cabecera-pagina">
-        <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          Manejo de Caja 
-          <Tooltip content="Esta sección muestra información detallada sobre los ingresos, egresos y otros bienes monetarios gestionados por las diversas compañías durante sus temporadas teatrales. Sirve para entender los flujos de dinero y la salud financiera." />
-        </h1>
+        <div className="titulo-pagina">
+          <h1>Manejo de Caja</h1>
+          <Tooltip label="Acerca de Manejo de Caja" content="Esta sección muestra información detallada sobre los ingresos, egresos y otros bienes monetarios gestionados por las diversas compañías durante sus temporadas teatrales. Sirve para entender los flujos de dinero y la salud financiera." />
+        </div>
         <div className="acciones-cabecera">
           {isEditMode && (
             <button 

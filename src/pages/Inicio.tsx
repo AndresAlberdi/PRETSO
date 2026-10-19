@@ -201,9 +201,10 @@ export default function Inicio() {
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'center',
-                  gap: '1rem'
+                  gap: '1rem',
+                  flexWrap: 'wrap'
                 }}>
-                  <div style={{ minWidth: 0, overflowWrap: 'anywhere' }}>
+                  <div style={{ flex: '1 1 12rem', minWidth: 0, overflowWrap: 'anywhere' }}>
                     <span style={{ 
                       background: 'var(--primary-color)', 
                       color: 'var(--on-primary)', 
@@ -219,7 +220,7 @@ export default function Inicio() {
                   </div>
                   <button 
                     onClick={() => navigate(res.path)}
-                    style={{ background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-primary)', padding: '0.4rem 1rem', borderRadius: '4px', cursor: 'pointer', flexShrink: 0 }}
+                    style={{ background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-primary)', padding: '0.4rem 1rem', borderRadius: '4px', cursor: 'pointer', flexShrink: 0, maxWidth: '100%' }}
                   >
                     Ir a la sección
                   </button>

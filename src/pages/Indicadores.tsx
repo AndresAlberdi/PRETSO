@@ -149,10 +149,10 @@ export default function Indicadores() {
   return (
     <div>
       <div className="cabecera-pagina">
-        <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          Identificación de Indicadores
-          <Tooltip content="Recoge transacciones y datos económicos clasificados por diversas categorías o conceptos. Provee información sobre precios y gastos habituales a lo largo de los años en distintas ciudades." />
-        </h1>
+        <div className="titulo-pagina">
+          <h1>Identificación de Indicadores</h1>
+          <Tooltip label="Acerca de Identificación de Indicadores" content="Recoge transacciones y datos económicos clasificados por diversas categorías o conceptos. Provee información sobre precios y gastos habituales a lo largo de los años en distintas ciudades." />
+        </div>
         <div className="acciones-cabecera">
           {isEditMode && (
             <button 
