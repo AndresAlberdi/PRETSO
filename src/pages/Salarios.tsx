@@ -195,10 +195,10 @@ export default function Salarios() {
   return (
     <div>
       <div className="cabecera-pagina">
-        <h1 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-          Remuneraciones
-          <Tooltip content="En esta sección se listan las remuneraciones y pagos específicos que la compañía efectuó a diversas personas (actores, músicos, tramoyistas, etc.) por su trabajo durante las diferentes temporadas." />
-        </h1>
+        <div className="titulo-pagina">
+          <h1>Remuneraciones</h1>
+          <Tooltip label="Acerca de Remuneraciones" content="En esta sección se listan las remuneraciones y pagos específicos que la compañía efectuó a diversas personas (actores, músicos, tramoyistas, etc.) por su trabajo durante las diferentes temporadas." />
+        </div>
         <div className="acciones-cabecera">
           {isEditMode && (
             <button 
