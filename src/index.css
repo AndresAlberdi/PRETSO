@@ -316,6 +316,10 @@ main {
 .barra-busqueda { display: flex; gap: 0.5rem; align-items: center; }
 .fila-filtros { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
 .fila-filtros select { max-width: 100%; }
+.titulo-pagina { display: flex; align-items: center; gap: 0.5rem; position: relative; min-width: 0; }
+.ayuda-seccion-panel { position: absolute; top: 100%; left: 0; z-index: 10; width: min(32rem, calc(100vw - 4rem)); padding: 0.75rem 1rem; background: var(--bg-color); color: var(--text-primary); border: 1px solid var(--input-border); border-radius: 8px; font-size: 0.9rem; font-weight: 400; line-height: 1.5; box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
+/* Gana a button:not([disabled]):hover (0,2,1): el botón de ayuda no cambia de color ni se desplaza al pasar el ratón */
+.ayuda-seccion > button:hover { background: rgba(255,255,255,0.2); transform: none; box-shadow: none; }
 
 @media (max-width: 64em) {
   .cabecera-pagina, .acciones-cabecera, .barra-busqueda { flex-wrap: wrap; }
