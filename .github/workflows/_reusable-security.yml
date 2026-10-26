@@ -526,7 +526,7 @@ jobs:
 
       - name: Subir SARIF a Code Scanning (Modo A/B)
         if: inputs.subir_sarif && always()
-        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4
         with:
           # Sin los exceptuados con nosemgrep (paso anterior).
           sarif_file: semgrep-code-scanning.sarif
@@ -799,7 +799,7 @@ jobs:
 
       - name: Subir SARIF a Code Scanning (Modo A/B)
         if: inputs.subir_sarif && always()
-        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4
         with:
           sarif_file: trivy-fs.sarif
           category: trivy-fs${{ needs.preparar.outputs.sufijo_sarif }}
@@ -843,7 +843,7 @@ jobs:
         run: cp excepciones-generadas/trivyignore.yaml .trivyignore.yaml
 
       - name: Checkov
-        uses: bridgecrewio/checkov-action@29be5868bfa968f099ae80169f61f42887494b8f # master @ 2026-10-12 = tag v12.3133.0 (sin release vigente)
+        uses: bridgecrewio/checkov-action@6f26dc90000b74feb589a906cdfae540f5119895 # master @ 2026-10-12 = tag v12.3133.0 (sin release vigente)
         with:
           directory: ${{ inputs.ruta }}
           # github_actions NO va aquí: lo analiza el job `workflows`, que corre siempre y sobre
@@ -876,7 +876,7 @@ jobs:
       # razón que nada tiene que ver con la seguridad del código.
       - name: Subir SARIF a Code Scanning (Modo A/B)
         if: inputs.subir_sarif && always() && hashFiles('trivy-config.sarif') != ''
-        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4
         with:
           sarif_file: trivy-config.sarif
           category: trivy-config${{ needs.preparar.outputs.sufijo_sarif }}
@@ -918,7 +918,7 @@ jobs:
 
       - name: Subir SARIF de Checkov a Code Scanning (Modo A/B)
         if: inputs.subir_sarif && always() && steps.sarif_checkov.outputs.archivo != ''
-        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4
         with:
           sarif_file: ${{ steps.sarif_checkov.outputs.archivo }}
           category: checkov${{ needs.preparar.outputs.sufijo_sarif }}
@@ -1018,7 +1018,7 @@ jobs:
 
       - name: Subir SARIF de los workflows a Code Scanning (Modo A/B)
         if: inputs.subir_sarif && always() && hashFiles('resultados-workflows/resultados.sarif') != ''
-        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4
+        uses: github/codeql-action/upload-sarif@6f2ac81f5cd81fe351a197ba0b00d91d03cd2aee # v4
         with:
           sarif_file: resultados-workflows/resultados.sarif
           category: checkov-workflows${{ needs.preparar.outputs.sufijo_sarif }}
