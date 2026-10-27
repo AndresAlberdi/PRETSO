@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
+import ReaderRoute from './components/ReaderRoute';
 import Login from './pages/Login';
 import Inicio from './pages/Inicio';
 import ManejoCaja from './pages/ManejoCaja';
@@ -39,18 +40,18 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           
-          <Route path="/" element={<ProtectedRoute><Layout><Inicio /></Layout></ProtectedRoute>} />
-          <Route path="/caja" element={<ProtectedRoute><Layout><ManejoCaja /></Layout></ProtectedRoute>} />
-          <Route path="/salarios" element={<ProtectedRoute><Layout><Salarios /></Layout></ProtectedRoute>} />
-          <Route path="/corpus" element={<ProtectedRoute><Layout><CorpusChristi /></Layout></ProtectedRoute>} />
-          <Route path="/indicadores" element={<ProtectedRoute><Layout><Indicadores /></Layout></ProtectedRoute>} />
-          <Route path="/companias" element={<ProtectedRoute><Layout><IndiceCompanias /></Layout></ProtectedRoute>} />
-          <Route path="/bibliografia" element={<ProtectedRoute><Layout><Bibliografia /></Layout></ProtectedRoute>} />
-          <Route path="/transacciones" element={<ProtectedRoute><Layout><Transacciones /></Layout></ProtectedRoute>} />
-          <Route path="/documentos" element={<ProtectedRoute><Layout><Documentos /></Layout></ProtectedRoute>} />
-          <Route path="/auditoria" element={<ProtectedRoute><AdminRoute><Layout><Auditoria /></Layout></AdminRoute></ProtectedRoute>} />
-          <Route path="/administracion" element={<ProtectedRoute><AdminRoute><Layout><Administracion /></Layout></AdminRoute></ProtectedRoute>} />
-          <Route path="/usuarios" element={<ProtectedRoute><AdminRoute><Layout><UserManagement /></Layout></AdminRoute></ProtectedRoute>} />
+          <Route path="/" element={<ProtectedRoute><ReaderRoute><Layout><Inicio /></Layout></ReaderRoute></ProtectedRoute>} />
+          <Route path="/caja" element={<ProtectedRoute><ReaderRoute><Layout><ManejoCaja /></Layout></ReaderRoute></ProtectedRoute>} />
+          <Route path="/salarios" element={<ProtectedRoute><ReaderRoute><Layout><Salarios /></Layout></ReaderRoute></ProtectedRoute>} />
+          <Route path="/corpus" element={<ProtectedRoute><ReaderRoute><Layout><CorpusChristi /></Layout></ReaderRoute></ProtectedRoute>} />
+          <Route path="/indicadores" element={<ProtectedRoute><ReaderRoute><Layout><Indicadores /></Layout></ReaderRoute></ProtectedRoute>} />
+          <Route path="/companias" element={<ProtectedRoute><ReaderRoute><Layout><IndiceCompanias /></Layout></ReaderRoute></ProtectedRoute>} />
+          <Route path="/bibliografia" element={<ProtectedRoute><ReaderRoute><Layout><Bibliografia /></Layout></ReaderRoute></ProtectedRoute>} />
+          <Route path="/transacciones" element={<ProtectedRoute><ReaderRoute><Layout><Transacciones /></Layout></ReaderRoute></ProtectedRoute>} />
+          <Route path="/documentos" element={<ProtectedRoute><ReaderRoute><Layout><Documentos /></Layout></ReaderRoute></ProtectedRoute>} />
+          <Route path="/auditoria" element={<ProtectedRoute><ReaderRoute><AdminRoute><Layout><Auditoria /></Layout></AdminRoute></ReaderRoute></ProtectedRoute>} />
+          <Route path="/administracion" element={<ProtectedRoute><ReaderRoute><AdminRoute><Layout><Administracion /></Layout></AdminRoute></ReaderRoute></ProtectedRoute>} />
+          <Route path="/usuarios" element={<ProtectedRoute><ReaderRoute><AdminRoute><Layout><UserManagement /></Layout></AdminRoute></ReaderRoute></ProtectedRoute>} />
           
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
