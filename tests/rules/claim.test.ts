@@ -125,6 +125,27 @@ describe('reglas: lectura', () => {
     await assertFails(getDocs(collection(contexto(), 'corpus_christi')))
   })
 
+  // Solo el booleano true concede lectura: cualquier otro valor del claim reader debe fallar.
+  const READER_NO_BOOLEANOS: Array<[string, unknown]> = [
+    ["'true'", 'true'],
+    ["'True'", 'True'],
+    ['1', 1],
+    ['[true]', [true]],
+    ['{}', {}],
+    ['false', false],
+  ]
+  for (const [etiqueta, valor] of READER_NO_BOOLEANOS) {
+    for (const ruta of RUTAS_GLOBALES) {
+      const coleccion = ruta.split('/').slice(0, -1).join('/')
+      it(`{reader:${etiqueta}} no lee ${ruta} ni la consulta`, async () => {
+        await sembrarDocs()
+        const db = contexto({ reader: valor })
+        await assertFails(getDoc(doc(db, ruta)))
+        await assertFails(getDocs(collection(db, coleccion)))
+      })
+    }
+  }
+
   for (const ruta of RUTAS_RESTRINGIDAS) {
     const coleccion = ruta.split('/')[0]!
     it(`{reader:true} no lee ${ruta} ni la consulta`, async () => {
