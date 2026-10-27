@@ -1,3 +1,4 @@
+import EditToggle from "../components/EditToggle";
 import { useEffect, useState, useMemo } from "react";
 import { collection, getDocs, query } from "firebase/firestore";
 import { db } from "../firebase";
@@ -177,6 +178,7 @@ export default function IndiceCompanias() {
       <div className="cabecera-pagina">
         <h1>Índice de Compañías</h1>
         <div className="acciones-cabecera">
+          <EditToggle />
           {isEditMode && (
             <button 
               onClick={() => setIsCreateOpen(true)}

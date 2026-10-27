@@ -18,6 +18,7 @@ import UserManagement from './pages/UserManagement';
 import './index.css';
 import { AdminProvider } from './context/AdminContext';
 import RouteEffects from './components/RouteEffects';
+import EditModeRouteReset from './components/EditModeRouteReset';
 import { SkipLink, MainNav } from './components/MainNav';
 
 function Layout({ children }: { children: React.ReactNode }) {
@@ -56,6 +57,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <RouteEffects />
+        <EditModeRouteReset />
       </Router>
     </AdminProvider>
   );

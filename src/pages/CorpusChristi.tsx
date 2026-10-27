@@ -1,3 +1,4 @@
+import EditToggle from "../components/EditToggle";
 import { useEffect, useState, useMemo } from "react";
 import { collection, getDocs, query, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { useLocation, useNavigate } from "react-router";
@@ -169,6 +170,7 @@ export default function CorpusChristi() {
           <Tooltip label="Acerca de Corpus Christi" content="Muestra los registros financieros y labores encargadas para la celebración del Corpus Christi por diversas ciudades en años específicos, detallando el pago y los fondos." />
         </div>
         <div className="acciones-cabecera">
+          <EditToggle />
           {isEditMode && (
             <button 
               onClick={() => setIsCreateOpen(true)}

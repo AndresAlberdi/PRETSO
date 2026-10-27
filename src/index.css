@@ -326,6 +326,17 @@ main {
 /* Misma especificidad (0,2,1) que button:not([disabled]):hover y gana por ir después: el botón de ayuda no se desplaza ni proyecta sombra al pasar el ratón (el fondo ya lo fija el estilo en línea) */
 .ayuda-seccion > button:hover { transform: none; box-shadow: none; }
 
+/* Botones y enlaces con forma de botón (rediseño v2). Los selectores button.x:not([disabled]) superan a la regla global de botón. */
+.boton { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 44px; padding: 0 1.5rem; border: 1.5px solid transparent; border-radius: 8px; font-family: var(--font-sans); font-weight: 600; font-size: 1rem; line-height: 1; text-decoration: none; cursor: pointer; }
+a.boton-primario, button.boton-primario:not([disabled]) { background: var(--primary-color); color: var(--on-primary); }
+a.boton-primario:hover, button.boton-primario:not([disabled]):hover { background: var(--primary-hover); color: var(--on-primary); }
+a.boton-secundario, button.boton-secundario:not([disabled]) { background: transparent; border-color: var(--input-border); color: var(--text-color); }
+a.boton-secundario:hover, button.boton-secundario:not([disabled]):hover { background: rgba(255, 255, 255, 0.04); color: var(--text-color); transform: none; box-shadow: none; }
+a.boton-editor, button.boton-editor:not([disabled]) { background: var(--editor-tint); border-color: var(--editor-color); color: var(--editor-text); }
+a.boton-editor:hover, button.boton-editor:not([disabled]):hover { background: rgba(255, 107, 107, 0.16); color: var(--editor-text); transform: none; box-shadow: none; }
+button.boton-editor-activo:not([disabled]) { background: var(--editor-color); border-color: var(--editor-color); color: var(--on-editor); }
+button.boton-editor-activo:not([disabled]):hover { background: var(--editor-color); color: var(--on-editor); transform: none; box-shadow: none; }
+
 @media (max-width: 64em) {
   .cabecera-pagina, .acciones-cabecera, .barra-busqueda { flex-wrap: wrap; }
   .cabecera-pagina { gap: 1rem; }

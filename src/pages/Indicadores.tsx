@@ -1,3 +1,4 @@
+import EditToggle from "../components/EditToggle";
 import { useEffect, useState, useMemo } from "react";
 import { collection, getDocs, query, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { useLocation, useNavigate } from "react-router";
@@ -154,6 +155,7 @@ export default function Indicadores() {
           <Tooltip label="Acerca de Identificación de Indicadores" content="Recoge transacciones y datos económicos clasificados por diversas categorías o conceptos. Provee información sobre precios y gastos habituales a lo largo de los años en distintas ciudades." />
         </div>
         <div className="acciones-cabecera">
+          <EditToggle />
           {isEditMode && (
             <button 
               onClick={() => setIsCreateOpen(true)}

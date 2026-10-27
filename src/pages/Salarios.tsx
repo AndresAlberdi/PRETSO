@@ -1,3 +1,4 @@
+import EditToggle from "../components/EditToggle";
 import { useEffect, useState, useMemo } from "react";
 import { collection, getDocs, query, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { useLocation, useNavigate } from "react-router";
@@ -200,6 +201,7 @@ export default function Salarios() {
           <Tooltip label="Acerca de Remuneraciones" content="En esta sección se listan las remuneraciones y pagos específicos que la compañía efectuó a diversas personas (actores, músicos, tramoyistas, etc.) por su trabajo durante las diferentes temporadas." />
         </div>
         <div className="acciones-cabecera">
+          <EditToggle />
           {isEditMode && (
             <button 
               onClick={() => setIsCreateOpen(true)}
