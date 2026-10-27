@@ -36,6 +36,7 @@ export default function Busqueda() {
   // Pre-load data to allow quick searching
   useEffect(() => {
     if (adminLoading) return;
+    let vigente = true;
     async function loadAllData() {
       setLoading(true);
       setLoadError('');
@@ -52,15 +53,18 @@ export default function Busqueda() {
           const snap = await getDocs(q);
           dataMap[collName] = snap.docs.map(cleanFirebaseData);
         }));
+        if (!vigente) return;
         setDbData(dataMap);
       } catch (error) {
+        if (!vigente) return;
         console.error('No se pudo cargar la base para la búsqueda:', (error as { code?: string })?.code);
         setLoadError('No se pudo cargar la base de datos para la búsqueda. Inténtelo de nuevo más tarde.');
       } finally {
-        setLoading(false);
+        if (vigente) setLoading(false);
       }
     }
     loadAllData();
+    return () => { vigente = false; };
   }, [isAdmin, adminLoading]);
 
   const searchResults = useMemo(() => {

@@ -43,6 +43,7 @@ export default function App() {
   return (
     <AdminProvider>
       <Router>
+        <RouteEffects />
         <Routes>
           <Route path="/login" element={<Login />} />
           
@@ -62,7 +63,6 @@ export default function App() {
           
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-        <RouteEffects />
         <EditModeRouteReset />
       </Router>
     </AdminProvider>

@@ -1,5 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import { MemoryRouter, Routes, Route } from 'react-router';
 
 const signOut = vi.fn();
 vi.mock('firebase/auth', () => ({ signOut: (...a: unknown[]) => signOut(...a) }));
@@ -9,6 +10,7 @@ let estado = { isAdmin: false, isReader: false, adminLoading: false };
 vi.mock('../context/AdminContext', () => ({ useAdmin: () => estado }));
 
 import ReaderRoute from '../components/ReaderRoute';
+import RouteEffects from '../components/RouteEffects';
 
 beforeEach(() => {
   signOut.mockReset();
@@ -46,5 +48,18 @@ describe('ReaderRoute', () => {
     estado = { isAdmin: true, isReader: false, adminLoading: false };
     montar();
     expect(screen.getByText('contenido protegido')).toBeTruthy();
+  });
+
+  it('sin claims el título del documento es «Acceso pendiente — PRETSO», aun con RouteEffects antes de las rutas', () => {
+    estado = { isAdmin: false, isReader: false, adminLoading: false };
+    render(
+      <MemoryRouter initialEntries={['/caja']}>
+        <RouteEffects />
+        <Routes>
+          <Route path="/caja" element={<ReaderRoute><p>contenido protegido</p></ReaderRoute>} />
+        </Routes>
+      </MemoryRouter>,
+    );
+    expect(document.title).toBe('Acceso pendiente — PRETSO');
   });
 });

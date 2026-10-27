@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, within, cleanup } from '@testing-library/react';
+import { render, screen, within, cleanup, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 
 vi.mock('../firebase', () => ({ db: {} }));
@@ -8,11 +8,13 @@ vi.mock('../context/AdminContext', () => ({ useAdmin: () => estado }));
 
 const consultadas: string[] = [];
 let fallar = false;
+let retener: Promise<void> | null = null;
 vi.mock('firebase/firestore', () => ({
   collection: (_db: unknown, nombre: string) => nombre,
   query: (nombre: string) => nombre,
   getDocs: async (nombre: string) => {
     consultadas.push(nombre);
+    if (retener) await retener;
     if (fallar) throw { code: 'permission-denied' };
     return { docs: [] };
   },
@@ -25,6 +27,7 @@ import { SECCIONES } from '../utils/secciones';
 beforeEach(() => {
   consultadas.length = 0;
   fallar = false;
+  retener = null;
   estado = { isAdmin: false, adminLoading: false };
   vi.spyOn(console, 'error').mockImplementation(() => {});
 });
@@ -97,5 +100,32 @@ describe('Búsqueda general', () => {
     const alerta = await screen.findByRole('alert');
     expect(alerta.textContent).toBe('No se pudo cargar la base de datos para la búsqueda. Inténtelo de nuevo más tarde.');
     expect(screen.queryByText(/Cargando base de datos/)).toBeNull();
+  });
+
+  it('si se desmonta antes de resolver getDocs no actualiza estado ni registra error', async () => {
+    let liberar!: () => void;
+    retener = new Promise<void>((r) => { liberar = r; });
+    const { unmount } = enRouter(<Busqueda />);
+    await vi.waitFor(() => expect(consultadas.length).toBe(6));
+    unmount();
+    await act(async () => {
+      liberar();
+      await Promise.resolve();
+    });
+    expect(console.error).not.toHaveBeenCalled();
+  });
+
+  it('si se desmonta y la carga falla después, tampoco registra error', async () => {
+    fallar = true;
+    let liberar!: () => void;
+    retener = new Promise<void>((r) => { liberar = r; });
+    const { unmount } = enRouter(<Busqueda />);
+    await vi.waitFor(() => expect(consultadas.length).toBe(6));
+    unmount();
+    await act(async () => {
+      liberar();
+      await Promise.resolve();
+    });
+    expect(console.error).not.toHaveBeenCalled();
   });
 });
