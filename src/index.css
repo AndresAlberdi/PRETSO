@@ -337,6 +337,10 @@ a.boton-editor:hover, button.boton-editor:not([disabled]):hover { background: rg
 button.boton-editor-activo:not([disabled]) { background: var(--editor-color); border-color: var(--editor-color); color: var(--on-editor); }
 button.boton-editor-activo:not([disabled]):hover { background: var(--editor-color); color: var(--on-editor); transform: none; box-shadow: none; }
 
+.barra-superior { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; padding: 1rem 2rem; background: var(--bg-card); border-bottom: 1px solid var(--border-color); }
+.barra-superior .marca { margin: 0 auto 0 0; }
+.barra-correo { color: var(--text-muted); font-size: 0.95rem; overflow-wrap: anywhere; }
+
 @media (max-width: 64em) {
   .cabecera-pagina, .acciones-cabecera, .barra-busqueda { flex-wrap: wrap; }
   .cabecera-pagina { gap: 1rem; }
@@ -345,6 +349,7 @@ button.boton-editor-activo:not([disabled]):hover { background: var(--editor-colo
 }
 
 @media (max-width: 30em) {
+  .barra-superior { padding: 1rem; }
   .contenido-principal { padding: 1rem; }
   h1 { font-size: 1.75rem; }
 }

@@ -11,7 +11,8 @@ vi.mock('../context/AdminContext', () => ({
 }));
 
 import RouteEffects from '../components/RouteEffects';
-import { MainNav, SkipLink } from '../components/MainNav';
+import { SkipLink } from '../components/SkipLink';
+import { TopBar } from '../components/TopBar';
 
 let navegar: NavigateFunction;
 function Capturador() {
@@ -26,7 +27,7 @@ function Shell({ conMain = true }: { conMain?: boolean }) {
   return (
     <>
       <SkipLink />
-      <MainNav />
+      <TopBar volver={{ to: '/buscar', texto: 'Atrás' }} />
       {conMain && <main id="contenido" tabIndex={-1}>contenido</main>}
       <Capturador />
       <RouteEffects />
@@ -83,11 +84,15 @@ describe('RouteEffects', () => {
   });
 });
 
-describe('MainNav y SkipLink', () => {
-  it('marca solo la sección actual con aria-current', () => {
+describe('TopBar y SkipLink', () => {
+  it('la barra de sección tiene solo la marca y el enlace Atrás a /buscar', () => {
     render(<MemoryRouter initialEntries={['/caja']}><Shell /></MemoryRouter>);
-    expect(screen.getByRole('link', { name: 'Inicio' }).getAttribute('aria-current')).toBeNull();
-    expect(screen.getByRole('link', { name: 'Manejo de Caja' }).getAttribute('aria-current')).toBe('page');
+    const enlaces = screen.getAllByRole('link').filter((l) => !l.classList.contains('skip-link'));
+    expect(enlaces).toHaveLength(1);
+    expect(enlaces[0].textContent).toBe('Atrás');
+    expect(enlaces[0].getAttribute('href')).toBe('/buscar');
+    expect(screen.queryByRole('button', { name: 'Salir' })).toBeNull();
+    expect(screen.queryByRole('navigation')).toBeNull();
   });
 
   it('incluye el enlace para saltar al contenido', () => {
