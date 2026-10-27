@@ -1,6 +1,7 @@
 // Título de documento por ruta (WCAG 2.4.2). Las rutas reflejan las de App.tsx.
 const SECCIONES: Record<string, string> = {
   '/': 'Inicio',
+  '/buscar': 'Búsqueda general',
   '/caja': 'Manejo de Caja',
   '/salarios': 'Remuneraciones',
   '/corpus': 'Corpus Christi',

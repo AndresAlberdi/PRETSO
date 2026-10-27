@@ -3,7 +3,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
 import ReaderRoute from './components/ReaderRoute';
 import Login from './pages/Login';
-import Inicio from './pages/Inicio';
+import Portada from './pages/Portada';
+import Busqueda from './pages/Busqueda';
 import ManejoCaja from './pages/ManejoCaja';
 import Salarios from './pages/Salarios';
 import CorpusChristi from './pages/CorpusChristi';
@@ -45,7 +46,8 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<Login />} />
           
-          <Route path="/" element={<ProtectedRoute><ReaderRoute><Layout barra={<TopBar conCuenta />}><Inicio /></Layout></ReaderRoute></ProtectedRoute>} />
+          <Route path="/" element={<ProtectedRoute><ReaderRoute><Layout barra={<TopBar conCuenta />}><Portada /></Layout></ReaderRoute></ProtectedRoute>} />
+          <Route path="/buscar" element={<ProtectedRoute><ReaderRoute><Layout barra={<TopBar volver={{ to: '/', texto: 'Inicio' }} />}><Busqueda /></Layout></ReaderRoute></ProtectedRoute>} />
           <Route path="/caja" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><ManejoCaja /></Layout></ReaderRoute></ProtectedRoute>} />
           <Route path="/salarios" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><Salarios /></Layout></ReaderRoute></ProtectedRoute>} />
           <Route path="/corpus" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><CorpusChristi /></Layout></ReaderRoute></ProtectedRoute>} />
