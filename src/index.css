@@ -5,8 +5,8 @@
   --bg-card: rgba(22, 30, 49, 0.65);
   --text-color: #f3f4f6;
   --text-muted: #9ca3af;
-  --primary-color: #f1b04c;
-  --primary-hover: #f3be6d;
+  --primary-color: #E6B1A1;
+  --primary-hover: #EDBFB4;
   --border-color: rgba(255, 255, 255, 0.08);
   --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-serif: 'Playfair Display', Georgia, serif;
@@ -14,6 +14,11 @@
   /* Colores de acento y de estado (antes usados sin definir) */
   --accent-color: #4a90e2;
   --danger-color: #ff4d4f;
+  /* Rol editor: elementos que solo ven y usan los editores (rediseño v2) */
+  --editor-color: #ff6b6b;
+  --editor-text: #ff8a8a;
+  --editor-tint: rgba(255, 107, 107, 0.08);
+  --on-editor: #0b0f19;
   --success-color: #2ecc71;
   /* Borde de controles de formulario: contraste >= 3:1 (WCAG 1.4.11) */
   --input-border: #7a8294;
@@ -41,7 +46,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-image: 
-    radial-gradient(at 0% 0%, rgba(241, 176, 76, 0.07) 0px, transparent 50%),
+    radial-gradient(at 0% 0%, rgba(230, 177, 161, 0.08) 0px, transparent 50%),
     radial-gradient(at 100% 100%, rgba(74, 144, 226, 0.05) 0px, transparent 50%);
   background-attachment: fixed;
   min-height: 100vh;
@@ -69,7 +74,7 @@ h1 {
 }
 
 h1, h2, h3, .page-title, .marca, .titulo-secundario {
-  background: linear-gradient(135deg, #ffffff 0%, #e5a93b 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #D99A8A 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
@@ -113,7 +118,7 @@ select:focus,
 textarea:focus {
   background: rgba(255, 255, 255, 0.08);
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(241, 176, 76, 0.15);
+  box-shadow: 0 0 0 3px rgba(230, 177, 161, 0.15);
 }
 
 /* Foco visible (WCAG 2.4.7); los estilos en línea no tocan outline */
@@ -169,7 +174,7 @@ button:not([disabled]) {
 button:not([disabled]):hover {
   background: var(--primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(241, 176, 76, 0.2);
+  box-shadow: 0 4px 12px rgba(230, 177, 161, 0.2);
 }
 
 button:disabled {
