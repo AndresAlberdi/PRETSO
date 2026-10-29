@@ -37,6 +37,8 @@ describe('Login con Google', () => {
     vi.mocked(signInWithPopup).mockResolvedValue({} as never);
     render(<Login />);
     fireEvent.click(screen.getByRole('button', { name: 'Continuar con Google' }));
+    // Sin await previo: el navegador solo permite el popup si sale del propio clic.
+    expect(signInWithPopup).toHaveBeenCalledTimes(1);
     await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/', { replace: true }));
     expect(signInWithPopup).toHaveBeenCalledTimes(1);
     const [authArg, provider] = vi.mocked(signInWithPopup).mock.calls[0];
