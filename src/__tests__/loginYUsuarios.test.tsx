@@ -9,6 +9,8 @@ vi.mock('firebase/auth', () => ({
   getAuth: vi.fn(() => ({})),
   signInWithEmailAndPassword: vi.fn(),
   createUserWithEmailAndPassword: vi.fn(),
+  signInWithPopup: vi.fn(),
+  GoogleAuthProvider: vi.fn(function GoogleAuthProvider() {}),
 }));
 vi.mock('../firebase', () => ({ auth: {}, firebaseConfig: {} }));
 vi.mock('react-router', () => ({ useNavigate: () => vi.fn() }));

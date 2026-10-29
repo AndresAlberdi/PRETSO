@@ -1,20 +1,20 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
 import { auth } from '../firebase';
-import { loginErrorCode, loginErrorMessage } from '../utils/authErrors';
+import { googleLoginErrorMessage, loginErrorCode, loginErrorMessage } from '../utils/authErrors';
 
 export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [pending, setPending] = useState<'email' | 'google' | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    setLoading(true);
+    setPending('email');
     try {
       await signInWithEmailAndPassword(auth, email, password);
       navigate('/', { replace: true });
@@ -23,7 +23,22 @@ export default function Login() {
       console.error('Error al iniciar sesión:', loginErrorCode(err));
       setError(loginErrorMessage(err));
     } finally {
-      setLoading(false);
+      setPending(null);
+    }
+  }
+
+  async function handleGoogle() {
+    setError(null);
+    setPending('google');
+    try {
+      await signInWithPopup(auth, new GoogleAuthProvider());
+      navigate('/', { replace: true });
+    } catch (err: unknown) {
+      // Solo el código de Firebase al registro: nunca el correo ni los datos del error.
+      console.error('Error al iniciar sesión con Google:', loginErrorCode(err));
+      setError(googleLoginErrorMessage(err));
+    } finally {
+      setPending(null);
     }
   }
 
@@ -81,10 +96,15 @@ export default function Login() {
           
           {error && <div role="alert" style={{ color: '#ff6b6b', fontSize: '0.9rem', textAlign: 'center', background: 'rgba(255, 107, 107, 0.1)', padding: '0.5rem', borderRadius: '4px' }}>{error}</div>}
           
-          <button type="submit" disabled={loading} style={{ marginTop: '0.5rem' }}>
-            {loading ? 'Cargando...' : 'Entrar'}
+          <button type="submit" disabled={pending !== null} style={{ marginTop: '0.5rem' }}>
+            {pending === 'email' ? 'Cargando...' : 'Entrar'}
           </button>
         </form>
+
+        <p style={{ textAlign: 'center', color: 'var(--text-muted)', margin: '1rem 0' }}>o</p>
+        <button type="button" className="boton boton-secundario" onClick={handleGoogle} disabled={pending !== null} style={{ width: '100%' }}>
+          {pending === 'google' ? 'Conectando con Google...' : 'Continuar con Google'}
+        </button>
       </div>
     </main>
   );
