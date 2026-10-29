@@ -1,3 +1,4 @@
+import EditToggle from "../components/EditToggle";
 import { useEffect, useState, useMemo } from "react";
 import { collection, getDocs, query, deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { useLocation, useNavigate } from "react-router";
@@ -199,6 +200,7 @@ export default function ManejoCaja() {
           <Tooltip label="Acerca de Manejo de Caja" content="Esta sección muestra información detallada sobre los ingresos, egresos y otros bienes monetarios gestionados por las diversas compañías durante sus temporadas teatrales. Sirve para entender los flujos de dinero y la salud financiera." />
         </div>
         <div className="acciones-cabecera">
+          <EditToggle />
           {isEditMode && (
             <button 
               onClick={() => setIsCreateOpen(true)}

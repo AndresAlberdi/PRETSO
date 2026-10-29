@@ -4,6 +4,7 @@ import { pageTitle } from '../utils/pageTitle';
 describe('pageTitle', () => {
   const casos: Array<[string, string]> = [
     ['/', 'Inicio — PRETSO'],
+    ['/buscar', 'Búsqueda general — PRETSO'],
     ['/caja', 'Manejo de Caja — PRETSO'],
     ['/salarios', 'Remuneraciones — PRETSO'],
     ['/corpus', 'Corpus Christi — PRETSO'],

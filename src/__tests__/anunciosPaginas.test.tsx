@@ -4,7 +4,7 @@ import ManejoCaja from '../pages/ManejoCaja';
 import Salarios from '../pages/Salarios';
 import CorpusChristi from '../pages/CorpusChristi';
 import Indicadores from '../pages/Indicadores';
-import Inicio from '../pages/Inicio';
+import Busqueda from '../pages/Busqueda';
 import IndiceCompanias from '../pages/IndiceCompanias';
 
 const companias = [
@@ -20,6 +20,7 @@ vi.mock('../utils/audit', () => ({ logAction: vi.fn() }));
 vi.mock('react-router', () => ({
   useNavigate: () => vi.fn(),
   useLocation: () => ({ pathname: '/x', search: ubicacion.search, state: null }),
+  Link: ({ to, children, ...r }: any) => <a href={String(to)} {...r}>{children}</a>,
 }));
 vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isEditMode: false }) }));
 vi.mock('firebase/firestore', () => ({
@@ -148,10 +149,10 @@ describe('Corpus Christi e Indicadores: anuncios', () => {
   });
 });
 
-describe('Inicio: anuncio de la búsqueda general', () => {
+describe('Búsqueda general: anuncio de la búsqueda general', () => {
   it('vacío al inicio y «Búsqueda sin resultados» sin coincidencias', async () => {
-    render(<Inicio />);
-    await screen.findByText('Búsqueda general');
+    render(<Busqueda />);
+    await screen.findByRole('heading', { name: 'Búsqueda general' });
     await vi.waitFor(() => expect(screen.queryByText(/Cargando base de datos/)).toBeNull());
     const nodo = region();
     expect(nodo.textContent).toBe('');

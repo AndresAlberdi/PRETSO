@@ -18,10 +18,11 @@ vi.mock('../firebase', () => ({ auth: { currentUser: null } }));
 import { AdminProvider, useAdmin } from '../context/AdminContext';
 
 function Probe() {
-  const { isAdmin, isEditMode, setIsEditMode, adminLoading } = useAdmin();
+  const { isAdmin, isReader, isEditMode, setIsEditMode, adminLoading } = useAdmin();
   return (
     <div>
       <span data-testid="admin">{String(isAdmin)}</span>
+      <span data-testid="reader">{String(isReader)}</span>
       <span data-testid="edit">{String(isEditMode)}</span>
       <span data-testid="loading">{String(adminLoading)}</span>
       <button onClick={() => setIsEditMode(true)}>editar</button>
@@ -94,5 +95,26 @@ describe('AdminProvider', () => {
     await act(async () => { authCb(null); });
     expect(screen.getByTestId('admin').textContent).toBe('false');
     expect(screen.getByTestId('edit').textContent).toBe('false');
+  });
+
+  it('concede isReader con reader:true y no isAdmin', async () => {
+    getIdTokenResult.mockResolvedValue({ claims: { reader: true } });
+    await act(async () => { authCb(userA); });
+    await waitFor(() => expect(screen.getByTestId('reader').textContent).toBe('true'));
+    expect(screen.getByTestId('admin').textContent).toBe('false');
+  });
+
+  it('no concede isReader con reader no booleano', async () => {
+    getIdTokenResult.mockResolvedValue({ claims: { reader: 'true' } });
+    await act(async () => { authCb(userA); });
+    expect(screen.getByTestId('reader').textContent).toBe('false');
+  });
+
+  it('al cerrar sesión isReader queda en falso', async () => {
+    getIdTokenResult.mockResolvedValue({ claims: { reader: true } });
+    await act(async () => { authCb(userA); });
+    expect(screen.getByTestId('reader').textContent).toBe('true');
+    await act(async () => { authCb(null); });
+    expect(screen.getByTestId('reader').textContent).toBe('false');
   });
 });

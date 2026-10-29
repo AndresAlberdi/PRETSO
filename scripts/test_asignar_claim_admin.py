@@ -46,6 +46,18 @@ class CalcularClaimsTest(unittest.TestCase):
         self.assertEqual(calcular_claims({"admin": "true"}, False),
                          {"admin": True})
 
+    def test_clave_reader_conserva_admin_y_otros(self):
+        self.assertEqual(
+            calcular_claims({"admin": True, "otro": 1}, False, "reader"),
+            {"admin": True, "otro": 1, "reader": True})
+        self.assertEqual(
+            calcular_claims({"admin": True, "reader": True, "otro": 1},
+                            True, "reader"),
+            {"admin": True, "otro": 1})
+
+    def test_clave_por_defecto_es_admin(self):
+        self.assertEqual(calcular_claims({}, False), calcular_claims({}, False, "admin"))
+
 
 def _usuario(claims=None, disabled=False, verificado=False):
     u = mock.Mock()
@@ -92,6 +104,43 @@ class MainTest(unittest.TestCase):
         self.assertIn("proveedores=['google.com'] verificado=False "
                       "deshabilitada=False", out)
         self.assertNotIn("UID-SECRETO", out)
+
+    def test_rol_lector_asigna_reader_sin_tocar_admin(self):
+        self.m["get_email"].return_value = _usuario({"admin": True, "otro": 1})
+        self.m["get"].return_value = _usuario(
+            {"admin": True, "otro": 1, "reader": True})
+        codigo, out = self.correr("--rol", "lector", "--aplicar")
+        self.assertEqual(codigo, 0)
+        self.m["set"].assert_called_once_with(
+            "UID-SECRETO", {"admin": True, "otro": 1, "reader": True})
+        self.assertIn("reader actual=False -> nuevo=True", out)
+        self.assertNotIn("UID-SECRETO", out)
+
+    def test_rol_lector_quita_reader_sin_tocar_admin(self):
+        self.m["get_email"].return_value = _usuario(
+            {"admin": True, "reader": True, "otro": 1})
+        self.m["get"].return_value = _usuario({"admin": True, "otro": 1})
+        codigo, out = self.correr("--rol", "lector", "--quitar", "--aplicar")
+        self.assertEqual(codigo, 0)
+        self.m["set"].assert_called_once_with(
+            "UID-SECRETO", {"admin": True, "otro": 1})
+        self.m["revoke"].assert_called_once_with("UID-SECRETO")
+        self.assertNotIn("UID-SECRETO", out)
+
+    def test_rol_lector_sin_aplicar_no_escribe(self):
+        self.m["get_email"].return_value = _usuario({})
+        codigo, out = self.correr("--rol", "lector")
+        self.assertEqual(codigo, 0)
+        self.m["set"].assert_not_called()
+        self.assertIn("(solo lectura, no se escribe)", out)
+
+    def test_rol_admin_explicito_igual_que_por_defecto(self):
+        self.m["get_email"].return_value = _usuario({})
+        self.m["get"].return_value = _usuario({"admin": True})
+        codigo, out = self.correr("--rol", "admin", "--aplicar")
+        self.assertEqual(codigo, 0)
+        self.m["set"].assert_called_once_with("UID-SECRETO", {"admin": True})
+        self.assertIn("admin actual=False -> nuevo=True", out)
 
     def test_aplicar_sin_cambio_no_escribe(self):
         self.m["get_email"].return_value = _usuario({"admin": True})

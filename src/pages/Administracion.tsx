@@ -145,6 +145,18 @@ export default function Administracion() {
             >
               Gestión de Usuarios
             </Link>
+            <Link 
+              to="/transacciones" 
+              style={{ padding: '0.8rem 1.5rem', background: 'var(--primary-color)', color: 'var(--on-primary)', textDecoration: 'none', borderRadius: '4px', fontWeight: 'bold' }}
+            >
+              Transacciones
+            </Link>
+            <Link 
+              to="/documentos" 
+              style={{ padding: '0.8rem 1.5rem', background: 'var(--primary-color)', color: 'var(--on-primary)', textDecoration: 'none', borderRadius: '4px', fontWeight: 'bold' }}
+            >
+              Documentos
+            </Link>
           </div>
         </section>
 

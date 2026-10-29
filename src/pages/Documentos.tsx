@@ -1,3 +1,4 @@
+import EditToggle from "../components/EditToggle";
 import { useEffect, useMemo, useState } from "react";
 import { collection, getDocs, query, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../firebase";
@@ -115,6 +116,7 @@ export default function Documentos() {
       <div className="cabecera-pagina" style={{ flexWrap: 'wrap' }}>
         <h1>Documentos</h1>
         <div className="acciones-cabecera">
+          <EditToggle />
           {isEditMode && (
             <button 
               onClick={() => setIsCreateOpen(true)}

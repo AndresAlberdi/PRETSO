@@ -3,7 +3,9 @@ import { collection, getDocs, query } from "firebase/firestore";
 import { db } from "../firebase";
 import { cleanFirebaseData } from "../utils";
 import SearchBar, { type SearchFilter } from "../components/SearchBar";
-import { useNavigate } from "react-router";
+import { useNavigate, Link } from "react-router";
+import { useAdmin } from "../context/AdminContext";
+import { SECCIONES } from "../utils/secciones";
 import { contar } from "../utils/anuncios";
 
 type SearchResultItem = {
@@ -15,10 +17,12 @@ type SearchResultItem = {
   path: string;
 };
 
-export default function Inicio() {
+export default function Busqueda() {
   const [loading, setLoading] = useState(false);
   const [filters, setFilters] = useState<SearchFilter[]>([]);
   const [dbData, setDbData] = useState<{ [key: string]: any[] }>({});
+  const [loadError, setLoadError] = useState('');
+  const { isAdmin, adminLoading } = useAdmin();
   
   const navigate = useNavigate();
 
@@ -31,26 +35,37 @@ export default function Inicio() {
 
   // Pre-load data to allow quick searching
   useEffect(() => {
+    if (adminLoading) return;
+    let vigente = true;
     async function loadAllData() {
       setLoading(true);
+      setLoadError('');
       const collections = [
-        "manejo_de_caja", "salarios", "corpus_christi", 
-        "indicadores", "companias", "bibliografia", 
-        "transacciones", "documentos"
+        "manejo_de_caja", "salarios", "corpus_christi",
+        "indicadores", "companias", "bibliografia",
+        ...(isAdmin ? ["transacciones", "documentos"] : [])
       ];
       const dataMap: { [key: string]: any[] } = {};
-      
-      await Promise.all(collections.map(async (collName) => {
-        const q = query(collection(db, collName));
-        const snap = await getDocs(q);
-        dataMap[collName] = snap.docs.map(cleanFirebaseData);
-      }));
-      
-      setDbData(dataMap);
-      setLoading(false);
+
+      try {
+        await Promise.all(collections.map(async (collName) => {
+          const q = query(collection(db, collName));
+          const snap = await getDocs(q);
+          dataMap[collName] = snap.docs.map(cleanFirebaseData);
+        }));
+        if (!vigente) return;
+        setDbData(dataMap);
+      } catch (error) {
+        if (!vigente) return;
+        console.error('No se pudo cargar la base para la búsqueda:', (error as { code?: string })?.code);
+        setLoadError('No se pudo cargar la base de datos para la búsqueda. Inténtelo de nuevo más tarde.');
+      } finally {
+        if (vigente) setLoading(false);
+      }
     }
     loadAllData();
-  }, []);
+    return () => { vigente = false; };
+  }, [isAdmin, adminLoading]);
 
   const searchResults = useMemo(() => {
     if (filters.length === 0 || Object.keys(dbData).length === 0) return [];
@@ -147,25 +162,7 @@ export default function Inicio() {
   return (
     <div>
       <div style={{ textAlign: 'center', margin: '2rem 0' }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1rem', gap: '2rem', flexWrap: 'wrap', width: '100%', maxWidth: '1200px', margin: '0 auto 2rem auto' }}>
-          <img src="/logo_this.jpg?v=2" alt="Logo THIS" style={{ width: '220px', maxWidth: '100%', objectFit: 'contain' }} />
-          <div style={{ flex: 1, textAlign: 'center', minWidth: 'min(280px, 100%)' }}>
-            <h1 style={{ whiteSpace: 'pre-line', margin: '0 0 1rem 0', color: 'var(--primary-color)' }}>
-              {"PRETSO\nPrecios del Teatro del Siglo de Oro"}
-            </h1>
-            <p className="titulo-secundario" style={{ fontSize: '1.2rem', fontWeight: 500, margin: '0 0 0.5rem 0' }}>
-              Base de datos para el estudio de las dinámicas económicas del teatro comercial en los territorios hispanos (siglos XVI-XVII)
-            </p>
-            <p className="titulo-secundario" style={{ fontSize: '1rem', fontWeight: 400, margin: 0, opacity: 0.8 }}>
-              Proyecto: [101150056] — [THIS] — [HORIZON-MSCA-2023-PF-01]
-            </p>
-            <p className="titulo-secundario" style={{ fontSize: '1rem', fontWeight: 400, margin: 0, opacity: 0.8 }}>
-              IP: Laura Paz Rescala
-            </p>
-          </div>
-          <img src="/logo_ue.png?v=2" alt="Logo UE" style={{ width: '150px', maxWidth: '100%', objectFit: 'contain' }} />
-        </div>
-        <h2 style={{ textAlign: 'center', fontSize: '1.5rem', fontWeight: 'bold', margin: '1rem 0 2rem 0' }}>Búsqueda general</h2>
+        <h1 className="titulo-busqueda">Búsqueda general</h1>
         
         <div style={{ display: 'inline-block', textAlign: 'left', minWidth: 'min(300px, 100%)', maxWidth: '600px', width: '100%' }}>
           <SearchBar 
@@ -182,6 +179,8 @@ export default function Inicio() {
             : `Búsqueda: ${contar(searchResults.length, 'resultado', 'resultados')}`)
           : ''}
       </output>
+
+      {loadError && <p role="alert">{loadError}</p>}
 
       {loading && <div style={{ textAlign: 'center', marginTop: '2rem' }}>Cargando base de datos para búsqueda...</div>}
 
@@ -230,6 +229,18 @@ export default function Inicio() {
           )}
         </div>
       )}
+      <p className="rotulo-secciones">Secciones</p>
+      <nav aria-label="Secciones de la base de datos">
+        <ol className="lista-secciones">
+          {SECCIONES.map((s, i) => (
+            <li key={s.ruta}><Link to={s.ruta} className="fila-seccion">
+              <span className="numero-seccion">{i + 1}</span>
+              <span className="nombre-seccion">{s.nombre}</span>
+              <svg className="flecha-seccion" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </Link></li>
+          ))}
+        </ol>
+      </nav>
     </div>
   );
 }

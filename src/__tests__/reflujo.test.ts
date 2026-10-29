@@ -148,10 +148,10 @@ describe('reflujo: componentes', () => {
     expect(leer('App.tsx')).toContain('<main id="contenido" tabIndex={-1} className="contenido-principal">');
   });
 
-  it('las tarjetas de Inicio y el menú evitan el desbordamiento', () => {
-    const inicio = leer('pages/Inicio.tsx');
+  it('las tarjetas de Búsqueda y la barra evitan el desbordamiento', () => {
+    const inicio = leer('pages/Busqueda.tsx');
     expect(inicio).toContain('flexShrink: 0');
     expect(inicio).toContain("minWidth: 0, overflowWrap: 'anywhere'");
-    expect(leer('components/MainNav.tsx')).toContain("flexWrap: 'wrap'");
+    expect(leer('index.css')).toContain('.barra-superior { display: flex; flex-wrap: wrap;');
   });
 });

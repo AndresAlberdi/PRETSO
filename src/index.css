@@ -5,8 +5,8 @@
   --bg-card: rgba(22, 30, 49, 0.65);
   --text-color: #f3f4f6;
   --text-muted: #9ca3af;
-  --primary-color: #f1b04c;
-  --primary-hover: #f3be6d;
+  --primary-color: #E6B1A1;
+  --primary-hover: #EDBFB4;
   --border-color: rgba(255, 255, 255, 0.08);
   --font-sans: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-serif: 'Playfair Display', Georgia, serif;
@@ -14,6 +14,11 @@
   /* Colores de acento y de estado (antes usados sin definir) */
   --accent-color: #4a90e2;
   --danger-color: #ff4d4f;
+  /* Rol editor: elementos que solo ven y usan los editores (rediseño v2) */
+  --editor-color: #ff6b6b;
+  --editor-text: #ff8a8a;
+  --editor-tint: rgba(255, 107, 107, 0.08);
+  --on-editor: #0b0f19;
   --success-color: #2ecc71;
   /* Borde de controles de formulario: contraste >= 3:1 (WCAG 1.4.11) */
   --input-border: #7a8294;
@@ -41,7 +46,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   background-image: 
-    radial-gradient(at 0% 0%, rgba(241, 176, 76, 0.07) 0px, transparent 50%),
+    radial-gradient(at 0% 0%, rgba(230, 177, 161, 0.08) 0px, transparent 50%),
     radial-gradient(at 100% 100%, rgba(74, 144, 226, 0.05) 0px, transparent 50%);
   background-attachment: fixed;
   min-height: 100vh;
@@ -69,7 +74,7 @@ h1 {
 }
 
 h1, h2, h3, .page-title, .marca, .titulo-secundario {
-  background: linear-gradient(135deg, #ffffff 0%, #e5a93b 100%);
+  background: linear-gradient(135deg, #ffffff 0%, #D99A8A 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   display: inline-block;
@@ -113,7 +118,7 @@ select:focus,
 textarea:focus {
   background: rgba(255, 255, 255, 0.08);
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(241, 176, 76, 0.15);
+  box-shadow: 0 0 0 3px rgba(230, 177, 161, 0.15);
 }
 
 /* Foco visible (WCAG 2.4.7); los estilos en línea no tocan outline */
@@ -169,7 +174,7 @@ button:not([disabled]) {
 button:not([disabled]):hover {
   background: var(--primary-hover);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(241, 176, 76, 0.2);
+  box-shadow: 0 4px 12px rgba(230, 177, 161, 0.2);
 }
 
 button:disabled {
@@ -321,6 +326,45 @@ main {
 /* Misma especificidad (0,2,1) que button:not([disabled]):hover y gana por ir después: el botón de ayuda no se desplaza ni proyecta sombra al pasar el ratón (el fondo ya lo fija el estilo en línea) */
 .ayuda-seccion > button:hover { transform: none; box-shadow: none; }
 
+/* Botones y enlaces con forma de botón (rediseño v2). Los selectores button.x:not([disabled]) superan a la regla global de botón. */
+.boton { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; min-height: 44px; padding: 0 1.5rem; border: 1.5px solid transparent; border-radius: 8px; font-family: var(--font-sans); font-weight: 600; font-size: 1rem; line-height: 1; text-decoration: none; cursor: pointer; }
+a.boton-primario, button.boton-primario:not([disabled]) { background: var(--primary-color); color: var(--on-primary); }
+a.boton-primario:hover, button.boton-primario:not([disabled]):hover { background: var(--primary-hover); color: var(--on-primary); transform: none; box-shadow: none; }
+a.boton-secundario, button.boton-secundario:not([disabled]) { background: transparent; border-color: var(--input-border); color: var(--text-color); }
+a.boton-secundario:hover, button.boton-secundario:not([disabled]):hover { background: rgba(255, 255, 255, 0.04); color: var(--text-color); transform: none; box-shadow: none; }
+a.boton-editor, button.boton-editor:not([disabled]) { background: var(--editor-tint); border-color: var(--editor-color); color: var(--editor-text); }
+a.boton-editor:hover, button.boton-editor:not([disabled]):hover { background: rgba(255, 107, 107, 0.16); color: var(--editor-text); transform: none; box-shadow: none; }
+button.boton-editor-activo:not([disabled]) { background: var(--editor-color); border-color: var(--editor-color); color: var(--on-editor); }
+button.boton-editor-activo:not([disabled]):hover { background: var(--editor-color); color: var(--on-editor); transform: none; box-shadow: none; }
+
+.barra-superior { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; padding: 1rem 2rem; background: var(--bg-card); border-bottom: 1px solid var(--border-color); }
+.barra-superior .marca { margin: 0 auto 0 0; }
+.barra-correo { color: var(--text-muted); font-size: 0.95rem; overflow-wrap: anywhere; }
+
+.portada { max-width: 1440px; margin: 0 auto; }
+.portada-hero { text-align: center; padding-top: 1.5rem; }
+h1.portada-titulo { font-size: 4.5rem; line-height: 1.05; margin: 0; }
+.portada-subtitulo { font-family: var(--font-serif); font-size: 1.75rem; margin: 0.5rem 0 0.75rem; }
+.portada-descripcion { color: var(--text-muted); font-size: 1.125rem; max-width: 62ch; margin: 0 auto; }
+.portada-lateral { display: flex; flex-direction: column; align-items: center; gap: 1.75rem; margin-top: 2.5rem; }
+.portada-logos { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem; }
+.portada-logo { display: flex; align-items: center; justify-content: center; height: 174px; max-width: 100%; padding: 12px; background: #ffffff; border-radius: 8px; }
+.portada-logo img { height: 150px; width: auto; max-width: 100%; object-fit: contain; }
+.portada-logo-oscuro { background: var(--bg-color); border: 1px solid rgba(255, 255, 255, 0.16); }
+.portada-leyenda { text-align: center; color: var(--text-muted); font-size: 0.95rem; }
+.portada-leyenda p { margin: 0.25rem 0 0; }
+.portada-acciones { display: flex; flex-direction: column; gap: 0.75rem; width: 300px; max-width: 100%; }
+h1.titulo-busqueda { font-size: 1.375rem; margin: 0 0 1rem; }
+.rotulo-secciones { font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin: 3rem 0 0.5rem; }
+.lista-secciones { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--border-color); }
+a.fila-seccion { display: flex; align-items: center; gap: 1.25rem; min-height: 64px; padding: 0 1rem; color: var(--text-color); border-bottom: 1px solid var(--border-color); }
+a.fila-seccion:hover { background: rgba(255, 255, 255, 0.04); color: var(--text-color); }
+.numero-seccion { width: 2rem; font-family: var(--font-serif); font-size: 1.375rem; font-weight: 700; color: var(--primary-color); }
+.nombre-seccion { flex: 1; min-width: 0; overflow-wrap: anywhere; font-family: var(--font-serif); font-size: 1.375rem; font-weight: 700; }
+.flecha-seccion { color: var(--text-muted); flex-shrink: 0; }
+a.fila-seccion:hover .flecha-seccion { color: var(--primary-color); }
+
+
 @media (max-width: 64em) {
   .cabecera-pagina, .acciones-cabecera, .barra-busqueda { flex-wrap: wrap; }
   .cabecera-pagina { gap: 1rem; }
@@ -329,6 +373,10 @@ main {
 }
 
 @media (max-width: 30em) {
+  .barra-superior { padding: 1rem; }
+  h1.portada-titulo { font-size: 3rem; }
+  .portada-logo { height: auto; }
+  .portada-logo img { height: auto; max-height: 150px; }
   .contenido-principal { padding: 1rem; }
   h1 { font-size: 1.75rem; }
 }

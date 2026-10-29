@@ -1,4 +1,4 @@
-"""Asigna o quita el custom claim `admin` a cuentas de Firebase Authentication.
+"""Asigna o quita el custom claim `admin` (o `reader`, con --rol lector) a cuentas de Firebase Authentication.
 
 Sin --aplicar solo lee y muestra el cambio previsto; no escribe nada.
 Nunca imprime uid, tokens ni credenciales.
@@ -7,6 +7,7 @@ Uso:
   python3 scripts/asignar_claim_admin.py --proyecto pretso-database --correo a@x.com
   python3 scripts/asignar_claim_admin.py --proyecto pretso-database --correo a@x.com --aplicar
   python3 scripts/asignar_claim_admin.py --proyecto pretso-database --correo a@x.com --quitar --aplicar
+  python3 scripts/asignar_claim_admin.py --proyecto pretso-database --correo a@x.com --rol lector --aplicar
 """
 import argparse
 import os
@@ -17,7 +18,10 @@ from firebase_admin import auth, credentials
 from firebase_admin.exceptions import FirebaseError
 
 
-def calcular_claims(actuales, quitar):
+ROLES = {"admin": "admin", "lector": "reader"}
+
+
+def calcular_claims(actuales, quitar, clave="admin"):
     """Devuelve los claims resultantes conservando los demás.
 
     set_custom_user_claims reemplaza todos los claims, por eso se parte de
@@ -25,9 +29,9 @@ def calcular_claims(actuales, quitar):
     """
     nuevos = dict(actuales or {})
     if quitar:
-        nuevos.pop("admin", None)
+        nuevos.pop(clave, None)
     else:
-        nuevos["admin"] = True
+        nuevos[clave] = True
     return nuevos
 
 
@@ -40,7 +44,10 @@ def _crear_parser():
     parser.add_argument("--aplicar", action="store_true",
                         help="Escribe el cambio; sin esta opción solo lee.")
     parser.add_argument("--quitar", action="store_true",
-                        help="Quita el claim admin en lugar de asignarlo.")
+                        help="Quita el claim en lugar de asignarlo.")
+    parser.add_argument("--rol", choices=sorted(ROLES), default="admin",
+                        help="Rol a asignar o quitar: admin (claim admin, "
+                             "por defecto) o lector (claim reader).")
     return parser
 
 
@@ -61,6 +68,7 @@ def main(argv=None):
     pierde frente a un 1).
     """
     args = _crear_parser().parse_args(argv)
+    clave = ROLES[args.rol]
 
     if os.environ.get("GOOGLE_APPLICATION_CREDENTIALS"):
         print("Aviso: GOOGLE_APPLICATION_CREDENTIALS está definida y se usaría "
@@ -79,15 +87,15 @@ def main(argv=None):
         try:
             usuario = auth.get_user_by_email(correo)
             actuales = usuario.custom_claims or {}
-            nuevos = calcular_claims(actuales, args.quitar)
-            antes = actuales.get("admin") is True
+            nuevos = calcular_claims(actuales, args.quitar, clave)
+            antes = actuales.get(clave) is True
             despues = not args.quitar
             if args.quitar:
-                cambia = "admin" in actuales
+                cambia = clave in actuales
             else:
                 cambia = not antes
             proveedores = [p.provider_id for p in (usuario.provider_data or [])]
-            print(f"{correo}: admin actual={antes} -> nuevo={despues}; "
+            print(f"{correo}: {clave} actual={antes} -> nuevo={despues}; "
                   f"proveedores={proveedores} "
                   f"verificado={bool(usuario.email_verified)} "
                   f"deshabilitada={bool(usuario.disabled)}")

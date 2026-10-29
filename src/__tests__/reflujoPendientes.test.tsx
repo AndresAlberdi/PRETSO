@@ -26,8 +26,8 @@ describe('reflujo a 320 px: pendientes F4', () => {
     expect(consulta.includes("overflowWrap: 'anywhere'")).toBe(true);
   });
 
-  it('las tarjetas de resultados de Inicio pasan a otra línea cuando no caben', () => {
-    const fuente = leer('pages/Inicio.tsx');
+  it('las tarjetas de resultados de Búsqueda general pasan a otra línea cuando no caben', () => {
+    const fuente = leer('pages/Busqueda.tsx');
     const fin = fuente.indexOf('Ir a la sección');
     const inicio = fuente.lastIndexOf("gap: '1rem'", fin);
     expect(inicio).toBeGreaterThanOrEqual(0);

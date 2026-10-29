@@ -1,4 +1,5 @@
 
+import EditToggle from "../components/EditToggle";
 import { useEffect, useState } from "react";
 import { collection, getDocs, query, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../firebase";
@@ -75,14 +76,17 @@ export default function Bibliografia() {
     <div>
       <div className="cabecera-pagina">
         <h1>Bibliografía</h1>
-        {isEditMode && (
-          <button 
-            onClick={() => setIsCreateOpen(true)}
-            style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-          >
-            Nuevo Registro
-          </button>
-        )}
+        <div className="acciones-cabecera">
+          <EditToggle />
+          {isEditMode && (
+            <button 
+              onClick={() => setIsCreateOpen(true)}
+              style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+            >
+              Nuevo Registro
+            </button>
+          )}
+        </div>
       </div>
       
       {!loading && <p style={{ color: 'var(--text-muted)' }}>Total registros: {data.length}</p>}

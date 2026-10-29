@@ -86,7 +86,7 @@ export default function SearchBar({ onSearch, categories }: SearchBarProps) {
         <button type="submit" style={{ padding: '0.5rem 1rem', background: 'transparent', color: 'var(--primary-color)', border: '1px solid var(--primary-color)', borderRadius: '4px', fontWeight: 'bold' }}>
           Agregar
         </button>
-        <button type="submit" style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: '#111', border: 'none', borderRadius: '4px', fontWeight: 'bold' }}>
+        <button type="submit" style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', fontWeight: 'bold' }}>
           Buscar
         </button>
         {filters.length > 0 && (

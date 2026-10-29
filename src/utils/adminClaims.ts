@@ -3,3 +3,8 @@
 export function hasAdminClaim(claims: Record<string, unknown> | null | undefined): boolean {
   return claims?.admin === true;
 }
+
+// Lector: solo `reader` con valor booleano verdadero (igual que firestore.rules).
+export function hasReaderClaim(claims: Record<string, unknown> | null | undefined): boolean {
+  return claims?.reader === true;
+}

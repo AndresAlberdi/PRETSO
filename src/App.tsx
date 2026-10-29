@@ -1,8 +1,10 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router';
 import ProtectedRoute from './components/ProtectedRoute';
 import AdminRoute from './components/AdminRoute';
+import ReaderRoute from './components/ReaderRoute';
 import Login from './pages/Login';
-import Inicio from './pages/Inicio';
+import Portada from './pages/Portada';
+import Busqueda from './pages/Busqueda';
 import ManejoCaja from './pages/ManejoCaja';
 import Salarios from './pages/Salarios';
 import CorpusChristi from './pages/CorpusChristi';
@@ -17,13 +19,18 @@ import UserManagement from './pages/UserManagement';
 import './index.css';
 import { AdminProvider } from './context/AdminContext';
 import RouteEffects from './components/RouteEffects';
-import { SkipLink, MainNav } from './components/MainNav';
+import EditModeRouteReset from './components/EditModeRouteReset';
+import { SkipLink } from './components/SkipLink';
+import { TopBar } from './components/TopBar';
 
-function Layout({ children }: { children: React.ReactNode }) {
+const ATRAS_BUSCAR = <TopBar volver={{ to: '/buscar', texto: 'Atrás' }} />;
+const ATRAS_ADMIN = <TopBar volver={{ to: '/administracion', texto: 'Atrás' }} />;
+
+function Layout({ barra, children }: { barra: React.ReactNode; children: React.ReactNode }) {
   return (
     <div>
       <SkipLink />
-      <MainNav />
+      {barra}
 
       <main id="contenido" tabIndex={-1} className="contenido-principal">
         {children}
@@ -36,25 +43,27 @@ export default function App() {
   return (
     <AdminProvider>
       <Router>
+        <RouteEffects />
         <Routes>
           <Route path="/login" element={<Login />} />
           
-          <Route path="/" element={<ProtectedRoute><Layout><Inicio /></Layout></ProtectedRoute>} />
-          <Route path="/caja" element={<ProtectedRoute><Layout><ManejoCaja /></Layout></ProtectedRoute>} />
-          <Route path="/salarios" element={<ProtectedRoute><Layout><Salarios /></Layout></ProtectedRoute>} />
-          <Route path="/corpus" element={<ProtectedRoute><Layout><CorpusChristi /></Layout></ProtectedRoute>} />
-          <Route path="/indicadores" element={<ProtectedRoute><Layout><Indicadores /></Layout></ProtectedRoute>} />
-          <Route path="/companias" element={<ProtectedRoute><Layout><IndiceCompanias /></Layout></ProtectedRoute>} />
-          <Route path="/bibliografia" element={<ProtectedRoute><Layout><Bibliografia /></Layout></ProtectedRoute>} />
-          <Route path="/transacciones" element={<ProtectedRoute><Layout><Transacciones /></Layout></ProtectedRoute>} />
-          <Route path="/documentos" element={<ProtectedRoute><Layout><Documentos /></Layout></ProtectedRoute>} />
-          <Route path="/auditoria" element={<ProtectedRoute><AdminRoute><Layout><Auditoria /></Layout></AdminRoute></ProtectedRoute>} />
-          <Route path="/administracion" element={<ProtectedRoute><AdminRoute><Layout><Administracion /></Layout></AdminRoute></ProtectedRoute>} />
-          <Route path="/usuarios" element={<ProtectedRoute><AdminRoute><Layout><UserManagement /></Layout></AdminRoute></ProtectedRoute>} />
+          <Route path="/" element={<ProtectedRoute><ReaderRoute><Layout barra={<TopBar conCuenta />}><Portada /></Layout></ReaderRoute></ProtectedRoute>} />
+          <Route path="/buscar" element={<ProtectedRoute><ReaderRoute><Layout barra={<TopBar volver={{ to: '/', texto: 'Inicio' }} />}><Busqueda /></Layout></ReaderRoute></ProtectedRoute>} />
+          <Route path="/caja" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><ManejoCaja /></Layout></ReaderRoute></ProtectedRoute>} />
+          <Route path="/salarios" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><Salarios /></Layout></ReaderRoute></ProtectedRoute>} />
+          <Route path="/corpus" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><CorpusChristi /></Layout></ReaderRoute></ProtectedRoute>} />
+          <Route path="/indicadores" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><Indicadores /></Layout></ReaderRoute></ProtectedRoute>} />
+          <Route path="/companias" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><IndiceCompanias /></Layout></ReaderRoute></ProtectedRoute>} />
+          <Route path="/bibliografia" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><Bibliografia /></Layout></ReaderRoute></ProtectedRoute>} />
+          <Route path="/transacciones" element={<ProtectedRoute><ReaderRoute><AdminRoute><Layout barra={ATRAS_ADMIN}><Transacciones /></Layout></AdminRoute></ReaderRoute></ProtectedRoute>} />
+          <Route path="/documentos" element={<ProtectedRoute><ReaderRoute><AdminRoute><Layout barra={ATRAS_ADMIN}><Documentos /></Layout></AdminRoute></ReaderRoute></ProtectedRoute>} />
+          <Route path="/auditoria" element={<ProtectedRoute><ReaderRoute><AdminRoute><Layout barra={ATRAS_ADMIN}><Auditoria /></Layout></AdminRoute></ReaderRoute></ProtectedRoute>} />
+          <Route path="/administracion" element={<ProtectedRoute><ReaderRoute><AdminRoute><Layout barra={<TopBar volver={{ to: '/', texto: 'Inicio' }} />}><Administracion /></Layout></AdminRoute></ReaderRoute></ProtectedRoute>} />
+          <Route path="/usuarios" element={<ProtectedRoute><ReaderRoute><AdminRoute><Layout barra={ATRAS_ADMIN}><UserManagement /></Layout></AdminRoute></ReaderRoute></ProtectedRoute>} />
           
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-        <RouteEffects />
+        <EditModeRouteReset />
       </Router>
     </AdminProvider>
   );
