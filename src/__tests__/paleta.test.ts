@@ -80,4 +80,17 @@ describe('paleta golden rose', () => {
     expect(regla![1]).toContain('var(--danger-color)');
     expect(regla![1]).toContain('var(--on-danger)');
   });
+
+  it('la etiqueta de editores y las tarjetas de carga usan los tokens del editor', () => {
+    const etiqueta = css.match(/\.etiqueta-editor\s*\{([^}]*)\}/);
+    expect(etiqueta).not.toBeNull();
+    expect(etiqueta![1]).toContain('var(--editor-color)');
+    expect(etiqueta![1]).toContain('var(--editor-tint)');
+    expect(etiqueta![1]).toContain('var(--editor-text)');
+    const tarjeta = css.match(/a\.tarjeta-carga\s*\{([^}]*)\}/);
+    expect(tarjeta).not.toBeNull();
+    expect(tarjeta![1]).toContain('min-height: 64px');
+    expect(tarjeta![1]).toContain('var(--editor-color)');
+    expect(contraste(variable('--editor-text'), variable('--bg-color'))).toBeGreaterThanOrEqual(4.5);
+  });
 });
