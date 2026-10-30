@@ -53,14 +53,6 @@ export default function Indicadores() {
   const [filterCategoria, setFilterCategoria] = useState('');
 
   useEffect(() => {
-    if (location.state?.reset) {
-      setSelectedCategoria(null);
-      setFilters([]);
-      navigate(location.pathname, { replace: true });
-    }
-  }, [location.state?.reset, location.pathname, navigate]);
-
-  useEffect(() => {
     async function fetchData() {
       const qInd = query(collection(db, "indicadores"));
       const snapInd = await getDocs(qInd);

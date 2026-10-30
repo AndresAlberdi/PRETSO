@@ -57,14 +57,6 @@ export default function CorpusChristi() {
   const [filterAno, setFilterAno] = useState('');
 
   useEffect(() => {
-    if (location.state?.reset) {
-      setSelectedCityYear(null);
-      setFilters([]);
-      navigate(location.pathname, { replace: true });
-    }
-  }, [location.state?.reset, location.pathname, navigate]);
-
-  useEffect(() => {
     async function fetchData() {
       const qData = query(collection(db, "corpus_christi"));
       const snap = await getDocs(qData);

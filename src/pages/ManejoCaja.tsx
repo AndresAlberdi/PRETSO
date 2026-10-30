@@ -56,14 +56,6 @@ export default function ManejoCaja() {
   const [filterAmbito, setFilterAmbito] = useState('');
 
   useEffect(() => {
-    if (location.state?.reset) {
-      setSelectedCompId(null);
-      setFilters([]);
-      navigate(location.pathname, { replace: true });
-    }
-  }, [location.state?.reset, location.pathname, navigate]);
-
-  useEffect(() => {
     const params = new URLSearchParams(location.search);
     const compania = params.get("compania");
     if (compania) {
