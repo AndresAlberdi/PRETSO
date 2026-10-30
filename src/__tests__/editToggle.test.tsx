@@ -76,9 +76,18 @@ describe('EditModeRouteReset', () => {
 });
 
 describe('páginas con modo edición', () => {
-  const paginas = ['ManejoCaja', 'Salarios', 'CorpusChristi', 'Indicadores', 'IndiceCompanias', 'Bibliografia', 'Documentos', 'Transacciones'];
+  const paginas = ['ManejoCaja', 'Salarios', 'CorpusChristi', 'Indicadores', 'IndiceCompanias', 'Bibliografia'];
   it.each(paginas)('%s contiene <EditToggle />', (nombre) => {
     const fuente = readFileSync(resolve(__dirname, '..', 'pages', `${nombre}.tsx`), 'utf8');
     expect(fuente).toContain('<EditToggle />');
+  });
+});
+
+describe('herramientas de carga sin modo edición', () => {
+  it.each(['Documentos', 'Transacciones'])('%s no usa EditToggle ni isEditMode y usa useCanLoad()', (nombre) => {
+    const fuente = readFileSync(resolve(__dirname, '..', 'pages', `${nombre}.tsx`), 'utf8');
+    expect(fuente).not.toContain('EditToggle');
+    expect(fuente).not.toContain('isEditMode');
+    expect(fuente).toContain('useCanLoad()');
   });
 });
