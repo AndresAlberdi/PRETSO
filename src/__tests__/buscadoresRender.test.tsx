@@ -28,8 +28,8 @@ vi.mock('firebase/firestore', () => ({
     docs: colecciones[nombre].map(d => ({ id: d.id, data: () => d })),
   }),
 }));
-const estado = vi.hoisted(() => ({ isEditMode: false }));
-vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isEditMode: estado.isEditMode }) }));
+const estado = vi.hoisted(() => ({ isAdmin: false, isEditMode: false }));
+vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isAdmin: estado.isAdmin, isEditMode: estado.isEditMode }) }));
 
 function filtrar(categoria: string, texto: string) {
   fireEvent.change(screen.getByRole('combobox'), { target: { value: categoria } });
@@ -38,7 +38,7 @@ function filtrar(categoria: string, texto: string) {
 }
 
 describe('buscadores de administración', () => {
-  afterEach(() => { cleanup(); estado.isEditMode = false; });
+  afterEach(() => { cleanup(); estado.isAdmin = false; estado.isEditMode = false; });
   it('Documentos reduce la tabla al filtrar y muestra el conteo', async () => {
     render(<Documentos />);
     await waitFor(() => expect(screen.getByText('Mostrando 3 de 3 registros')).toBeTruthy());
@@ -100,15 +100,31 @@ describe('buscadores de administración', () => {
     expect(screen.queryByText('Pago a García')).toBeNull();
   });
 
-  it('en modo edición siguen apareciendo Nuevo Registro, Editar y Borrar junto al buscador', async () => {
+  it('un administrador ve «Nuevo registro», Editar y Borrar junto al buscador sin activar el modo edición', async () => {
+    estado.isAdmin = true;
+    estado.isEditMode = false;
+    for (const Pagina of [Documentos, Transacciones]) {
+      const { unmount } = render(<Pagina />);
+      await waitFor(() => expect(screen.getByText('Mostrando 3 de 3 registros')).toBeTruthy());
+      expect(screen.getByRole('button', { name: 'Nuevo registro' })).toBeTruthy();
+      expect(screen.getByPlaceholderText('Añadir filtro...')).toBeTruthy();
+      expect(screen.getAllByRole('button', { name: 'Editar' }).length).toBe(3);
+      expect(screen.getAllByRole('button', { name: 'Borrar' }).length).toBe(3);
+      unmount();
+    }
+  });
+
+  it('sin ser administrador no hay controles de carga aunque el modo edición esté forzado', async () => {
+    estado.isAdmin = false;
     estado.isEditMode = true;
     for (const Pagina of [Documentos, Transacciones]) {
       const { unmount } = render(<Pagina />);
       await waitFor(() => expect(screen.getByText('Mostrando 3 de 3 registros')).toBeTruthy());
-      expect(screen.getByRole('button', { name: 'Nuevo Registro' })).toBeTruthy();
-      expect(screen.getByPlaceholderText('Añadir filtro...')).toBeTruthy();
-      expect(screen.getAllByRole('button', { name: 'Editar' }).length).toBe(3);
-      expect(screen.getAllByRole('button', { name: 'Borrar' }).length).toBe(3);
+      expect(screen.queryByRole('button', { name: 'Nuevo registro' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Editar' })).toBeNull();
+      expect(screen.queryByRole('button', { name: 'Borrar' })).toBeNull();
+      expect(screen.queryByRole('columnheader', { name: 'Admin' })).toBeNull();
+      expect(screen.queryByText('Solo editores')).toBeNull();
       unmount();
     }
   });

@@ -3,7 +3,7 @@ interface CeldaAdminProps {
   onBorrar: () => void;
 }
 
-// Celda de la columna «Admin». La página decide si se muestra con useCanEdit();
+// Celda de la columna «Admin». La página decide si se muestra con useCanEdit() o useCanLoad();
 // el componente no se oculta por sí solo.
 export default function CeldaAdmin({ onEditar, onBorrar }: CeldaAdminProps) {
   return (

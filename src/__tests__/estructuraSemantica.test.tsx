@@ -75,7 +75,7 @@ describe('estructura semántica: análisis estático', () => {
     // columna de acciones legítima (o se quita una), actualice el valor esperado de la página.
     const esperado: Record<string, number> = {
       'ManejoCaja.tsx': 2, 'Salarios.tsx': 2, 'CorpusChristi.tsx': 2, 'Indicadores.tsx': 2,
-      'IndiceCompanias.tsx': 1, 'Documentos.tsx': 1, 'Transacciones.tsx': 1,
+      'IndiceCompanias.tsx': 1,
     };
     for (const [nombre, src] of PAGINAS) {
       const cuenta = (src.match(/className="acciones-celda"/g) ?? []).length;

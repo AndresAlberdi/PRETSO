@@ -1,9 +1,9 @@
-import EditToggle from "../components/EditToggle";
 import { useEffect, useMemo, useState } from "react";
 import { collection, getDocs, query, deleteDoc, doc, where } from "firebase/firestore";
 import { db } from "../firebase";
 import { cleanFirebaseData } from "../utils";
-import { useAdmin } from "../context/AdminContext";
+import { useCanLoad } from "../hooks/useCanEdit";
+import CeldaAdmin from "../components/CeldaAdmin";
 import ConfirmModal from "../components/ConfirmModal";
 import BusyModal from "../components/BusyModal";
 import { logAction } from "../utils/audit";
@@ -28,7 +28,7 @@ const SEARCH_CATEGORIES = [
 export default function Transacciones() {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const { isEditMode } = useAdmin();
+  const canLoad = useCanLoad();
   const [recordToDelete, setRecordToDelete] = useState<any>(null);
   const [deleteErrorAlert, setDeleteErrorAlert] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -153,18 +153,15 @@ export default function Transacciones() {
   return (
     <div>
       <div className="cabecera-pagina" style={{ flexWrap: 'wrap' }}>
-        <h1>Transacciones</h1>
+        <div>
+          <h1>Transacciones</h1>
+          {canLoad && <p className="etiqueta-editor">Solo editores</p>}
+        </div>
         <div className="acciones-cabecera">
-          <EditToggle />
-          {isEditMode && (
-            <button 
-              onClick={() => setIsCreateOpen(true)}
-              style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-            >
-              Nuevo Registro
-            </button>
-          )}
           <SearchBar onSearch={setFilters} categories={SEARCH_CATEGORIES} />
+          {canLoad && (
+            <button type="button" className="boton boton-editor" onClick={() => setIsCreateOpen(true)}>Nuevo registro</button>
+          )}
         </div>
       </div>
       
@@ -184,7 +181,7 @@ export default function Transacciones() {
                 <th scope="col">Noticia</th>
                 <th scope="col">Fuentes</th>
                 <th scope="col">Documentos</th>
-                {isEditMode && <th scope="col">Admin</th>}
+                {canLoad && <th scope="col">Admin</th>}
               </tr>
             </thead>
             <tbody>
@@ -194,12 +191,7 @@ export default function Transacciones() {
                   <td style={{ maxWidth: '400px' }}>{row["Noticia"]}</td>
                   <td style={{ maxWidth: '200px' }}>{row["Fuentes para la generación del dato"]}</td>
                   <td>{renderDocsForTransaction(row)}</td>
-                  {isEditMode && (
-                    <td><div className="acciones-celda">
-                      <button onClick={() => setRecordToEdit(row)} style={{ background: 'var(--primary-color)' }}>Editar</button>
-                      <button onClick={() => attemptDelete(row)} style={{ background: '#ff4d4f' }}>Borrar</button>
-                    </div></td>
-                  )}
+                  {canLoad && <CeldaAdmin onEditar={() => setRecordToEdit(row)} onBorrar={() => attemptDelete(row)} />}
                 </tr>
               ))}
             </tbody>

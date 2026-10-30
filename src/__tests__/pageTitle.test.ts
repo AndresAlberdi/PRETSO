@@ -11,6 +11,7 @@ describe('pageTitle', () => {
     ['/indicadores', 'Identificación de Indicadores — PRETSO'],
     ['/companias', 'Compañías — PRETSO'],
     ['/bibliografia', 'Bibliografía — PRETSO'],
+    ['/agregar', 'Agregar transacción — PRETSO'],
     ['/transacciones', 'Transacciones — PRETSO'],
     ['/documentos', 'Documentos — PRETSO'],
     ['/auditoria', 'Auditoría — PRETSO'],

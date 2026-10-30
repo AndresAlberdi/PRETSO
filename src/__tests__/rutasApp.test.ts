@@ -17,13 +17,13 @@ const sinEspacios = (t: string) => t.replace(/\s+/g, '');
 
 describe('rutas de App.tsx', () => {
   it('declara las rutas esperadas', () => {
-    for (const p of ['/buscar', '/', '/transacciones', '/documentos', '/auditoria', '/administracion', '/usuarios',
+    for (const p of ['/buscar', '/', '/agregar', '/transacciones', '/documentos', '/auditoria', '/administracion', '/usuarios',
       '/caja', '/salarios', '/corpus', '/indicadores', '/companias', '/bibliografia', '*']) {
       expect(R.has(p), p).toBe(true);
     }
   });
 
-  it.each(['/transacciones', '/documentos', '/auditoria', '/administracion', '/usuarios'])(
+  it.each(['/agregar', '/transacciones', '/documentos', '/auditoria', '/administracion', '/usuarios'])(
     '%s anida ProtectedRoute, ReaderRoute y AdminRoute en ese orden',
     (p) => {
       const t = R.get(p)!;
@@ -45,10 +45,35 @@ describe('rutas de App.tsx', () => {
     },
   );
 
+  it.each(['/documentos', '/transacciones'])('%s usa ATRAS_AGREGAR y no ATRAS_ADMIN', (p) => {
+    const t = R.get(p)!;
+    expect(t).toContain('ATRAS_AGREGAR');
+    expect(t).not.toContain('ATRAS_ADMIN');
+    expect(fuente).toContain("volver={{ to: '/agregar', texto: 'Atrás' }}");
+  });
+
+  it('solo /documentos y /transacciones contienen ATRAS_AGREGAR', () => {
+    for (const [p, t] of R) {
+      if (p === '/documentos' || p === '/transacciones') expect(t, p).toContain('ATRAS_AGREGAR');
+      else expect(t, p).not.toContain('ATRAS_AGREGAR');
+    }
+  });
+
+  it('/agregar usa ATRAS_BUSCAR', () => {
+    expect(R.get('/agregar')!).toContain('ATRAS_BUSCAR');
+  });
+
   it('solo la ruta "/" usa conCuenta', () => {
     for (const [p, t] of R) {
       if (p === '/') expect(sinEspacios(t)).toContain('conCuenta');
       else expect(t, p).not.toContain('conCuenta');
+    }
+  });
+
+  it('solo /buscar usa conAgregar', () => {
+    for (const [p, t] of R) {
+      if (p === '/buscar') expect(sinEspacios(t)).toContain('conAgregar');
+      else expect(t, p).not.toContain('conAgregar');
     }
   });
 

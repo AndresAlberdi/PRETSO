@@ -340,6 +340,12 @@ button.boton-editor-activo:not([disabled]):hover { background: var(--editor-colo
 button.boton-borrar:not([disabled]) { background: var(--danger-color); border-color: var(--danger-color); color: var(--on-danger); }
 button.boton-borrar:not([disabled]):hover { background: var(--danger-color); color: var(--on-danger); transform: none; box-shadow: none; }
 
+.etiqueta-editor { display: inline-block; margin: 0.25rem 0 0; padding: 0.25rem 0.75rem; border: 1px solid var(--editor-color); border-radius: 999px; background: var(--editor-tint); color: var(--editor-text); font-size: 0.8125rem; font-weight: 600; }
+.texto-agregar { color: var(--text-muted); max-width: 62ch; margin: 1rem 0 0; }
+.tarjetas-carga { list-style: none; padding: 0; margin: 1.5rem 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr)); gap: 1rem; }
+a.tarjeta-carga { display: flex; align-items: center; justify-content: space-between; gap: 1rem; min-height: 64px; padding: 1.25rem 1.5rem; border: 1.5px solid var(--editor-color); border-radius: 8px; color: var(--text-color); font-family: var(--font-serif); font-size: 1.375rem; font-weight: 700; text-decoration: none; overflow-wrap: anywhere; }
+a.tarjeta-carga:hover { background: var(--editor-tint); color: var(--text-color); }
+
 .barra-superior { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; padding: 1rem 2rem; background: var(--bg-card); border-bottom: 1px solid var(--border-color); }
 .barra-superior .marca { margin: 0 auto 0 0; }
 .barra-correo { color: var(--text-muted); font-size: 0.95rem; overflow-wrap: anywhere; }
