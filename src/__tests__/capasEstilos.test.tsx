@@ -13,7 +13,7 @@ vi.mock('react-router', () => ({
   Link: ({ children, to }: { children: React.ReactNode; to: string }) => <a href={to}>{children}</a>,
   useNavigate: () => vi.fn(),
 }));
-vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isEditMode: true }) }));
+vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isAdmin: true, isEditMode: true }) }));
 vi.mock('firebase/firestore', () => ({
   collection: (_db: unknown, nombre: string) => nombre,
   query: (c: string) => c,

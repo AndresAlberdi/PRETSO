@@ -15,7 +15,7 @@ vi.mock('../utils/audit', () => ({ logAction: vi.fn() }));
 vi.mock('react-router', () => ({
   useNavigate: () => vi.fn(),
 }));
-vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isEditMode: true }) }));
+vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isAdmin: true, isEditMode: true }) }));
 vi.mock('firebase/firestore', () => ({
   collection: (_db: unknown, nombre: string) => nombre,
   where: (campo: string, op: string, valor: unknown) => ({ campo, op, valor }),

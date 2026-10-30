@@ -19,7 +19,7 @@ vi.mock('react-router', () => ({
   useNavigate: () => vi.fn(),
   useLocation: () => ({ pathname: '/x', search: ubicacion.search, state: null }),
 }));
-vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isEditMode: admin.isEditMode }) }));
+vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isAdmin: true, isEditMode: admin.isEditMode }) }));
 vi.mock('firebase/firestore', () => ({
   collection: (_db: unknown, nombre: string) => nombre,
   query: (nombre: string) => nombre,
