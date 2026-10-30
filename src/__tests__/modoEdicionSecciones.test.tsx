@@ -9,6 +9,8 @@ import CorpusChristi from '../pages/CorpusChristi';
 import Indicadores from '../pages/Indicadores';
 import IndiceCompanias from '../pages/IndiceCompanias';
 import Bibliografia from '../pages/Bibliografia';
+import Documentos from '../pages/Documentos';
+import Transacciones from '../pages/Transacciones';
 
 const SRC = resolve(__dirname, '..');
 
@@ -40,7 +42,14 @@ beforeEach(() => {
       { id: 'c7', 'Indicador de registro': 7, 'Sigla Compañía': 'GA-JR', 'Nombre Compañía': 'Compañía de Alarcón', Autores: 'Alarcón y Ramírez' },
       { id: 'c8', 'Indicador de registro': 8, 'Sigla Compañía': 'TM-01', 'Nombre Compañía': 'Compañía de Tirso', Autores: 'Tirso de Molina' },
     ],
-    transacciones: [],
+    documentos: [
+      { id: 'd1', Doc: 1, Documento: 'Carta de García' },
+      { id: 'd2', Doc: 2, Documento: 'Recibo de tela' },
+    ],
+    transacciones: [
+      { id: 't1', Num: 1, Noticia: 'Pago a García', 'Fuentes para la generación del dato': 'ALP' },
+      { id: 't2', Num: 2, Noticia: 'Compra de tela', 'Fuentes para la generación del dato': 'AGI' },
+    ],
     manejo_de_caja: [{ id: 'm1', ...base, Ingresos: 100 }, { id: 'm2', ...base, Ingresos: 200 }],
     salarios: [{ id: 's1', ...base }, { id: 's2', ...base }],
     corpus_christi: [{ id: 'cc1', ...base }, { id: 'cc2', ...base }],
@@ -200,5 +209,73 @@ describe.each(PAGINAS.filter((p): p is Pagina & { detalle: NonNullable<Pagina['d
     expect(borrar[0].classList.contains('boton-fila') && borrar[0].classList.contains('boton-borrar')).toBe(true);
     fireEvent.click(editar[0]);
     expect(await screen.findByRole('dialog')).toBeTruthy();
+  });
+});
+
+// Documentos y Transacciones: las herramientas de carga dependen de ser administrador, no del modo edición.
+const CARGA = [
+  { nombre: 'Documentos', archivo: 'Documentos.tsx', Componente: Documentos, tabla: 'Documentos', dialogo: 'Nuevo Registro - DOCUMENTOS' },
+  { nombre: 'Transacciones', archivo: 'Transacciones.tsx', Componente: Transacciones, tabla: 'Transacciones', dialogo: 'Nuevo Registro - TRANSACCIONES' },
+];
+
+describe.each(CARGA)('herramientas de carga en $nombre', (p) => {
+  async function mostrar(): Promise<HTMLElement> {
+    render(<p.Componente />);
+    return screen.findByRole('table', { name: p.tabla });
+  }
+
+  it('un lector con modo edición forzado no ve controles ni etiqueta', async () => {
+    Object.assign(estado, { isAdmin: false, isReader: true, isEditMode: true });
+    const tabla = await mostrar();
+    for (const nombre of ['Nuevo registro', 'Editar', 'Borrar', 'Salir de edición']) {
+      expect(screen.queryByRole('button', { name: nombre }), nombre).toBeNull();
+    }
+    expect(screen.queryByRole('columnheader', { name: 'Admin' })).toBeNull();
+    expect(within(tabla).queryByRole('columnheader', { name: 'Admin' })).toBeNull();
+    expect(screen.queryByText('Solo editores')).toBeNull();
+    expect(document.querySelector('.boton-editor, .boton-editor-activo, .boton-borrar, .etiqueta-editor')).toBeNull();
+  });
+
+  it.each([false, true])('un administrador ve alta, Admin, Editar y Borrar (modo edición: %s)', async (modo) => {
+    Object.assign(estado, { isAdmin: true, isEditMode: modo });
+    const tabla = await mostrar();
+    expect(screen.getByRole('button', { name: 'Nuevo registro' }).className).toBe('boton boton-editor');
+    expect(within(tabla).getByRole('columnheader', { name: 'Admin' })).toBeTruthy();
+    const editar = within(tabla).getAllByRole('button', { name: 'Editar' });
+    const borrar = within(tabla).getAllByRole('button', { name: 'Borrar' });
+    expect(editar).toHaveLength(2);
+    expect(borrar).toHaveLength(2);
+    expect(editar[0].classList.contains('boton-fila')).toBe(true);
+    expect(screen.getAllByRole('button', { name: 'Editar' })).toHaveLength(2);
+    expect(screen.queryByRole('button', { name: 'Salir de edición' })).toBeNull();
+  });
+
+  it('la cabecera pone «Solo editores» tras el h1 y el buscador antes de «Nuevo registro»', async () => {
+    Object.assign(estado, { isAdmin: true, isEditMode: false });
+    await mostrar();
+    const h1 = screen.getByRole('heading', { level: 1 });
+    expect(h1.nextElementSibling?.textContent).toBe('Solo editores');
+    const nuevo = screen.getByRole('button', { name: 'Nuevo registro' });
+    const cabecera = nuevo.closest('.acciones-cabecera') as HTMLElement;
+    expect(cabecera).not.toBeNull();
+    const form = cabecera.querySelector('form') as Node;
+    expect(form).not.toBeNull();
+    expect(Boolean(form.compareDocumentPosition(nuevo) & Node.DOCUMENT_POSITION_FOLLOWING)).toBe(true);
+  });
+
+  it('«Nuevo registro» abre el diálogo de alta', async () => {
+    Object.assign(estado, { isAdmin: true, isEditMode: false });
+    await mostrar();
+    fireEvent.click(screen.getByRole('button', { name: 'Nuevo registro' }));
+    expect(await screen.findByRole('dialog', { name: p.dialogo })).toBeTruthy();
+  });
+
+  it('el código fuente usa useCanLoad y una sola CeldaAdmin, sin restos del modo edición', () => {
+    const src = readFileSync(join(SRC, 'pages', p.archivo), 'utf8');
+    expect(src).not.toContain('isEditMode');
+    expect(src).not.toContain('EditToggle');
+    expect(src).not.toContain('>Nuevo Registro<');
+    expect(src).toContain('useCanLoad()');
+    expect((src.match(/<CeldaAdmin\b/g) ?? []).length).toBe(1);
   });
 });
