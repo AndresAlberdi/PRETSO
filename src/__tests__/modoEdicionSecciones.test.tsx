@@ -38,13 +38,16 @@ beforeEach(() => {
   colecciones = {
     companias: [
       { id: 'c7', 'Indicador de registro': 7, 'Sigla Compañía': 'GA-JR', 'Nombre Compañía': 'Compañía de Alarcón', Autores: 'Alarcón y Ramírez' },
+      { id: 'c8', 'Indicador de registro': 8, 'Sigla Compañía': 'TM-01', 'Nombre Compañía': 'Compañía de Tirso', Autores: 'Tirso de Molina' },
     ],
     transacciones: [],
-    manejo_de_caja: [{ id: 'm1', ...base, Ingresos: 100 }],
-    salarios: [{ id: 's1', ...base }],
-    corpus_christi: [{ id: 'cc1', ...base }],
-    indicadores: [{ id: 'i1', ...base, 'Categorías': 'Precios' }],
-    bibliografia: [{ id: 'b1', Autores: 'Rennert', 'Referencias bibliográficas': 'The Spanish Stage' }],
+    manejo_de_caja: [{ id: 'm1', ...base, Ingresos: 100 }, { id: 'm2', ...base, Ingresos: 200 }],
+    salarios: [{ id: 's1', ...base }, { id: 's2', ...base }],
+    corpus_christi: [{ id: 'cc1', ...base }, { id: 'cc2', ...base }],
+    indicadores: [{ id: 'i1', ...base, 'Categorías': 'Precios' }, { id: 'i2', ...base, 'Categorías': 'Precios' }],
+    bibliografia: [{ id: 'b1', Autores: 'Rennert', 'Referencias bibliográficas': 'The Spanish Stage' },
+      { id: 'b2', Autores: 'Shergold', 'Referencias bibliográficas': 'A History of the Spanish Stage' },
+    ],
   };
   estado.isAdmin = false; estado.isReader = false; estado.isEditMode = false;
 });
@@ -54,22 +57,26 @@ interface Pagina {
   nombre: string;
   archivo: string;
   Componente: ComponentType;
-  conBuscador: boolean;
+  buscador: 'SearchBar' | 'campo' | 'ninguno';
   filas: number;
+  /** Usos de <CeldaAdmin en el código de la página. */
+  celdas: number;
+  /** Botón de la lista que abre la tabla de detalle y nombre de esa tabla. */
+  detalle?: { boton: string; tabla: RegExp };
 }
 const PAGINAS: Pagina[] = [
-  { nombre: 'Manejo de Caja', archivo: 'ManejoCaja.tsx', Componente: ManejoCaja, conBuscador: true, filas: 1 },
-  { nombre: 'Remuneraciones', archivo: 'Salarios.tsx', Componente: Salarios, conBuscador: true, filas: 1 },
-  { nombre: 'Corpus Christi', archivo: 'CorpusChristi.tsx', Componente: CorpusChristi, conBuscador: true, filas: 1 },
-  { nombre: 'Indicadores', archivo: 'Indicadores.tsx', Componente: Indicadores, conBuscador: true, filas: 1 },
-  { nombre: 'Índice de Compañías', archivo: 'IndiceCompanias.tsx', Componente: IndiceCompanias, conBuscador: false, filas: 1 },
-  { nombre: 'Bibliografía', archivo: 'Bibliografia.tsx', Componente: Bibliografia, conBuscador: false, filas: 1 },
+  { nombre: 'Manejo de Caja', archivo: 'ManejoCaja.tsx', Componente: ManejoCaja, buscador: 'SearchBar', filas: 2, celdas: 2, detalle: { boton: 'CAJA', tabla: /^Registros de caja de / } },
+  { nombre: 'Remuneraciones', archivo: 'Salarios.tsx', Componente: Salarios, buscador: 'SearchBar', filas: 2, celdas: 2, detalle: { boton: 'TRATO', tabla: /^Remuneraciones de / } },
+  { nombre: 'Corpus Christi', archivo: 'CorpusChristi.tsx', Componente: CorpusChristi, buscador: 'SearchBar', filas: 2, celdas: 2, detalle: { boton: 'TRATO', tabla: /^Transacciones de Corpus Christi en / } },
+  { nombre: 'Indicadores', archivo: 'Indicadores.tsx', Componente: Indicadores, buscador: 'SearchBar', filas: 2, celdas: 2, detalle: { boton: 'LISTA', tabla: /^Indicadores de la categoría / } },
+  { nombre: 'Índice de Compañías', archivo: 'IndiceCompanias.tsx', Componente: IndiceCompanias, buscador: 'campo', filas: 2, celdas: 1 },
+  { nombre: 'Bibliografía', archivo: 'Bibliografia.tsx', Componente: Bibliografia, buscador: 'ninguno', filas: 2, celdas: 1 },
 ];
 
 // Deja a la vista una tabla de datos: en las secciones con buscador, la de resultados.
 async function mostrarTabla(p: Pagina): Promise<HTMLElement> {
   render(<p.Componente />);
-  if (!p.conBuscador) return (await screen.findAllByRole('table'))[0];
+  if (p.buscador !== 'SearchBar') return (await screen.findAllByRole('table'))[0];
   await screen.findAllByRole('table');
   fireEvent.change(screen.getByRole('combobox', { name: 'Buscar en' }), { target: { value: 'all' } });
   fireEvent.change(screen.getByPlaceholderText('Añadir filtro...'), { target: { value: 'Potosí' } });
@@ -125,10 +132,12 @@ describe.each(PAGINAS)('modo edición en $nombre', (p) => {
     expect(cabecera).not.toBeNull();
     expect(cabecera.contains(salir)).toBe(true);
     const sigue = (a: Node, b: Node) => Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
-    if (p.conBuscador) {
+    if (p.buscador === 'SearchBar') {
       expect(sigue(cabecera.querySelector('form') as Node, salir)).toBe(true);
-    } else if (cabecera.querySelector('input')) {
-      expect(sigue(cabecera.querySelector('input') as Node, salir)).toBe(true);
+    } else if (p.buscador === 'campo') {
+      expect(sigue(screen.getByRole('textbox', { name: 'Buscar por nombre o autores' }), salir)).toBe(true);
+    } else {
+      expect(cabecera.querySelector('input, form')).toBeNull();
     }
     expect(sigue(salir, nuevo)).toBe(true);
   });
@@ -147,5 +156,49 @@ describe.each(PAGINAS)('modo edición en $nombre', (p) => {
     expect(src).not.toContain('>Nuevo Registro<');
     expect(src).toContain('useCanEdit()');
     expect(src).toContain('<CeldaAdmin');
+    expect((src.match(/<CeldaAdmin\b/g) ?? []).length).toBe(p.celdas);
+  });
+});
+
+// §5.3 del diseño: solo Bibliografía carece de buscador; confirmar con Laura.
+it('las páginas sin buscador son exactamente Bibliografía', () => {
+  expect(PAGINAS.filter(p => p.buscador === 'ninguno').map(p => p.nombre)).toEqual(['Bibliografía']);
+});
+
+// Deja a la vista la tabla de detalle de una sección con lista de compañías, categorías o ciudades.
+async function mostrarDetalle(p: Pagina & { detalle: NonNullable<Pagina['detalle']> }): Promise<HTMLElement> {
+  render(<p.Componente />);
+  fireEvent.click((await screen.findAllByRole('button', { name: p.detalle.boton }))[0]);
+  return screen.findByRole('table', { name: p.detalle.tabla });
+}
+
+describe.each(PAGINAS.filter((p): p is Pagina & { detalle: NonNullable<Pagina['detalle']> } => Boolean(p.detalle)))('tabla de detalle en $nombre', (p) => {
+  it('un lector con modo edición forzado no ve controles de edición', async () => {
+    Object.assign(estado, { isAdmin: false, isReader: true, isEditMode: true });
+    const tabla = await mostrarDetalle(p);
+    expect(within(tabla).queryByRole('columnheader', { name: 'Admin' })).toBeNull();
+    expect(within(tabla).queryByRole('button', { name: 'Editar' })).toBeNull();
+    expect(within(tabla).queryByRole('button', { name: 'Borrar' })).toBeNull();
+    expect(document.querySelector('.boton-borrar')).toBeNull();
+  });
+
+  it('un administrador sin modo edición no ve la columna Admin', async () => {
+    Object.assign(estado, { isAdmin: true, isEditMode: false });
+    const tabla = await mostrarDetalle(p);
+    expect(within(tabla).queryByRole('columnheader', { name: 'Admin' })).toBeNull();
+  });
+
+  it('un administrador en modo edición ve Editar y Borrar en cada fila', async () => {
+    Object.assign(estado, { isAdmin: true, isEditMode: true });
+    const tabla = await mostrarDetalle(p);
+    expect(within(tabla).getByRole('columnheader', { name: 'Admin' })).toBeTruthy();
+    const editar = within(tabla).getAllByRole('button', { name: 'Editar' });
+    const borrar = within(tabla).getAllByRole('button', { name: 'Borrar' });
+    expect(editar).toHaveLength(p.filas);
+    expect(borrar).toHaveLength(p.filas);
+    expect(editar[0].classList.contains('boton-fila') && editar[0].classList.contains('boton-editor')).toBe(true);
+    expect(borrar[0].classList.contains('boton-fila') && borrar[0].classList.contains('boton-borrar')).toBe(true);
+    fireEvent.click(editar[0]);
+    expect(await screen.findByRole('dialog')).toBeTruthy();
   });
 });
