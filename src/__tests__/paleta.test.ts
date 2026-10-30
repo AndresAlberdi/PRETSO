@@ -53,6 +53,8 @@ describe('paleta golden rose', () => {
     expect(variable('--on-primary')).toBe('#0b0f19');
     expect(variable('--editor-color')).toBe('#ff6b6b');
     expect(css).toContain('#D99A8A');
+    expect(variable('--danger-color')).toBe('#ff4d4f');
+    expect(variable('--on-danger')).toBe('#0b0f19');
   });
 
   it('cumple los contrastes WCAG', () => {
@@ -67,5 +69,15 @@ describe('paleta golden rose', () => {
     expect(contraste('#D99A8A', fondo)).toBeGreaterThanOrEqual(4.5);
     expect(contraste(variable('--input-border'), fondo)).toBeGreaterThanOrEqual(3);
     expect(contraste(p, fondo)).toBeGreaterThanOrEqual(3);
+    expect(contraste(variable('--on-danger'), variable('--danger-color'))).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it('los botones de fila miden 36 px y Borrar usa el color de peligro', () => {
+    expect(css).toMatch(/\.boton-fila\s*\{[^}]*min-height:\s*36px/);
+    expect(css.indexOf('.boton-fila {')).toBeGreaterThan(css.indexOf('.boton {'));
+    const regla = css.match(/button\.boton-borrar:not\(\[disabled\]\)\s*\{([^}]*)\}/);
+    expect(regla).not.toBeNull();
+    expect(regla![1]).toContain('var(--danger-color)');
+    expect(regla![1]).toContain('var(--on-danger)');
   });
 });
