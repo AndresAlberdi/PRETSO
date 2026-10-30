@@ -26,6 +26,7 @@ import { TopBar } from './components/TopBar';
 
 const ATRAS_BUSCAR = <TopBar volver={{ to: '/buscar', texto: 'Atrás' }} />;
 const ATRAS_ADMIN = <TopBar volver={{ to: '/administracion', texto: 'Atrás' }} />;
+const ATRAS_AGREGAR = <TopBar volver={{ to: '/agregar', texto: 'Atrás' }} />;
 
 function Layout({ barra, children }: { barra: React.ReactNode; children: React.ReactNode }) {
   return (
@@ -57,8 +58,8 @@ export default function App() {
           <Route path="/companias" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><IndiceCompanias /></Layout></ReaderRoute></ProtectedRoute>} />
           <Route path="/bibliografia" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><Bibliografia /></Layout></ReaderRoute></ProtectedRoute>} />
           <Route path="/agregar" element={<ProtectedRoute><ReaderRoute><AdminRoute><Layout barra={ATRAS_BUSCAR}><AgregarTransaccion /></Layout></AdminRoute></ReaderRoute></ProtectedRoute>} />
-          <Route path="/transacciones" element={<ProtectedRoute><ReaderRoute><AdminRoute><Layout barra={ATRAS_ADMIN}><Transacciones /></Layout></AdminRoute></ReaderRoute></ProtectedRoute>} />
-          <Route path="/documentos" element={<ProtectedRoute><ReaderRoute><AdminRoute><Layout barra={ATRAS_ADMIN}><Documentos /></Layout></AdminRoute></ReaderRoute></ProtectedRoute>} />
+          <Route path="/transacciones" element={<ProtectedRoute><ReaderRoute><AdminRoute><Layout barra={ATRAS_AGREGAR}><Transacciones /></Layout></AdminRoute></ReaderRoute></ProtectedRoute>} />
+          <Route path="/documentos" element={<ProtectedRoute><ReaderRoute><AdminRoute><Layout barra={ATRAS_AGREGAR}><Documentos /></Layout></AdminRoute></ReaderRoute></ProtectedRoute>} />
           <Route path="/auditoria" element={<ProtectedRoute><ReaderRoute><AdminRoute><Layout barra={ATRAS_ADMIN}><Auditoria /></Layout></AdminRoute></ReaderRoute></ProtectedRoute>} />
           <Route path="/administracion" element={<ProtectedRoute><ReaderRoute><AdminRoute><Layout barra={<TopBar volver={{ to: '/', texto: 'Inicio' }} />}><Administracion /></Layout></AdminRoute></ReaderRoute></ProtectedRoute>} />
           <Route path="/usuarios" element={<ProtectedRoute><ReaderRoute><AdminRoute><Layout barra={ATRAS_ADMIN}><UserManagement /></Layout></AdminRoute></ReaderRoute></ProtectedRoute>} />

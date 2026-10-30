@@ -45,6 +45,13 @@ describe('rutas de App.tsx', () => {
     },
   );
 
+  it.each(['/documentos', '/transacciones'])('%s usa ATRAS_AGREGAR y no ATRAS_ADMIN', (p) => {
+    const t = R.get(p)!;
+    expect(t).toContain('ATRAS_AGREGAR');
+    expect(t).not.toContain('ATRAS_ADMIN');
+    expect(fuente).toContain("volver={{ to: '/agregar', texto: 'Atrás' }}");
+  });
+
   it('/agregar usa ATRAS_BUSCAR', () => {
     expect(R.get('/agregar')!).toContain('ATRAS_BUSCAR');
   });
