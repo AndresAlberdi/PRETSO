@@ -7,7 +7,8 @@ import TransactionModal from "../components/TransactionModal";
 import DocumentModal from "../components/DocumentModal";
 import SearchBar, { type SearchFilter } from "../components/SearchBar";
 import { cleanFirebaseData } from "../utils";
-import { useAdmin } from "../context/AdminContext";
+import { useCanEdit } from "../hooks/useCanEdit";
+import CeldaAdmin from "../components/CeldaAdmin";
 import ConfirmModal from "../components/ConfirmModal";
 import { logAction } from "../utils/audit";
 import GenericCreateModal from "../components/GenericCreateModal";
@@ -25,7 +26,7 @@ export default function Salarios() {
   const [companias, setCompanias] = useState<any[]>([]);
   const [transaccionesMap, setTransaccionesMap] = useState<Map<number, any>>(new Map());
   const [loading, setLoading] = useState(true);
-  const { isEditMode } = useAdmin();
+  const canEdit = useCanEdit();
   
   const location = useLocation();
   const navigate = useNavigate();
@@ -53,14 +54,6 @@ export default function Salarios() {
   const [filterCompania, setFilterCompania] = useState('');
   const [filterTemporada, setFilterTemporada] = useState('');
   const [filterAmbito, setFilterAmbito] = useState('');
-
-  useEffect(() => {
-    if (location.state?.reset) {
-      setSelectedCompId(null);
-      setFilters([]);
-      navigate(location.pathname, { replace: true });
-    }
-  }, [location.state?.reset, location.pathname, navigate]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -201,16 +194,11 @@ export default function Salarios() {
           <Tooltip label="Acerca de Remuneraciones" content="En esta sección se listan las remuneraciones y pagos específicos que la compañía efectuó a diversas personas (actores, músicos, tramoyistas, etc.) por su trabajo durante las diferentes temporadas." />
         </div>
         <div className="acciones-cabecera">
-          <EditToggle />
-          {isEditMode && (
-            <button 
-              onClick={() => setIsCreateOpen(true)}
-              style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-            >
-              Nuevo Registro
-            </button>
-          )}
           <SearchBar onSearch={(f) => { setFilters(f); setSelectedCompId(null); }} categories={searchCategories} />
+          <EditToggle />
+          {canEdit && (
+            <button type="button" className="boton boton-editor" onClick={() => setIsCreateOpen(true)}>Nuevo registro</button>
+          )}
         </div>
       </div>
 
@@ -235,7 +223,7 @@ export default function Salarios() {
                   <SortableTh label="Año" sortKey="Año" sortConfig={scSearch} onSort={sortSearch} />
                   <th scope="col">Documentos</th>
                   <th scope="col"><span className="visually-hidden">Transacción</span></th>
-                  {isEditMode && <th scope="col">Admin</th>}
+                  {canEdit && <th scope="col">Admin</th>}
                 </tr>
               </thead>
               <tbody>
@@ -274,12 +262,7 @@ export default function Salarios() {
                         )
                       )}
                     </div></td>
-                    {isEditMode && (
-                      <td><div className="acciones-celda">
-                        <button onClick={() => setRecordToEdit(registro)} style={{ background: 'var(--primary-color)' }}>Editar</button>
-                        <button onClick={() => attemptDelete(registro)} style={{ background: '#ff4d4f' }}>Borrar</button>
-                      </div></td>
-                    )}
+                    {canEdit && <CeldaAdmin onEditar={() => setRecordToEdit(registro)} onBorrar={() => attemptDelete(registro)} />}
                   </tr>
                 )})}
               </tbody>
@@ -361,7 +344,7 @@ export default function Salarios() {
                 <th scope="col">Remuneración</th>
                 <th scope="col">Documentos</th>
                 <th scope="col"><span className="visually-hidden">Transacción</span></th>
-                {isEditMode && <th scope="col">Admin</th>}
+                {canEdit && <th scope="col">Admin</th>}
               </tr>
             </thead>
             <tbody>
@@ -397,12 +380,7 @@ export default function Salarios() {
                       )
                     )}
                   </div></td>
-                  {isEditMode && (
-                    <td><div className="acciones-celda">
-                      <button onClick={() => setRecordToEdit(row)} style={{ background: 'var(--primary-color)' }}>Editar</button>
-                      <button onClick={() => attemptDelete(row)} style={{ background: '#ff4d4f' }}>Borrar</button>
-                    </div></td>
-                  )}
+                  {canEdit && <CeldaAdmin onEditar={() => setRecordToEdit(row)} onBorrar={() => attemptDelete(row)} />}
                 </tr>
               )})}
             </tbody>

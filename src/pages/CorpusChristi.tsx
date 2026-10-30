@@ -10,7 +10,8 @@ import { cleanFirebaseData } from "../utils";
 import CompaniaModal from "../components/CompaniaModal";
 import ListaSiglasCompania from "../components/ListaSiglasCompania";
 import { camposReferenciaCompania } from "../utils/referenciaCompania";
-import { useAdmin } from "../context/AdminContext";
+import { useCanEdit } from "../hooks/useCanEdit";
+import CeldaAdmin from "../components/CeldaAdmin";
 import ConfirmModal from "../components/ConfirmModal";
 import { logAction } from "../utils/audit";
 import GenericCreateModal from "../components/GenericCreateModal";
@@ -27,7 +28,7 @@ export default function CorpusChristi() {
   const [companias, setCompanias] = useState<any[]>([]);
   const [transaccionesMap, setTransaccionesMap] = useState<Map<number, any>>(new Map());
   const [loading, setLoading] = useState(true);
-  const { isEditMode } = useAdmin();
+  const canEdit = useCanEdit();
   
   const location = useLocation();
   const navigate = useNavigate();
@@ -54,14 +55,6 @@ export default function CorpusChristi() {
 
   const [filterCiudad, setFilterCiudad] = useState('');
   const [filterAno, setFilterAno] = useState('');
-
-  useEffect(() => {
-    if (location.state?.reset) {
-      setSelectedCityYear(null);
-      setFilters([]);
-      navigate(location.pathname, { replace: true });
-    }
-  }, [location.state?.reset, location.pathname, navigate]);
 
   useEffect(() => {
     async function fetchData() {
@@ -170,16 +163,11 @@ export default function CorpusChristi() {
           <Tooltip label="Acerca de Corpus Christi" content="Muestra los registros financieros y labores encargadas para la celebración del Corpus Christi por diversas ciudades en años específicos, detallando el pago y los fondos." />
         </div>
         <div className="acciones-cabecera">
-          <EditToggle />
-          {isEditMode && (
-            <button 
-              onClick={() => setIsCreateOpen(true)}
-              style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-            >
-              Nuevo Registro
-            </button>
-          )}
           <SearchBar onSearch={(f) => { setFilters(f); setSelectedCityYear(null); }} categories={searchCategories} />
+          <EditToggle />
+          {canEdit && (
+            <button type="button" className="boton boton-editor" onClick={() => setIsCreateOpen(true)}>Nuevo registro</button>
+          )}
         </div>
       </div>
 
@@ -205,7 +193,7 @@ export default function CorpusChristi() {
                   <SortableTh label="Monto a pagar" sortKey="Monto a pagar" sortConfig={scSearch} onSort={sortSearch} />
                   <th scope="col">Documentos</th>
                   <th scope="col"><span className="visually-hidden">Transacción</span></th>
-                  {isEditMode && <th scope="col">Admin</th>}
+                  {canEdit && <th scope="col">Admin</th>}
                 </tr>
               </thead>
               <tbody>
@@ -240,12 +228,7 @@ export default function CorpusChristi() {
                         )
                       )}
                     </div></td>
-                    {isEditMode && (
-                      <td><div className="acciones-celda">
-                        <button onClick={() => setRecordToEdit(row)} style={{ background: 'var(--primary-color)' }}>Editar</button>
-                        <button onClick={() => attemptDelete(row)} style={{ background: '#ff4d4f' }}>Borrar</button>
-                      </div></td>
-                    )}
+                    {canEdit && <CeldaAdmin onEditar={() => setRecordToEdit(row)} onBorrar={() => attemptDelete(row)} />}
                   </tr>
                 )})}
               </tbody>
@@ -308,7 +291,7 @@ export default function CorpusChristi() {
                 <th scope="col">Fondos</th>
                 <th scope="col">Documentos</th>
                 <th scope="col"><span className="visually-hidden">Transacción</span></th>
-                {isEditMode && <th scope="col">Admin</th>}
+                {canEdit && <th scope="col">Admin</th>}
               </tr>
             </thead>
             <tbody>
@@ -348,12 +331,7 @@ export default function CorpusChristi() {
                       )
                     )}
                   </div></td>
-                  {isEditMode && (
-                    <td><div className="acciones-celda">
-                      <button onClick={() => setRecordToEdit(row)} style={{ background: 'var(--primary-color)' }}>Editar</button>
-                      <button onClick={() => attemptDelete(row)} style={{ background: '#ff4d4f' }}>Borrar</button>
-                    </div></td>
-                  )}
+                  {canEdit && <CeldaAdmin onEditar={() => setRecordToEdit(row)} onBorrar={() => attemptDelete(row)} />}
                 </tr>
               )})}
             </tbody>

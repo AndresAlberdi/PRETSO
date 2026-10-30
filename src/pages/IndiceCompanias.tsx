@@ -3,7 +3,8 @@ import { useEffect, useState, useMemo } from "react";
 import { collection, getDocs, query } from "firebase/firestore";
 import { db } from "../firebase";
 import { cleanFirebaseData } from "../utils";
-import { useAdmin } from "../context/AdminContext";
+import { useCanEdit } from "../hooks/useCanEdit";
+import CeldaAdmin from "../components/CeldaAdmin";
 import ConfirmModal from "../components/ConfirmModal";
 import BusyModal from "../components/BusyModal";
 import { deleteDoc, doc, updateDoc } from "firebase/firestore";
@@ -19,7 +20,7 @@ import { contar } from "../utils/anuncios";
 export default function IndiceCompanias() {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const { isEditMode } = useAdmin();
+  const canEdit = useCanEdit();
   const [recordToDelete, setRecordToDelete] = useState<any>(null);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -178,15 +179,6 @@ export default function IndiceCompanias() {
       <div className="cabecera-pagina">
         <h1>Índice de Compañías</h1>
         <div className="acciones-cabecera">
-          <EditToggle />
-          {isEditMode && (
-            <button 
-              onClick={() => setIsCreateOpen(true)}
-              style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-            >
-              Nuevo Registro
-            </button>
-          )}
           <input 
             type="text" 
             placeholder="Buscar por nombre o autores..." 
@@ -195,6 +187,10 @@ export default function IndiceCompanias() {
             onChange={(e) => setSearchQuery(e.target.value)}
             style={{ padding: '0.5rem', borderRadius: '4px', border: '1px solid var(--input-border)', background: 'rgba(255,255,255,0.05)', color: 'white', minWidth: 'min(250px, 100%)' }}
           />
+          <EditToggle />
+          {canEdit && (
+            <button type="button" className="boton boton-editor" onClick={() => setIsCreateOpen(true)}>Nuevo registro</button>
+          )}
         </div>
       </div>
       
@@ -213,7 +209,7 @@ export default function IndiceCompanias() {
                 <SortableTh label="Temporadas Teatrales" sortKey="Temporadas teatrales" sortConfig={sortConfig} onSort={requestSort} />
                 <SortableTh label="Ámbito" sortKey="Ámbito" sortConfig={sortConfig} onSort={requestSort} />
                 <th scope="col">Vínculos Rápidos</th>
-                {isEditMode && <th scope="col"><span className="visually-hidden">Admin</span></th>}
+                {canEdit && <th scope="col">Admin</th>}
               </tr>
             </thead>
             <tbody>
@@ -228,12 +224,7 @@ export default function IndiceCompanias() {
                     <button onClick={() => checkRecordsAndNavigate('salarios', '/salarios', item)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Remuneraciones</button>
                     <button onClick={() => checkRecordsAndNavigate('corpus_christi', '/corpus', item)} style={{ fontSize: '0.8rem', padding: '0.2rem 0.5rem' }}>Corpus Christi</button>
                   </div></td>
-                  {isEditMode && (
-                    <td><div className="acciones-celda">
-                      <button onClick={() => setRecordToEdit(item)} style={{ background: 'var(--primary-color)' }}>Editar</button>
-                      <button onClick={() => attemptDelete(item)} style={{ background: '#ff4d4f' }}>Borrar</button>
-                    </div></td>
-                  )}
+                  {canEdit && <CeldaAdmin onEditar={() => setRecordToEdit(item)} onBorrar={() => attemptDelete(item)} />}
                 </tr>
               ))}
             </tbody>

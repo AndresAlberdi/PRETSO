@@ -15,7 +15,7 @@ const fallo = vi.hoisted(() => ({ coleccion: null as string | null }));
 vi.mock('../firebase', () => ({ db: {} }));
 vi.mock('../utils/audit', () => ({ logAction: vi.fn() }));
 vi.mock('react-router', () => ({ useNavigate: () => vi.fn() }));
-vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isEditMode: true }) }));
+vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isAdmin: true, isEditMode: true }) }));
 // Firestore simulado: igualdad estricta por campo, como las consultas `==` reales
 vi.mock('firebase/firestore', () => ({
   collection: (_db: unknown, nombre: string) => nombre,

@@ -336,6 +336,9 @@ a.boton-editor, button.boton-editor:not([disabled]) { background: var(--editor-t
 a.boton-editor:hover, button.boton-editor:not([disabled]):hover { background: rgba(255, 107, 107, 0.16); color: var(--editor-text); transform: none; box-shadow: none; }
 button.boton-editor-activo:not([disabled]) { background: var(--editor-color); border-color: var(--editor-color); color: var(--on-editor); }
 button.boton-editor-activo:not([disabled]):hover { background: var(--editor-color); color: var(--on-editor); transform: none; box-shadow: none; }
+.boton-fila { min-height: 36px; padding: 0 0.875rem; font-size: 0.9375rem; }
+button.boton-borrar:not([disabled]) { background: var(--danger-color); border-color: var(--danger-color); color: var(--on-danger); }
+button.boton-borrar:not([disabled]):hover { background: var(--danger-color); color: var(--on-danger); transform: none; box-shadow: none; }
 
 .barra-superior { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; padding: 1rem 2rem; background: var(--bg-card); border-bottom: 1px solid var(--border-color); }
 .barra-superior .marca { margin: 0 auto 0 0; }
