@@ -50,7 +50,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           
           <Route path="/" element={<ProtectedRoute><ReaderRoute><Layout barra={<TopBar conCuenta />}><Portada /></Layout></ReaderRoute></ProtectedRoute>} />
-          <Route path="/buscar" element={<ProtectedRoute><ReaderRoute><Layout barra={<TopBar volver={{ to: '/', texto: 'Inicio' }} />}><Busqueda /></Layout></ReaderRoute></ProtectedRoute>} />
+          <Route path="/buscar" element={<ProtectedRoute><ReaderRoute><Layout barra={<TopBar conAgregar volver={{ to: '/', texto: 'Inicio' }} />}><Busqueda /></Layout></ReaderRoute></ProtectedRoute>} />
           <Route path="/caja" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><ManejoCaja /></Layout></ReaderRoute></ProtectedRoute>} />
           <Route path="/salarios" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><Salarios /></Layout></ReaderRoute></ProtectedRoute>} />
           <Route path="/corpus" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><CorpusChristi /></Layout></ReaderRoute></ProtectedRoute>} />

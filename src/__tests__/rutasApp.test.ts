@@ -63,6 +63,13 @@ describe('rutas de App.tsx', () => {
     }
   });
 
+  it('solo /buscar usa conAgregar', () => {
+    for (const [p, t] of R) {
+      if (p === '/buscar') expect(sinEspacios(t)).toContain('conAgregar');
+      else expect(t, p).not.toContain('conAgregar');
+    }
+  });
+
   it('el comodín navega a "/"', () => {
     expect(sinEspacios(R.get('*')!)).toMatch(/<Navigateto="\/"/);
   });

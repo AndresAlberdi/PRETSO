@@ -8,13 +8,15 @@ const signOut = vi.fn();
 vi.mock('firebase/auth', () => ({ signOut: (...a: unknown[]) => signOut(...a) }));
 vi.mock('../firebase', () => ({ auth: {} }));
 let usuario: { email: string } | null = { email: 'lectora@example.com' };
-vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ user: usuario }) }));
+let admin: boolean | undefined = false;
+vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ user: usuario, isAdmin: admin }) }));
 
 import { TopBar } from '../components/TopBar';
 
 beforeEach(() => {
   signOut.mockReset();
   usuario = { email: 'lectora@example.com' };
+  admin = false;
 });
 afterEach(cleanup);
 
@@ -37,6 +39,33 @@ describe('TopBar', () => {
   it('con volver muestra el enlace con su destino', () => {
     montar(<TopBar volver={{ to: '/administracion', texto: 'Atrás' }} />);
     expect(screen.getByRole('link', { name: 'Atrás' }).getAttribute('href')).toBe('/administracion');
+  });
+});
+
+describe('TopBar: enlace «Agregar transacción»', () => {
+  it('un administrador lo ve con conAgregar, en rojo y antes de «Inicio»', () => {
+    admin = true;
+    montar(<TopBar conAgregar volver={{ to: '/', texto: 'Inicio' }} />);
+    const agregar = screen.getByRole('link', { name: 'Agregar transacción' });
+    expect(agregar.getAttribute('href')).toBe('/agregar');
+    expect(agregar.classList.contains('boton-editor')).toBe(true);
+    const inicio = screen.getByRole('link', { name: 'Inicio' });
+    expect(agregar.compareDocumentPosition(inicio) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+  it('un no administrador no lo ve', () => {
+    admin = false;
+    montar(<TopBar conAgregar />);
+    expect(screen.queryByRole('link', { name: 'Agregar transacción' })).toBeNull();
+  });
+  it('con isAdmin indefinido no lo ve', () => {
+    admin = undefined;
+    montar(<TopBar conAgregar />);
+    expect(screen.queryByRole('link', { name: 'Agregar transacción' })).toBeNull();
+  });
+  it('un administrador no lo ve sin conAgregar', () => {
+    admin = true;
+    montar(<TopBar />);
+    expect(screen.queryByRole('link', { name: 'Agregar transacción' })).toBeNull();
   });
 });
 
