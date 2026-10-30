@@ -17,13 +17,13 @@ const sinEspacios = (t: string) => t.replace(/\s+/g, '');
 
 describe('rutas de App.tsx', () => {
   it('declara las rutas esperadas', () => {
-    for (const p of ['/buscar', '/', '/transacciones', '/documentos', '/auditoria', '/administracion', '/usuarios',
+    for (const p of ['/buscar', '/', '/agregar', '/transacciones', '/documentos', '/auditoria', '/administracion', '/usuarios',
       '/caja', '/salarios', '/corpus', '/indicadores', '/companias', '/bibliografia', '*']) {
       expect(R.has(p), p).toBe(true);
     }
   });
 
-  it.each(['/transacciones', '/documentos', '/auditoria', '/administracion', '/usuarios'])(
+  it.each(['/agregar', '/transacciones', '/documentos', '/auditoria', '/administracion', '/usuarios'])(
     '%s anida ProtectedRoute, ReaderRoute y AdminRoute en ese orden',
     (p) => {
       const t = R.get(p)!;
@@ -44,6 +44,10 @@ describe('rutas de App.tsx', () => {
       expect(t).not.toContain('AdminRoute');
     },
   );
+
+  it('/agregar usa ATRAS_BUSCAR', () => {
+    expect(R.get('/agregar')!).toContain('ATRAS_BUSCAR');
+  });
 
   it('solo la ruta "/" usa conCuenta', () => {
     for (const [p, t] of R) {

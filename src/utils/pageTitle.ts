@@ -8,6 +8,7 @@ const SECCIONES: Record<string, string> = {
   '/indicadores': 'Identificación de Indicadores',
   '/companias': 'Compañías',
   '/bibliografia': 'Bibliografía',
+  '/agregar': 'Agregar transacción',
   '/transacciones': 'Transacciones',
   '/documentos': 'Documentos',
   '/auditoria': 'Auditoría',

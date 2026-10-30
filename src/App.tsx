@@ -11,6 +11,7 @@ import CorpusChristi from './pages/CorpusChristi';
 import Indicadores from './pages/Indicadores';
 import IndiceCompanias from './pages/IndiceCompanias';
 import Bibliografia from './pages/Bibliografia';
+import AgregarTransaccion from './pages/AgregarTransaccion';
 import Transacciones from './pages/Transacciones';
 import Documentos from './pages/Documentos';
 import Auditoria from './pages/Auditoria';
@@ -55,6 +56,7 @@ export default function App() {
           <Route path="/indicadores" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><Indicadores /></Layout></ReaderRoute></ProtectedRoute>} />
           <Route path="/companias" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><IndiceCompanias /></Layout></ReaderRoute></ProtectedRoute>} />
           <Route path="/bibliografia" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><Bibliografia /></Layout></ReaderRoute></ProtectedRoute>} />
+          <Route path="/agregar" element={<ProtectedRoute><ReaderRoute><AdminRoute><Layout barra={ATRAS_BUSCAR}><AgregarTransaccion /></Layout></AdminRoute></ReaderRoute></ProtectedRoute>} />
           <Route path="/transacciones" element={<ProtectedRoute><ReaderRoute><AdminRoute><Layout barra={ATRAS_ADMIN}><Transacciones /></Layout></AdminRoute></ReaderRoute></ProtectedRoute>} />
           <Route path="/documentos" element={<ProtectedRoute><ReaderRoute><AdminRoute><Layout barra={ATRAS_ADMIN}><Documentos /></Layout></AdminRoute></ReaderRoute></ProtectedRoute>} />
           <Route path="/auditoria" element={<ProtectedRoute><ReaderRoute><AdminRoute><Layout barra={ATRAS_ADMIN}><Auditoria /></Layout></AdminRoute></ReaderRoute></ProtectedRoute>} />
