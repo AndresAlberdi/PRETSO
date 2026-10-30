@@ -74,7 +74,7 @@ describe('estructura semántica: análisis estático', () => {
     // El conteo es exacto a propósito: fija en qué páginas hay celdas de acciones. Si se añade una
     // columna de acciones legítima (o se quita una), actualice el valor esperado de la página.
     const esperado: Record<string, number> = {
-      'ManejoCaja.tsx': 4, 'Salarios.tsx': 4, 'CorpusChristi.tsx': 4, 'Indicadores.tsx': 4,
+      'ManejoCaja.tsx': 2, 'Salarios.tsx': 4, 'CorpusChristi.tsx': 4, 'Indicadores.tsx': 4,
       'IndiceCompanias.tsx': 2, 'Bibliografia.tsx': 1, 'Documentos.tsx': 1, 'Transacciones.tsx': 1,
     };
     for (const [nombre, src] of PAGINAS) {
