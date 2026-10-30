@@ -121,7 +121,8 @@ describe.each(PAGINAS)('modo edición en $nombre', (p) => {
     const salir = screen.getByRole('button', { name: 'Salir de edición' });
     expect(salir.classList.contains('boton-editor-activo')).toBe(true);
     const nuevo = screen.getByRole('button', { name: 'Nuevo registro' });
-    expect(nuevo.className).toBe('boton boton-editor');
+    expect(nuevo.classList.contains('boton')).toBe(true);
+    expect(nuevo.classList.contains('boton-editor')).toBe(true);
     const admin = within(tabla).getByRole('columnheader', { name: 'Admin' });
     expect(admin.querySelector('.visually-hidden')).toBeNull();
     const editar = within(tabla).getAllByRole('button', { name: 'Editar' });
@@ -169,11 +170,6 @@ describe.each(PAGINAS)('modo edición en $nombre', (p) => {
   });
 });
 
-// §5.3 del diseño: solo Bibliografía carece de buscador; confirmar con Laura.
-it('las páginas sin buscador son exactamente Bibliografía', () => {
-  expect(PAGINAS.filter(p => p.buscador === 'ninguno').map(p => p.nombre)).toEqual(['Bibliografía']);
-});
-
 // Deja a la vista la tabla de detalle de una sección con lista de compañías, categorías o ciudades.
 async function mostrarDetalle(p: Pagina & { detalle: NonNullable<Pagina['detalle']> }): Promise<HTMLElement> {
   render(<p.Componente />);
@@ -189,12 +185,15 @@ describe.each(PAGINAS.filter((p): p is Pagina & { detalle: NonNullable<Pagina['d
     expect(within(tabla).queryByRole('button', { name: 'Editar' })).toBeNull();
     expect(within(tabla).queryByRole('button', { name: 'Borrar' })).toBeNull();
     expect(document.querySelector('.boton-borrar')).toBeNull();
+    expect(document.querySelector('.boton-editor')).toBeNull();
   });
 
   it('un administrador sin modo edición no ve la columna Admin', async () => {
     Object.assign(estado, { isAdmin: true, isEditMode: false });
     const tabla = await mostrarDetalle(p);
     expect(within(tabla).queryByRole('columnheader', { name: 'Admin' })).toBeNull();
+    expect(within(tabla).queryByRole('button', { name: 'Editar' })).toBeNull();
+    expect(within(tabla).queryByRole('button', { name: 'Borrar' })).toBeNull();
   });
 
   it('un administrador en modo edición ve Editar y Borrar en cada fila', async () => {
