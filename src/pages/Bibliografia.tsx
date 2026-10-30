@@ -4,7 +4,8 @@ import { useEffect, useState } from "react";
 import { collection, getDocs, query, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../firebase";
 import { cleanFirebaseData } from "../utils";
-import { useAdmin } from "../context/AdminContext";
+import { useCanEdit } from "../hooks/useCanEdit";
+import CeldaAdmin from "../components/CeldaAdmin";
 import ConfirmModal from "../components/ConfirmModal";
 import BusyModal from "../components/BusyModal";
 import { logAction } from "../utils/audit";
@@ -17,7 +18,7 @@ import SortableTh from "../components/SortableTh";
 export default function Bibliografia() {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const { isEditMode } = useAdmin();
+  const canEdit = useCanEdit();
   const [recordToDelete, setRecordToDelete] = useState<any>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -78,13 +79,8 @@ export default function Bibliografia() {
         <h1>Bibliografía</h1>
         <div className="acciones-cabecera">
           <EditToggle />
-          {isEditMode && (
-            <button 
-              onClick={() => setIsCreateOpen(true)}
-              style={{ padding: '0.5rem 1rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-            >
-              Nuevo Registro
-            </button>
+          {canEdit && (
+            <button type="button" className="boton boton-editor" onClick={() => setIsCreateOpen(true)}>Nuevo registro</button>
           )}
         </div>
       </div>
@@ -98,7 +94,7 @@ export default function Bibliografia() {
               <tr>
                 <SortableTh label="Autores" sortKey="Autores" sortConfig={sortConfig} onSort={requestSort} />
                 <SortableTh label="Referencias bibliográficas" sortKey="Referencias bibliográficas" sortConfig={sortConfig} onSort={requestSort} />
-                {isEditMode && <th scope="col">Admin</th>}
+                {canEdit && <th scope="col">Admin</th>}
               </tr>
             </thead>
             <tbody>
@@ -106,12 +102,7 @@ export default function Bibliografia() {
                 <tr key={item.id}>
                   <td>{item["Autores"]}</td>
                   <td>{item["Referencias bibliográficas"]}</td>
-                  {isEditMode && (
-                    <td><div className="acciones-celda">
-                      <button onClick={() => setRecordToEdit(item)} style={{ background: 'var(--primary-color)' }}>Editar</button>
-                      <button onClick={() => attemptDelete(item)} style={{ background: '#ff4d4f' }}>Borrar</button>
-                    </div></td>
-                  )}
+                  {canEdit && <CeldaAdmin onEditar={() => setRecordToEdit(item)} onBorrar={() => attemptDelete(item)} />}
                 </tr>
               ))}
             </tbody>
