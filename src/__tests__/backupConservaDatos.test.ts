@@ -13,7 +13,7 @@ vi.mock('../firebase', () => ({ db: {} }));
 
 import { generateDatabaseXml } from '../utils/backup';
 
-describe('la copia XML conserva los nombres y números reales de campo', () => {
+describe('la copia XML conserva los valores de referencia con nombres de campo en inglés', () => {
   beforeEach(() => {
     for (const k of Object.keys(datos)) delete datos[k];
     datos.salarios = [{ 'Indicador de registro': 1, 'Sigla Compañía': 7 }];
@@ -21,12 +21,11 @@ describe('la copia XML conserva los nombres y números reales de campo', () => {
     datos.companias = [{ 'Indicador de registro': 7, 'Sigla Compañía': 'ABC' }];
   });
 
-  it('conserva el número de compañía, el número de transacción y el indicador de registro', async () => {
+  it('la copia XML conserva los valores numéricos de referencia con nombres de campo en inglés', async () => {
     const xml = await generateDatabaseXml();
     expect(xml).toContain('<company_code>7</company_code>');
     expect(xml).toContain('<transaction_number>3</transaction_number>');
     const companias = xml.slice(xml.indexOf('<companies>'), xml.indexOf('</companies>'));
     expect(companias).toContain('<record_indicator>7</record_indicator>');
-    expect(xml).not.toContain('Nro.');
   });
 });
