@@ -61,6 +61,21 @@ export function textoVisibleCompania(compania: CompaniaRef): string {
   return nombre || 'Compañía sin sigla';
 }
 
+export const TEXTO_COMPANIA_NO_ENCONTRADA = 'Compañía no encontrada';
+
+/**
+ * Valor de una referencia a compañía para el Excel: la sigla (o el nombre) de la
+ * compañía resuelta, nunca el número de registro. Si no resuelve y es numérico,
+ * un rótulo fijo; si no resuelve y es texto, el texto canonizado.
+ */
+export function siglaParaExportar(valor: unknown, companias: CompaniaRef[]): string {
+  const ref = canonizarReferencia(valor);
+  if (ref === '') return '';
+  const compania = resolverCompania(valor, companias);
+  if (compania) return textoVisibleCompania(compania);
+  return NUMERICO.test(ref) ? TEXTO_COMPANIA_NO_ENCONTRADA : ref;
+}
+
 /**
  * Valor que se guarda en el registro para una compañía: el número de registro,
  * con tipo numérico (igual que los datos migrados, que conservan el tipo de

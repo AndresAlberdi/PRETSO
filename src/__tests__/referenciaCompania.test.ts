@@ -3,6 +3,7 @@ import {
   canonizarReferencia, normalizarSigla, resolverCompania, siglaDeReferencia,
   valorDeReferencia, etiquetaCompania, esCampoCompaniaCorpus,
   camposReferenciaCompania, valoresDeBusquedaReferencia, textoVisibleCompania,
+  siglaParaExportar,
 } from '../utils/referenciaCompania';
 import { COLUMN_ORDERS } from '../utils/xlsxExport';
 
@@ -121,5 +122,27 @@ describe('textoVisibleCompania', () => {
   });
   it('sin sigla ni nombre devuelve el rótulo fijo y nunca el número', () => {
     expect(textoVisibleCompania({ 'Indicador de registro': 7 })).toBe('Compañía sin sigla');
+  });
+});
+
+describe('siglaParaExportar', () => {
+  it('devuelve la sigla por número, decimal o sigla normalizada', () => {
+    expect(siglaParaExportar(7, companias)).toBe('GA-JR');
+    expect(siglaParaExportar('7.0', companias)).toBe('GA-JR');
+    expect(siglaParaExportar('ga-jr ', companias)).toBe('GA-JR');
+  });
+  it('con sigla vacía devuelve el nombre', () => {
+    const lista = [{ 'Indicador de registro': 3, 'Sigla Compañía': '', 'Nombre Compañía': 'Sin Sigla SA' }];
+    expect(siglaParaExportar(3, lista)).toBe('Sin Sigla SA');
+  });
+  it('un número que no resuelve no se expone', () => {
+    expect(siglaParaExportar(99, companias)).toBe('Compañía no encontrada');
+    expect(siglaParaExportar('99', companias)).toBe('Compañía no encontrada');
+  });
+  it('un texto que no resuelve se conserva', () => {
+    expect(siglaParaExportar('XYZ', companias)).toBe('XYZ');
+  });
+  it('los valores vacíos dan cadena vacía', () => {
+    for (const v of [null, undefined, '', 'None', NaN]) expect(siglaParaExportar(v, companias)).toBe('');
   });
 });
