@@ -18,5 +18,10 @@ odfpy==1.4.1
 # osv-scanner resuelve anyio 4.9.0 (GHSA-82r6-8w77-94w6, corregido en 4.14.2)
 # e idna 3.9.0 (PYSEC-2026-215, corregido en 3.15). Son las versiones que ya
 # instala un venv limpio.
+#
+# certifi 2026.7.22 (httpx → firebase-admin) trae las raíces emSign con
+# intermedias comprometidas (GHSA-6q48-6c7w-9gw2 / PYSEC-2026-4320, corregido
+# en 2026.10.18).
 anyio==4.15.1
 idna==3.20
+certifi==2026.10.18
