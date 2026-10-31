@@ -212,7 +212,7 @@ Después de restaurar:
    - Alternativa para recuperar documentos puntuales: `gcloud firestore export gs://<bucket>/<prefijo> --snapshot-time=<instante> --collection-ids=<colección> --project "$PROYECTO"` (el argumento `gs://<bucket>/<prefijo>` es obligatorio; la opción existe en `gcloud firestore export --help`; instante dentro de la ventana PITR) hacia ese mismo bucket, e importar solo lo necesario. NO PROBADO.
 4. Dejar la base nueva sin borrar hasta cerrar el incidente. Las bases de **ensayo** se borran al terminar el ensayo (costo y datos personales), igual que el bucket y su contenido si fue solo para el ensayo.
 
-Una pérdida acotada en datos de lectura (el corpus) también se puede recomponer con la exportación de la pantalla «Administración» (XML, XLSX, copia a Drive) y `scripts/migrate_ods.py`; es un segundo respaldo, no sustituye a PITR.
+Una pérdida acotada en datos de lectura (el corpus) también se puede recomponer con la copia XML de la pantalla «Administración» (descarga XML o copia a Drive), que conserva los nombres y valores reales de cada campo; es un segundo respaldo, no sustituye a PITR y no hay hoy un script que la reimporte. El XLSX es una exportación de consulta para personas (títulos como «Nro.» y siglas en lugar de números de compañía) y no sirve para restaurar; `scripts/migrate_ods.py` lee el ODS original, no ese XLSX.
 
 ### 2.4 Authentication y claims
 
