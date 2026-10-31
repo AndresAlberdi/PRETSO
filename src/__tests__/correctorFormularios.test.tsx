@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
+import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import GenericCreateModal from '../components/GenericCreateModal';
 import GenericEditModal from '../components/GenericEditModal';
@@ -33,7 +33,6 @@ const ESPERADOS: Record<string, number> = {
 };
 
 describe('alta: corrector ortográfico en los campos de texto', () => {
-  beforeEach(() => undefined);
   for (const c of Object.keys(ESPERADOS)) {
     it(`${c}: todo campo de texto lleva corrector, salvo la sigla`, async () => {
       render(<GenericCreateModal collectionName={c} onClose={vi.fn()} onCreated={vi.fn()} />);
@@ -41,8 +40,11 @@ describe('alta: corrector ortográfico en los campos de texto', () => {
       if (c === 'corpus_christi') fireEvent.click(screen.getByLabelText('Nueva ciudad'));
       const campos = document.body.querySelectorAll<HTMLElement>('textarea, input[type="text"]');
       expect(campos.length).toBe(ESPERADOS[c]);
+      // La sigla se identifica por su etiqueta accesible; solo existe en companias.
+      const sigla = screen.queryByRole('textbox', { name: /Sigla Compañía/ });
+      expect(sigla !== null).toBe(c === 'companias');
       campos.forEach(el => {
-        if (el.getAttribute('placeholder') === 'Ej: GA-JR') {
+        if (el === sigla) {
           expect(el.getAttribute('spellcheck')).toBe('false');
           expect(el.hasAttribute('lang')).toBe(false);
         } else {
