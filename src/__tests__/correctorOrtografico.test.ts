@@ -11,11 +11,15 @@ describe('propsCorrector', () => {
   it('referencias a documentos DocN: sin corrector', () => {
     expect(propsCorrector('Doc3', 1)).toBe(TEXTO_CODIGO);
   });
-  it('valor numérico: sin corrector', () => {
+  it('campo numérico del alta, por nombre: sin corrector', () => {
     expect(propsCorrector('Año', 1600)).toBe(TEXTO_CODIGO);
+    expect(propsCorrector('Ración diaria', 2)).toBe(TEXTO_CODIGO);
   });
-  it('año heredado como texto: con corrector', () => {
-    expect(propsCorrector('Año', '1600')).toBe(TEXTO_LIBRE);
+  it('campo numérico del alta con el valor heredado como texto: también sin corrector (decide el nombre, no el tipo)', () => {
+    expect(propsCorrector('Año', '1600')).toBe(TEXTO_CODIGO);
+  });
+  it('campo libre con valor numérico importado: con corrector', () => {
+    expect(propsCorrector('Monto a pagar', 120)).toBe(TEXTO_LIBRE);
   });
   it('valor booleano: sin corrector', () => {
     expect(propsCorrector('Activo', true)).toBe(TEXTO_CODIGO);

@@ -95,6 +95,14 @@ describe('edición: corrector ortográfico según el tipo de campo', () => {
   });
 });
 
+describe('edición: campo libre con valor numérico', () => {
+  it('corpus_christi: Monto a pagar (120) conserva el corrector; Año no', async () => {
+    await editar('corpus_christi', { id: 'k0', 'Indicador de registro': 2, Ciudad: 'Potosí', 'Año': 1600, 'Monto a pagar': 120 });
+    libre(screen.getByLabelText('Monto a pagar'));
+    codigo(screen.getByLabelText('Año'));
+  });
+});
+
 describe('buscador: corrector ortográfico', () => {
   it('SearchBar: «Añadir filtro» con corrector', () => {
     render(<SearchBar categories={[{ id: 'todo', label: 'Texto libre' }]} onSearch={() => undefined} />);
