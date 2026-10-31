@@ -26,10 +26,11 @@ export const COLUMN_ORDERS: Record<string, string[]> = {
   bibliografia: ['Autores', 'Referencias bibliográficas']
 };
 
-// Header renaming map to remove technical training spaces in columns
+// Títulos visibles del Excel para personas; los nombres de campo de Firestore no cambian.
 const HEADER_CLEANUPS: Record<string, string> = {
   'Beneficiario ': 'Beneficiario',
   'Encargado ': 'Encargado',
+  'Num': 'Nro.',
 };
 
 export async function generateDatabaseXlsx(): Promise<Blob> {

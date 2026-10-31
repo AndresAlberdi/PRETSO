@@ -204,10 +204,10 @@ describe('«Num» se muestra como «Nro.»', () => {
     expect(texto).toContain("'Num': 'Nro.'");
   });
 
-  it('el campo de datos y la exportación siguen usando «Num»', () => {
+  it('el campo de datos sigue siendo «Num» y el Excel lo titula «Nro.»', () => {
     const xlsx = readFileSync(join(SRC, 'utils', 'xlsxExport.ts'), 'utf-8');
     expect(xlsx).toMatch(/transacciones:\s*\['Num'/);
-    expect(xlsx).not.toContain('Nro.');
+    expect(xlsx).toContain("'Num': 'Nro.'");
     const modal = readFileSync(join(SRC, 'components', 'TransactionModal.tsx'), 'utf-8');
     expect(modal).toContain("where('Num'");
   });

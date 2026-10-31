@@ -83,4 +83,16 @@ describe('generateDatabaseXlsx', () => {
       'Categorías', 'Transacción', 'Sigla Compañía',
     ]);
   });
+
+  it('la hoja Transacciones titula «Nro.» la columna Num y conserva el orden', async () => {
+    datos.transacciones = [{ Num: 3, Noticia: 'n' }, { Num: 1, Noticia: 'm' }];
+    const wb = await leerLibro();
+    expect(encabezados(wb, 'Transacciones')).toEqual([
+      'Nro.', 'Noticia', 'Fuentes para la generación del dato',
+      'Doc1', 'Doc2', 'Doc3', 'Doc4', 'Doc5', 'Doc6', 'Doc7', 'Doc8', 'Doc9', 'Doc10',
+    ]);
+    const ws = wb.getWorksheet('Transacciones')!;
+    expect((ws.getRow(2).values as unknown[])[1]).toBe(1);
+    expect((ws.getRow(3).values as unknown[])[1]).toBe(3);
+  });
 });
