@@ -9,6 +9,7 @@ import {
   prepararSigla, claveSigla, errorFormatoSigla, evaluarSigla, lineaParecido, introAvisoSigla,
   TITULO_AVISO_SIGLA, CIERRE_AVISO_SIGLA, MENSAJE_VERIFICACION_SIGLA, type ParecidoSigla,
 } from '../utils/siglas';
+import { TEXTO_LIBRE, TEXTO_CODIGO } from '../utils/correctorOrtografico';
 import SelectorCompania from './SelectorCompania';
 import Modal from './Modal';
 import ConfirmModal from './ConfirmModal';
@@ -422,6 +423,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
               <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 <strong>Documento (Texto)</strong>
                 <textarea
+                  {...TEXTO_LIBRE}
                   required
                   rows={4}
                   value={formData['Documento'] || ''}
@@ -437,6 +439,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                 <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <strong>Noticia</strong>
                   <textarea
+                    {...TEXTO_LIBRE}
                     required
                     rows={4}
                     value={formData['Noticia'] || ''}
@@ -447,6 +450,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                 <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <strong>Fuentes para la generación del dato</strong>
                   <textarea
+                    {...TEXTO_LIBRE}
                     required
                     rows={3}
                     value={formData['Fuentes para la generación del dato'] || ''}
@@ -486,6 +490,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Sigla Compañía</strong>
                   <input
                     type="text"
+                    {...TEXTO_CODIGO}
                     required
                     value={formData['Sigla Compañía'] || ''}
                     onChange={e => handleChange('Sigla Compañía', e.target.value)}
@@ -497,6 +502,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Autores</strong>
                   <input
                     type="text"
+                    {...TEXTO_LIBRE}
                     value={formData['Autores'] || ''}
                     onChange={e => handleChange('Autores', e.target.value)}
                     placeholder="Ej: Gonzalo de Alarcón y Juan Ramírez"
@@ -506,6 +512,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Temporadas teatrales</strong>
                   <input
                     type="text"
+                    {...TEXTO_LIBRE}
                     value={formData['Temporadas teatrales'] || ''}
                     onChange={e => handleChange('Temporadas teatrales', e.target.value)}
                     placeholder="Ej: De 1600 a 1601"
@@ -515,6 +522,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Índice de compañías</strong>
                   <input
                     type="text"
+                    {...TEXTO_LIBRE}
                     value={formData['Índice de compañías'] || ''}
                     onChange={e => handleChange('Índice de compañías', e.target.value)}
                     placeholder="Ej: Sí / No"
@@ -524,6 +532,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Ámbito</strong>
                   <input
                     type="text"
+                    {...TEXTO_LIBRE}
                     value={formData['Ámbito'] || ''}
                     onChange={e => handleChange('Ámbito', e.target.value)}
                     placeholder="Ej: España"
@@ -539,6 +548,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Autores</strong>
                   <input
                     type="text"
+                    {...TEXTO_LIBRE}
                     required
                     {...invalidProps('Autores')}
                     value={formData['Autores'] || ''}
@@ -549,6 +559,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                 <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <strong>Referencias bibliográficas</strong>
                   <textarea
+                    {...TEXTO_LIBRE}
                     required
                     rows={4}
                     {...invalidProps('Referencias bibliográficas')}
@@ -595,6 +606,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Ciudad</strong>
                   <input
                     type="text"
+                    {...TEXTO_LIBRE}
                     required
                     value={formData['Ciudad'] || ''}
                     onChange={e => handleChange('Ciudad', e.target.value)}
@@ -613,6 +625,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Ingresos</strong>
                   <input
                     type="text"
+                    {...TEXTO_LIBRE}
                     value={formData['Ingresos'] || ''}
                     onChange={e => handleChange('Ingresos', e.target.value)}
                   />
@@ -621,6 +634,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Egresos</strong>
                   <input
                     type="text"
+                    {...TEXTO_LIBRE}
                     value={formData['Egresos'] || ''}
                     onChange={e => handleChange('Egresos', e.target.value)}
                   />
@@ -629,6 +643,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Otros bienes de la compañía</strong>
                   <input
                     type="text"
+                    {...TEXTO_LIBRE}
                     value={formData['Otros bienes de la compañía'] || ''}
                     onChange={e => handleChange('Otros bienes de la compañía', e.target.value)}
                   />
@@ -637,6 +652,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Datos sobre normativa de manejo de caja</strong>
                   <input
                     type="text"
+                    {...TEXTO_LIBRE}
                     value={formData['Datos sobre normativa de manejo de caja'] || ''}
                     onChange={e => handleChange('Datos sobre normativa de manejo de caja', e.target.value)}
                   />
@@ -679,6 +695,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Beneficiario</strong>
                   <input
                     type="text"
+                    {...TEXTO_LIBRE}
                     required
                     value={formData['Beneficiario '] || ''}
                     onChange={e => handleChange('Beneficiario ', e.target.value)}
@@ -688,6 +705,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Encargo (Ocupación)</strong>
                   <input
                     type="text"
+                    {...TEXTO_LIBRE}
                     value={formData['Encargo'] || ''}
                     onChange={e => handleChange('Encargo', e.target.value)}
                   />
@@ -696,6 +714,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Monto a pagar (Remuneración)</strong>
                   <input
                     type="text"
+                    {...TEXTO_LIBRE}
                     value={formData['Monto a pagar'] || ''}
                     onChange={e => handleChange('Monto a pagar', e.target.value)}
                   />
@@ -704,6 +723,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Ciudad</strong>
                   <input
                     type="text"
+                    {...TEXTO_LIBRE}
                     value={formData['Ciudad'] || ''}
                     onChange={e => handleChange('Ciudad', e.target.value)}
                   />
@@ -788,6 +808,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                     ) : (
                       <input
                         type="text"
+                        {...TEXTO_LIBRE}
                         aria-labelledby={`${fieldId}-ciudad-leyenda`}
                         {...invalidProps('Ciudad')}
                         required
@@ -854,6 +875,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Encargo</strong>
                   <input
                     type="text"
+                    {...TEXTO_LIBRE}
                     value={formData['Encargo'] || ''}
                     onChange={e => handleChange('Encargo', e.target.value)}
                   />
@@ -862,6 +884,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Encargado</strong>
                   <input
                     type="text"
+                    {...TEXTO_LIBRE}
                     value={formData['Encargado '] || ''}
                     onChange={e => handleChange('Encargado ', e.target.value)}
                   />
@@ -870,6 +893,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Monto a pagar</strong>
                   <input
                     type="text"
+                    {...TEXTO_LIBRE}
                     value={formData['Monto a pagar'] || ''}
                     onChange={e => handleChange('Monto a pagar', e.target.value)}
                   />
@@ -878,6 +902,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Fondos</strong>
                   <input
                     type="text"
+                    {...TEXTO_LIBRE}
                     value={formData['Fondos'] || ''}
                     onChange={e => handleChange('Fondos', e.target.value)}
                   />
@@ -924,6 +949,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                     ) : (
                       <input
                         type="text"
+                        {...TEXTO_LIBRE}
                         aria-labelledby={`${fieldId}-categoria-leyenda`}
                         {...invalidProps('Categorías')}
                         required
@@ -953,6 +979,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Ciudad</strong>
                   <input
                     type="text"
+                    {...TEXTO_LIBRE}
                     value={formData['Ciudad'] || ''}
                     onChange={e => handleChange('Ciudad', e.target.value)}
                   />
@@ -961,6 +988,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Años</strong>
                   <input
                     type="text"
+                    {...TEXTO_LIBRE}
                     value={formData['Años'] || ''}
                     onChange={e => handleChange('Años', e.target.value)}
                   />
@@ -969,6 +997,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Concepto</strong>
                   <input
                     type="text"
+                    {...TEXTO_LIBRE}
                     value={formData['Concepto'] || ''}
                     onChange={e => handleChange('Concepto', e.target.value)}
                   />
@@ -977,6 +1006,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Monto</strong>
                   <input
                     type="text"
+                    {...TEXTO_LIBRE}
                     value={formData['Monto'] || ''}
                     onChange={e => handleChange('Monto', e.target.value)}
                   />
@@ -985,6 +1015,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   <strong>Nota</strong>
                   <input
                     type="text"
+                    {...TEXTO_LIBRE}
                     value={formData['Nota'] || ''}
                     onChange={e => handleChange('Nota', e.target.value)}
                   />
