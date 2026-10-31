@@ -147,10 +147,14 @@ describe('generateDatabaseXlsx', () => {
       const cols = encabezados(wb, hoja);
       for (const campo of camposReferenciaCompania(coleccion)) {
         const idx = cols.indexOf(campo);
-        if (idx < 0) continue;
-        const v = celda(wb, hoja, 2, idx + 1);
-        expect(typeof v).not.toBe('number');
-        expect(String(v)).not.toMatch(/^\d+(\.\d+)?$/);
+        expect(idx).toBeGreaterThanOrEqual(0);
+        const ws = wb.getWorksheet(hoja)!;
+        expect(ws.rowCount).toBeGreaterThanOrEqual(2);
+        for (let fila = 2; fila <= ws.rowCount; fila++) {
+          const v = celda(wb, hoja, fila, idx + 1);
+          expect(typeof v).not.toBe('number');
+          expect(String(v)).not.toMatch(/^\d+(\.\d+)?$/);
+        }
       }
     }
   });
@@ -167,16 +171,9 @@ describe('generateDatabaseXlsx', () => {
     expect(encabezados(wb, 'Compañías')).toEqual([
       'Sigla Compañía', 'Nombre Compañía', 'Autores', 'Temporadas teatrales', 'Índice de compañías', 'Ámbito',
     ]);
-    const ws = wb.getWorksheet('Compañías')!;
-    ws.eachRow(row => {
-      for (const v of (row.values as unknown[]).slice(1)) {
-        expect(v).not.toBe(1);
-        expect(v).not.toBe(2);
-      }
-    });
-    expect(celda(wb, 'Compañías', 2, 1)).toBe('ABC');
     expect(celda(wb, 'Compañías', 3, 1)).toBe('');
     expect(celda(wb, 'Compañías', 3, 2)).toBe('Sin Sigla SA');
+    expect(celda(wb, 'Compañías', 2, 1)).toBe('ABC');
   });
 
   it('sin compañías, una referencia numérica no falla y se rotula', async () => {
