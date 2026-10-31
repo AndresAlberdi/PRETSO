@@ -164,4 +164,28 @@ describe('edición de compañías: sigla', () => {
     expect(lecturasDeCompanias()).toBe(0);
     expect(screen.queryByRole('alert')).toBeNull();
   });
+
+  it('corregir la sigla limpia la marca y el mensaje de error', async () => {
+    const { form, sigla } = await abrir('c1');
+    escribir(sigla, 'ga');
+    fireEvent.submit(form);
+    await screen.findByRole('alert');
+    expect(sigla.getAttribute('aria-invalid')).toBe('true');
+    escribir(sigla, 'gax');
+    expect(sigla.getAttribute('aria-invalid')).toBeNull();
+    expect(sigla.getAttribute('aria-describedby')).toBeNull();
+    expect(screen.queryByRole('alert')).toBeNull();
+  });
+
+  it('una sigla numérica sin cambios se guarda con su valor original', async () => {
+    const numerica = { id: 'c8', 'Indicador de registro': 8, 'Sigla Compañía': 123, Autores: 'Eva' };
+    const onSave = vi.fn().mockResolvedValue(undefined);
+    render(<GenericEditModal collectionName="companias" record={numerica} onSave={onSave} onClose={vi.fn()} />);
+    await screen.findByRole('dialog', { name: /Editar Registro/ });
+    escribir(screen.getByLabelText('Autores'), 'Eva Paz');
+    fireEvent.submit(document.querySelector('form') as HTMLFormElement);
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+    expect(onSave.mock.calls[0][0]['Sigla Compañía']).toBe(123);
+    expect(lecturasDeCompanias()).toBe(0);
+  });
 });

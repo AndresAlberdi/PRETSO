@@ -133,6 +133,11 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
   const handleChange = (key: string, value: any) => {
     setTouched(true);
     setFormData((prev: any) => ({ ...prev, [key]: value }));
+    // Al corregir la sigla se limpia el error que la señalaba.
+    if (esSiglaCompania(key)) {
+      setErrorEnSigla(false);
+      setError(null);
+    }
   };
 
   const esSiglaCompania = (key: string) => collectionName === 'companias' && key === 'Sigla Compañía';
@@ -174,8 +179,12 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
       // avisa de las parecidas (no bloquea). Así no se obliga a corregir siglas antiguas al editar otros campos.
       if (collectionName === 'companias' && 'Sigla Compañía' in processedData) {
         const sigla = prepararSigla(processedData['Sigla Compañía']);
-        processedData['Sigla Compañía'] = sigla;
-        if (claveSigla(sigla) !== claveSigla(record['Sigla Compañía'])) {
+        const textoCambio = formData['Sigla Compañía'] !== record['Sigla Compañía'];
+        const claveCambio = claveSigla(sigla) !== claveSigla(record['Sigla Compañía']);
+        // Si la persona no tocó la sigla, se conserva el valor original tal cual (tipo y espacios incluidos).
+        if (textoCambio || claveCambio) processedData['Sigla Compañía'] = sigla;
+        else processedData['Sigla Compañía'] = record['Sigla Compañía'];
+        if (claveCambio) {
           const fmt = errorFormatoSigla(sigla);
           if (fmt) {
             setError(fmt);
