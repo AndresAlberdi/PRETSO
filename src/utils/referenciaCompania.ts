@@ -51,6 +51,17 @@ export function siglaDeReferencia(valor: unknown, companias: CompaniaRef[]): str
 }
 
 /**
+ * Texto visible de una compañía resuelta: su sigla; si está vacía, su nombre; si
+ * tampoco hay, un rótulo fijo. Nunca el número de registro.
+ */
+export function textoVisibleCompania(compania: CompaniaRef): string {
+  const sigla = String(compania['Sigla Compañía'] ?? '').trim();
+  if (sigla) return sigla;
+  const nombre = String(compania['Nombre Compañía'] ?? '').trim();
+  return nombre || 'Compañía sin sigla';
+}
+
+/**
  * Valor que se guarda en el registro para una compañía: el número de registro,
  * con tipo numérico (igual que los datos migrados, que conservan el tipo de
  * `Indicador de registro`). Si no fuera numérico, se conserva tal cual.

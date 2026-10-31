@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   canonizarReferencia, normalizarSigla, resolverCompania, siglaDeReferencia,
   valorDeReferencia, etiquetaCompania, esCampoCompaniaCorpus,
-  camposReferenciaCompania, valoresDeBusquedaReferencia,
+  camposReferenciaCompania, valoresDeBusquedaReferencia, textoVisibleCompania,
 } from '../utils/referenciaCompania';
 import { COLUMN_ORDERS } from '../utils/xlsxExport';
 
@@ -109,5 +109,17 @@ describe('valoresDeBusquedaReferencia', () => {
   });
   it('sin número de registro, solo la sigla', () => {
     expect(valoresDeBusquedaReferencia({ 'Sigla Compañía': 'X' })).toEqual(['X']);
+  });
+});
+
+describe('textoVisibleCompania', () => {
+  it('devuelve la sigla recortada', () => {
+    expect(textoVisibleCompania({ 'Indicador de registro': 7, 'Sigla Compañía': ' GA-JR ' })).toBe('GA-JR');
+  });
+  it('con sigla vacía usa el nombre', () => {
+    expect(textoVisibleCompania({ 'Indicador de registro': 7, 'Sigla Compañía': '', 'Nombre Compañía': ' Sin Sigla SA ' })).toBe('Sin Sigla SA');
+  });
+  it('sin sigla ni nombre devuelve el rótulo fijo y nunca el número', () => {
+    expect(textoVisibleCompania({ 'Indicador de registro': 7 })).toBe('Compañía sin sigla');
   });
 });
