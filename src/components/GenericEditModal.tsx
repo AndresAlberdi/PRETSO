@@ -12,6 +12,7 @@ import { propsCorrector } from '../utils/correctorOrtografico';
 import SelectorCompania from './SelectorCompania';
 import Modal from './Modal';
 import ConfirmModal from './ConfirmModal';
+import { etiquetaCampo } from '../utils/etiquetas';
 
 interface GenericEditModalProps {
   collectionName: string;
@@ -29,17 +30,6 @@ const COLLECTION_LABELS: Record<string, string> = {
   corpus_christi: 'Corpus Christi',
   indicadores: 'Indicadores',
   bibliografia: 'Bibliografía'
-};
-
-const FIELD_LABEL_MAP: Record<string, string> = {
-  'Num': 'Nro.',
-  'Sigla Compañía': 'Compañía',
-  'Año': 'Año',
-  'Años': 'Años',
-  'Categorías': 'Categoría',
-  'Beneficiario ': 'Beneficiario',
-  'Encargado ': 'Encargado',
-  'Número de representaciones  por año ': 'Número de representaciones por año'
 };
 
 const TEXTAREA_FIELDS = [
@@ -270,7 +260,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
             const isReadOnly = READONLY_FIELDS.includes(key);
             const isTextarea = TEXTAREA_FIELDS.includes(key);
             const isDocField = /^Doc\d+$/.test(key);
-            const displayLabel = FIELD_LABEL_MAP[key] || key;
+            const displayLabel = etiquetaCampo(key);
             const fieldId = `${fieldIdBase}-campo-${i}`;
 
             return (
