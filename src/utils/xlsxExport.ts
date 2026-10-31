@@ -1,6 +1,7 @@
-import { collection, getDocs, query } from "firebase/firestore";
+import { collection, getDocs, query, type DocumentData, type QueryDocumentSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
 import ExcelJS from "exceljs";
+import { camposReferenciaCompania, siglaParaExportar } from "./referenciaCompania";
 
 // Sheet names in Spanish for the tabs
 const SHEET_NAMES: Record<string, string> = {
@@ -33,16 +34,28 @@ const HEADER_CLEANUPS: Record<string, string> = {
   'Num': 'Nro.',
 };
 
+// Columnas que se leen pero no se muestran en el Excel de consulta.
+const XLSX_OMITTED_COLUMNS: Record<string, string[]> = {
+  companias: ['Indicador de registro'],
+};
+
 export async function generateDatabaseXlsx(): Promise<Blob> {
   const wb = new ExcelJS.Workbook();
   const collections = Object.keys(SHEET_NAMES);
 
+  // Primera pasada: se lee UNA vez cada colección; las compañías se necesitan para
+  // resolver las referencias de las demás hojas.
+  const snaps: Record<string, QueryDocumentSnapshot<DocumentData>[]> = {};
   for (const collName of collections) {
-    const q = query(collection(db, collName));
-    const snap = await getDocs(q);
+    snaps[collName] = [...(await getDocs(query(collection(db, collName)))).docs];
+  }
+  const companias = (snaps.companias ?? []).map(d => d.data());
 
+  for (const collName of collections) {
     // 1. Sort the records sequentially by their index field
-    const docs = [...snap.docs];
+    const docs = snaps[collName];
+    const omitted = XLSX_OMITTED_COLUMNS[collName] ?? [];
+    const refCols = camposReferenciaCompania(collName);
     docs.sort((docA, docB) => {
       const a = docA.data();
       const b = docB.data();
@@ -71,11 +84,15 @@ export async function generateDatabaseXlsx(): Promise<Blob> {
     const formattedRows = docs.map(doc => {
       const rowData = doc.data();
       const newRow: Record<string, any> = {};
-      const columns = COLUMN_ORDERS[collName] || Object.keys(rowData).sort();
+      const columns = (COLUMN_ORDERS[collName] || Object.keys(rowData).sort()).filter(c => !omitted.includes(c));
 
       columns.forEach(col => {
         const cleanHeader = HEADER_CLEANUPS[col] || col;
-        newRow[cleanHeader] = rowData[col] !== undefined && rowData[col] !== null ? rowData[col] : '';
+        if (refCols.includes(col)) {
+          newRow[cleanHeader] = siglaParaExportar(rowData[col], companias);
+        } else {
+          newRow[cleanHeader] = rowData[col] !== undefined && rowData[col] !== null ? rowData[col] : '';
+        }
       });
       return newRow;
     });
@@ -83,7 +100,7 @@ export async function generateDatabaseXlsx(): Promise<Blob> {
     // 3. Create worksheet and append to workbook
     const ws = wb.addWorksheet(SHEET_NAMES[collName]);
     
-    let columns = COLUMN_ORDERS[collName] || [];
+    let columns = (COLUMN_ORDERS[collName] || []).filter(c => !omitted.includes(c));
     if (columns.length === 0 && formattedRows.length > 0) {
       columns = Object.keys(formattedRows[0]);
     }
