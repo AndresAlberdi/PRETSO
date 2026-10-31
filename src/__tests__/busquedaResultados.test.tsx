@@ -56,7 +56,7 @@ const region = () => document.querySelector('output.visually-hidden') as HTMLEle
 describe('Búsqueda general: texto de los resultados', () => {
   it('lector: sigla de la compañía y sin números de registro ni «Num»', async () => {
     await abrir('Potosí');
-    expect(screen.getByText(/Compañía: GA-JR/)).toBeTruthy();
+    expect(screen.getByText('Compañía: GA-JR | Ciudad: Potosí | Año: 1600')).toBeTruthy();
     const cuerpo = document.body.textContent ?? '';
     expect(cuerpo).not.toContain('Sigla Compañía:');
     expect(cuerpo).not.toContain('Indicador de registro');

@@ -204,6 +204,7 @@ describe('«Num» se muestra como «Nro.»', () => {
     expect(etiquetas).toContain("'Num': 'Nro.'");
     const modal = readFileSync(join(SRC, 'components', 'GenericEditModal.tsx'), 'utf-8');
     expect(modal).toContain("import { etiquetaCampo } from '../utils/etiquetas'");
+    expect(modal).toContain('etiquetaCampo(key)');
     expect(modal).not.toContain('FIELD_LABEL_MAP');
   });
 

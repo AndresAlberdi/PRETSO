@@ -34,6 +34,11 @@ describe('textoResultadoBusqueda', () => {
     expect(t).toBe('Compañía: GA-JR | Compañía2: Compañía de Vargas | Cmp: Compañía sin sigla');
   });
 
+  it('corpus_christi: cualquier campo de compañía (Cmp3, Compañía11) muestra sigla o nombre', () => {
+    const t = textoResultadoBusqueda({ 'Cmp3': 7, 'Compañía11': 12 }, 'corpus_christi', companias);
+    expect(t).toBe('Cmp3: GA-JR | Compañía11: Compañía de Vargas');
+  });
+
   it('referencias que no resuelven', () => {
     const f = (v: unknown) => textoResultadoBusqueda({ 'Sigla Compañía': v }, 'manejo_de_caja', companias);
     expect(f(99)).toBe('Compañía: Compañía no encontrada');
