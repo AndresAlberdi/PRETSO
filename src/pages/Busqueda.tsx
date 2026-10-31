@@ -7,6 +7,7 @@ import { useNavigate, Link } from "react-router";
 import { useAdmin } from "../context/AdminContext";
 import { SECCIONES } from "../utils/secciones";
 import { contar } from "../utils/anuncios";
+import { textoResultadoBusqueda } from "../utils/textoResultadoBusqueda";
 
 type SearchResultItem = {
   id: string;
@@ -133,22 +134,18 @@ export default function Busqueda() {
       return false;
     };
 
+    const companias = dbData.companias ?? [];
+
     for (const [coll, items] of Object.entries(dbData)) {
       for (const item of items) {
         // Must match ALL filters
         const matchesAll = filters.every(f => checkMatch(item, coll, f));
         if (matchesAll) {
-          // Construct a display string
-          const vals = Object.entries(item)
-            .filter(([k, v]) => k !== 'id' && v)
-            .map(([k, v]) => `${k}: ${v}`);
-          const matchStr = vals.slice(0, 3).join(" | ");
-
           results.push({
             id: item.id,
             source: coll,
             label: getLabel(coll),
-            match: matchStr + (vals.length > 3 ? '...' : ''),
+            match: textoResultadoBusqueda(item, coll, companias),
             data: item,
             path: getPath(coll)
           });
