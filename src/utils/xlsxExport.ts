@@ -18,7 +18,7 @@ const SHEET_NAMES: Record<string, string> = {
 // Column ordering for each sheet to display them logically
 export const COLUMN_ORDERS: Record<string, string[]> = {
   documentos: ['Doc', 'Documento'],
-  companias: ['Indicador de registro', 'Sigla Compañía', 'Autores', 'Temporadas teatrales', 'Índice de compañías', 'Ámbito'],
+  companias: ['Indicador de registro', 'Sigla Compañía', 'Nombre Compañía', 'Autores', 'Temporadas teatrales', 'Índice de compañías', 'Ámbito'],
   transacciones: ['Num', 'Noticia', 'Fuentes para la generación del dato', 'Doc1', 'Doc2', 'Doc3', 'Doc4', 'Doc5', 'Doc6', 'Doc7', 'Doc8', 'Doc9', 'Doc10'],
   manejo_de_caja: ['Indicador de registro', 'Sigla Compañía', 'Año', 'Ciudad', 'Ingresos', 'Egresos', 'Otros bienes de la compañía', 'Transacción', 'Datos sobre normativa de manejo de caja'],
   salarios: ['Indicador de registro', 'Sigla Compañía', 'Año', 'Ciudad', 'Beneficiario ', 'Encargo', 'Monto a pagar', 'Transacción', 'Ración diaria', 'Pago por representación'],

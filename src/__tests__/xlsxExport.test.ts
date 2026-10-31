@@ -162,10 +162,10 @@ describe('generateDatabaseXlsx', () => {
     expect(celda(wb, 'Manejo de Caja', 2, 1)).toBe(4);
   });
 
-  it('la hoja Compañías no incluye el indicador de registro', async () => {
+  it('la hoja Compañías no incluye el indicador de registro e incluye el nombre', async () => {
     const wb = await leerLibro();
     expect(encabezados(wb, 'Compañías')).toEqual([
-      'Sigla Compañía', 'Autores', 'Temporadas teatrales', 'Índice de compañías', 'Ámbito',
+      'Sigla Compañía', 'Nombre Compañía', 'Autores', 'Temporadas teatrales', 'Índice de compañías', 'Ámbito',
     ]);
     const ws = wb.getWorksheet('Compañías')!;
     ws.eachRow(row => {
@@ -175,6 +175,8 @@ describe('generateDatabaseXlsx', () => {
       }
     });
     expect(celda(wb, 'Compañías', 2, 1)).toBe('ABC');
+    expect(celda(wb, 'Compañías', 3, 1)).toBe('');
+    expect(celda(wb, 'Compañías', 3, 2)).toBe('Sin Sigla SA');
   });
 
   it('sin compañías, una referencia numérica no falla y se rotula', async () => {
