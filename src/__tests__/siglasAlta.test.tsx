@@ -12,6 +12,7 @@ const base = () => [
   { id: 'c2', 'Indicador de registro': 8, 'Sigla Compañía': 'GA' },
 ];
 
+const contadorDoc = vi.hoisted(() => ({ n: 0 }));
 const setDoc = vi.hoisted(() => vi.fn());
 const getDocs = vi.hoisted(() => vi.fn());
 const logAction = vi.hoisted(() => vi.fn());
@@ -20,7 +21,7 @@ vi.mock('../utils/audit', () => ({ logAction: (...a: unknown[]) => logAction(...
 vi.mock('firebase/firestore', () => ({
   collection: (_db: unknown, nombre: string) => nombre,
   query: (c: string) => c,
-  doc: (coleccion: string) => ({ id: 'nuevo', coleccion }),
+  doc: (coleccion: string) => ({ id: `nuevo-${++contadorDoc.n}`, coleccion }),
   setDoc: (...a: unknown[]) => setDoc(...a),
   getDocs: (nombre: string) => getDocs(nombre),
 }));
@@ -30,6 +31,7 @@ const lecturaNormal = async (nombre: string) => ({
 });
 
 beforeEach(() => {
+  contadorDoc.n = 0;
   colecciones.companias = base();
   setDoc.mockReset().mockResolvedValue(undefined);
   getDocs.mockReset().mockImplementation(lecturaNormal);
@@ -121,23 +123,43 @@ describe('alta de compañías: sigla', () => {
     escribir(campo, 'XY');
     fireEvent.submit(form);
     await screen.findByRole('alert');
-    colecciones.companias = [...base(), { id: 'nuevo', 'Sigla Compañía': 'XY' }];
+    colecciones.companias = [...base(), { id: setDoc.mock.calls[0][0].id, 'Sigla Compañía': 'XY' }];
     fireEvent.submit(form);
     await waitFor(() => expect(setDoc).toHaveBeenCalledTimes(2));
     expect(setDoc.mock.calls[1][0].id).toBe(setDoc.mock.calls[0][0].id);
+    expect(contadorDoc.n).toBe(1);
     expect(screen.queryByRole('alert')).toBeNull();
   });
 
   it('un doble envío con la lectura pendiente guarda una sola vez', async () => {
     const { form, campo } = await abrir();
-    let liberar: (v: unknown) => void = () => undefined;
-    getDocs.mockImplementation(() => new Promise(resolver => { liberar = resolver; }));
+    const pendientes: Array<(v: unknown) => void> = [];
+    const lecturasPrevias = getDocs.mock.calls.filter(c => c[0] === 'companias').length;
+    getDocs.mockImplementation(() => new Promise(resolver => { pendientes.push(resolver); }));
     escribir(campo, 'XY');
     fireEvent.submit(form);
     fireEvent.submit(form);
-    await waitFor(() => expect(getDocs).toHaveBeenCalled());
-    liberar(await lecturaNormal('companias'));
+    await waitFor(() => expect(pendientes.length).toBeGreaterThan(0));
+    const lectura = await lecturaNormal('companias');
+    pendientes.forEach(liberar => liberar(lectura));
     await waitFor(() => expect(setDoc).toHaveBeenCalledTimes(1));
+    // Sin la protección habría dos lecturas de 'companias' y dos guardados.
+    expect(getDocs.mock.calls.filter(c => c[0] === 'companias').length - lecturasPrevias).toBe(1);
+    expect(setDoc).toHaveBeenCalledTimes(1);
+  });
+
+  it('tras aceptar el aviso y fallar la escritura, el reintento con la misma sigla guarda sin preguntar', async () => {
+    setDoc.mockRejectedValueOnce(new Error('sin red'));
+    const { form, campo, onCreated } = await abrir();
+    escribir(campo, 'JR-GA');
+    fireEvent.submit(form);
+    fireEvent.click(within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'Guardar de todos modos' }));
+    await screen.findByRole('alert');
+    expect(setDoc).toHaveBeenCalledTimes(1);
+    fireEvent.submit(form);
+    await waitFor(() => expect(setDoc).toHaveBeenCalledTimes(2));
+    expect(screen.queryByRole('alertdialog')).toBeNull();
+    await waitFor(() => expect(onCreated).toHaveBeenCalledTimes(1));
   });
 
   it('guarda la sigla sin espacios en los extremos', async () => {

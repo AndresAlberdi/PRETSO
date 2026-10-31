@@ -121,13 +121,47 @@ describe('edición de compañías: sigla', () => {
 
   it('un doble envío con la lectura pendiente guarda una sola vez', async () => {
     const { form, sigla, onSave } = await abrir('c1');
-    let liberar: (v: unknown) => void = () => undefined;
-    getDocs.mockImplementation(() => new Promise(resolver => { liberar = resolver; }));
+    const pendientes: Array<(v: unknown) => void> = [];
+    getDocs.mockImplementation(() => new Promise(resolver => { pendientes.push(resolver); }));
     escribir(sigla, 'XY');
     fireEvent.submit(form);
     fireEvent.submit(form);
-    await waitFor(() => expect(getDocs).toHaveBeenCalled());
-    liberar(await lecturaNormal());
+    await waitFor(() => expect(pendientes.length).toBeGreaterThan(0));
+    const lectura = await lecturaNormal();
+    pendientes.forEach(liberar => liberar(lectura));
     await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+    // Sin la protección habría dos lecturas de 'companias' y dos guardados.
+    expect(lecturasDeCompanias()).toBe(1);
+    expect(onSave).toHaveBeenCalledTimes(1);
+  });
+
+  it('la aceptación del aviso queda atada a la sigla aceptada', async () => {
+    const { form, sigla, onSave } = await abrir('c2');
+    escribir(sigla, 'JR-GA');
+    fireEvent.submit(form);
+    fireEvent.click(within(await screen.findByRole('alertdialog')).getByRole('button', { name: 'Guardar de todos modos' }));
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+    // Mismo valor: no vuelve a preguntar.
+    fireEvent.submit(form);
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(2));
+    expect(screen.queryByRole('alertdialog')).toBeNull();
+    // Otra sigla parecida: vuelve a avisar.
+    escribir(sigla, 'JR-GA-X');
+    fireEvent.submit(form);
+    expect(await screen.findByRole('alertdialog')).toBeTruthy();
+    expect(onSave).toHaveBeenCalledTimes(2);
+  });
+
+  it('un registro con sigla antigua mal formada se guarda al cambiar otro campo', async () => {
+    const antiguo = { id: 'c9', 'Indicador de registro': 9, 'Sigla Compañía': 'GA - JR', Autores: 'Dora' };
+    const onSave = vi.fn().mockResolvedValue(undefined);
+    render(<GenericEditModal collectionName="companias" record={antiguo} onSave={onSave} onClose={vi.fn()} />);
+    await screen.findByRole('dialog', { name: /Editar Registro/ });
+    escribir(screen.getByLabelText('Autores'), 'Dora Ruiz');
+    fireEvent.submit(document.querySelector('form') as HTMLFormElement);
+    await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
+    expect(onSave.mock.calls[0][0]['Sigla Compañía']).toBe('GA - JR');
+    expect(lecturasDeCompanias()).toBe(0);
+    expect(screen.queryByRole('alert')).toBeNull();
   });
 });
