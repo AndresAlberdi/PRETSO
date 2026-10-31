@@ -3,6 +3,11 @@ import { collection, query, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { cleanFirebaseData } from '../utils';
 import { esCampoCompaniaCorpus } from '../utils/referenciaCompania';
+import { leerSiglasCompanias } from '../utils/integridadCompanias';
+import {
+  prepararSigla, claveSigla, errorFormatoSigla, evaluarSigla, lineaParecido, introAvisoSigla,
+  TITULO_AVISO_SIGLA, CIERRE_AVISO_SIGLA, MENSAJE_VERIFICACION_SIGLA, type ParecidoSigla,
+} from '../utils/siglas';
 import SelectorCompania from './SelectorCompania';
 import Modal from './Modal';
 import ConfirmModal from './ConfirmModal';
@@ -81,6 +86,12 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
   const [confirmDiscard, setConfirmDiscard] = useState(false);
   const titleId = useId();
   const fieldIdBase = useId();
+  const errorId = `${fieldIdBase}-error`;
+  const [error, setError] = useState<string | null>(null);
+  const [errorEnSigla, setErrorEnSigla] = useState(false);
+  // Aviso (no bloqueante) de sigla parecida a otra; la aceptación queda atada a la sigla aceptada.
+  const [avisoSigla, setAvisoSigla] = useState<{ sigla: string; parecidos: ParecidoSigla[] } | null>(null);
+  const avisoAceptadoRef = useRef<string | null>(null);
   const [documents, setDocuments] = useState<any[]>([]);
   const [companias, setCompanias] = useState<any[]>([]);
   const [companiasCargadas, setCompaniasCargadas] = useState(false);
@@ -124,8 +135,14 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
     setFormData((prev: any) => ({ ...prev, [key]: value }));
   };
 
-  const handleSave = async (e: React.FormEvent) => {
+  const esSiglaCompania = (key: string) => collectionName === 'companias' && key === 'Sigla Compañía';
+
+  const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
+    void guardar();
+  };
+
+  const guardar = async () => {
     if (savingRef.current) return;
     savingRef.current = true;
     // El botón sigue enfocable mientras guarda: se le entrega el foco (WCAG 2.4.3).
@@ -133,6 +150,8 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
     setLoading(true);
 
     try {
+      setError(null);
+      setErrorEnSigla(false);
       // Auto-convert fields back to their original types (number, boolean) before saving
       const processedData = { ...formData };
       for (const key of Object.keys(processedData)) {
@@ -148,6 +167,39 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
         // Handle boolean type conversions
         else if (typeof originalValue === 'boolean') {
           processedData[key] = processedData[key] === 'true' || processedData[key] === true;
+        }
+      }
+
+      // Compañías: solo si la sigla cambió de verdad se exige formato y unicidad (bloquea) y se
+      // avisa de las parecidas (no bloquea). Así no se obliga a corregir siglas antiguas al editar otros campos.
+      if (collectionName === 'companias' && 'Sigla Compañía' in processedData) {
+        const sigla = prepararSigla(processedData['Sigla Compañía']);
+        processedData['Sigla Compañía'] = sigla;
+        if (claveSigla(sigla) !== claveSigla(record['Sigla Compañía'])) {
+          const fmt = errorFormatoSigla(sigla);
+          if (fmt) {
+            setError(fmt);
+            setErrorEnSigla(true);
+            return;
+          }
+          let lista;
+          try {
+            lista = await leerSiglasCompanias();
+          } catch (err) {
+            console.error('Error verificando siglas de compañías', err);
+            setError(MENSAJE_VERIFICACION_SIGLA);
+            return;
+          }
+          const r = evaluarSigla(sigla, lista, record.id);
+          if (r.estado === 'error') {
+            setError(r.mensaje);
+            setErrorEnSigla(true);
+            return;
+          }
+          if (r.estado === 'aviso' && avisoAceptadoRef.current !== claveSigla(sigla)) {
+            setAvisoSigla({ sigla, parecidos: r.parecidos });
+            return;
+          }
         }
       }
 
@@ -280,6 +332,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
                     value={formData[key] !== null && formData[key] !== undefined ? formData[key] : ''}
                     onChange={e => handleChange(key, e.target.value)}
                     disabled={isReadOnly || loading}
+                    {...(esSiglaCompania(key) && errorEnSigla ? { 'aria-invalid': true, 'aria-describedby': errorId } : {})}
                     style={{
                       padding: '0.6rem',
                       borderRadius: '4px',
@@ -293,7 +346,9 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
               </div>
             );
           })}
-          
+
+          {error && <div id={errorId} role="alert" style={{ color: '#ff4d4f', background: 'rgba(255,77,79,0.1)', padding: '0.8rem', borderRadius: '4px', textAlign: 'center', fontSize: '0.95rem' }}>{error}</div>}
+
           <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginTop: '1.5rem' }}>
             <button 
               type="button"
@@ -322,6 +377,26 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
           cancelText="Seguir editando"
           onConfirm={() => { setConfirmDiscard(false); onClose(); }}
           onCancel={() => setConfirmDiscard(false)}
+        />
+      )}
+      {avisoSigla && (
+        <ConfirmModal
+          title={TITULO_AVISO_SIGLA}
+          message={(
+            <>
+              <p>{introAvisoSigla(avisoSigla.sigla, avisoSigla.parecidos.length)}</p>
+              <ul>{avisoSigla.parecidos.map(p => <li key={p.id}>{lineaParecido(p)}</li>)}</ul>
+              <p>{CIERRE_AVISO_SIGLA}</p>
+            </>
+          )}
+          confirmText="Guardar de todos modos"
+          cancelText="Revisar la sigla"
+          onConfirm={() => {
+            avisoAceptadoRef.current = claveSigla(avisoSigla.sigla);
+            setAvisoSigla(null);
+            void guardar();
+          }}
+          onCancel={() => setAvisoSigla(null)}
         />
       )}
     </>
