@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, useState } from 'react';
+import { TEXTO_LIBRE } from '../utils/correctorOrtografico';
 
 interface SearchCategory {
   id: string;
@@ -77,6 +78,7 @@ export default function SearchBar({ onSearch, categories }: SearchBarProps) {
         <input 
           ref={inputRef}
           type="text" 
+          {...TEXTO_LIBRE}
           value={query} 
           onChange={e => setQuery(e.target.value)} 
           placeholder="Añadir filtro..."
