@@ -37,6 +37,11 @@ describe('diálogo del Client ID de Google', () => {
     expect(document.activeElement).toBe(screen.getByLabelText('Client ID de Google'));
   });
 
+  it('el Client ID no pasa por el corrector ortográfico', () => {
+    abrir();
+    expect(screen.getByLabelText('Client ID de Google').getAttribute('spellcheck')).toBe('false');
+  });
+
   it('«Guardar» usa el valor del campo y cierra', () => {
     const { campo } = abrir();
     fireEvent.change(campo, { target: { value: '  mi-id.apps.googleusercontent.com ' } });

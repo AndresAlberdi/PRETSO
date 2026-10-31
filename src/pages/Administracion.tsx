@@ -5,6 +5,7 @@ import { generateDatabaseXml, downloadXml, generateZipBlob, uploadToGoogleDrive 
 import { generateDatabaseXlsx, downloadXlsx } from '../utils/xlsxExport';
 import { GOOGLE_CLIENT_ID_STORAGE_KEY, resolveGoogleClientId } from '../utils/googleClientId';
 import Modal from '../components/Modal';
+import { TEXTO_CODIGO } from '../utils/correctorOrtografico';
 
 export default function Administracion() {
   const [configuringClientId, setConfiguringClientId] = useState(false);
@@ -251,6 +252,7 @@ export default function Administracion() {
               ref={inputRef}
               id={clientIdInputId}
               type="text" 
+              {...TEXTO_CODIGO}
               placeholder="Ingrese su Client ID (ej: 123...apps.googleusercontent.com)"
               defaultValue={clientId}
               style={{ width: '100%', padding: '0.8rem', marginBottom: '1.5rem', background: 'var(--bg-body, #222)', border: '1px solid var(--input-border)', color: 'var(--text-primary)', borderRadius: '4px' }}
