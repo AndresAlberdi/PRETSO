@@ -4,6 +4,11 @@ import { db } from '../firebase';
 import { cleanFirebaseData } from '../utils';
 import { logAction } from '../utils/audit';
 import { canonizarReferencia } from '../utils/referenciaCompania';
+import { leerSiglasCompanias } from '../utils/integridadCompanias';
+import {
+  prepararSigla, claveSigla, errorFormatoSigla, evaluarSigla, lineaParecido, introAvisoSigla,
+  TITULO_AVISO_SIGLA, CIERRE_AVISO_SIGLA, MENSAJE_VERIFICACION_SIGLA, type ParecidoSigla,
+} from '../utils/siglas';
 import SelectorCompania from './SelectorCompania';
 import Modal from './Modal';
 import ConfirmModal from './ConfirmModal';
@@ -72,6 +77,10 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
   const fieldId = useId();
   const errorId = `${fieldId}-error`;
   const closeRef = useRef<HTMLButtonElement>(null);
+  const submitRef = useRef<HTMLButtonElement>(null);
+  // Aviso (no bloqueante) de sigla parecida a otra; la aceptación queda atada a la sigla aceptada.
+  const [avisoSigla, setAvisoSigla] = useState<{ sigla: string; parecidos: ParecidoSigla[] } | null>(null);
+  const avisoAceptadoRef = useRef<string | null>(null);
 
   // Integridad del alta: la protección contra doble envío es síncrona (el estado `saving` se
   // actualiza de forma asíncrona y no basta). El ID se fija en el primer envío y los reintentos lo
@@ -213,8 +222,12 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    void guardar();
+  };
+
+  const guardar = async () => {
     if (enviandoRef.current) return;
     enviandoRef.current = true;
     setError(null);
@@ -309,6 +322,30 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
         if (!recordToSave['Referencias bibliográficas'] || !recordToSave['Referencias bibliográficas'].trim()) {
           throw new ValidationError('Referencias bibliográficas', "Debe completar las 'Referencias bibliográficas'.");
         }
+      }
+
+      // Compañías: la sigla no puede tener formato inválido ni repetir la de otra compañía (bloquea);
+      // si solo se parece por partes, se avisa y la persona decide.
+      if (collectionName === 'companias' && !escritoRef.current) {
+        const sigla = prepararSigla(recordToSave['Sigla Compañía']);
+        const fmt = errorFormatoSigla(sigla);
+        if (fmt) throw new ValidationError('Sigla Compañía', fmt);
+        let lista;
+        try {
+          lista = await leerSiglasCompanias();
+        } catch (e) {
+          console.error('Error verificando siglas de compañías', e);
+          throw new Error(MENSAJE_VERIFICACION_SIGLA);
+        }
+        // Se excluye el id ya reservado: un reintento idempotente no choca consigo mismo.
+        const r = evaluarSigla(sigla, lista, docRefRef.current?.id ?? null);
+        if (r.estado === 'error') throw new ValidationError('Sigla Compañía', r.mensaje);
+        if (r.estado === 'aviso' && avisoAceptadoRef.current !== claveSigla(sigla)) {
+          submitRef.current?.focus();
+          setAvisoSigla({ sigla, parecidos: r.parecidos });
+          return;
+        }
+        recordToSave['Sigla Compañía'] = sigla;
       }
 
       // 2. Save in Firestore: el ID se genera en el cliente una sola vez y los reintentos lo reutilizan
@@ -453,6 +490,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                     value={formData['Sigla Compañía'] || ''}
                     onChange={e => handleChange('Sigla Compañía', e.target.value)}
                     placeholder="Ej: GA-JR"
+                    {...invalidProps('Sigla Compañía')}
                   />
                 </label>
                 <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
@@ -976,6 +1014,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                 Cancelar
               </button>
               <button
+                ref={submitRef}
                 type="submit"
                 aria-disabled={saving || undefined}
                 style={{ padding: '0.5rem 1.2rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: saving ? 'not-allowed' : 'pointer' }}
@@ -995,6 +1034,26 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
           cancelText="Seguir editando"
           onConfirm={() => { setConfirmDiscard(false); onClose(); }}
           onCancel={() => setConfirmDiscard(false)}
+        />
+      )}
+      {avisoSigla && (
+        <ConfirmModal
+          title={TITULO_AVISO_SIGLA}
+          message={(
+            <>
+              <p>{introAvisoSigla(avisoSigla.sigla, avisoSigla.parecidos.length)}</p>
+              <ul>{avisoSigla.parecidos.map(p => <li key={p.id}>{lineaParecido(p)}</li>)}</ul>
+              <p>{CIERRE_AVISO_SIGLA}</p>
+            </>
+          )}
+          confirmText="Guardar de todos modos"
+          cancelText="Revisar la sigla"
+          onConfirm={() => {
+            avisoAceptadoRef.current = claveSigla(avisoSigla.sigla);
+            setAvisoSigla(null);
+            void guardar();
+          }}
+          onCancel={() => setAvisoSigla(null)}
         />
       )}
     </>
