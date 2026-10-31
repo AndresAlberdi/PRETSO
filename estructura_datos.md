@@ -6,7 +6,7 @@ Esta documentación describe las colecciones principales en Firestore utilizadas
 
 ### 1. `companias` (Índice de Compañías)
 Almacena el registro maestro de las compañías, corporaciones o gremios registrados.
-*   **`Sigla Compañía`** (String): Identificador corto, por ejemplo "GA-AR-MR". Una o más partes de letras o números unidas por un solo guion (sin guion si tiene una sola parte), sin espacios. La aplicación no permite guardar dos compañías con la misma sigla (sin distinguir mayúsculas, tildes ni espacios en los extremos) y avisa, sin bloquear, cuando una sigla está contenida en otra o tiene sus mismas partes en otro orden. (Llave foránea utilizada en otras colecciones).
+*   **`Sigla Compañía`** (String): Identificador corto, por ejemplo "GA-AR-MR". Una o más partes de letras o números unidas por un solo guion (sin guion si tiene una sola parte), sin espacios. La aplicación verifica al guardar que no exista otra compañía con la misma sigla (sin distinguir mayúsculas, tildes ni espacios en los extremos) y avisa, sin bloquear, cuando una sigla está contenida en otra o tiene sus mismas partes en otro orden. Es una verificación del cliente: no hay control en el servidor, de modo que dos altas simultáneas o una escritura directa podrían duplicar la sigla. (Llave foránea utilizada en otras colecciones).
 *   **`Nombre Compañía`** (String): Nombre descriptivo o completo.
 *   **`Autores`** (String): Nombres de las personas o directores asociados.
 *   **`Temporadas teatrales`** (String): Años en los que la compañía tuvo actividad relevante.
