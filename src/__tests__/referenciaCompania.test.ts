@@ -139,6 +139,10 @@ describe('siglaParaExportar', () => {
     expect(siglaParaExportar(99, companias)).toBe('Compañía no encontrada');
     expect(siglaParaExportar('99', companias)).toBe('Compañía no encontrada');
   });
+  it('un texto de solo dígitos y símbolos que no resuelve no se expone', () => {
+    expect(siglaParaExportar('99,0', companias)).toBe('Compañía no encontrada');
+    expect(siglaParaExportar('99 / 98', companias)).toBe('Compañía no encontrada');
+  });
   it('un texto que no resuelve se conserva', () => {
     expect(siglaParaExportar('XYZ', companias)).toBe('XYZ');
   });
