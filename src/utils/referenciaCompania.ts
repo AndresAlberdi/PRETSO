@@ -51,6 +51,35 @@ export function siglaDeReferencia(valor: unknown, companias: CompaniaRef[]): str
 }
 
 /**
+ * Texto visible de una compañía resuelta: su sigla; si está vacía, su nombre; si
+ * tampoco hay, un rótulo fijo. Nunca el número de registro.
+ */
+export function textoVisibleCompania(compania: CompaniaRef): string {
+  const sigla = String(compania['Sigla Compañía'] ?? '').trim();
+  if (sigla) return sigla;
+  const nombre = String(compania['Nombre Compañía'] ?? '').trim();
+  return nombre || 'Compañía sin sigla';
+}
+
+export const TEXTO_COMPANIA_NO_ENCONTRADA = 'Compañía no encontrada';
+
+/**
+ * Valor de una referencia a compañía para el Excel: la sigla (o el nombre) de la
+ * compañía resuelta, nunca el número de registro. Si no resuelve y es numérico,
+ * un rótulo fijo (también si solo tiene dígitos y símbolos); si no resuelve y es
+ * texto con letras, el texto canonizado.
+ */
+export function siglaParaExportar(valor: unknown, companias: CompaniaRef[]): string {
+  const ref = canonizarReferencia(valor);
+  if (ref === '') return '';
+  const compania = resolverCompania(valor, companias);
+  if (compania) return textoVisibleCompania(compania);
+  // Sin letras y con algún dígito («7,0», «7 / 8»): sería un número a la vista.
+  const sinLetras = !/\p{L}/u.test(ref) && /\d/.test(ref);
+  return NUMERICO.test(ref) || sinLetras ? TEXTO_COMPANIA_NO_ENCONTRADA : ref;
+}
+
+/**
  * Valor que se guarda en el registro para una compañía: el número de registro,
  * con tipo numérico (igual que los datos migrados, que conservan el tipo de
  * `Indicador de registro`). Si no fuera numérico, se conserva tal cual.

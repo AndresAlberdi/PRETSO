@@ -1,6 +1,7 @@
-import { collection, getDocs, query } from "firebase/firestore";
+import { collection, getDocs, query, type DocumentData, type QueryDocumentSnapshot } from "firebase/firestore";
 import { db } from "../firebase";
 import ExcelJS from "exceljs";
+import { camposReferenciaCompania, siglaParaExportar } from "./referenciaCompania";
 
 // Sheet names in Spanish for the tabs
 const SHEET_NAMES: Record<string, string> = {
@@ -17,7 +18,7 @@ const SHEET_NAMES: Record<string, string> = {
 // Column ordering for each sheet to display them logically
 export const COLUMN_ORDERS: Record<string, string[]> = {
   documentos: ['Doc', 'Documento'],
-  companias: ['Indicador de registro', 'Sigla Compañía', 'Autores', 'Temporadas teatrales', 'Índice de compañías', 'Ámbito'],
+  companias: ['Indicador de registro', 'Sigla Compañía', 'Nombre Compañía', 'Autores', 'Temporadas teatrales', 'Índice de compañías', 'Ámbito'],
   transacciones: ['Num', 'Noticia', 'Fuentes para la generación del dato', 'Doc1', 'Doc2', 'Doc3', 'Doc4', 'Doc5', 'Doc6', 'Doc7', 'Doc8', 'Doc9', 'Doc10'],
   manejo_de_caja: ['Indicador de registro', 'Sigla Compañía', 'Año', 'Ciudad', 'Ingresos', 'Egresos', 'Otros bienes de la compañía', 'Transacción', 'Datos sobre normativa de manejo de caja'],
   salarios: ['Indicador de registro', 'Sigla Compañía', 'Año', 'Ciudad', 'Beneficiario ', 'Encargo', 'Monto a pagar', 'Transacción', 'Ración diaria', 'Pago por representación'],
@@ -26,22 +27,35 @@ export const COLUMN_ORDERS: Record<string, string[]> = {
   bibliografia: ['Autores', 'Referencias bibliográficas']
 };
 
-// Header renaming map to remove technical training spaces in columns
+// Títulos visibles del Excel para personas; los nombres de campo de Firestore no cambian.
 const HEADER_CLEANUPS: Record<string, string> = {
   'Beneficiario ': 'Beneficiario',
   'Encargado ': 'Encargado',
+  'Num': 'Nro.',
+};
+
+// Columnas que se leen pero no se muestran en el Excel de consulta.
+const XLSX_OMITTED_COLUMNS: Record<string, string[]> = {
+  companias: ['Indicador de registro'],
 };
 
 export async function generateDatabaseXlsx(): Promise<Blob> {
   const wb = new ExcelJS.Workbook();
   const collections = Object.keys(SHEET_NAMES);
 
+  // Primera pasada: se lee UNA vez cada colección; las compañías se necesitan para
+  // resolver las referencias de las demás hojas.
+  const snaps: Record<string, QueryDocumentSnapshot<DocumentData>[]> = {};
   for (const collName of collections) {
-    const q = query(collection(db, collName));
-    const snap = await getDocs(q);
+    snaps[collName] = [...(await getDocs(query(collection(db, collName)))).docs];
+  }
+  const companias = (snaps.companias ?? []).map(d => d.data());
 
+  for (const collName of collections) {
     // 1. Sort the records sequentially by their index field
-    const docs = [...snap.docs];
+    const docs = snaps[collName];
+    const omitted = XLSX_OMITTED_COLUMNS[collName] ?? [];
+    const refCols = camposReferenciaCompania(collName);
     docs.sort((docA, docB) => {
       const a = docA.data();
       const b = docB.data();
@@ -70,11 +84,15 @@ export async function generateDatabaseXlsx(): Promise<Blob> {
     const formattedRows = docs.map(doc => {
       const rowData = doc.data();
       const newRow: Record<string, any> = {};
-      const columns = COLUMN_ORDERS[collName] || Object.keys(rowData).sort();
+      const columns = (COLUMN_ORDERS[collName] || Object.keys(rowData).sort()).filter(c => !omitted.includes(c));
 
       columns.forEach(col => {
         const cleanHeader = HEADER_CLEANUPS[col] || col;
-        newRow[cleanHeader] = rowData[col] !== undefined && rowData[col] !== null ? rowData[col] : '';
+        if (refCols.includes(col)) {
+          newRow[cleanHeader] = siglaParaExportar(rowData[col], companias);
+        } else {
+          newRow[cleanHeader] = rowData[col] !== undefined && rowData[col] !== null ? rowData[col] : '';
+        }
       });
       return newRow;
     });
@@ -82,7 +100,7 @@ export async function generateDatabaseXlsx(): Promise<Blob> {
     // 3. Create worksheet and append to workbook
     const ws = wb.addWorksheet(SHEET_NAMES[collName]);
     
-    let columns = COLUMN_ORDERS[collName] || [];
+    let columns = (COLUMN_ORDERS[collName] || []).filter(c => !omitted.includes(c));
     if (columns.length === 0 && formattedRows.length > 0) {
       columns = Object.keys(formattedRows[0]);
     }
