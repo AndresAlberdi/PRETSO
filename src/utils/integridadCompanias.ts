@@ -1,6 +1,7 @@
 import { collection, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { camposReferenciaCompania, resolverCompania, type CompaniaRef } from './referenciaCompania';
+import type { CompaniaSigla } from './siglas';
 
 /**
  * Cuenta los documentos de una colección que referencian a la compañía, en
@@ -19,4 +20,16 @@ export async function contarReferenciasACompania(coleccion: string, compania: Co
     if (campos.some(campo => resolverCompania(datos[campo], [compania]) !== null)) total++;
   }
   return total;
+}
+
+/**
+ * Lee la sigla de todas las compañías para validar unicidad al guardar. Si la
+ * lectura falla, el error se propaga (fallo cerrado: no se debe guardar sin verificar).
+ */
+export async function leerSiglasCompanias(): Promise<CompaniaSigla[]> {
+  const snap = await getDocs(collection(db, 'companias'));
+  return snap.docs.map(d => {
+    const data = d.data() as Record<string, unknown>;
+    return { id: d.id, 'Sigla Compañía': data['Sigla Compañía'] };
+  });
 }

@@ -142,6 +142,9 @@ const casos: Array<[string, string, string, () => void, () => HTMLElement]> = [
   ['Transacción', 'manejo_de_caja', 'sin transacción', () => {
     fireEvent.change(screen.getByLabelText(/Sigla Compañía \(Obligatorio\)/), { target: { value: '7' } });
   }, () => screen.getByLabelText(/Transacción Relacionada/)],
+  ['Sigla Compañía', 'companias', 'sigla duplicada', () => {
+    fireEvent.change(screen.getByPlaceholderText('Ej: GA-JR'), { target: { value: 'ga-jr' } });
+  }, () => screen.getByPlaceholderText('Ej: GA-JR')],
   ['Autores', 'bibliografia', 'sin autores', () => {
     fireEvent.change(screen.getByPlaceholderText('Detalles bibliográficos...'), { target: { value: 'Ref' } });
   }, () => screen.getByPlaceholderText('Autores del documento...')],
