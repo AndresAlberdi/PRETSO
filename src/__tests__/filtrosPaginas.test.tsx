@@ -64,5 +64,8 @@ describe('IndiceCompanias: búsqueda con nombre accesible', () => {
   it('el campo se encuentra por rol y nombre', async () => {
     render(<IndiceCompanias />);
     expect(await screen.findByRole('textbox', { name: 'Buscar por nombre o autores' })).toBeTruthy();
+    const campo = screen.getByRole('textbox', { name: 'Buscar por nombre o autores' });
+    expect(campo.getAttribute('spellcheck')).toBe('true');
+    expect(campo.getAttribute('lang')).toBe('es');
   });
 });

@@ -16,6 +16,7 @@ import { useNavigate } from "react-router";
 import { useSortableTable } from "../hooks/useSortableTable";
 import SortableTh from "../components/SortableTh";
 import { contar } from "../utils/anuncios";
+import { TEXTO_LIBRE } from "../utils/correctorOrtografico";
 
 export default function IndiceCompanias() {
   const [data, setData] = useState<any[]>([]);
@@ -181,6 +182,7 @@ export default function IndiceCompanias() {
         <div className="acciones-cabecera">
           <input 
             type="text" 
+            {...TEXTO_LIBRE}
             placeholder="Buscar por nombre o autores..." 
             aria-label="Buscar por nombre o autores"
             value={searchQuery}

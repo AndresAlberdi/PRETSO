@@ -8,6 +8,7 @@ import {
   prepararSigla, claveSigla, errorFormatoSigla, evaluarSigla, lineaParecido, introAvisoSigla,
   TITULO_AVISO_SIGLA, CIERRE_AVISO_SIGLA, MENSAJE_VERIFICACION_SIGLA, type ParecidoSigla,
 } from '../utils/siglas';
+import { propsCorrector } from '../utils/correctorOrtografico';
 import SelectorCompania from './SelectorCompania';
 import Modal from './Modal';
 import ConfirmModal from './ConfirmModal';
@@ -320,6 +321,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
                 ) : isTextarea ? (
                   <textarea
                     id={fieldId}
+                    {...propsCorrector(key, record[key])}
                     value={formData[key] || ''}
                     onChange={e => handleChange(key, e.target.value)}
                     disabled={isReadOnly || loading}
@@ -337,6 +339,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
                 ) : (
                   <input
                     id={fieldId}
+                    {...propsCorrector(key, record[key])}
                     type="text"
                     value={formData[key] !== null && formData[key] !== undefined ? formData[key] : ''}
                     onChange={e => handleChange(key, e.target.value)}
