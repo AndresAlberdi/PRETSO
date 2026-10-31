@@ -199,9 +199,13 @@ describe('«Num» se muestra como «Nro.»', () => {
     expect(texto).toContain('sortKey="Num"');
   });
 
-  it('FIELD_LABEL_MAP de GenericEditModal mapea Num a Nro.', () => {
-    const texto = readFileSync(join(SRC, 'components', 'GenericEditModal.tsx'), 'utf-8');
-    expect(texto).toContain("'Num': 'Nro.'");
+  it('la tabla de etiquetas (utils/etiquetas) mapea Num a Nro.', () => {
+    const etiquetas = readFileSync(join(SRC, 'utils', 'etiquetas.ts'), 'utf-8');
+    expect(etiquetas).toContain("'Num': 'Nro.'");
+    const modal = readFileSync(join(SRC, 'components', 'GenericEditModal.tsx'), 'utf-8');
+    expect(modal).toContain("import { etiquetaCampo } from '../utils/etiquetas'");
+    expect(modal).toContain('etiquetaCampo(key)');
+    expect(modal).not.toContain('FIELD_LABEL_MAP');
   });
 
   // El título «Nro.» del Excel lo cubre xlsxExport.test.ts por comportamiento.
