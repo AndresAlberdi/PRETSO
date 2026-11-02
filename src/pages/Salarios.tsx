@@ -18,7 +18,7 @@ import { useRestoreFocusOnViewChange } from "../hooks/useRestoreFocusOnViewChang
 import SortableTh from "../components/SortableTh";
 import { contar } from "../utils/anuncios";
 import Tooltip from "../components/Tooltip";
-import { canonizarReferencia, normalizarSigla, resolverCompania, siglaDeReferencia } from "../utils/referenciaCompania";
+import { normalizarSigla, resolverCompania, siglaDeReferencia, textoVisibleCompania } from "../utils/referenciaCompania";
 import DetailsModal from "../components/DetailsModal";
 
 export default function Salarios() {
@@ -231,8 +231,8 @@ export default function Salarios() {
                   const registro: any = { ...row };
                   delete registro.__sigla;
                   const comp = resolverCompania(row["Sigla Compañía"], companias);
-                  const sigla = comp ? comp["Sigla Compañía"] : canonizarReferencia(row["Sigla Compañía"]);
-                  const fullName = comp && comp["Nombre Compañía"] ? `${sigla} - ${comp["Nombre Compañía"]}` : sigla;
+                  const sigla = siglaDeReferencia(row["Sigla Compañía"], companias);
+                  const fullName = comp && comp["Sigla Compañía"] && comp["Nombre Compañía"] ? `${sigla} - ${comp["Nombre Compañía"]}` : sigla;
                   const isBroken = row["Transacción"] && !transaccionesMap.has(Number(row["Transacción"]));
                   return (
                   <tr key={row.id}>
@@ -280,7 +280,7 @@ export default function Salarios() {
               <option value="">Todas las Compañías</option>
               {uniqueCompanias.map(opt => {
                 const c = companiasMap.get(opt);
-                return <option key={opt} value={opt}>{c ? c["Sigla Compañía"] : opt}</option>;
+                return <option key={opt} value={opt}>{c ? textoVisibleCompania(c) : siglaDeReferencia(opt, companias)}</option>;
               })}
             </select>
             <select

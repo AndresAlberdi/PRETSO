@@ -59,9 +59,13 @@ describe('siglaDeReferencia y etiquetas', () => {
   it('devuelve la sigla de la compañía resuelta', () => {
     expect(siglaDeReferencia(7, companias)).toBe('GA-JR');
   });
-  it('si no resuelve devuelve la referencia canonizada', () => {
-    expect(siglaDeReferencia(99.0, companias)).toBe('99');
+  it('si no resuelve numérica muestra «Compañía no encontrada», nunca el número', () => {
+    expect(siglaDeReferencia(99.0, companias)).toBe('Compañía no encontrada');
+    expect(siglaDeReferencia('99', companias)).toBe('Compañía no encontrada');
     expect(siglaDeReferencia(null, companias)).toBe('');
+  });
+  it('si no resuelve y es una sigla heredada con letras, la muestra tal cual', () => {
+    expect(siglaDeReferencia('XX-YY', companias)).toBe('XX-YY');
   });
   it('arma la etiqueta «sigla - autores»', () => {
     expect(etiquetaCompania(companias[0])).toBe('GA-JR - Alarcón y Ramírez');

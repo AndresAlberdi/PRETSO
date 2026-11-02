@@ -1,4 +1,4 @@
-import { canonizarReferencia, resolverCompania, textoVisibleCompania, type CompaniaRef } from '../utils/referenciaCompania';
+import { canonizarReferencia, resolverCompania, siglaParaExportar, textoVisibleCompania, type CompaniaRef } from '../utils/referenciaCompania';
 
 interface ListaSiglasCompaniaProps {
   // Valores crudos guardados en el registro (número de registro, o sigla en datos heredados).
@@ -26,10 +26,10 @@ export default function ListaSiglasCompania({ referencias, companias, onAbrir }:
     const compania = resolverCompania(valor, companias);
     const clave = compania
       ? `c:${canonizarReferencia(compania['Indicador de registro']) || String(compania['Sigla Compañía'] ?? '')}`
-      : `r:${ref}`;
+      : `r:${siglaParaExportar(valor, companias)}`;
     if (vistos.has(clave)) continue;
     vistos.add(clave);
-    elementos.push({ clave, compania, texto: compania ? textoVisibleCompania(compania) : ref });
+    elementos.push({ clave, compania, texto: compania ? textoVisibleCompania(compania) : siglaParaExportar(valor, companias) });
   }
 
   return (
