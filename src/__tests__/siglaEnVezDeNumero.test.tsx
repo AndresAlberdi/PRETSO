@@ -86,8 +86,9 @@ describe('Corpus Christi: sigla en vez de número de registro', () => {
     colecciones.corpus_christi[0]['Compañía3'] = 99;
     await abrirTratoCorpus();
     await screen.findByRole('button', { name: 'GA-JR' });
-    expect(screen.getByText('99')).toBeTruthy();
-    expect(screen.queryByRole('button', { name: '99' })).toBeNull();
+    expect(screen.getByText('Compañía no encontrada')).toBeTruthy();
+    expect(screen.queryByText('99')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Compañía no encontrada' })).toBeNull();
   });
 });
 
@@ -120,8 +121,9 @@ describe('Indicadores: sigla en vez de número de registro', () => {
   it('un valor sin resolver se muestra como texto sin botón y la referencia vacía no muestra nada', async () => {
     await abrirLista();
     await screen.findByRole('button', { name: 'JG' });
-    expect(screen.getByText('55')).toBeTruthy();
-    expect(screen.queryByRole('button', { name: '55' })).toBeNull();
+    expect(screen.getByText('Compañía no encontrada')).toBeTruthy();
+    expect(screen.queryByText('55')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Compañía no encontrada' })).toBeNull();
     expect(screen.queryByText('null')).toBeNull();
   });
 });

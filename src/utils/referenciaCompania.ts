@@ -44,10 +44,13 @@ export function resolverCompania<T extends CompaniaRef>(valor: unknown, compania
   return companias.find(c => normalizarSigla(c['Sigla Compañía']) === sigla && sigla !== '') || null;
 }
 
-/** Sigla para mostrar: la de la compañía resuelta; si no resuelve, la referencia canonizada. */
+/**
+ * Texto para mostrar de una referencia: la sigla (o nombre) de la compañía
+ * resuelta; si no resuelve, «Compañía no encontrada» (nunca el número de
+ * registro) o, en datos heredados con letras, el texto guardado.
+ */
 export function siglaDeReferencia(valor: unknown, companias: CompaniaRef[]): string {
-  const c = resolverCompania(valor, companias);
-  return c ? String(c['Sigla Compañía'] ?? '') : canonizarReferencia(valor);
+  return siglaParaExportar(valor, companias);
 }
 
 export const TEXTO_COMPANIA_SIN_SIGLA = 'Compañía sin sigla';
