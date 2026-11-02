@@ -20,7 +20,7 @@ export const COLUMN_ORDERS: Record<string, string[]> = {
   documentos: ['Doc', 'Documento'],
   companias: ['Indicador de registro', 'Sigla Compañía', 'Nombre Compañía', 'Autores', 'Temporadas teatrales', 'Índice de compañías', 'Ámbito'],
   transacciones: ['Num', 'Noticia', 'Fuentes para la generación del dato', 'Doc1', 'Doc2', 'Doc3', 'Doc4', 'Doc5', 'Doc6', 'Doc7', 'Doc8', 'Doc9', 'Doc10'],
-  manejo_de_caja: ['Indicador de registro', 'Sigla Compañía', 'Año', 'Ciudad', 'Ingresos', 'Egresos', 'Otros bienes de la compañía', 'Transacción', 'Datos sobre normativa de manejo de caja'],
+  manejo_de_caja: ['Indicador de registro', 'Sigla Compañía', 'Año', 'Ciudad', 'Ingresos', 'Egresos', 'Otros bienes de la compañía', 'Transacción'],
   salarios: ['Indicador de registro', 'Sigla Compañía', 'Año', 'Ciudad', 'Beneficiario ', 'Encargo', 'Monto a pagar', 'Transacción', 'Ración diaria', 'Pago por representación'],
   corpus_christi: ['Indicador de registro', 'Ciudad', 'Año', 'Encargado ', 'Encargo', 'Monto a pagar', 'Fondos', 'Transacción', 'Compañía', 'Compañía2', 'Compañía3', 'Compañía4', 'Compañía5', 'Compañía6', 'Compañía7', 'Compañía8', 'Compañía9', 'Compañía10', 'Cmp', 'Cmp2'],
   indicadores: ['Indicador de registro', 'Ciudad', 'Años', 'Concepto', 'Monto', 'Nota', 'Categorías', 'Transacción', 'Sigla Compañía'],

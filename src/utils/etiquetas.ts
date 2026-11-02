@@ -7,7 +7,6 @@ export const ETIQUETAS_CAMPO: Readonly<Record<string, string>> = {
   'Categorías': 'Categoría',
   'Beneficiario ': 'Beneficiario',
   'Encargado ': 'Encargado',
-  'Número de representaciones  por año ': 'Número de representaciones por año'
 };
 
 /** Etiqueta visible de un campo; si no hay una propia, el nombre del campo. */
