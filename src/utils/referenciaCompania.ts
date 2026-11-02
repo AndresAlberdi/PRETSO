@@ -50,6 +50,8 @@ export function siglaDeReferencia(valor: unknown, companias: CompaniaRef[]): str
   return c ? String(c['Sigla Compañía'] ?? '') : canonizarReferencia(valor);
 }
 
+export const TEXTO_COMPANIA_SIN_SIGLA = 'Compañía sin sigla';
+
 /**
  * Texto visible de una compañía resuelta: su sigla; si está vacía, su nombre; si
  * tampoco hay, un rótulo fijo. Nunca el número de registro.
@@ -58,7 +60,7 @@ export function textoVisibleCompania(compania: CompaniaRef): string {
   const sigla = String(compania['Sigla Compañía'] ?? '').trim();
   if (sigla) return sigla;
   const nombre = String(compania['Nombre Compañía'] ?? '').trim();
-  return nombre || 'Compañía sin sigla';
+  return nombre || TEXTO_COMPANIA_SIN_SIGLA;
 }
 
 export const TEXTO_COMPANIA_NO_ENCONTRADA = 'Compañía no encontrada';

@@ -54,6 +54,16 @@ async function abrir(texto: string) {
 const region = () => document.querySelector('output.visually-hidden') as HTMLElement;
 
 describe('Búsqueda general: texto de los resultados', () => {
+  it('buscar la sigla encuentra el registro que guarda el número de la compañía', async () => {
+    await abrir('ga-jr');
+    expect(screen.getByText('Compañía: GA-JR | Ciudad: Potosí | Año: 1600')).toBeTruthy();
+  });
+
+  it('la sigla de otra compañía no trae el registro', async () => {
+    await abrir('zz-zz');
+    expect(screen.queryByText(/GA-JR/)).toBeNull();
+  });
+
   it('lector: sigla de la compañía y sin números de registro ni «Num»', async () => {
     await abrir('Potosí');
     expect(screen.getByText('Compañía: GA-JR | Ciudad: Potosí | Año: 1600')).toBeTruthy();

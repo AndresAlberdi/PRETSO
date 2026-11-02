@@ -7,7 +7,7 @@ import { useNavigate, Link } from "react-router";
 import { useAdmin } from "../context/AdminContext";
 import { SECCIONES } from "../utils/secciones";
 import { contar } from "../utils/anuncios";
-import { textoResultadoBusqueda } from "../utils/textoResultadoBusqueda";
+import { textoResultadoBusqueda, textosCompaniaBuscables } from "../utils/textoResultadoBusqueda";
 
 type SearchResultItem = {
   id: string;
@@ -109,11 +109,15 @@ export default function Busqueda() {
       return labels[coll] || coll;
     };
 
+    const companias = dbData.companias ?? [];
+    const cacheCompanias = new Map<string, string>();
+
     const checkMatch = (data: any, coll: string, filter: SearchFilter) => {
       const q = filter.query.toLowerCase();
       
       if (filter.category === 'all') {
-        return Object.values(data).some(v => String(v).toLowerCase().includes(q));
+        return Object.values(data).some(v => String(v).toLowerCase().includes(q))
+          || textosCompaniaBuscables(data, coll, companias, cacheCompanias).some(t => t.toLowerCase().includes(q));
       }
       
       if (filter.category === 'Persona') {
@@ -133,8 +137,6 @@ export default function Busqueda() {
       
       return false;
     };
-
-    const companias = dbData.companias ?? [];
 
     for (const [coll, items] of Object.entries(dbData)) {
       for (const item of items) {
