@@ -29,7 +29,7 @@ afterEach(cleanup);
 // Cantidad real de controles de texto por colección en el alta.
 const ESPERADOS: Record<string, number> = {
   documentos: 1, transacciones: 2, companias: 5, bibliografia: 2,
-  manejo_de_caja: 5, salarios: 4, corpus_christi: 5, indicadores: 6,
+  manejo_de_caja: 4, salarios: 4, corpus_christi: 5, indicadores: 6,
 };
 
 describe('alta: corrector ortográfico en los campos de texto', () => {

@@ -12,6 +12,7 @@ import { propsCorrector } from '../utils/correctorOrtografico';
 import SelectorCompania from './SelectorCompania';
 import Modal from './Modal';
 import ConfirmModal from './ConfirmModal';
+import { esCampoRetirado } from '../utils/camposRetirados';
 import { etiquetaCampo } from '../utils/etiquetas';
 
 interface GenericEditModalProps {
@@ -212,7 +213,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
 
   // Sort keys custom function to place primary keys first and Doc1..Doc10 last
   const getSortedKeys = () => {
-    const keys = Object.keys(record).filter(k => k !== 'id');
+    const keys = Object.keys(record).filter(k => k !== 'id' && !esCampoRetirado(collectionName, k));
     
     let indexField = '';
     if (collectionName === 'documentos') indexField = 'Doc';

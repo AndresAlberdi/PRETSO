@@ -83,7 +83,7 @@ describe('generateDatabaseXlsx', () => {
     const wb = await leerLibro();
     expect(encabezados(wb, 'Manejo de Caja')).toEqual([
       'Indicador de registro', 'Sigla Compañía', 'Año', 'Ciudad', 'Ingresos', 'Egresos',
-      'Otros bienes de la compañía', 'Transacción', 'Datos sobre normativa de manejo de caja',
+      'Otros bienes de la compañía', 'Transacción',
     ]);
     expect(encabezados(wb, 'Indicadores')).toEqual([
       'Indicador de registro', 'Ciudad', 'Años', 'Concepto', 'Monto', 'Nota',

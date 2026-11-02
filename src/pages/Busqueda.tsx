@@ -7,6 +7,7 @@ import { useNavigate, Link } from "react-router";
 import { useAdmin } from "../context/AdminContext";
 import { SECCIONES } from "../utils/secciones";
 import { contar } from "../utils/anuncios";
+import { esCampoRetirado } from "../utils/camposRetirados";
 import { textoResultadoBusqueda, textosCompaniaBuscables } from "../utils/textoResultadoBusqueda";
 
 type SearchResultItem = {
@@ -116,7 +117,7 @@ export default function Busqueda() {
       const q = filter.query.toLowerCase();
       
       if (filter.category === 'all') {
-        return Object.values(data).some(v => String(v).toLowerCase().includes(q))
+        return Object.entries(data).some(([k, v]) => !esCampoRetirado(coll, k) && String(v).toLowerCase().includes(q))
           || textosCompaniaBuscables(data, coll, companias, cacheCompanias).some(t => t.toLowerCase().includes(q));
       }
       

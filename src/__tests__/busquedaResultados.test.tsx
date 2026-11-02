@@ -59,6 +59,16 @@ describe('Búsqueda general: texto de los resultados', () => {
     expect(screen.getByText('Compañía: GA-JR | Ciudad: Potosí | Año: 1600')).toBeTruthy();
   });
 
+  it('un texto que solo está en un campo retirado no encuentra el registro', async () => {
+    colecciones.manejo_de_caja[0]['Datos sobre normativa de manejo de caja'] = 'norma secreta';
+    render(<Busqueda />);
+    await screen.findByRole('heading', { name: 'Búsqueda general' });
+    await vi.waitFor(() => expect(screen.queryByText(/Cargando base de datos/)).toBeNull());
+    buscar('all', 'norma secreta');
+    await screen.findByText(/Resultados de Búsqueda/);
+    expect(screen.queryByText(/Ciudad: Potosí/)).toBeNull();
+  });
+
   it('la sigla de otra compañía no trae el registro', async () => {
     await abrir('zz-zz');
     expect(screen.queryByText(/GA-JR/)).toBeNull();

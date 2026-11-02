@@ -648,15 +648,6 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                     onChange={e => handleChange('Otros bienes de la compañía', e.target.value)}
                   />
                 </label>
-                <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <strong>Datos sobre normativa de manejo de caja</strong>
-                  <input
-                    type="text"
-                    {...TEXTO_LIBRE}
-                    value={formData['Datos sobre normativa de manejo de caja'] || ''}
-                    onChange={e => handleChange('Datos sobre normativa de manejo de caja', e.target.value)}
-                  />
-                </label>
               </>
             )}
 
@@ -750,30 +741,6 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                     type="number"
                     value={formData['Pago por representación'] || ''}
                     onChange={e => handleChange('Pago por representación', e.target.value)}
-                  />
-                </label>
-                <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <strong>Días de ración en un año</strong>
-                  <input
-                    type="number"
-                    value={formData['Días de ración en un año'] || ''}
-                    onChange={e => handleChange('Días de ración en un año', e.target.value)}
-                  />
-                </label>
-                <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <strong>Número estimado de representaciones por año</strong>
-                  <input
-                    type="number"
-                    value={formData['Número estimado de representaciones por año'] || ''}
-                    onChange={e => handleChange('Número estimado de representaciones por año', e.target.value)}
-                  />
-                </label>
-                <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <strong>Número de representaciones por año</strong>
-                  <input
-                    type="number"
-                    value={formData['Número de representaciones  por año '] || ''}
-                    onChange={e => handleChange('Número de representaciones  por año ', e.target.value)}
                   />
                 </label>
               </>

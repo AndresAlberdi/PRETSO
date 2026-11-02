@@ -20,6 +20,7 @@ import { contar } from "../utils/anuncios";
 import Tooltip from "../components/Tooltip";
 import { normalizarSigla, resolverCompania, siglaDeReferencia, textoVisibleCompania } from "../utils/referenciaCompania";
 import DetailsModal from "../components/DetailsModal";
+import { esCampoRetirado } from "../utils/camposRetirados";
 
 export default function ManejoCaja() {
   const [data, setData] = useState<any[]>([]);
@@ -147,7 +148,7 @@ export default function ManejoCaja() {
       return filters.every(f => {
         const q = f.query.toLowerCase();
         if (f.category === 'all') {
-          return Object.values(d).some(v => String(v).toLowerCase().includes(q));
+          return Object.entries(d).some(([k, v]) => !esCampoRetirado('manejo_de_caja', k) && String(v).toLowerCase().includes(q));
         }
         if (f.category === 'Autores') {
           const comp = resolverCompania(d["Sigla Compañía"], companias);
@@ -388,7 +389,7 @@ export default function ManejoCaja() {
       )}
       {activeTransaction && <TransactionModal transactionCode={activeTransaction} onClose={() => setActiveTransaction(null)} />}
       {activeDocuments && <DocumentModal documentCode={activeDocuments} onClose={() => setActiveDocuments(null)} />}
-      {recordToView && <DetailsModal record={recordToView} onClose={() => setRecordToView(null)} />}
+      {recordToView && <DetailsModal record={recordToView} collectionName="manejo_de_caja" onClose={() => setRecordToView(null)} />}
       
       {isCreateOpen && (
         <GenericCreateModal 
