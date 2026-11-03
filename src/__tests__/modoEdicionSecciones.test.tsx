@@ -66,7 +66,8 @@ interface Pagina {
   nombre: string;
   archivo: string;
   Componente: ComponentType;
-  buscador: 'SearchBar' | 'campo' | 'ninguno';
+  /** 'barra': SearchBar sin tabla de resumen ni pantalla de detalle. */
+  buscador: 'SearchBar' | 'barra' | 'campo' | 'ninguno';
   filas: number;
   /** Usos de <CeldaAdmin en el código de la página. */
   celdas: number;
@@ -79,7 +80,7 @@ const PAGINAS: Pagina[] = [
   { nombre: 'Corpus Christi', archivo: 'CorpusChristi.tsx', Componente: CorpusChristi, buscador: 'SearchBar', filas: 2, celdas: 2, detalle: { boton: 'TRATO', tabla: /^Transacciones de Corpus Christi en / } },
   { nombre: 'Indicadores', archivo: 'Indicadores.tsx', Componente: Indicadores, buscador: 'SearchBar', filas: 2, celdas: 2, detalle: { boton: 'LISTA', tabla: /^Indicadores de la categoría / } },
   { nombre: 'Índice de compañías', archivo: 'IndiceCompanias.tsx', Componente: IndiceCompanias, buscador: 'campo', filas: 2, celdas: 1 },
-  { nombre: 'Bibliografía', archivo: 'Bibliografia.tsx', Componente: Bibliografia, buscador: 'ninguno', filas: 2, celdas: 1 },
+  { nombre: 'Bibliografía', archivo: 'Bibliografia.tsx', Componente: Bibliografia, buscador: 'barra', filas: 2, celdas: 1 },
 ];
 
 // Deja a la vista una tabla de datos: en las secciones con buscador, la de resultados.
@@ -142,7 +143,7 @@ describe.each(PAGINAS)('modo edición en $nombre', (p) => {
     expect(cabecera).not.toBeNull();
     expect(cabecera.contains(salir)).toBe(true);
     const sigue = (a: Node, b: Node) => Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
-    if (p.buscador === 'SearchBar') {
+    if (p.buscador === 'SearchBar' || p.buscador === 'barra') {
       expect(sigue(cabecera.querySelector('form') as Node, salir)).toBe(true);
     } else if (p.buscador === 'campo') {
       expect(sigue(screen.getByRole('textbox', { name: 'Buscar por nombre o autores' }), salir)).toBe(true);
