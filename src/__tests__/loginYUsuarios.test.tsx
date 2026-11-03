@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
-import Login from '../pages/Login';
+import AccesoForm from '../components/AccesoForm';
 import UserManagement from '../pages/UserManagement';
 
 vi.mock('firebase/app', () => ({ initializeApp: vi.fn(() => ({})) }));
@@ -13,7 +13,9 @@ vi.mock('firebase/auth', () => ({
   GoogleAuthProvider: vi.fn(function GoogleAuthProvider() {}),
 }));
 vi.mock('../firebase', () => ({ auth: {}, firebaseConfig: {} }));
-vi.mock('react-router', () => ({ useNavigate: () => vi.fn() }));
+vi.mock('../context/AdminContext', () => ({
+  useAdmin: () => ({ authNotice: null, clearAuthNotice: vi.fn() }),
+}));
 
 beforeEach(() => {
   vi.mocked(signInWithEmailAndPassword).mockReset();
@@ -25,10 +27,10 @@ afterEach(() => {
   vi.restoreAllMocks();
 });
 
-describe('Login', () => {
+describe('Acceso (formulario de la portada)', () => {
   it('declara el autocompletado y anuncia cada fallo', async () => {
     vi.mocked(signInWithEmailAndPassword).mockRejectedValue(new Error('fallo'));
-    render(<Login />);
+    render(<AccesoForm />);
     expect(screen.getByLabelText('Correo Electrónico').getAttribute('autocomplete')).toBe('username');
     expect(screen.getByLabelText('Contraseña').getAttribute('autocomplete')).toBe('current-password');
     expect(screen.queryByRole('alert')).toBeNull();
@@ -50,7 +52,7 @@ describe('Login', () => {
     vi.mocked(signInWithEmailAndPassword)
       .mockRejectedValueOnce({ code: 'auth/user-not-found', message: 'Firebase: Error (auth/user-not-found).' })
       .mockRejectedValueOnce({ code: 'auth/wrong-password', message: 'Firebase: Error (auth/wrong-password).' });
-    render(<Login />);
+    render(<AccesoForm />);
     fireEvent.change(screen.getByLabelText('Correo Electrónico'), { target: { value: correo } });
     fireEvent.change(screen.getByLabelText('Contraseña'), { target: { value: clave } });
     const form = screen.getByLabelText('Correo Electrónico').closest('form') as HTMLFormElement;

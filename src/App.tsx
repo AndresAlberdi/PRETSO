@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router';
 import ProtectedRoute from './components/ProtectedRoute';
+import HomeRoute from './components/HomeRoute';
 import AdminRoute from './components/AdminRoute';
 import ReaderRoute from './components/ReaderRoute';
-import Login from './pages/Login';
 import Portada from './pages/Portada';
 import Busqueda from './pages/Busqueda';
 import ManejoCaja from './pages/ManejoCaja';
@@ -47,9 +47,9 @@ export default function App() {
       <Router>
         <RouteEffects />
         <Routes>
-          <Route path="/login" element={<Login />} />
+          <Route path="/login" element={<Navigate to="/" replace />} />
           
-          <Route path="/" element={<ProtectedRoute><ReaderRoute><Layout barra={<TopBar conCuenta />}><Portada /></Layout></ReaderRoute></ProtectedRoute>} />
+          <Route path="/" element={<HomeRoute signedOut={<Layout barra={<TopBar />}><Portada acceso /></Layout>} signedIn={<ReaderRoute><Layout barra={<TopBar conCuenta />}><Portada /></Layout></ReaderRoute>} />} />
           <Route path="/buscar" element={<ProtectedRoute><ReaderRoute><Layout barra={<TopBar conAgregar volver={{ to: '/', texto: 'Inicio' }} />}><Busqueda /></Layout></ReaderRoute></ProtectedRoute>} />
           <Route path="/caja" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><ManejoCaja /></Layout></ReaderRoute></ProtectedRoute>} />
           <Route path="/salarios" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><Salarios /></Layout></ReaderRoute></ProtectedRoute>} />

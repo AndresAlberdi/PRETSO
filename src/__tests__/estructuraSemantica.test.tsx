@@ -2,7 +2,7 @@ import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { readFileSync, readdirSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { render, screen, fireEvent, within, cleanup } from '@testing-library/react';
-import Login from '../pages/Login';
+import AccesoForm from '../components/AccesoForm';
 import ManejoCaja from '../pages/ManejoCaja';
 
 const SRC = resolve(__dirname, '..');
@@ -18,7 +18,7 @@ vi.mock('react-router', () => ({
   useNavigate: () => vi.fn(),
   useLocation: () => ({ pathname: '/x', search: '', state: null }),
 }));
-vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isAdmin: true, isEditMode: true }) }));
+vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isAdmin: true, isEditMode: true, authNotice: null, clearAuthNotice: () => undefined }) }));
 
 const companias = [
   { id: 'c7', 'Indicador de registro': 7, 'Sigla Compañía': 'GA-JR', 'Nombre Compañía': 'Compañía de Alarcón', Autores: 'Alarcón y Ramírez' },
@@ -112,15 +112,11 @@ describe('estructura semántica: análisis estático', () => {
 });
 
 describe('estructura semántica: render', () => {
-  it('g) el login tiene main, un solo h1 y «Iniciar Sesión» como h2', () => {
-    render(<Login />);
-    const main = screen.getByRole('main');
-    expect(main.id).toBe('contenido');
-    expect(main.getAttribute('tabindex')).toBe('-1');
-    const h1 = screen.getAllByRole('heading', { level: 1 });
-    expect(h1).toHaveLength(1);
-    expect(h1[0].textContent).toMatch(/PRETSO/);
-    expect(screen.getByRole('heading', { level: 2, name: 'Iniciar Sesión' })).toBeTruthy();
+  it('g) el acceso es un h2 «Iniciar sesión» sin main ni h1 propios (los pone la portada)', () => {
+    render(<AccesoForm />);
+    expect(screen.queryByRole('main')).toBeNull();
+    expect(screen.queryAllByRole('heading', { level: 1 })).toHaveLength(0);
+    expect(screen.getByRole('heading', { level: 2, name: 'Iniciar sesión' })).toBeTruthy();
   });
 
   it('h) Manejo de Caja: tablas con título, columnas con nombre y acciones sin flex en el td', async () => {
