@@ -12,7 +12,11 @@ vi.mock('firebase/auth', () => ({
   signInWithPopup: vi.fn(),
   GoogleAuthProvider: vi.fn(function GoogleAuthProvider() {}),
 }));
-vi.mock('../firebase', () => ({ auth: {}, firebaseConfig: {} }));
+vi.mock('../firebase', () => ({ auth: {}, functions: {}, firebaseConfig: {} }));
+vi.mock('firebase/functions', () => ({
+  getFunctions: vi.fn(() => ({})),
+  httpsCallable: vi.fn(() => vi.fn().mockResolvedValue({ data: { accounts: [], truncated: false } })),
+}));
 vi.mock('../context/AdminContext', () => ({
   useAdmin: () => ({ authNotice: null, clearAuthNotice: vi.fn() }),
 }));

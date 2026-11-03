@@ -173,3 +173,7 @@ Observación: el historial contiene en un commit antiguo (`#14`) un directorio `
 | Revisión periódica de este inventario | Cada trimestre y en cada pase a producción | Andres Alberdi | Próxima: 2027-01-01 |
 
 Los secretos S3 no tienen periodicidad de rotación por calendario: se rotan al cambiar la infraestructura (regla de la clase S3). Si se agregara un S1 o S2, se añade una fila en la sección 2 con su fecha de rotación (90 y 180 días respectivamente).
+
+## Función `listAccounts` (lista de cuentas, 2026-11-02)
+
+Identidad de ejecución prevista: `fn-usuarios@<proyecto>.iam.gserviceaccount.com` con solo `roles/firebaseauth.viewer` (sin `roles/editor`; no usa la cuenta de cómputo por defecto). `createReaderUser` sigue sin desplegarse. Estado: código listo; la cuenta de servicio y los roles del desplegador se crean en `pretso-database` con autorización del propietario (aún no ejecutado).

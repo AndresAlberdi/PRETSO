@@ -3,6 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { firebaseConfig } from "../firebase";
 import { createUserErrorMessage, loginErrorCode } from "../utils/authErrors";
+import AccountList from "../components/AccountList";
 
 let secondaryApp: any;
 let secondaryAuth: any;
@@ -20,6 +21,7 @@ export default function UserManagement() {
   const [password, setPassword] = useState('');
   const [status, setStatus] = useState({ message: '', type: '' });
   const [loading, setLoading] = useState(false);
+  const [refreshSignal, setRefreshSignal] = useState(0);
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -36,6 +38,7 @@ export default function UserManagement() {
       setStatus({ message: `Usuario ${email} creado exitosamente como lector.`, type: 'success' });
       setEmail('');
       setPassword('');
+      setRefreshSignal(n => n + 1);
     } catch (error: unknown) {
       console.error('Error al crear usuario:', loginErrorCode(error));
       setStatus({ message: `Error al crear usuario: ${createUserErrorMessage(error)}`, type: 'error' });
@@ -45,7 +48,7 @@ export default function UserManagement() {
   };
 
   return (
-    <div style={{ maxWidth: '600px', margin: '2rem auto', padding: '2rem', background: 'var(--bg-card)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+    <div style={{ maxWidth: '900px', margin: '2rem auto', padding: '2rem', background: 'var(--bg-card)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
       <h1 style={{ marginTop: 0, marginBottom: '0.83em', fontSize: '1.5em', color: 'var(--primary-color)' }}>Gestión de Usuarios Lectores</h1>
       <p style={{ color: 'var(--text-secondary)', lineHeight: 1.5 }}>
         Crea usuarios con acceso de solo lectura. Estos usuarios podrán acceder a la plataforma pero no podrán modificar ni borrar ningún registro, dado que la Base de Datos solo permite escrituras al administrador.
@@ -95,6 +98,8 @@ export default function UserManagement() {
           {loading ? 'Creando...' : 'Crear Usuario Lector'}
         </button>
       </form>
+
+      <AccountList refreshSignal={refreshSignal} />
     </div>
   );
 }

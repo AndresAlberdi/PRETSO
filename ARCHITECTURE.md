@@ -50,6 +50,9 @@ Las reglas están ubicadas en `firestore.rules` en la raíz del proyecto. Estas 
 - Solamente la cuenta designada como administradora tiene permisos de escritura, actualización o eliminación en las colecciones de la base de datos.
 - Bloquea interacciones no autorizadas a nivel de servidor, independientemente de la interfaz que use el cliente.
 
+### Lista de cuentas (`listAccounts`)
+La pantalla «Gestión de Usuarios» muestra las cuentas (correo, rol, acceso con Google o contraseña, estado y último acceso) a partir de la función callable `listAccounts` (`functions/src/index.ts`, 2.ª generación, `us-central1`). Solo responde si el token trae `admin === true`; no recibe parámetros y no devuelve uid, hashes ni claims crudos (contrato en `functions/src/accounts.ts`, validado en `src/utils/accounts.ts`). Corre con la cuenta de servicio `fn-usuarios@<proyecto>`, que solo lee Authentication (`roles/firebaseauth.viewer`). Se despliega con `functions:listAccounts` (no con todo `functions/`); la CSP de `firebase.json` permite solo los hosts de esa función.
+
 ## 6. Despliegue y Pipeline CI/CD
 
 El proceso está condensado en un script shell (`deploy.sh`), invocado vía `npm run deploy`, el cual consta de cuatro pasos lineales estrictos:

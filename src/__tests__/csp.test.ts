@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import firebaseJson from '../../firebase.json';
 
 const EXPECTED_CSP =
-  "default-src 'self'; script-src 'self' https://accounts.google.com https://apis.google.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://firebasestorage.googleapis.com https://www.google.com/recaptcha/; frame-src https://accounts.google.com https://pretso-database.firebaseapp.com https://pretso-prod.firebaseapp.com https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/; frame-ancestors 'none'; base-uri 'self'; form-action 'self'";
+  "default-src 'self'; script-src 'self' https://accounts.google.com https://apis.google.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://firebasestorage.googleapis.com https://www.google.com/recaptcha/ https://us-central1-pretso-database.cloudfunctions.net https://us-central1-pretso-prod.cloudfunctions.net; frame-src https://accounts.google.com https://pretso-database.firebaseapp.com https://pretso-prod.firebaseapp.com https://www.google.com/recaptcha/ https://recaptcha.google.com/recaptcha/; frame-ancestors 'none'; base-uri 'self'; form-action 'self'";
 
 const block = firebaseJson.hosting.headers.find((entry) => entry.source === '**');
 const headers = new Map((block?.headers ?? []).map((header) => [header.key, header.value]));
@@ -11,6 +11,13 @@ const csp = headers.get('Content-Security-Policy') ?? '';
 describe('Content-Security-Policy de firebase.json', () => {
   it('matches the expected policy exactly', () => {
     expect(csp).toBe(EXPECTED_CSP);
+  });
+
+  it('allows only the two callable hosts without wildcards', () => {
+    const connect = csp.split(';').find((d) => d.trim().startsWith('connect-src')) ?? '';
+    expect(connect).toContain('https://us-central1-pretso-database.cloudfunctions.net');
+    expect(connect).toContain('https://us-central1-pretso-prod.cloudfunctions.net');
+    expect(csp).not.toContain('*.cloudfunctions.net');
   });
 
   it('keeps script-src free of unsafe-inline and unsafe-eval', () => {
