@@ -51,7 +51,7 @@ Las reglas están ubicadas en `firestore.rules` en la raíz del proyecto. Estas 
 - Bloquea interacciones no autorizadas a nivel de servidor, independientemente de la interfaz que use el cliente.
 
 ### Lista de cuentas (`listAccounts`)
-La pantalla «Gestión de Usuarios» muestra las cuentas (correo, rol, acceso con Google o contraseña, estado y último acceso) a partir de la función callable `listAccounts` (`functions/src/index.ts`, 2.ª generación, `us-central1`). Solo responde si el token trae `admin === true`; no recibe parámetros y no devuelve uid, hashes ni claims crudos (contrato en `functions/src/accounts.ts`, validado en `src/utils/accounts.ts`). Corre con la cuenta de servicio `fn-usuarios@<proyecto>`, que solo lee Authentication (`roles/firebaseauth.viewer`). Se despliega solo con `functions:listAccounts`, nunca con `--only functions` a secas (sacaría también `createReaderUser`, de 1.ª generación y con la cuenta por defecto); la CSP de `firebase.json` permite solo los hosts de esa función.
+La pantalla «Gestión de Usuarios» muestra las cuentas (correo, rol, acceso con Google o contraseña, estado y último acceso) a partir de la función callable `listAccounts` (`functions/src/index.ts`, 2.ª generación, `us-central1`). Solo responde si el token trae `admin === true`; no recibe parámetros y no devuelve uid, hashes ni claims crudos (contrato en `functions/src/accounts.ts`, validado en `src/utils/accounts.ts`). Corre con la cuenta de servicio `fn-usuarios@<proyecto>`, que solo lee Authentication (`roles/firebaseauth.viewer`). Se despliega solo con `functions:listAccounts`, y la antigua `createReaderUser` se eliminó del código (2026-11-02); la CSP de `firebase.json` permite solo los hosts de esa función.
 
 ## 6. Despliegue y Pipeline CI/CD
 

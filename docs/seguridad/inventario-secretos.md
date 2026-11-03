@@ -176,4 +176,4 @@ Los secretos S3 no tienen periodicidad de rotación por calendario: se rotan al 
 
 ## Función `listAccounts` (lista de cuentas, 2026-11-02)
 
-Identidad de ejecución prevista: `fn-usuarios@<proyecto>.iam.gserviceaccount.com` con solo `roles/firebaseauth.viewer` (sin `roles/editor`; no usa la cuenta de cómputo por defecto). `createReaderUser` sigue sin desplegarse. Estado: código listo; la cuenta de servicio y los roles del desplegador se crean en `pretso-database` con autorización del propietario (aún no ejecutado).
+Identidad de ejecución prevista: `fn-usuarios@<proyecto>.iam.gserviceaccount.com` con solo `roles/firebaseauth.viewer` (sin `roles/editor`; no usa la cuenta de cómputo por defecto). `createReaderUser` se eliminó del código el 2026-11-02. Estado: código listo; la cuenta de servicio y los roles del desplegador se crean en `pretso-database` con autorización del propietario (aún no ejecutado).
