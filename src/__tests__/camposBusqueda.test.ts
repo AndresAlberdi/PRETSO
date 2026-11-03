@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { COLUMN_ORDERS } from '../utils/xlsxExport';
 import {
+  CAMPOS_BUSQUEDA_BIBLIOGRAFIA,
   CAMPOS_BUSQUEDA_DOCUMENTOS,
   CAMPOS_BUSQUEDA_TRANSACCIONES,
 } from '../utils/camposBusqueda';
@@ -32,5 +33,13 @@ describe('nombres de campo de los buscadores', () => {
     expect(CAMPOS_BUSQUEDA_TRANSACCIONES.doc.modo).toBe('exacto');
     expect(CAMPOS_BUSQUEDA_DOCUMENTOS.all.modo ?? 'contiene').toBe('contiene');
     expect(CAMPOS_BUSQUEDA_TRANSACCIONES.all.modo ?? 'contiene').toBe('contiene');
+  });
+  it('Bibliografía usa solo columnas reales y separa autores de referencia', () => {
+    for (const campo of camposDe(CAMPOS_BUSQUEDA_BIBLIOGRAFIA)) {
+      expect(COLUMN_ORDERS.bibliografia).toContain(campo);
+    }
+    expect(CAMPOS_BUSQUEDA_BIBLIOGRAFIA.autores.campos).toEqual(['Autores']);
+    expect(CAMPOS_BUSQUEDA_BIBLIOGRAFIA.referencia.campos).toEqual(['Referencias bibliográficas']);
+    expect(CAMPOS_BUSQUEDA_BIBLIOGRAFIA.all.modo ?? 'contiene').toBe('contiene');
   });
 });
