@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
+import { existsSync, readFileSync } from 'node:fs';
+import { join, resolve } from 'node:path';
 
 const fuente = readFileSync(resolve(__dirname, '../App.tsx'), 'utf8');
 
@@ -75,6 +75,22 @@ describe('rutas de App.tsx', () => {
       if (p === '/buscar') expect(sinEspacios(t)).toContain('conAgregar');
       else expect(t, p).not.toContain('conAgregar');
     }
+  });
+
+  it('/login redirige a «/» y «/» usa HomeRoute con el acceso, no ProtectedRoute', () => {
+    expect(sinEspacios(R.get('/login')!)).toContain('<Navigateto="/"replace/>');
+    const raiz = sinEspacios(R.get('/')!);
+    expect(raiz).toContain('<HomeRoute');
+    expect(raiz).toContain('<Portadaacceso/>');
+    expect(raiz).toContain('<ReaderRoute>');
+    expect(raiz).not.toContain('<ProtectedRoute>');
+  });
+
+  it('ProtectedRoute redirige a «/» y ya no existe pages/Login', () => {
+    const protegida = readFileSync(join(__dirname, '..', 'components', 'ProtectedRoute.tsx'), 'utf8');
+    expect(protegida).toContain('<Navigate to="/" replace />');
+    expect(protegida).not.toContain('/login');
+    expect(existsSync(join(__dirname, '..', 'pages', 'Login.tsx'))).toBe(false);
   });
 
   it('el comodín navega a "/"', () => {

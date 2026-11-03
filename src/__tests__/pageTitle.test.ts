@@ -17,7 +17,7 @@ describe('pageTitle', () => {
     ['/auditoria', 'Auditoría — PRETSO'],
     ['/administracion', 'Administración — PRETSO'],
     ['/usuarios', 'Usuarios — PRETSO'],
-    ['/login', 'Iniciar sesión — PRETSO'],
+    ['/login', 'PRETSO'],
   ];
 
   it.each(casos)('ruta %s', (ruta, esperado) => {

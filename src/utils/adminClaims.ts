@@ -8,3 +8,9 @@ export function hasAdminClaim(claims: Record<string, unknown> | null | undefined
 export function hasReaderClaim(claims: Record<string, unknown> | null | undefined): boolean {
   return claims?.reader === true;
 }
+
+// Administración solo por Google: el proveedor con el que se abrió ESTA sesión (claim
+// firebase.sign_in_provider). Lista blanca: cualquier otro valor, incluido null, no habilita.
+export function isAllowedAdminProvider(provider: string | null | undefined): boolean {
+  return provider === 'google.com';
+}

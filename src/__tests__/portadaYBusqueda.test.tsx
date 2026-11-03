@@ -2,8 +2,13 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, within, cleanup, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 
-vi.mock('../firebase', () => ({ db: {} }));
-let estado: { isAdmin: boolean; adminLoading: boolean } = { isAdmin: false, adminLoading: false };
+vi.mock('../firebase', () => ({ db: {}, auth: {} }));
+vi.mock('firebase/auth', () => ({
+  signInWithEmailAndPassword: vi.fn(),
+  signInWithPopup: vi.fn(),
+  GoogleAuthProvider: vi.fn(function GoogleAuthProvider() {}),
+}));
+let estado: { isAdmin: boolean; adminLoading: boolean; authNotice?: string | null; clearAuthNotice?: () => void } = { isAdmin: false, adminLoading: false, authNotice: null, clearAuthNotice: () => undefined };
 vi.mock('../context/AdminContext', () => ({ useAdmin: () => estado }));
 
 const consultadas: string[] = [];
@@ -28,7 +33,7 @@ beforeEach(() => {
   consultadas.length = 0;
   fallar = false;
   retener = null;
-  estado = { isAdmin: false, adminLoading: false };
+  estado = { isAdmin: false, adminLoading: false, authNotice: null, clearAuthNotice: () => undefined };
   vi.spyOn(console, 'error').mockImplementation(() => {});
 });
 afterEach(() => {
@@ -63,6 +68,20 @@ describe('Portada', () => {
     expect(admin.getAttribute('href')).toBe('/administracion');
     expect(editar.classList.contains('boton-editor')).toBe(true);
     expect(admin.classList.contains('boton-editor')).toBe(true);
+  });
+});
+
+describe('Portada con acceso (sin sesión)', () => {
+  it('muestra título, logos y el acceso, sin botones de la aplicación', () => {
+    enRouter(<Portada acceso />);
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('PRETSO');
+    expect(screen.getAllByRole('img')).toHaveLength(3);
+    expect(screen.getByRole('heading', { level: 2, name: 'Iniciar sesión' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Continuar con Google' })).toBeTruthy();
+    expect(screen.queryByRole('link', { name: 'Realizar búsquedas' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Editar' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Administración' })).toBeNull();
   });
 });
 
