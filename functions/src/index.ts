@@ -70,7 +70,7 @@ export const createReaderUser = functions.https.onCall(async (data, context) => 
 export const listAccounts = onCall(
   {
     region: "us-central1",
-    serviceAccount: `fn-usuarios@${process.env.GCLOUD_PROJECT}.iam.gserviceaccount.com`,
+    serviceAccount: "fn-usuarios@",
     enforceAppCheck: false,
     maxInstances: 2,
     memory: "256MiB",

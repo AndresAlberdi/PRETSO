@@ -5,40 +5,42 @@ import {
 } from '../utils/accounts';
 import { loginErrorCode } from '../utils/authErrors';
 
-type Estado = { tipo: 'cargando' } | { tipo: 'listo'; datos: ListAccountsResult } | { tipo: 'error'; mensaje: string };
+// `clave` identifica la petición a la que pertenece el resultado: si no coincide con la actual, se está cargando.
+type Resultado = { clave: string; tipo: 'listo'; datos: ListAccountsResult } | { clave: string; tipo: 'error'; mensaje: string };
 
 // Lista de cuentas (correo, rol, acceso, estado y último acceso). Los datos vienen de la función
 // `listAccounts`, solo para administradores; nunca incluyen uid ni contraseñas.
 export default function AccountList({ refreshSignal }: { refreshSignal: number }) {
-  const [estado, setEstado] = useState<Estado>({ tipo: 'cargando' });
+  const [resultado, setResultado] = useState<Resultado | null>(null);
   const [recarga, setRecarga] = useState(0);
+  const clave = `${refreshSignal}-${recarga}`;
 
   useEffect(() => {
     let vigente = true;
-    setEstado({ tipo: 'cargando' });
     fetchAccounts()
-      .then((datos) => { if (vigente) setEstado({ tipo: 'listo', datos }); })
+      .then((datos) => { if (vigente) setResultado({ clave, tipo: 'listo', datos }); })
       .catch((err: unknown) => {
         if (!vigente) return;
         console.error('Error al listar usuarios:', loginErrorCode(err));
-        setEstado({ tipo: 'error', mensaje: accountsErrorMessage(err) });
+        setResultado({ clave, tipo: 'error', mensaje: accountsErrorMessage(err) });
       });
     return () => { vigente = false; };
-  }, [refreshSignal, recarga]);
+  }, [clave]);
 
-  const cargando = estado.tipo === 'cargando';
+  const estado = resultado !== null && resultado.clave === clave ? resultado : null;
+  const cargando = estado === null;
 
   return (
     <section style={{ marginTop: '2rem' }} aria-labelledby="titulo-cuentas">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
         <h2 id="titulo-cuentas" style={{ margin: 0, fontSize: '1.2em' }}>Cuentas registradas</h2>
-        <button type="button" className="boton boton-secundario" disabled={cargando} onClick={() => setRecarga((n) => n + 1)}>
+        <button type="button" className="boton boton-secundario" aria-disabled={cargando} onClick={() => { if (!cargando) setRecarga((n) => n + 1); }}>
           Actualizar lista
         </button>
       </div>
       {cargando && <output>Cargando usuarios...</output>}
-      {estado.tipo === 'error' && <div role="alert" className="acceso-error" style={{ marginTop: '1rem' }}>{estado.mensaje}</div>}
-      {estado.tipo === 'listo' && (
+      {estado?.tipo === 'error' && <div role="alert" className="acceso-error" style={{ marginTop: '1rem' }}>{estado.mensaje}</div>}
+      {estado?.tipo === 'listo' && (
         estado.datos.accounts.length === 0 ? <p>No hay cuentas registradas.</p> : (
           <div style={{ overflowX: 'auto', marginTop: '1rem' }}>
             <table>
@@ -67,7 +69,7 @@ export default function AccountList({ refreshSignal }: { refreshSignal: number }
           </div>
         )
       )}
-      {estado.tipo === 'listo' && estado.datos.truncated && (
+      {estado?.tipo === 'listo' && estado.datos.truncated && (
         <p>Se muestran las primeras {MAX_ACCOUNTS_SHOWN} cuentas.</p>
       )}
     </section>

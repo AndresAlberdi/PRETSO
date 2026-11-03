@@ -68,6 +68,20 @@ describe('AccountList', () => {
     expect((await screen.findByRole('alert')).textContent).toBe('No se pudo cargar la lista de usuarios. Inténtelo de nuevo.');
   });
 
+  it('sesión expirada: texto propio', async () => {
+    llamada.mockRejectedValue({ code: 'functions/unauthenticated' });
+    render(<AccountList refreshSignal={0} />);
+    expect((await screen.findByRole('alert')).textContent).toBe('Su sesión expiró. Vuelva a iniciar sesión.');
+  });
+
+  it('un cambio de refreshSignal (alta de usuario) recarga la lista', async () => {
+    llamada.mockResolvedValue({ data: { truncated: false, accounts: [cuenta()] } });
+    const { rerender } = render(<AccountList refreshSignal={0} />);
+    await screen.findByRole('table');
+    rerender(<AccountList refreshSignal={1} />);
+    await waitFor(() => expect(llamada).toHaveBeenCalledTimes(2));
+  });
+
   it('truncado y lista vacía', async () => {
     llamada.mockResolvedValueOnce({ data: { truncated: true, accounts: [cuenta()] } });
     const { unmount } = render(<AccountList refreshSignal={0} />);
