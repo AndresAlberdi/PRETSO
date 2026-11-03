@@ -29,7 +29,7 @@ describe('caracterización de los estilos de los formularios modales', () => {
   it('GenericCreateModal (bibliografía)', async () => {
     render(<GenericCreateModal collectionName="bibliografia" onClose={() => {}} onCreated={() => {}} />);
     await waitFor(() => expect(screen.queryByText('Cargando opciones...')).toBeNull());
-    expect(capas('Nuevo Registro - BIBLIOGRAFÍA')).toMatchInlineSnapshot(`
+    expect(capas('Nuevo registro: BIBLIOGRAFÍA')).toMatchInlineSnapshot(`
       {
         "overlay": "position: fixed; top: 0px; left: 0px; right: 0px; bottom: 0px; background-color: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 2000;",
         "panel": "background: var(--bg-card); padding: 2.5rem; border-radius: 12px; max-width: 700px; width: 90%; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border-color); box-shadow: 0 8px 32px rgba(0,0,0,0.3);",
@@ -46,7 +46,7 @@ describe('caracterización de los estilos de los formularios modales', () => {
         onClose={() => {}}
       />,
     );
-    expect(capas('Editar Registro - BIBLIOGRAFÍA')).toMatchInlineSnapshot(`
+    expect(capas('Editar registro: BIBLIOGRAFÍA')).toMatchInlineSnapshot(`
       {
         "overlay": "position: fixed; top: 0px; left: 0px; right: 0px; bottom: 0px; background-color: rgba(0, 0, 0, 0.6); display: flex; align-items: center; justify-content: center; z-index: 2000;",
         "panel": "background: var(--bg-card); padding: 2rem; border-radius: 12px; max-width: 600px; width: 90%; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border-color); box-shadow: 0 8px 32px rgba(0,0,0,0.3);",

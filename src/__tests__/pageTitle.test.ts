@@ -5,10 +5,10 @@ describe('pageTitle', () => {
   const casos: Array<[string, string]> = [
     ['/', 'Inicio — PRETSO'],
     ['/buscar', 'Búsqueda general — PRETSO'],
-    ['/caja', 'Manejo de Caja — PRETSO'],
+    ['/caja', 'Manejo de caja — PRETSO'],
     ['/salarios', 'Remuneraciones — PRETSO'],
     ['/corpus', 'Corpus Christi — PRETSO'],
-    ['/indicadores', 'Identificación de Indicadores — PRETSO'],
+    ['/indicadores', 'Identificación de indicadores — PRETSO'],
     ['/companias', 'Compañías — PRETSO'],
     ['/bibliografia', 'Bibliografía — PRETSO'],
     ['/agregar', 'Agregar transacción — PRETSO'],
@@ -25,7 +25,7 @@ describe('pageTitle', () => {
   });
 
   it('ignora la barra final', () => {
-    expect(pageTitle('/caja/')).toBe('Manejo de Caja — PRETSO');
+    expect(pageTitle('/caja/')).toBe('Manejo de caja — PRETSO');
   });
 
   it('usa PRETSO por defecto en rutas desconocidas', () => {

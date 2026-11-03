@@ -48,7 +48,7 @@ async function abrir(texto: string) {
   await screen.findByRole('heading', { name: 'Búsqueda general' });
   await vi.waitFor(() => expect(screen.queryByText(/Cargando base de datos/)).toBeNull());
   buscar('all', texto);
-  await screen.findByText(/Resultados de Búsqueda/);
+  await screen.findByText(/Resultados de búsqueda/);
 }
 
 const region = () => document.querySelector('output.visually-hidden') as HTMLElement;
@@ -65,7 +65,7 @@ describe('Búsqueda general: texto de los resultados', () => {
     await screen.findByRole('heading', { name: 'Búsqueda general' });
     await vi.waitFor(() => expect(screen.queryByText(/Cargando base de datos/)).toBeNull());
     buscar('all', 'norma secreta');
-    await screen.findByText(/Resultados de Búsqueda/);
+    await screen.findByText(/Resultados de búsqueda/);
     expect(screen.queryByText(/Ciudad: Potosí/)).toBeNull();
   });
 

@@ -60,7 +60,7 @@ describe('Corpus Christi: sigla en vez de número de registro', () => {
     const boton = await screen.findByRole('button', { name: 'GA-JR' });
     const antes = lecturas.lista.length;
     fireEvent.click(boton);
-    expect(screen.getByText('Detalle de Compañía')).toBeTruthy();
+    expect(screen.getByText('Detalle de compañía')).toBeTruthy();
     expect(screen.getByText('Compañía de Alarcón')).toBeTruthy();
     expect(screen.queryByText('Indicador de registro')).toBeNull();
     expect(screen.queryByText('c7')).toBeNull();
@@ -112,7 +112,7 @@ describe('Indicadores: sigla en vez de número de registro', () => {
     expect(screen.queryByText('12')).toBeNull();
     const antes = lecturas.lista.length;
     fireEvent.click(boton);
-    expect(screen.getByText('Detalle de Compañía')).toBeTruthy();
+    expect(screen.getByText('Detalle de compañía')).toBeTruthy();
     expect(screen.getByText('Juan')).toBeTruthy();
     expect(screen.queryByText('Indicador de registro')).toBeNull();
     expect(lecturas.lista.length).toBe(antes);

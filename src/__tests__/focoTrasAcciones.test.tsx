@@ -169,11 +169,11 @@ describe('Botones de guardar', () => {
     let rechazar: (e: Error) => void = () => {};
     setDoc.mockImplementation(() => ({ then: (_ok: unknown, ko: (e: Error) => void) => { rechazar = ko; } }));
     render(<GenericCreateModal collectionName="bibliografia" onClose={vi.fn()} onCreated={vi.fn()} />);
-    await screen.findByRole('dialog', { name: /Nuevo Registro - / });
+    await screen.findByRole('dialog', { name: /Nuevo registro: / });
     await waitFor(() => expect(screen.queryByText('Cargando opciones...')).toBeNull());
     fireEvent.change(screen.getByPlaceholderText('Autores del documento...'), { target: { value: 'Alguien' } });
     fireEvent.change(screen.getByPlaceholderText('Detalles bibliográficos...'), { target: { value: 'Ref' } });
-    const enviar = screen.getByRole('button', { name: 'Crear Registro' });
+    const enviar = screen.getByRole('button', { name: 'Crear registro' });
     enviar.focus();
     fireEvent.submit(document.querySelector('form') as HTMLFormElement);
     const guardando = await screen.findByRole('button', { name: 'Guardando...' });
@@ -181,7 +181,7 @@ describe('Botones de guardar', () => {
     expect((guardando as HTMLButtonElement).disabled).toBe(false);
     expect(document.activeElement).toBe(guardando);
     rechazar(new Error('fallo'));
-    const tras = await screen.findByRole('button', { name: 'Crear Registro' });
+    const tras = await screen.findByRole('button', { name: 'Crear registro' });
     expect(tras.getAttribute('aria-disabled')).toBeNull();
     expect(document.activeElement).toBe(tras);
   });
@@ -197,7 +197,7 @@ describe('Botones de guardar', () => {
         onClose={vi.fn()}
       />,
     );
-    await screen.findByRole('dialog', { name: /Editar Registro/ });
+    await screen.findByRole('dialog', { name: /Editar registro/ });
     const campo = screen.getAllByRole('textbox')[0];
     campo.focus();
     const form = document.querySelector('form') as HTMLFormElement;
@@ -208,10 +208,10 @@ describe('Botones de guardar', () => {
     fireEvent.submit(form);
     expect(onSave).toHaveBeenCalledTimes(1);
     terminar();
-    await screen.findByRole('button', { name: 'Guardar Cambios' });
+    await screen.findByRole('button', { name: 'Guardar cambios' });
   });
 
-  it('edición: si onSave rechaza, vuelve «Guardar Cambios» sin aria-disabled y se puede reenviar', async () => {
+  it('edición: si onSave rechaza, vuelve «Guardar cambios» sin aria-disabled y se puede reenviar', async () => {
     const onSave = vi.fn().mockImplementation(() => ({ then: (_ok: unknown, ko: (e: Error) => void) => { ko(new Error('fallo')); } }));
     render(
       <GenericEditModal
@@ -221,7 +221,7 @@ describe('Botones de guardar', () => {
         onClose={vi.fn()}
       />,
     );
-    await screen.findByRole('dialog', { name: /Editar Registro/ });
+    await screen.findByRole('dialog', { name: /Editar registro/ });
     const form = document.querySelector('form') as HTMLFormElement;
     // El rechazo se propaga desde el manejador; se captura aquí para no ensuciar la ejecución.
     const previos = process.listeners('unhandledRejection');
@@ -229,10 +229,10 @@ describe('Botones de guardar', () => {
     const capturados: unknown[] = [];
     process.on('unhandledRejection', motivo => { capturados.push(motivo); });
     fireEvent.submit(form);
-    const boton = await screen.findByRole('button', { name: 'Guardar Cambios' });
+    const boton = await screen.findByRole('button', { name: 'Guardar cambios' });
     expect(boton.getAttribute('aria-disabled')).toBeNull();
     fireEvent.submit(form);
-    await screen.findByRole('button', { name: 'Guardar Cambios' });
+    await screen.findByRole('button', { name: 'Guardar cambios' });
     expect(onSave).toHaveBeenCalledTimes(2);
     await new Promise(r => setTimeout(r, 0));
     process.removeAllListeners('unhandledRejection');

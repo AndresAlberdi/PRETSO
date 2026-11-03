@@ -37,7 +37,7 @@ describe('aviso de enlace roto en Remuneraciones', () => {
     fireEvent.change(screen.getAllByRole('combobox')[0], { target: { value: 'Autores' } });
     fireEvent.change(screen.getByPlaceholderText('Añadir filtro...'), { target: { value: 'Alarcón' } });
     fireEvent.click(screen.getAllByRole('button', { name: 'Buscar' })[0]);
-    fireEvent.click(await screen.findByRole('button', { name: 'Enlace Roto' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Enlace roto' }));
     const alerta = screen.getByRole('alert');
     expect(alerta.textContent).toBe('El enlace a la transacción 999 está roto.');
     const cerrar = screen.getByRole('button', { name: 'Cerrar' });

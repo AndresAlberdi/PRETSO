@@ -57,7 +57,7 @@ export default function AccesoForm() {
       {mensaje && <div ref={avisoRef} tabIndex={-1} role="alert" className="acceso-error">{mensaje}</div>}
       <form className="acceso-form" onSubmit={handleSubmit}>
         <label className="acceso-campo">
-          Correo Electrónico
+          Correo electrónico
           <input
             type="email"
             autoComplete="username"

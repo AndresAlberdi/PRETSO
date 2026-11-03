@@ -87,7 +87,7 @@ describe('valorDeReferencia', () => {
 describe('esCampoCompaniaCorpus', () => {
   it('reconoce los campos de compañía de Corpus Christi', () => {
     for (const k of ['Compañía', 'Compañía2', 'Compañía10', 'Cmp', 'Cmp2']) expect(esCampoCompaniaCorpus(k)).toBe(true);
-    for (const k of ['Ciudad', 'Sigla Compañía', 'Compañía Principal']) expect(esCampoCompaniaCorpus(k)).toBe(false);
+    for (const k of ['Ciudad', 'Sigla Compañía', 'Compañía principal']) expect(esCampoCompaniaCorpus(k)).toBe(false);
   });
 });
 

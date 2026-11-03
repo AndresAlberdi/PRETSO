@@ -178,7 +178,7 @@ export default function IndiceCompanias() {
   return (
     <div>
       <div className="cabecera-pagina">
-        <h1>Índice de Compañías</h1>
+        <h1>Índice de compañías</h1>
         <div className="acciones-cabecera">
           <input 
             type="text" 
@@ -208,9 +208,9 @@ export default function IndiceCompanias() {
               <tr>
                 <SortableTh label="Sigla (Compañías)" sortKey="Sigla Compañía" sortConfig={sortConfig} onSort={requestSort} />
                 <SortableTh label="Autores" sortKey="Autores" sortConfig={sortConfig} onSort={requestSort} />
-                <SortableTh label="Temporadas Teatrales" sortKey="Temporadas teatrales" sortConfig={sortConfig} onSort={requestSort} />
+                <SortableTh label="Temporadas teatrales" sortKey="Temporadas teatrales" sortConfig={sortConfig} onSort={requestSort} />
                 <SortableTh label="Ámbito" sortKey="Ámbito" sortConfig={sortConfig} onSort={requestSort} />
-                <th scope="col">Vínculos Rápidos</th>
+                <th scope="col">Vínculos rápidos</th>
                 {canEdit && <th scope="col">Admin</th>}
               </tr>
             </thead>
@@ -259,7 +259,7 @@ export default function IndiceCompanias() {
 
       {recordToDelete && (
         <ConfirmModal 
-          title="Confirmar Borrado"
+          title="Confirmar borrado"
           message={<>¿Está seguro de que desea eliminar la compañía <strong>{recordToDelete["Sigla Compañía"]}</strong>? Esta acción no se puede deshacer.</>}
           onConfirm={handleDelete}
           onCancel={() => setRecordToDelete(null)}
