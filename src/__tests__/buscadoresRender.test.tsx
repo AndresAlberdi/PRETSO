@@ -2,8 +2,14 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import Documentos from '../pages/Documentos';
 import Transacciones from '../pages/Transacciones';
+import Bibliografia from '../pages/Bibliografia';
 
 const colecciones: Record<string, any[]> = {
+  bibliografia: [
+    { id: 'b1', Autores: 'García, Juan', 'Referencias bibliográficas': 'Teatro en Valencia, 1990' },
+    { id: 'b2', Autores: 'Pérez, Ana', 'Referencias bibliográficas': 'Estudio sobre García Lorca' },
+    { id: 'b3', Autores: 'Ruiz, Luis', 'Referencias bibliográficas': 'Fiestas del Corpus' },
+  ],
   documentos: [
     { id: 'd1', Doc: 1, Documento: 'Carta de García sobre el carro' },
     { id: 'd2', Doc: 2, Documento: 'Recibo de tela' },
@@ -127,5 +133,29 @@ describe('buscadores de administración', () => {
       expect(screen.queryByText('Solo editores')).toBeNull();
       unmount();
     }
+  });
+});
+
+describe('buscador de Bibliografía', () => {
+  afterEach(() => { cleanup(); });
+  it('encuentra «garcia» como «García», no busca autores en referencias y combina con AND', async () => {
+    render(<Bibliografia />);
+    await waitFor(() => expect(screen.getByText('Mostrando 3 de 3 registros')).toBeTruthy());
+    filtrar('all', 'garcia');
+    expect(screen.getByText('Mostrando 2 de 3 registros')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Limpiar' }));
+    filtrar('autores', 'garcia');
+    expect(screen.getByText('Mostrando 1 de 3 registros')).toBeTruthy();
+    expect(screen.queryByText('Estudio sobre García Lorca')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: 'Limpiar' }));
+    filtrar('referencia', 'ruiz');
+    expect(screen.getByText('No se encontraron registros con los filtros aplicados.')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Limpiar' }));
+    filtrar('all', 'garcia');
+    filtrar('referencia', 'valencia');
+    expect(screen.getByText('Mostrando 1 de 3 registros')).toBeTruthy();
+    expect(screen.getByText('Teatro en Valencia, 1990')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Limpiar' }));
+    expect(screen.getByText('Mostrando 3 de 3 registros')).toBeTruthy();
   });
 });

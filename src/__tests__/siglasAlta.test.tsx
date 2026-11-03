@@ -88,7 +88,7 @@ describe('alta de compañías: sigla', () => {
     fireEvent.click(within(dialogo).getByRole('button', { name: 'Revisar la sigla' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(setDoc).not.toHaveBeenCalled();
-    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Crear Registro' }));
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Crear registro' }));
   });
 
   it('la aceptación queda atada a la sigla aceptada', async () => {

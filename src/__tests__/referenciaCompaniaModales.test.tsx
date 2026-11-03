@@ -39,7 +39,7 @@ async function abrirAlta(coleccion: string) {
 }
 
 describe('alta: la compañía se guarda por número de registro', () => {
-  it('Manejo de Caja guarda el número (tipo numérico) y muestra «sigla - autores»', async () => {
+  it('Manejo de caja guarda el número (tipo numérico) y muestra «sigla - autores»', async () => {
     const { form } = await abrirAlta('manejo_de_caja');
     expect(screen.getByRole('option', { name: 'JG - Juan' })).toBeTruthy();
     const [selCompania, selTransaccion] = screen.getAllByRole('combobox');
@@ -132,7 +132,7 @@ describe('edición: la compañía es un selector', () => {
     expect(selector.tagName).toBe('SELECT');
     expect(selector.value).toBe('7');
     fireEvent.change(selector, { target: { value: '12' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Guardar Cambios' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar cambios' }));
     await waitFor(() => expect(onSave).toHaveBeenCalled());
     expect(onSave.mock.calls[0][0]['Sigla Compañía']).toBe(12);
   });
@@ -141,7 +141,7 @@ describe('edición: la compañía es un selector', () => {
     const { onSave, selector } = await abrirEdicion('manejo_de_caja', { id: 'r4', 'Indicador de registro': 2, 'Sigla Compañía': 7 });
     expect(selector.value).toBe('7');
     fireEvent.change(selector, { target: { value: '' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Guardar Cambios' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar cambios' }));
     await waitFor(() => expect(onSave).toHaveBeenCalled());
     expect(onSave.mock.calls[0][0]['Sigla Compañía']).toBeNull();
   });
@@ -149,7 +149,7 @@ describe('edición: la compañía es un selector', () => {
   it('Corpus Christi: guarda el número de Compañía elegido', async () => {
     const { onSave, selector } = await abrirEdicion('corpus_christi', { id: 'r5', Ciudad: 'Potosí', 'Compañía': 12.0 });
     fireEvent.change(selector, { target: { value: '7' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Guardar Cambios' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar cambios' }));
     await waitFor(() => expect(onSave).toHaveBeenCalled());
     const guardado = onSave.mock.calls[0][0];
     expect(guardado['Compañía']).toBe(7);
@@ -158,7 +158,7 @@ describe('edición: la compañía es un selector', () => {
 
   it('Corpus Christi: sin tocar la compañía conserva su valor original', async () => {
     const { onSave } = await abrirEdicion('corpus_christi', { id: 'r6', Ciudad: 'Potosí', 'Compañía': 12.0 });
-    fireEvent.click(screen.getByRole('button', { name: 'Guardar Cambios' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar cambios' }));
     await waitFor(() => expect(onSave).toHaveBeenCalled());
     expect(onSave.mock.calls[0][0]['Compañía']).toBe(12);
   });
@@ -167,7 +167,7 @@ describe('edición: la compañía es un selector', () => {
     const { onSave, selector } = await abrirEdicion('salarios', { id: 'r2', 'Sigla Compañía': 'ZZ' });
     expect(screen.getByRole('option', { name: '(sin resolver: ZZ)' })).toBeTruthy();
     expect(selector.value).toBe('ZZ');
-    fireEvent.click(screen.getByRole('button', { name: 'Guardar Cambios' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar cambios' }));
     await waitFor(() => expect(onSave).toHaveBeenCalled());
     expect(onSave.mock.calls[0][0]['Sigla Compañía']).toBe('ZZ');
   });

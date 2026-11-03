@@ -1,6 +1,6 @@
 
 import EditToggle from "../components/EditToggle";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { collection, getDocs, query, deleteDoc, doc } from "firebase/firestore";
 import { db } from "../firebase";
 import { cleanFirebaseData } from "../utils";
@@ -14,6 +14,15 @@ import GenericEditModal from "../components/GenericEditModal";
 import { updateDoc } from "firebase/firestore";
 import { useSortableTable } from "../hooks/useSortableTable";
 import SortableTh from "../components/SortableTh";
+import SearchBar, { type SearchFilter } from "../components/SearchBar";
+import { filtrarRegistros } from "../utils/filtrarRegistros";
+import { CAMPOS_BUSQUEDA_BIBLIOGRAFIA } from "../utils/camposBusqueda";
+
+const SEARCH_CATEGORIES = [
+  { id: 'autores', label: 'Autores' },
+  { id: 'referencia', label: 'Referencia' },
+  { id: 'all', label: 'Texto libre' },
+];
 
 export default function Bibliografia() {
   const [data, setData] = useState<any[]>([]);
@@ -24,7 +33,10 @@ export default function Bibliografia() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
 
-  const { items: sortedData, requestSort, sortConfig } = useSortableTable(data);
+  const [filters, setFilters] = useState<SearchFilter[]>([]);
+  const filteredData = useMemo(() => filtrarRegistros(data, filters, CAMPOS_BUSQUEDA_BIBLIOGRAFIA), [data, filters]);
+
+  const { items: sortedData, requestSort, sortConfig } = useSortableTable(filteredData);
 
   useEffect(() => {
     async function fetchData() {
@@ -78,6 +90,7 @@ export default function Bibliografia() {
       <div className="cabecera-pagina">
         <h1>Bibliografía</h1>
         <div className="acciones-cabecera">
+          <SearchBar onSearch={setFilters} categories={SEARCH_CATEGORIES} />
           <EditToggle />
           {canEdit && (
             <button type="button" className="boton boton-editor" onClick={() => setIsCreateOpen(true)}>Nuevo registro</button>
@@ -85,8 +98,13 @@ export default function Bibliografia() {
         </div>
       </div>
       
-      {!loading && <p style={{ color: 'var(--text-muted)' }}>Total registros: {data.length}</p>}
       {loading ? <p>Cargando datos...</p> : (
+        <>
+        <output aria-live="polite" style={{ display: 'block', margin: '0 0 0.5rem' }}>
+          {filteredData.length === 0 && filters.length > 0
+            ? 'No se encontraron registros con los filtros aplicados.'
+            : `Mostrando ${filteredData.length} de ${data.length} registros`}
+        </output>
         <div className="tabla-desplazable">
           <table className="sortable">
             <caption className="visually-hidden">Bibliografía</caption>
@@ -108,6 +126,7 @@ export default function Bibliografia() {
             </tbody>
           </table>
         </div>
+        </>
       )}
 
       {isCreateOpen && (
@@ -135,7 +154,7 @@ export default function Bibliografia() {
 
       {recordToDelete && (
         <ConfirmModal 
-          title="Confirmar Borrado"
+          title="Confirmar borrado"
           message={<>¿Está seguro de que desea eliminar la referencia bibliográfica de <strong>{recordToDelete["Autores"]}</strong>? Esta acción no se puede deshacer.</>}
           onConfirm={handleDelete}
           onCancel={() => setRecordToDelete(null)}

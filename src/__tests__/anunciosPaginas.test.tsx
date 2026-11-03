@@ -72,7 +72,7 @@ function buscar(categoria: string, texto: string) {
 }
 
 describe.each([
-  ['Manejo de Caja', ManejoCaja],
+  ['Manejo de caja', ManejoCaja],
   ['Remuneraciones', Salarios],
 ])('%s: anuncios de resultados', (_nombre, Pagina) => {
   it('anuncia el listado y la búsqueda en el mismo nodo persistente', async () => {
@@ -82,11 +82,11 @@ describe.each([
     expect(document.querySelectorAll('output.visually-hidden').length).toBe(1);
     expect(nodo.textContent).toBe('Listado: 2 registros');
     buscar('Autores', 'Alarcón');
-    await screen.findByText('Resultados de Búsqueda (1 registros)');
+    await screen.findByText('Resultados de búsqueda (1 registros)');
     expect(region()).toBe(nodo);
     expect(nodo.textContent).toBe('Búsqueda: 1 registro encontrado');
     expect(document.querySelectorAll('output.visually-hidden').length).toBe(1);
-    expect(screen.getAllByText(/Resultados de Búsqueda \(1 registros\)/).length).toBe(1);
+    expect(screen.getAllByText(/Resultados de búsqueda \(1 registros\)/).length).toBe(1);
   });
 
   it('compañía inexistente: anuncia que no se encontró', async () => {
@@ -121,7 +121,7 @@ describe('Corpus Christi e Indicadores: anuncios', () => {
     await screen.findByText(/Mostrando \d+ registros/);
     expect(region().textContent).toBe('Listado: 2 registros');
     buscar('Ciudad', 'Lima');
-    await screen.findByText(/Resultados de Búsqueda/);
+    await screen.findByText(/Resultados de búsqueda \(/);
     expect(region().textContent).toBe('Búsqueda: 1 registro encontrado');
   });
 
@@ -137,7 +137,7 @@ describe('Corpus Christi e Indicadores: anuncios', () => {
     await screen.findByText(/Mostrando \d+ categorías/);
     expect(region().textContent).toBe('Listado: 3 categorías');
     buscar('all', 'Pan');
-    await screen.findByText(/Resultados de Búsqueda/);
+    await screen.findByText(/Resultados de búsqueda \(/);
     expect(region().textContent).toBe('Búsqueda: 1 registro encontrado');
   });
 

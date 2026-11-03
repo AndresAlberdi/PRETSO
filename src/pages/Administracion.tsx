@@ -128,7 +128,7 @@ export default function Administracion() {
 
   return (
     <div style={{ padding: '2rem', maxWidth: '800px', margin: '0 auto' }}>
-      <h1>Administración del Sistema</h1>
+      <h1>Administración del sistema</h1>
       
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', marginTop: '2rem' }}>
         <section style={{ background: 'var(--bg-card)', padding: '1.5rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
@@ -144,7 +144,7 @@ export default function Administracion() {
               to="/usuarios" 
               style={{ padding: '0.8rem 1.5rem', background: 'var(--primary-color)', color: 'var(--on-primary)', textDecoration: 'none', borderRadius: '4px', fontWeight: 'bold' }}
             >
-              Gestión de Usuarios
+              Gestión de usuarios
             </Link>
             <Link 
               to="/transacciones" 
@@ -162,21 +162,21 @@ export default function Administracion() {
         </section>
 
         <section style={{ background: 'var(--bg-card)', padding: '1.5rem', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-          <h2>Exportación y Respaldos</h2>
+          <h2>Exportación y respaldos</h2>
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '1rem' }}>
             <button 
               onClick={handleDownloadXml}
               style={{ padding: '0.8rem 1.5rem', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
               disabled={backupStatus === 'loading'}
             >
-              Descargar Base de Datos (XML)
+              Descargar base de datos (XML)
             </button>
             <button 
               onClick={handleDownloadXlsx}
               style={{ padding: '0.8rem 1.5rem', background: '#28a745', color: 'var(--on-success)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
               disabled={backupStatus === 'loading'}
             >
-              Descargar Base de Datos (XLSX)
+              Descargar base de datos (XLSX)
             </button>
             <button 
               onClick={handleGoogleDriveBackup}
@@ -242,7 +242,7 @@ export default function Administracion() {
           }}
           panelStyle={{ background: 'var(--bg-card)', padding: '2rem', borderRadius: '8px', maxWidth: '500px', width: '90%' }}
         >
-            <h2 id={clientIdTitleId}>Configurar Google Client ID</h2>
+            <h2 id={clientIdTitleId}>Configurar el Client ID de Google</h2>
             <p id={clientIdDescId} style={{ color: 'var(--text-secondary, #aaa)', marginBottom: '1.5rem' }}>
               Para hacer copias en Google Drive, necesita proporcionar un Client ID de Google Cloud Console
               configurado para aplicaciones web con acceso a Google Drive API.

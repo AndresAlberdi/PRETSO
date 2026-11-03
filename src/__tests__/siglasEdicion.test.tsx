@@ -28,7 +28,7 @@ afterEach(cleanup);
 async function abrir(id: 'c1' | 'c2', onSave = vi.fn().mockResolvedValue(undefined)) {
   const record = companias.find(c => c.id === id)!;
   render(<GenericEditModal collectionName="companias" record={record} onSave={onSave} onClose={vi.fn()} />);
-  await screen.findByRole('dialog', { name: /Editar Registro/ });
+  await screen.findByRole('dialog', { name: /Editar registro/ });
   return {
     onSave,
     form: document.querySelector('form') as HTMLFormElement,
@@ -96,7 +96,7 @@ describe('edición de compañías: sigla', () => {
     expect(onSave.mock.calls[0][0]['Sigla Compañía']).toBe('JR-GA');
   });
 
-  it('al revisar la sigla no guarda y el foco queda en «Guardar Cambios»', async () => {
+  it('al revisar la sigla no guarda y el foco queda en «Guardar cambios»', async () => {
     const { form, sigla, onSave } = await abrir('c2');
     escribir(sigla, 'JR-GA');
     fireEvent.submit(form);
@@ -104,7 +104,7 @@ describe('edición de compañías: sigla', () => {
     fireEvent.click(within(dialogo).getByRole('button', { name: 'Revisar la sigla' }));
     await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
     expect(onSave).not.toHaveBeenCalled();
-    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Guardar Cambios' }));
+    expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Guardar cambios' }));
   });
 
   it('si falla la lectura no guarda y avisa sin marcar el campo', async () => {
@@ -156,7 +156,7 @@ describe('edición de compañías: sigla', () => {
     const antiguo = { id: 'c9', 'Indicador de registro': 9, 'Sigla Compañía': 'GA - JR', Autores: 'Dora' };
     const onSave = vi.fn().mockResolvedValue(undefined);
     render(<GenericEditModal collectionName="companias" record={antiguo} onSave={onSave} onClose={vi.fn()} />);
-    await screen.findByRole('dialog', { name: /Editar Registro/ });
+    await screen.findByRole('dialog', { name: /Editar registro/ });
     escribir(screen.getByLabelText('Autores'), 'Dora Ruiz');
     fireEvent.submit(document.querySelector('form') as HTMLFormElement);
     await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));
@@ -181,7 +181,7 @@ describe('edición de compañías: sigla', () => {
     const numerica = { id: 'c8', 'Indicador de registro': 8, 'Sigla Compañía': 123, Autores: 'Eva' };
     const onSave = vi.fn().mockResolvedValue(undefined);
     render(<GenericEditModal collectionName="companias" record={numerica} onSave={onSave} onClose={vi.fn()} />);
-    await screen.findByRole('dialog', { name: /Editar Registro/ });
+    await screen.findByRole('dialog', { name: /Editar registro/ });
     escribir(screen.getByLabelText('Autores'), 'Eva Paz');
     fireEvent.submit(document.querySelector('form') as HTMLFormElement);
     await waitFor(() => expect(onSave).toHaveBeenCalledTimes(1));

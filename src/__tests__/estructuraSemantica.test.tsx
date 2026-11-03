@@ -119,9 +119,9 @@ describe('estructura semántica: render', () => {
     expect(screen.getByRole('heading', { level: 2, name: 'Iniciar sesión' })).toBeTruthy();
   });
 
-  it('h) Manejo de Caja: tablas con título, columnas con nombre y acciones sin flex en el td', async () => {
+  it('h) Manejo de caja: tablas con título, columnas con nombre y acciones sin flex en el td', async () => {
     render(<ManejoCaja />);
-    const lista = await screen.findByRole('table', { name: 'Compañías de Manejo de Caja' });
+    const lista = await screen.findByRole('table', { name: 'Compañías de Manejo de caja' });
     expect(screen.getByRole('columnheader', { name: 'Detalle' })).toBeTruthy();
     const fila = within(lista).getByText(/Compañía de Alarcón/).closest('tr') as HTMLElement;
     fireEvent.click(within(fila).getByRole('button', { name: 'CAJA' }));

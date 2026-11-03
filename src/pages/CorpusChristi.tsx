@@ -181,7 +181,7 @@ export default function CorpusChristi() {
 
       {loading ? <p>Cargando datos...</p> : isSearching ? (
         <div>
-          <h2>Resultados de Búsqueda ({sortedSearchResults.length} registros)</h2>
+          <h2>Resultados de búsqueda ({sortedSearchResults.length} registros)</h2>
           <div className="tabla-desplazable">
             <table className="sortable">
               <caption className="visually-hidden">Resultados de búsqueda en Corpus Christi</caption>
@@ -222,7 +222,7 @@ export default function CorpusChristi() {
                     <td><div className="acciones-celda">
                       {row["Transacción"] && (
                         isBroken ? 
-                          <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
+                          <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace roto</button>
                         : (
                           <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
                         )
@@ -243,7 +243,7 @@ export default function CorpusChristi() {
               onChange={e => setFilterCiudad(e.target.value)}
               aria-label="Filtrar por ciudad"
             >
-              <option value="">Todas las Ciudades</option>
+              <option value="">Todas las ciudades</option>
               {uniqueCiudades.map(opt => <option key={String(opt)} value={String(opt)}>{String(opt)}</option>)}
             </select>
             <select
@@ -251,7 +251,7 @@ export default function CorpusChristi() {
               onChange={e => setFilterAno(e.target.value)}
               aria-label="Filtrar por año"
             >
-              <option value="">Todos los Años</option>
+              <option value="">Todos los años</option>
               {uniqueAnos.map(opt => <option key={String(opt)} value={String(opt)}>{String(opt)}</option>)}
             </select>
           </div>
@@ -325,7 +325,7 @@ export default function CorpusChristi() {
                   <td><div className="acciones-celda">
                     {row["Transacción"] && (
                       isBroken ? 
-                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
+                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace roto</button>
                       : (
                         <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
                       )
@@ -367,7 +367,7 @@ export default function CorpusChristi() {
       
       {recordToDelete && (
         <ConfirmModal 
-          title="Confirmar Eliminación"
+          title="Confirmar eliminación"
           message={`¿Estás seguro de que deseas eliminar este registro para ${recordToDelete["Encargado "]}?`}
           onConfirm={handleDelete}
           onCancel={() => setRecordToDelete(null)}

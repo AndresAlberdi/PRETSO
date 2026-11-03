@@ -79,9 +79,9 @@ describe('generateDatabaseXlsx', () => {
     expect(fila[9]).toBe(3);
   });
 
-  it('Manejo de Caja e Indicadores conservan sus encabezados', async () => {
+  it('Manejo de caja e Indicadores conservan sus encabezados', async () => {
     const wb = await leerLibro();
-    expect(encabezados(wb, 'Manejo de Caja')).toEqual([
+    expect(encabezados(wb, 'Manejo de caja')).toEqual([
       'Indicador de registro', 'Sigla Compañía', 'Año', 'Ciudad', 'Ingresos', 'Egresos',
       'Otros bienes de la compañía', 'Transacción',
     ]);
@@ -127,11 +127,11 @@ describe('generateDatabaseXlsx', () => {
     expect(valor('Cmp2')).toBe('');
   });
 
-  it('Manejo de Caja e Indicadores muestran la sigla', async () => {
+  it('Manejo de caja e Indicadores muestran la sigla', async () => {
     datos.manejo_de_caja = [{ 'Indicador de registro': 1, 'Sigla Compañía': 'abc' }];
     datos.indicadores = [{ 'Indicador de registro': 1, 'Sigla Compañía': 1 }];
     const wb = await leerLibro();
-    expect(celda(wb, 'Manejo de Caja', 2, 2)).toBe('ABC');
+    expect(celda(wb, 'Manejo de caja', 2, 2)).toBe('ABC');
     expect(celda(wb, 'Indicadores', 2, 9)).toBe('ABC');
   });
 
@@ -141,7 +141,7 @@ describe('generateDatabaseXlsx', () => {
     datos.indicadores = [{ 'Indicador de registro': 1, 'Sigla Compañía': 99 }];
     const wb = await leerLibro();
     for (const [coleccion, hoja] of [
-      ['manejo_de_caja', 'Manejo de Caja'], ['salarios', 'Remuneraciones'],
+      ['manejo_de_caja', 'Manejo de caja'], ['salarios', 'Remuneraciones'],
       ['corpus_christi', 'Corpus Christi'], ['indicadores', 'Indicadores'],
     ]) {
       const cols = encabezados(wb, hoja);
@@ -163,7 +163,7 @@ describe('generateDatabaseXlsx', () => {
     datos.manejo_de_caja = [{ 'Indicador de registro': 4, 'Sigla Compañía': 1 }];
     const wb = await leerLibro();
     expect(celda(wb, 'Remuneraciones', 2, 1)).toBe(1);
-    expect(celda(wb, 'Manejo de Caja', 2, 1)).toBe(4);
+    expect(celda(wb, 'Manejo de caja', 2, 1)).toBe(4);
   });
 
   it('la hoja Compañías no incluye el indicador de registro e incluye el nombre', async () => {

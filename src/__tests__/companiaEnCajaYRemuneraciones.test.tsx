@@ -55,14 +55,14 @@ function buscar(categoria: string, texto: string) {
 }
 
 describe.each([
-  ['Manejo de Caja', ManejoCaja, 'Alarcón', 'Alarcón'],
+  ['Manejo de caja', ManejoCaja, 'Alarcón', 'Alarcón'],
   ['Remuneraciones', Salarios, 'Alarcón', 'Alarcón'],
 ])('%s: la compañía se resuelve por número en los resultados y la búsqueda', (_nombre, Pagina, consulta) => {
   it('la búsqueda por persona encuentra el registro con referencia numérica', async () => {
     render(<Pagina />);
     await screen.findByText(/Mostrando \d+ registros/);
     buscar('Autores', consulta);
-    expect(await screen.findByText('Resultados de Búsqueda (1 registros)')).toBeTruthy();
+    expect(await screen.findByText('Resultados de búsqueda (1 registros)')).toBeTruthy();
   });
 
   it('los resultados muestran «sigla - nombre completo» y no el número', async () => {
@@ -95,12 +95,12 @@ describe('Remuneraciones: la búsqueda por persona también mira al beneficiario
     render(<Salarios />);
     await screen.findByText(/Mostrando \d+ registros/);
     buscar('Autores', 'Ruiz');
-    expect(await screen.findByText('Resultados de Búsqueda (1 registros)')).toBeTruthy();
+    expect(await screen.findByText('Resultados de búsqueda (1 registros)')).toBeTruthy();
   });
 });
 
 describe.each([
-  ['Manejo de Caja', ManejoCaja, 'manejo_de_caja'],
+  ['Manejo de caja', ManejoCaja, 'manejo_de_caja'],
   ['Remuneraciones', Salarios, 'salarios'],
 ])('%s: el filtro ?compania= muestra lo mismo que cuenta el índice de compañías', (_nombre, Pagina, coleccion) => {
   it('incluye número, variante heredada «7.0», número en texto y sigla heredada; excluye otras compañías', async () => {
@@ -128,7 +128,7 @@ describe.each([
 });
 
 describe.each([
-  ['Manejo de Caja', ManejoCaja, 'manejo_de_caja'],
+  ['Manejo de caja', ManejoCaja, 'manejo_de_caja'],
   ['Remuneraciones', Salarios, 'salarios'],
 ])('%s: la columna «Compañía» de los resultados ordena por sigla', (_nombre, Pagina, coleccion) => {
   it('ordena alfabéticamente por sigla y no por número guardado, en ambos sentidos', async () => {
@@ -146,7 +146,7 @@ describe.each([
     render(<Pagina />);
     await screen.findByText(/Mostrando \d+ registros/);
     buscar('Año', '16');
-    await screen.findByText('Resultados de Búsqueda (3 registros)');
+    await screen.findByText('Resultados de búsqueda (3 registros)');
     const columna = () => screen.getAllByRole('row').slice(1).map(r => within(r).getAllByRole('cell')[0].textContent);
     const encabezado = () => screen.getByRole('columnheader', { name: /Compañía/ });
     fireEvent.click(screen.getByRole('button', { name: /Compañía/ }));
@@ -162,14 +162,14 @@ describe.each([
     render(<Pagina />);
     await screen.findByText(/Mostrando \d+ registros/);
     buscar('Ciudad', 'Lima');
-    await screen.findByText('Resultados de Búsqueda (1 registros)');
+    await screen.findByText('Resultados de búsqueda (1 registros)');
     fireEvent.click(screen.getByRole('button', { name: 'Editar' }));
     expect(document.body.innerHTML).not.toContain('__sigla');
   });
 });
 
 describe.each([
-  ['Manejo de Caja', ManejoCaja],
+  ['Manejo de caja', ManejoCaja],
   ['Remuneraciones', Salarios],
 ])('%s: enlace con una compañía inexistente', (_nombre, Pagina) => {
   it('muestra «Compañía no encontrada» y no «0 registros para 99»', async () => {
@@ -181,13 +181,13 @@ describe.each([
   });
 });
 
-describe('Manejo de Caja: el mensaje de borrado dice la sigla', () => {
+describe('Manejo de caja: el mensaje de borrado dice la sigla', () => {
   it('«registro de caja de GA-JR (1600)» y no el número', async () => {
     admin.isEditMode = true;
     render(<ManejoCaja />);
     await screen.findByText(/Mostrando \d+ registros/);
     buscar('Ciudad', 'Potosí');
-    await screen.findByText('Resultados de Búsqueda (1 registros)');
+    await screen.findByText('Resultados de búsqueda (1 registros)');
     fireEvent.click(screen.getByRole('button', { name: 'Borrar' }));
     expect(await screen.findByText(/eliminar este registro de caja de GA-JR \(1600\)\?/)).toBeTruthy();
     expect(screen.queryByText(/caja de 7 /)).toBeNull();

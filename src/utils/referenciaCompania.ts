@@ -1,4 +1,4 @@
-// Referencia a una compañía en los registros de Manejo de Caja, Remuneraciones,
+// Referencia a una compañía en los registros de Manejo de caja, Remuneraciones,
 // Indicadores y Corpus Christi: la llave interna es el NÚMERO de registro
 // («Indicador de registro» de la colección `companias`); la sigla solo se muestra.
 
