@@ -39,9 +39,9 @@ async function abrirAlta(coleccion: string) {
 }
 
 describe('alta: la compañía se guarda por número de registro', () => {
-  it('Manejo de caja guarda el número (tipo numérico) y muestra «sigla - autores»', async () => {
+  it('Manejo de caja guarda el número (tipo numérico) y muestra «sigla / autores»', async () => {
     const { form } = await abrirAlta('manejo_de_caja');
-    expect(screen.getByRole('option', { name: 'JG - Juan' })).toBeTruthy();
+    expect(screen.getByRole('option', { name: 'JG / Juan' })).toBeTruthy();
     const [selCompania, selTransaccion] = screen.getAllByRole('combobox');
     // Sin compañía preseleccionada: el usuario debe elegirla
     expect((selCompania as HTMLSelectElement).value).toBe('');
@@ -80,7 +80,7 @@ describe('alta: la compañía se guarda por número de registro', () => {
   it('Indicadores: elegir «Ninguna» después de una compañía guarda null', async () => {
     const { form } = await abrirAlta('indicadores');
     const combos = screen.getAllByRole('combobox') as HTMLSelectElement[];
-    const selCompania = combos.find(s => Array.from(s.options).some(o => o.text === 'GA-JR - Alarcón y Ramírez'))!;
+    const selCompania = combos.find(s => Array.from(s.options).some(o => o.text === 'GA-JR / Alarcón y Ramírez'))!;
     const selTransaccion = combos.find(s => Array.from(s.options).some(o => o.text.startsWith('Transacción 3')))!;
     fireEvent.change(selCompania, { target: { value: '7' } });
     fireEvent.change(selCompania, { target: { value: '' } });
@@ -94,7 +94,7 @@ describe('alta: la compañía se guarda por número de registro', () => {
   it('Indicadores guarda el número elegido', async () => {
     const { form } = await abrirAlta('indicadores');
     const combos = screen.getAllByRole('combobox') as HTMLSelectElement[];
-    const selCompania = combos.find(s => Array.from(s.options).some(o => o.text === 'GA-JR - Alarcón y Ramírez'))!;
+    const selCompania = combos.find(s => Array.from(s.options).some(o => o.text === 'GA-JR / Alarcón y Ramírez'))!;
     const selTransaccion = combos.find(s => Array.from(s.options).some(o => o.text.startsWith('Transacción 3')))!;
     fireEvent.change(selCompania, { target: { value: '7' } });
     fireEvent.change(selTransaccion, { target: { value: '3' } });
@@ -108,7 +108,7 @@ describe('alta: la compañía se guarda por número de registro', () => {
   it('Corpus Christi guarda la compañía principal por número', async () => {
     const { form } = await abrirAlta('corpus_christi');
     const combos = screen.getAllByRole('combobox') as HTMLSelectElement[];
-    const selCompania = combos.find(s => Array.from(s.options).some(o => o.text === 'JG - Juan'))!;
+    const selCompania = combos.find(s => Array.from(s.options).some(o => o.text === 'JG / Juan'))!;
     const selTransaccion = combos.find(s => Array.from(s.options).some(o => o.text.startsWith('Transacción 3')))!;
     fireEvent.change(selCompania, { target: { value: '12' } });
     fireEvent.change(selTransaccion, { target: { value: '3' } });

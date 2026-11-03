@@ -233,7 +233,7 @@ export default function Salarios() {
                   delete registro.__sigla;
                   const comp = resolverCompania(row["Sigla Compañía"], companias);
                   const sigla = siglaDeReferencia(row["Sigla Compañía"], companias);
-                  const fullName = comp && comp["Sigla Compañía"] && comp["Nombre Compañía"] ? `${sigla} - ${comp["Nombre Compañía"]}` : sigla;
+                  const fullName = comp && comp["Sigla Compañía"] && comp["Nombre Compañía"] ? `${sigla} / ${comp["Nombre Compañía"]}` : sigla;
                   const isBroken = row["Transacción"] && !transaccionesMap.has(Number(row["Transacción"]));
                   return (
                   <tr key={row.id}>
@@ -315,7 +315,7 @@ export default function Salarios() {
               </thead>
               <tbody>
                 {sortedFilteredCompanias.map((c, i) => {
-                  const fullName = c["Nombre Compañía"] ? `${c["Sigla Compañía"]} - ${c["Nombre Compañía"]}` : c["Sigla Compañía"];
+                  const fullName = c["Nombre Compañía"] ? `${c["Sigla Compañía"]} / ${c["Nombre Compañía"]}` : c["Sigla Compañía"];
                   return (
                   <tr key={i}>
                     <td>{fullName}</td>
