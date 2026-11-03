@@ -95,9 +95,11 @@ export function valorDeReferencia(compania: CompaniaRef): number | string {
   return NUMERICO.test(canon) ? Number(canon) : canon;
 }
 
-/** Etiqueta del selector: «sigla - autores». */
+/** Etiqueta del selector: «sigla / autores»; sin autores, solo la sigla. */
 export function etiquetaCompania(compania: CompaniaRef): string {
-  return `${compania['Sigla Compañía'] ?? ''} - ${compania['Autores'] ?? ''}`;
+  const sigla = textoVisibleCompania(compania).trim();
+  const autores = String(compania['Autores'] ?? '').trim();
+  return autores ? `${sigla} / ${autores}` : sigla;
 }
 
 /** Campos de Corpus Christi que referencian compañías (Compañía, Compañía2…, Cmp, Cmp2…). */

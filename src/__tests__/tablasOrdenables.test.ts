@@ -12,7 +12,7 @@ const ESPERADO: Record<string, string[]> = {
   'Bibliografia.tsx': ['Autores', 'Referencias bibliográficas'],
   'CorpusChristi.tsx': ['Ciudad', 'Año', 'Encargado', 'Monto a pagar', 'Ciudad', 'Año'],
   'Documentos.tsx': ['Doc ID'],
-  'IndiceCompanias.tsx': ['Sigla (Compañías)', 'Autores', 'Temporadas teatrales', 'Ámbito'],
+  'IndiceCompanias.tsx': ['Sigla', 'Autores', 'Temporadas teatrales', 'Ámbito'],
   'Indicadores.tsx': ['Ciudad', 'Año', 'Concepto', 'Monto', 'Categoría', 'Ciudad', 'Años'],
   'ManejoCaja.tsx': ['Compañía', 'Ciudad', 'Año', 'Compañía', 'Autores', 'Temporadas', 'Ámbito'],
   'Salarios.tsx': ['Compañía', 'Ciudad', 'Año', 'Compañía', 'Autores', 'Temporadas', 'Ámbito'],

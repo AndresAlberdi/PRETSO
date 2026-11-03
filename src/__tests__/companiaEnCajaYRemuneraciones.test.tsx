@@ -65,13 +65,19 @@ describe.each([
     expect(await screen.findByText('Resultados de búsqueda (1 registros)')).toBeTruthy();
   });
 
-  it('los resultados muestran «sigla - nombre completo» y no el número', async () => {
+  it('los resultados muestran «sigla / nombre completo» y no el número', async () => {
     render(<Pagina />);
     await screen.findByText(/Mostrando \d+ registros/);
     buscar('Autores', consulta);
-    expect(await screen.findByText('GA-JR - Compañía de Alarcón')).toBeTruthy();
-    const fila = screen.getByText('GA-JR - Compañía de Alarcón').closest('tr') as HTMLElement;
+    expect(await screen.findByText('GA-JR / Compañía de Alarcón')).toBeTruthy();
+    const fila = screen.getByText('GA-JR / Compañía de Alarcón').closest('tr') as HTMLElement;
     expect(within(fila).queryByText('7')).toBeNull();
+  });
+
+  it('la lista maestra de compañías muestra «sigla / nombre completo»', async () => {
+    render(<Pagina />);
+    await screen.findByText(/Mostrando \d+ registros/);
+    expect(await screen.findByText('GA-JR / Compañía de Alarcón')).toBeTruthy();
   });
 
   it('sin nombre completo, los resultados muestran la sigla', async () => {

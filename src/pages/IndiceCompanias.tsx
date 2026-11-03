@@ -206,7 +206,7 @@ export default function IndiceCompanias() {
             <caption className="visually-hidden">Índice de compañías</caption>
             <thead>
               <tr>
-                <SortableTh label="Sigla (Compañías)" sortKey="Sigla Compañía" sortConfig={sortConfig} onSort={requestSort} />
+                <SortableTh label="Sigla" sortKey="Sigla Compañía" sortConfig={sortConfig} onSort={requestSort} />
                 <SortableTh label="Autores" sortKey="Autores" sortConfig={sortConfig} onSort={requestSort} />
                 <SortableTh label="Temporadas teatrales" sortKey="Temporadas teatrales" sortConfig={sortConfig} onSort={requestSort} />
                 <SortableTh label="Ámbito" sortKey="Ámbito" sortConfig={sortConfig} onSort={requestSort} />
