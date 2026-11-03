@@ -27,7 +27,7 @@ describe('diálogo del Client ID de Google', () => {
 
   it('es un diálogo con nombre y descripción, y el foco inicial va al campo', () => {
     const { campo } = abrir();
-    const d = screen.getByRole('dialog', { name: 'Configurar Google Client ID' });
+    const d = screen.getByRole('dialog', { name: 'Configurar el Client ID de Google' });
     expect(d.getAttribute('aria-describedby')).toBeTruthy();
     expect(document.activeElement).toBe(campo);
   });
@@ -65,7 +65,7 @@ describe('diálogo del Client ID de Google', () => {
     const { abrirBtn } = abrir();
     // El diálogo está abierto y el botón de origen queda inerte; si se activara de nuevo no debe cerrarlo.
     fireEvent.click(abrirBtn);
-    expect(screen.getByRole('dialog', { name: 'Configurar Google Client ID' })).toBeTruthy();
+    expect(screen.getByRole('dialog', { name: 'Configurar el Client ID de Google' })).toBeTruthy();
   });
 
   it('«Guardar» con el campo vacío o solo con espacios borra el Client ID guardado', () => {

@@ -75,7 +75,7 @@ describe('capa de espera en IndiceCompanias', () => {
     const borrar = await pulsarBorrar();
     const capa = await screen.findByRole('dialog', { name: 'Por favor espere' });
     expect(document.activeElement).toBe(capa);
-    const confirmacion = await screen.findByRole('alertdialog', { name: 'Confirmar Borrado' }, { timeout: 4000 });
+    const confirmacion = await screen.findByRole('alertdialog', { name: 'Confirmar borrado' }, { timeout: 4000 });
     expect(screen.queryByRole('dialog', { name: 'Por favor espere' })).toBeNull();
     const cancelar = Array.from(confirmacion.querySelectorAll('button')).find(b => b.textContent === 'Cancelar')!;
     expect(document.activeElement).toBe(cancelar);

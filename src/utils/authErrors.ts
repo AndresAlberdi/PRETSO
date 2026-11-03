@@ -39,7 +39,7 @@ export function loginErrorMessage(err: unknown): string {
   }
 
   if (code === CONFIG_NOT_FOUND || message.includes(CONFIG_NOT_FOUND)) {
-    return 'Autenticación por Correo/Contraseña no está habilitada en Firebase Console. Por favor, habilítela.';
+    return 'Autenticación por correo/contraseña no está habilitada en Firebase Console. Por favor, habilítela.';
   }
   if (CREDENTIAL_CODES.includes(code)) return 'Correo o contraseña incorrectos. Si el problema persiste, comuníquese con la administración del proyecto.';
   if (code === 'auth/too-many-requests') {

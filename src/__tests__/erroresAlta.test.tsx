@@ -68,11 +68,11 @@ describe('errores del alta anunciados y enlazados', () => {
 
   it('remuneraciones sin compañía: el selector de compañía queda inválido', async () => {
     const form = await abrirAlta('salarios');
-    fireEvent.change(screen.getByLabelText(/Transacción Relacionada/), { target: { value: '3' } });
+    fireEvent.change(screen.getByLabelText(/Transacción relacionada/), { target: { value: '3' } });
     fireEvent.submit(form);
     const alerta = await screen.findByRole('alert');
     expect(alerta.textContent).toBe('Debe elegir una compañía existente.');
-    const selector = screen.getByLabelText(/Sigla Compañía \(Obligatorio\)/);
+    const selector = screen.getByLabelText(/Sigla de la compañía \(obligatorio\)/);
     expect(selector.getAttribute('aria-invalid')).toBe('true');
     expect(selector.getAttribute('aria-describedby')).toBe(alerta.id);
   });
@@ -121,7 +121,7 @@ const casos: Array<[string, string, string, () => void, () => HTMLElement]> = [
   ['Categorías', 'indicadores', 'sin categoría', () => undefined, porNombre('textbox', 'Categoría / Indicador (Obligatorio)')],
   ['Transacción', 'indicadores', 'sin transacción', () => {
     fireEvent.change(screen.getByPlaceholderText('Nombre de la nueva categoría'), { target: { value: 'Pagos' } });
-  }, () => screen.getByLabelText(/Transacción Relacionada/)],
+  }, () => screen.getByLabelText(/Transacción relacionada/)],
   ['Ciudad', 'corpus_christi', 'sin ciudad', () => undefined, porNombre('textbox', 'Ciudad (Obligatorio)')],
   ['Año', 'corpus_christi', 'sin año', () => {
     fireEvent.change(screen.getByPlaceholderText('Nombre de la nueva ciudad'), { target: { value: 'Potosí' } });
@@ -129,19 +129,19 @@ const casos: Array<[string, string, string, () => void, () => HTMLElement]> = [
   ['Transacción', 'corpus_christi', 'sin transacción', () => {
     fireEvent.change(screen.getByPlaceholderText('Nombre de la nueva ciudad'), { target: { value: 'Potosí' } });
     fireEvent.change(screen.getByPlaceholderText('Año (numérico)'), { target: { value: '1600' } });
-  }, () => screen.getByLabelText(/Transacción Relacionada/)],
+  }, () => screen.getByLabelText(/Transacción relacionada/)],
   ['Sigla Compañía', 'salarios', 'sin compañía', () => {
-    fireEvent.change(screen.getByLabelText(/Transacción Relacionada/), { target: { value: '3' } });
-  }, () => screen.getByLabelText(/Sigla Compañía \(Obligatorio\)/)],
+    fireEvent.change(screen.getByLabelText(/Transacción relacionada/), { target: { value: '3' } });
+  }, () => screen.getByLabelText(/Sigla de la compañía \(obligatorio\)/)],
   ['Transacción', 'salarios', 'sin transacción', () => {
-    fireEvent.change(screen.getByLabelText(/Sigla Compañía \(Obligatorio\)/), { target: { value: '7' } });
-  }, () => screen.getByLabelText(/Transacción Relacionada/)],
+    fireEvent.change(screen.getByLabelText(/Sigla de la compañía \(obligatorio\)/), { target: { value: '7' } });
+  }, () => screen.getByLabelText(/Transacción relacionada/)],
   ['Sigla Compañía', 'manejo_de_caja', 'sin compañía', () => {
-    fireEvent.change(screen.getByLabelText(/Transacción Relacionada/), { target: { value: '3' } });
-  }, () => screen.getByLabelText(/Sigla Compañía \(Obligatorio\)/)],
+    fireEvent.change(screen.getByLabelText(/Transacción relacionada/), { target: { value: '3' } });
+  }, () => screen.getByLabelText(/Sigla de la compañía \(obligatorio\)/)],
   ['Transacción', 'manejo_de_caja', 'sin transacción', () => {
-    fireEvent.change(screen.getByLabelText(/Sigla Compañía \(Obligatorio\)/), { target: { value: '7' } });
-  }, () => screen.getByLabelText(/Transacción Relacionada/)],
+    fireEvent.change(screen.getByLabelText(/Sigla de la compañía \(obligatorio\)/), { target: { value: '7' } });
+  }, () => screen.getByLabelText(/Transacción relacionada/)],
   ['Sigla Compañía', 'companias', 'sigla duplicada', () => {
     fireEvent.change(screen.getByPlaceholderText('Ej: GA-JR'), { target: { value: 'ga-jr' } });
   }, () => screen.getByPlaceholderText('Ej: GA-JR')],

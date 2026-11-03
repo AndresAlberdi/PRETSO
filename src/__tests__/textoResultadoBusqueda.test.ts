@@ -57,7 +57,7 @@ describe('textoResultadoBusqueda', () => {
   it('companias: no muestra el número de registro', () => {
     const t = textoResultadoBusqueda(
       { 'Indicador de registro': 7, 'Sigla Compañía': 'GA-JR', 'Nombre Compañía': 'X' }, 'companias', companias);
-    expect(t).toBe('Compañía: GA-JR | Nombre Compañía: X');
+    expect(t).toBe('Compañía: GA-JR | Nombre de la compañía: X');
   });
 
   it('transacciones y documentos', () => {

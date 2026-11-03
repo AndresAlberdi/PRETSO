@@ -36,7 +36,7 @@ describe('alta: corrector ortográfico en los campos de texto', () => {
   for (const c of Object.keys(ESPERADOS)) {
     it(`${c}: todo campo de texto lleva corrector, salvo la sigla`, async () => {
       render(<GenericCreateModal collectionName={c} onClose={vi.fn()} onCreated={vi.fn()} />);
-      await screen.findByRole('button', { name: 'Crear Registro' });
+      await screen.findByRole('button', { name: 'Crear registro' });
       if (c === 'corpus_christi') fireEvent.click(screen.getByLabelText('Nueva ciudad'));
       const campos = document.body.querySelectorAll<HTMLElement>('textarea, input[type="text"]');
       expect(campos.length).toBe(ESPERADOS[c]);
@@ -58,7 +58,7 @@ describe('alta: corrector ortográfico en los campos de texto', () => {
 
 function editar(coleccion: string, record: any) {
   render(<GenericEditModal collectionName={coleccion} record={record} onSave={vi.fn()} onClose={vi.fn()} />);
-  return screen.findByRole('dialog', { name: /Editar Registro/ });
+  return screen.findByRole('dialog', { name: /Editar registro/ });
 }
 
 function libre(el: HTMLElement) {

@@ -117,6 +117,6 @@ describe('Login con Google', () => {
 
   it('el marcador del correo no sugiere una cuenta de administración', () => {
     render(<AccesoForm />);
-    expect(screen.getByLabelText('Correo Electrónico').getAttribute('placeholder')).toBe('nombre@example.com');
+    expect(screen.getByLabelText('Correo electrónico').getAttribute('placeholder')).toBe('nombre@example.com');
   });
 });

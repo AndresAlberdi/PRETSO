@@ -111,7 +111,7 @@ describe('formularios de alta etiquetados', () => {
   it('transacciones: cada documento tiene su etiqueta dentro de un grupo', async () => {
     await abrirAlta('transacciones');
     expect(screen.getByLabelText('Documento 1').tagName).toBe('SELECT');
-    expect(screen.getByRole('group', { name: 'Asociar Documentos (Hasta 10)' })).toBeTruthy();
+    expect(screen.getByRole('group', { name: 'Asociar documentos (hasta 10)' })).toBeTruthy();
   });
 
   it('corpus: los grupos Ciudad y Año tienen radios con name propio y control con nombre de grupo', async () => {
@@ -144,14 +144,14 @@ describe('formulario de edición etiquetado', () => {
     render(<GenericEditModal collectionName={coleccion} record={record} onSave={async () => undefined} onClose={() => undefined} />);
     await waitFor(() => expect(screen.getByRole('dialog')).toBeTruthy());
     // Espera a que carguen las compañías y documentos antes de inspeccionar.
-    await waitFor(() => expect((screen.getByRole('button', { name: 'Guardar Cambios' }) as HTMLButtonElement).disabled).toBe(false));
+    await waitFor(() => expect((screen.getByRole('button', { name: 'Guardar cambios' }) as HTMLButtonElement).disabled).toBe(false));
     return screen.getByRole('dialog');
   }
 
   it('remuneraciones: cada etiqueta queda asociada a su campo', async () => {
     const dialogo = await abrirEdicion('salarios', { id: 'x', 'Indicador de registro': 3, 'Sigla Compañía': 7, 'Beneficiario ': 'Ana' });
     expect(screen.getByLabelText('Compañía').tagName).toBe('SELECT');
-    expect((screen.getByLabelText('Indicador de registro (No Editable)') as HTMLInputElement).disabled).toBe(true);
+    expect((screen.getByLabelText('Indicador de registro (no editable)') as HTMLInputElement).disabled).toBe(true);
     expect((screen.getByLabelText('Beneficiario') as HTMLInputElement).value).toBe('Ana');
     expect(sinNombre(dialogo)).toEqual([]);
     expect(referenciasRotas(dialogo)).toEqual([]);

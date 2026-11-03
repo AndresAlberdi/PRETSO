@@ -135,7 +135,7 @@ export default function Bibliografia() {
 
       {recordToDelete && (
         <ConfirmModal 
-          title="Confirmar Borrado"
+          title="Confirmar borrado"
           message={<>¿Está seguro de que desea eliminar la referencia bibliográfica de <strong>{recordToDelete["Autores"]}</strong>? Esta acción no se puede deshacer.</>}
           onConfirm={handleDelete}
           onCancel={() => setRecordToDelete(null)}

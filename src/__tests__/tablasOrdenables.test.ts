@@ -12,7 +12,7 @@ const ESPERADO: Record<string, string[]> = {
   'Bibliografia.tsx': ['Autores', 'Referencias bibliográficas'],
   'CorpusChristi.tsx': ['Ciudad', 'Año', 'Encargado', 'Monto a pagar', 'Ciudad', 'Año'],
   'Documentos.tsx': ['Doc ID'],
-  'IndiceCompanias.tsx': ['Sigla (Compañías)', 'Autores', 'Temporadas Teatrales', 'Ámbito'],
+  'IndiceCompanias.tsx': ['Sigla (Compañías)', 'Autores', 'Temporadas teatrales', 'Ámbito'],
   'Indicadores.tsx': ['Ciudad', 'Año', 'Concepto', 'Monto', 'Categoría', 'Ciudad', 'Años'],
   'ManejoCaja.tsx': ['Compañía', 'Ciudad', 'Año', 'Compañía', 'Autores', 'Temporadas', 'Ámbito'],
   'Salarios.tsx': ['Compañía', 'Ciudad', 'Año', 'Compañía', 'Autores', 'Temporadas', 'Ámbito'],
@@ -203,7 +203,7 @@ describe('«Num» se muestra como «Nro.»', () => {
     const etiquetas = readFileSync(join(SRC, 'utils', 'etiquetas.ts'), 'utf-8');
     expect(etiquetas).toContain("'Num': 'Nro.'");
     const modal = readFileSync(join(SRC, 'components', 'GenericEditModal.tsx'), 'utf-8');
-    expect(modal).toContain("import { etiquetaCampo } from '../utils/etiquetas'");
+    expect(modal).toContain("import { etiquetaCampo, nombreColeccion } from '../utils/etiquetas'");
     expect(modal).toContain('etiquetaCampo(key)');
     expect(modal).not.toContain('FIELD_LABEL_MAP');
   });

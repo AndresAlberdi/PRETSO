@@ -225,7 +225,7 @@ export default function Transacciones() {
 
       {recordToDelete && (
         <ConfirmModal 
-          title="Confirmar Borrado"
+          title="Confirmar borrado"
           message={`¿Está seguro de que desea eliminar la transacción asociada a los documentos: ${getDocsForTransaction(recordToDelete)}?`}
           onConfirm={handleDelete}
           onCancel={() => setRecordToDelete(null)}
@@ -235,7 +235,7 @@ export default function Transacciones() {
 
       {deleteErrorAlert && (
         <ConfirmModal 
-          title="Error de Integridad"
+          title="Error de integridad"
           message={deleteErrorAlert}
           onCancel={() => setDeleteErrorAlert(null)}
           isAlertOnly={true}
