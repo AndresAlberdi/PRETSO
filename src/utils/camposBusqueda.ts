@@ -19,3 +19,9 @@ export const CAMPOS_BUSQUEDA_TRANSACCIONES: Record<string, ConfigCategoria> = {
   doc: { campos: CAMPOS_DOC, modo: 'exacto' },
   all: { campos: ['Num', 'Noticia', 'Fuentes para la generación del dato', ...CAMPOS_DOC] },
 };
+
+export const CAMPOS_BUSQUEDA_BIBLIOGRAFIA: Record<string, ConfigCategoria> = {
+  autores: { campos: ['Autores'] },
+  referencia: { campos: ['Referencias bibliográficas'] },
+  all: { campos: ['Autores', 'Referencias bibliográficas'] },
+};

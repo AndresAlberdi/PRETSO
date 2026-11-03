@@ -6,6 +6,7 @@ import SearchBar, { type SearchFilter } from "../components/SearchBar";
 import { useNavigate, Link } from "react-router";
 import { useAdmin } from "../context/AdminContext";
 import { SECCIONES } from "../utils/secciones";
+import { nombreColeccion } from "../utils/etiquetas";
 import { contar } from "../utils/anuncios";
 import { esCampoRetirado } from "../utils/camposRetirados";
 import { textoResultadoBusqueda, textosCompaniaBuscables } from "../utils/textoResultadoBusqueda";
@@ -96,19 +97,7 @@ export default function Busqueda() {
       }
     };
 
-    const getLabel = (coll: string) => {
-      const labels: Record<string, string> = {
-        manejo_de_caja: 'Manejo de Caja',
-        salarios: 'Remuneraciones',
-        corpus_christi: 'Corpus Christi',
-        indicadores: 'Indicadores',
-        companias: 'Compañías',
-        bibliografia: 'Bibliografía',
-        transacciones: 'Transacciones',
-        documentos: 'Documentos'
-      };
-      return labels[coll] || coll;
-    };
+    const getLabel = nombreColeccion;
 
     const companias = dbData.companias ?? [];
     const cacheCompanias = new Map<string, string>();
@@ -186,7 +175,7 @@ export default function Busqueda() {
 
       {!loading && filters.length > 0 && (
         <div style={{ marginTop: '2rem' }}>
-          <h2>Resultados de Búsqueda ({searchResults.length})</h2>
+          <h2>Resultados de búsqueda ({searchResults.length})</h2>
           {searchResults.length === 0 ? (
             <p>No se encontraron resultados que coincidan con su búsqueda.</p>
           ) : (

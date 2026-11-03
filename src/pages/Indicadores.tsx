@@ -146,8 +146,8 @@ export default function Indicadores() {
     <div>
       <div className="cabecera-pagina">
         <div className="titulo-pagina">
-          <h1>Identificación de Indicadores</h1>
-          <Tooltip label="Acerca de Identificación de Indicadores" content="Recoge transacciones y datos económicos clasificados por diversas categorías o conceptos. Provee información sobre precios y gastos habituales a lo largo de los años en distintas ciudades." />
+          <h1>Identificación de indicadores</h1>
+          <Tooltip label="Acerca de Identificación de indicadores" content="Recoge transacciones y datos económicos clasificados por diversas categorías o conceptos. Provee información sobre precios y gastos habituales a lo largo de los años en distintas ciudades." />
         </div>
         <div className="acciones-cabecera">
           <SearchBar onSearch={(f) => { setFilters(f); setSelectedCategoria(null); }} categories={searchCategories} />
@@ -168,10 +168,10 @@ export default function Indicadores() {
 
       {loading ? <p>Cargando datos...</p> : isSearching ? (
         <div>
-          <h2>Resultados de Búsqueda ({sortedSearchResults.length} registros)</h2>
+          <h2>Resultados de búsqueda ({sortedSearchResults.length} registros)</h2>
           <div className="tabla-desplazable">
             <table className="sortable">
-              <caption className="visually-hidden">Resultados de búsqueda en Identificación de Indicadores</caption>
+              <caption className="visually-hidden">Resultados de búsqueda en Identificación de indicadores</caption>
               <thead>
                 <tr>
                   <SortableTh label="Ciudad" sortKey="Ciudad" sortConfig={scSearch} onSort={sortSearch} />
@@ -209,7 +209,7 @@ export default function Indicadores() {
                     <td><div className="acciones-celda">
                       {row["Transacción"] && (
                         isBroken ? 
-                          <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
+                          <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace roto</button>
                         : <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
                       )}
                     </div></td>
@@ -228,7 +228,7 @@ export default function Indicadores() {
               onChange={e => setFilterCategoria(e.target.value)}
               aria-label="Filtrar por categoría"
             >
-              <option value="">Todas las Categorías</option>
+              <option value="">Todas las categorías</option>
               {uniqueCategorias.map(opt => <option key={String(opt)} value={String(opt)}>{String(opt)}</option>)}
             </select>
           </div>
@@ -304,7 +304,7 @@ export default function Indicadores() {
                   <td><div className="acciones-celda">
                     {row["Transacción"] && (
                       isBroken ? 
-                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
+                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace roto</button>
                       : <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
                     )}
                   </div></td>
@@ -361,7 +361,7 @@ export default function Indicadores() {
       
       {recordToDelete && (
         <ConfirmModal 
-          title="Confirmar Eliminación"
+          title="Confirmar eliminación"
           message={`¿Estás seguro de que deseas eliminar este registro de Indicadores para ${recordToDelete["Concepto"]} (${recordToDelete["Años"]})?`}
           onConfirm={handleDelete}
           onCancel={() => setRecordToDelete(null)}

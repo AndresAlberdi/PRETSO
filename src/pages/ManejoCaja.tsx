@@ -190,8 +190,8 @@ export default function ManejoCaja() {
     <div>
       <div className="cabecera-pagina">
         <div className="titulo-pagina">
-          <h1>Manejo de Caja</h1>
-          <Tooltip label="Acerca de Manejo de Caja" content="Esta sección muestra información detallada sobre los ingresos, egresos y otros bienes monetarios gestionados por las diversas compañías durante sus temporadas teatrales. Sirve para entender los flujos de dinero y la salud financiera." />
+          <h1>Manejo de caja</h1>
+          <Tooltip label="Acerca de Manejo de caja" content="Esta sección muestra información detallada sobre los ingresos, egresos y otros bienes monetarios gestionados por las diversas compañías durante sus temporadas teatrales. Sirve para entender los flujos de dinero y la salud financiera." />
         </div>
         <div className="acciones-cabecera">
           <SearchBar onSearch={(f) => { setFilters(f); setSelectedCompId(null); }} categories={searchCategories} />
@@ -212,10 +212,10 @@ export default function ManejoCaja() {
 
       {loading ? <p>Cargando datos...</p> : isSearching ? (
         <div>
-          <h2>Resultados de Búsqueda ({sortedSearchResults.length} registros)</h2>
+          <h2>Resultados de búsqueda ({sortedSearchResults.length} registros)</h2>
           <div className="tabla-desplazable">
             <table className="sortable">
-              <caption className="visually-hidden">Resultados de búsqueda en Manejo de Caja</caption>
+              <caption className="visually-hidden">Resultados de búsqueda en Manejo de caja</caption>
               <thead>
                 <tr>
                   <SortableTh label="Compañía" sortKey="__sigla" sortConfig={scSearch} onSort={sortSearch} />
@@ -232,7 +232,7 @@ export default function ManejoCaja() {
                   delete registro.__sigla;
                   const comp = resolverCompania(row["Sigla Compañía"], companias);
                   const sigla = siglaDeReferencia(row["Sigla Compañía"], companias);
-                  const fullName = comp && comp["Sigla Compañía"] && comp["Nombre Compañía"] ? `${sigla} - ${comp["Nombre Compañía"]}` : sigla;
+                  const fullName = comp && comp["Sigla Compañía"] && comp["Nombre Compañía"] ? `${sigla} / ${comp["Nombre Compañía"]}` : sigla;
                   const isBroken = row["Transacción"] && !transaccionesMap.has(Number(row["Transacción"]));
                   return (
                   <tr key={row.id}>
@@ -256,7 +256,7 @@ export default function ManejoCaja() {
                     <td><div className="acciones-celda">
                       {row["Transacción"] && (
                         isBroken ? 
-                          <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
+                          <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace roto</button>
                         : (
                           <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
                         )
@@ -277,7 +277,7 @@ export default function ManejoCaja() {
               onChange={e => setFilterCompania(e.target.value)}
               aria-label="Filtrar por compañía"
             >
-              <option value="">Todas las Compañías</option>
+              <option value="">Todas las compañías</option>
               {uniqueCompanias.map(opt => {
                 const c = companiasMap.get(opt);
                 return <option key={opt} value={opt}>{c ? textoVisibleCompania(c) : siglaDeReferencia(opt, companias)}</option>;
@@ -288,7 +288,7 @@ export default function ManejoCaja() {
               onChange={e => setFilterTemporada(e.target.value)}
               aria-label="Filtrar por temporada"
             >
-              <option value="">Todas las Temporadas</option>
+              <option value="">Todas las temporadas</option>
               {uniqueTemporadas.map(opt => <option key={opt} value={opt}>{opt}</option>)}
             </select>
             <select
@@ -296,13 +296,13 @@ export default function ManejoCaja() {
               onChange={e => setFilterAmbito(e.target.value)}
               aria-label="Filtrar por ámbito"
             >
-              <option value="">Todos los Ámbitos</option>
+              <option value="">Todos los ámbitos</option>
               {uniqueAmbitos.map(opt => <option key={opt} value={opt}>{opt}</option>)}
             </select>
           </div>
           <div className="tabla-desplazable">
             <table className="sortable">
-              <caption className="visually-hidden">Compañías de Manejo de Caja</caption>
+              <caption className="visually-hidden">Compañías de Manejo de caja</caption>
               <thead>
                 <tr>
                   <SortableTh label="Compañía" sortKey="Sigla Compañía" sortConfig={scComp} onSort={sortComp} />
@@ -314,7 +314,7 @@ export default function ManejoCaja() {
               </thead>
               <tbody>
                 {sortedFilteredCompanias.map((c, i) => {
-                  const fullName = c["Nombre Compañía"] ? `${c["Sigla Compañía"]} - ${c["Nombre Compañía"]}` : c["Sigla Compañía"];
+                  const fullName = c["Nombre Compañía"] ? `${c["Sigla Compañía"]} / ${c["Nombre Compañía"]}` : c["Sigla Compañía"];
                   return (
                   <tr key={i}>
                     <td>{fullName}</td>
@@ -374,7 +374,7 @@ export default function ManejoCaja() {
                   <td><div className="acciones-celda">
                     {row["Transacción"] && (
                       isBroken ? 
-                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
+                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace roto</button>
                       : (
                         <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
                       )
@@ -414,7 +414,7 @@ export default function ManejoCaja() {
 
       {recordToDelete && (
         <ConfirmModal 
-          title="Confirmar Eliminación"
+          title="Confirmar eliminación"
           message={`¿Estás seguro de que deseas eliminar este registro de caja de ${siglaDeReferencia(recordToDelete["Sigla Compañía"], companias)} (${recordToDelete["Año"]})?`}
           onConfirm={handleDelete}
           onCancel={() => setRecordToDelete(null)}

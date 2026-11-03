@@ -30,7 +30,7 @@ describe('anuncios del estado del respaldo', () => {
     vi.mocked(generateDatabaseXml).mockRejectedValue(new Error('boom'));
     render(<Administracion />);
     const alerta = screen.getByRole('alert');
-    fireEvent.click(screen.getByRole('button', { name: /Descargar Base de Datos \(XML\)/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Descargar base de datos \(XML\)/ }));
     await waitFor(() => expect(alerta.textContent).toContain('Error al generar XML: boom'));
     expect(screen.getByRole('alert')).toBe(alerta);
   });
@@ -39,7 +39,7 @@ describe('anuncios del estado del respaldo', () => {
     vi.mocked(generateDatabaseXml).mockResolvedValue('<x/>');
     render(<Administracion />);
     const estado = screen.getByRole('status');
-    fireEvent.click(screen.getByRole('button', { name: /Descargar Base de Datos \(XML\)/ }));
+    fireEvent.click(screen.getByRole('button', { name: /Descargar base de datos \(XML\)/ }));
     await waitFor(() => expect(estado.textContent).toContain('¡Volcado XML descargado exitosamente!'));
     expect(screen.getByRole('status')).toBe(estado);
   });

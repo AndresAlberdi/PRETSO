@@ -213,7 +213,7 @@ export default function Salarios() {
 
       {loading ? <p>Cargando datos...</p> : isSearching ? (
         <div>
-          <h2>Resultados de Búsqueda ({sortedSearchResults.length} registros)</h2>
+          <h2>Resultados de búsqueda ({sortedSearchResults.length} registros)</h2>
           <div className="tabla-desplazable">
             <table className="sortable">
               <caption className="visually-hidden">Resultados de búsqueda en Remuneraciones</caption>
@@ -233,7 +233,7 @@ export default function Salarios() {
                   delete registro.__sigla;
                   const comp = resolverCompania(row["Sigla Compañía"], companias);
                   const sigla = siglaDeReferencia(row["Sigla Compañía"], companias);
-                  const fullName = comp && comp["Sigla Compañía"] && comp["Nombre Compañía"] ? `${sigla} - ${comp["Nombre Compañía"]}` : sigla;
+                  const fullName = comp && comp["Sigla Compañía"] && comp["Nombre Compañía"] ? `${sigla} / ${comp["Nombre Compañía"]}` : sigla;
                   const isBroken = row["Transacción"] && !transaccionesMap.has(Number(row["Transacción"]));
                   return (
                   <tr key={row.id}>
@@ -257,7 +257,7 @@ export default function Salarios() {
                     <td><div className="acciones-celda">
                       {row["Transacción"] && (
                         isBroken ? 
-                          <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
+                          <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace roto</button>
                         : (
                           <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
                         )
@@ -278,7 +278,7 @@ export default function Salarios() {
               onChange={e => setFilterCompania(e.target.value)}
               aria-label="Filtrar por compañía"
             >
-              <option value="">Todas las Compañías</option>
+              <option value="">Todas las compañías</option>
               {uniqueCompanias.map(opt => {
                 const c = companiasMap.get(opt);
                 return <option key={opt} value={opt}>{c ? textoVisibleCompania(c) : siglaDeReferencia(opt, companias)}</option>;
@@ -289,7 +289,7 @@ export default function Salarios() {
               onChange={e => setFilterTemporada(e.target.value)}
               aria-label="Filtrar por temporada"
             >
-              <option value="">Todas las Temporadas</option>
+              <option value="">Todas las temporadas</option>
               {uniqueTemporadas.map(opt => <option key={opt} value={opt}>{opt}</option>)}
             </select>
             <select
@@ -297,7 +297,7 @@ export default function Salarios() {
               onChange={e => setFilterAmbito(e.target.value)}
               aria-label="Filtrar por ámbito"
             >
-              <option value="">Todos los Ámbitos</option>
+              <option value="">Todos los ámbitos</option>
               {uniqueAmbitos.map(opt => <option key={opt} value={opt}>{opt}</option>)}
             </select>
           </div>
@@ -315,7 +315,7 @@ export default function Salarios() {
               </thead>
               <tbody>
                 {sortedFilteredCompanias.map((c, i) => {
-                  const fullName = c["Nombre Compañía"] ? `${c["Sigla Compañía"]} - ${c["Nombre Compañía"]}` : c["Sigla Compañía"];
+                  const fullName = c["Nombre Compañía"] ? `${c["Sigla Compañía"]} / ${c["Nombre Compañía"]}` : c["Sigla Compañía"];
                   return (
                   <tr key={i}>
                     <td>{fullName}</td>
@@ -375,7 +375,7 @@ export default function Salarios() {
                   <td><div className="acciones-celda">
                     {row["Transacción"] && (
                       isBroken ? 
-                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
+                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace roto</button>
                       : (
                         <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
                       )
@@ -415,7 +415,7 @@ export default function Salarios() {
 
       {recordToDelete && (
         <ConfirmModal 
-          title="Confirmar Eliminación"
+          title="Confirmar eliminación"
           message={`¿Estás seguro de que deseas eliminar este registro de remuneración para ${recordToDelete["Beneficiario "]}?`}
           onConfirm={handleDelete}
           onCancel={() => setRecordToDelete(null)}

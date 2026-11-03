@@ -13,7 +13,7 @@ import SelectorCompania from './SelectorCompania';
 import Modal from './Modal';
 import ConfirmModal from './ConfirmModal';
 import { esCampoRetirado } from '../utils/camposRetirados';
-import { etiquetaCampo } from '../utils/etiquetas';
+import { etiquetaCampo, nombreColeccion } from '../utils/etiquetas';
 
 interface GenericEditModalProps {
   collectionName: string;
@@ -21,17 +21,6 @@ interface GenericEditModalProps {
   onSave: (updatedRecord: any) => Promise<void>;
   onClose: () => void;
 }
-
-const COLLECTION_LABELS: Record<string, string> = {
-  documentos: 'Documentos',
-  companias: 'Compañias',
-  transacciones: 'Transacciones',
-  manejo_de_caja: 'Manejo de Caja',
-  salarios: 'Remuneraciones',
-  corpus_christi: 'Corpus Christi',
-  indicadores: 'Indicadores',
-  bibliografia: 'Bibliografía'
-};
 
 const TEXTAREA_FIELDS = [
   'Documento',
@@ -254,7 +243,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
     <>
       <Modal labelledBy={titleId} onEscape={handleEscape} overlayStyle={overlayStyle} panelStyle={panelStyle}>
         <h2 id={titleId} style={{ marginTop: 0, color: 'var(--primary-color)' }}>
-          Editar Registro - {(COLLECTION_LABELS[collectionName] || collectionName).toUpperCase()}
+          Editar registro: {nombreColeccion(collectionName).toUpperCase()}
         </h2>
         <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', marginTop: '1.5rem' }}>
           {getSortedKeys().map((key, i) => {
@@ -267,7 +256,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
             return (
               <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 <label htmlFor={fieldId} style={{ fontWeight: 'bold', fontSize: '0.95rem' }}>
-                  {displayLabel} {isReadOnly && <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>(No Editable)</span>}
+                  {displayLabel} {isReadOnly && <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)', fontWeight: 'normal' }}>(no editable)</span>}
                 </label>
                 
                 {referenciaCompania(key) ? (
@@ -367,7 +356,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
               style={{ padding: '0.5rem 1.2rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: loading ? 'not-allowed' : 'pointer' }}
               aria-disabled={loading || undefined}
             >
-              {loading ? 'Guardando...' : 'Guardar Cambios'}
+              {loading ? 'Guardando...' : 'Guardar cambios'}
             </button>
           </div>
         </form>

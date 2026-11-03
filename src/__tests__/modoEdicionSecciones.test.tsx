@@ -66,7 +66,8 @@ interface Pagina {
   nombre: string;
   archivo: string;
   Componente: ComponentType;
-  buscador: 'SearchBar' | 'campo' | 'ninguno';
+  /** 'barra': SearchBar sin tabla de resumen ni pantalla de detalle. */
+  buscador: 'SearchBar' | 'barra' | 'campo' | 'ninguno';
   filas: number;
   /** Usos de <CeldaAdmin en el código de la página. */
   celdas: number;
@@ -74,12 +75,12 @@ interface Pagina {
   detalle?: { boton: string; tabla: RegExp };
 }
 const PAGINAS: Pagina[] = [
-  { nombre: 'Manejo de Caja', archivo: 'ManejoCaja.tsx', Componente: ManejoCaja, buscador: 'SearchBar', filas: 2, celdas: 2, detalle: { boton: 'CAJA', tabla: /^Registros de caja de / } },
+  { nombre: 'Manejo de caja', archivo: 'ManejoCaja.tsx', Componente: ManejoCaja, buscador: 'SearchBar', filas: 2, celdas: 2, detalle: { boton: 'CAJA', tabla: /^Registros de caja de / } },
   { nombre: 'Remuneraciones', archivo: 'Salarios.tsx', Componente: Salarios, buscador: 'SearchBar', filas: 2, celdas: 2, detalle: { boton: 'TRATO', tabla: /^Remuneraciones de / } },
   { nombre: 'Corpus Christi', archivo: 'CorpusChristi.tsx', Componente: CorpusChristi, buscador: 'SearchBar', filas: 2, celdas: 2, detalle: { boton: 'TRATO', tabla: /^Transacciones de Corpus Christi en / } },
   { nombre: 'Indicadores', archivo: 'Indicadores.tsx', Componente: Indicadores, buscador: 'SearchBar', filas: 2, celdas: 2, detalle: { boton: 'LISTA', tabla: /^Indicadores de la categoría / } },
-  { nombre: 'Índice de Compañías', archivo: 'IndiceCompanias.tsx', Componente: IndiceCompanias, buscador: 'campo', filas: 2, celdas: 1 },
-  { nombre: 'Bibliografía', archivo: 'Bibliografia.tsx', Componente: Bibliografia, buscador: 'ninguno', filas: 2, celdas: 1 },
+  { nombre: 'Índice de compañías', archivo: 'IndiceCompanias.tsx', Componente: IndiceCompanias, buscador: 'campo', filas: 2, celdas: 1 },
+  { nombre: 'Bibliografía', archivo: 'Bibliografia.tsx', Componente: Bibliografia, buscador: 'barra', filas: 2, celdas: 1 },
 ];
 
 // Deja a la vista una tabla de datos: en las secciones con buscador, la de resultados.
@@ -142,7 +143,7 @@ describe.each(PAGINAS)('modo edición en $nombre', (p) => {
     expect(cabecera).not.toBeNull();
     expect(cabecera.contains(salir)).toBe(true);
     const sigue = (a: Node, b: Node) => Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
-    if (p.buscador === 'SearchBar') {
+    if (p.buscador === 'SearchBar' || p.buscador === 'barra') {
       expect(sigue(cabecera.querySelector('form') as Node, salir)).toBe(true);
     } else if (p.buscador === 'campo') {
       expect(sigue(screen.getByRole('textbox', { name: 'Buscar por nombre o autores' }), salir)).toBe(true);
@@ -156,7 +157,7 @@ describe.each(PAGINAS)('modo edición en $nombre', (p) => {
     Object.assign(estado, { isAdmin: true, isEditMode: true });
     await mostrarTabla(p);
     fireEvent.click(screen.getByRole('button', { name: 'Nuevo registro' }));
-    expect(await screen.findByRole('dialog', { name: /^Nuevo Registro - / })).toBeTruthy();
+    expect(await screen.findByRole('dialog', { name: /^Nuevo registro: / })).toBeTruthy();
   });
 
   it('el código fuente usa useCanEdit y CeldaAdmin, sin restos del esquema anterior', () => {
@@ -213,8 +214,8 @@ describe.each(PAGINAS.filter((p): p is Pagina & { detalle: NonNullable<Pagina['d
 
 // Documentos y Transacciones: las herramientas de carga dependen de ser administrador, no del modo edición.
 const CARGA = [
-  { nombre: 'Documentos', archivo: 'Documentos.tsx', Componente: Documentos, tabla: 'Documentos', dialogo: 'Nuevo Registro - DOCUMENTOS' },
-  { nombre: 'Transacciones', archivo: 'Transacciones.tsx', Componente: Transacciones, tabla: 'Transacciones', dialogo: 'Nuevo Registro - TRANSACCIONES' },
+  { nombre: 'Documentos', archivo: 'Documentos.tsx', Componente: Documentos, tabla: 'Documentos', dialogo: 'Nuevo registro: DOCUMENTOS' },
+  { nombre: 'Transacciones', archivo: 'Transacciones.tsx', Componente: Transacciones, tabla: 'Transacciones', dialogo: 'Nuevo registro: TRANSACCIONES' },
 ];
 
 describe.each(CARGA)('herramientas de carga en $nombre', (p) => {
