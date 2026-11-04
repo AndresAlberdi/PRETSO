@@ -123,6 +123,13 @@ describe('Búsqueda general', () => {
     expect(screen.queryByText(/Buscando en la base de datos/)).toBeNull();
   });
 
+  it('con fallo de carga y sin término sigue mostrando la lista de secciones', async () => {
+    fallar = true;
+    enRouter(<Busqueda />);
+    expect(await screen.findByRole('alert')).toBeTruthy();
+    expect(screen.getByRole('navigation', { name: 'Secciones de la base de datos' })).toBeTruthy();
+  });
+
   it('«Reintentar» vuelve a cargar y, si ahora funciona, quita el aviso', async () => {
     fallar = true;
     enRouter(<Busqueda />);

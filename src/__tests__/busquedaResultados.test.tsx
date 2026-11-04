@@ -52,6 +52,8 @@ describe('Búsqueda general: nivel 1 (secciones con coincidencias)', () => {
     expect(screen.queryByRole('link', { name: /Transacciones/ })).toBeNull();
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(region().textContent).toBe('Búsqueda: «Alberto» aparece en 1 sección');
+    expect(document.body.textContent).not.toContain('Pagó');
+    expect(document.body.textContent).not.toContain('Nro.');
   });
 
   it('administrador: aparece también «Transacciones»', async () => {

@@ -28,6 +28,8 @@ export default function Busqueda() {
 
   const buscando = termino !== null && estado !== 'error' && indice === null;
   const hayError = estado === 'error';
+  // Con un texto inválido el campo ya muestra su propio aviso: no se duplica el rol «alert».
+  const mostrarError = hayError && !(crudo !== '' && termino === null);
   const resuelto = termino !== null && !buscando && !hayError;
 
   const anuncio = !resuelto
@@ -53,7 +55,7 @@ export default function Busqueda() {
 
       <output aria-live="polite" className="visually-hidden">{anuncio}</output>
 
-      {hayError && (
+      {mostrarError && (
         <div>
           <p role="alert">{MENSAJE_ERROR}</p>
           <button type="button" onClick={reintentar}>Reintentar</button>
@@ -81,7 +83,7 @@ export default function Busqueda() {
         </div>
       )}
 
-      {termino === null && !hayError && (
+      {termino === null && (
         <>
           <p className="rotulo-secciones">Secciones</p>
           <nav aria-label="Secciones de la base de datos">
