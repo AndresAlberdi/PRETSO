@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
-import { render, screen, fireEvent, act, cleanup } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import IndiceCompanias from '../pages/IndiceCompanias';
+import { invalidarIndice } from '../utils/busquedaGuia/cargaIndice';
 
 const companias = [
   { id: 'c7', 'Indicador de registro': 7, 'Sigla Compañía': 'GA-JR', 'Nombre Compañía': 'Compañía de Alarcón', Autores: 'Alarcón y Ramírez' },
@@ -28,6 +29,7 @@ vi.mock('firebase/firestore', () => ({
 }));
 
 beforeEach(() => {
+  invalidarIndice();
   ubicacion.search = '';
   colecciones = {
     companias,
@@ -59,25 +61,21 @@ afterEach(() => {
 
 const region = () => document.querySelector('output.visually-hidden') as HTMLElement;
 
-describe('Índice de compañías: anuncio con retraso', () => {
-  it('anuncia a los 800 ms de escribir', async () => {
+describe('Índice de compañías: anuncio de la búsqueda guiada', () => {
+  it('anuncia el total al terminar de buscar, sin retraso fijo, y se vacía al limpiar', async () => {
+    ubicacion.search = '?q=garc';
+    render(<IndiceCompanias />);
+    await screen.findByText('Búsqueda: 1 compañía encontrada');
+    expect(region().textContent).toBe('Búsqueda: 1 compañía encontrada');
+    expect(document.querySelectorAll('output[aria-live]')).toHaveLength(1);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Limpiar' }));
+    await waitFor(() => expect(region().textContent).toBe(''));
+  });
+
+  it('sin búsqueda el anuncio persiste vacío', async () => {
     render(<IndiceCompanias />);
     await screen.findByText('GA-JR');
-    vi.useFakeTimers();
-    fireEvent.change(screen.getByRole('textbox', { name: 'Buscar por nombre o autores' }), { target: { value: 'gar' } });
-    act(() => { vi.advanceTimersByTime(799); });
     expect(region().textContent).toBe('');
-    act(() => { vi.advanceTimersByTime(1); });
-    expect(region().textContent).toBe('Búsqueda: 1 compañía encontrada');
-
-    const campo = screen.getByRole('textbox', { name: 'Buscar por nombre o autores' });
-    fireEvent.change(campo, { target: { value: '' } });
-    act(() => { vi.advanceTimersByTime(800); });
-    expect(region().textContent).toBe('');
-    fireEvent.change(campo, { target: { value: 'gar' } });
-    act(() => { vi.advanceTimersByTime(799); });
-    expect(region().textContent).toBe('');
-    act(() => { vi.advanceTimersByTime(1); });
-    expect(region().textContent).toBe('Búsqueda: 1 compañía encontrada');
   });
 });
