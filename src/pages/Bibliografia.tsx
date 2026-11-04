@@ -30,12 +30,12 @@ export default function Bibliografia() {
   const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
 
   const { crudo, termino, fijar, quitar } = useTerminoBusqueda();
-  const { estado: estadoBusqueda, porId } = useCoincidenciasSeccion("bibliografia", termino);
+  const { estado: estadoBusqueda, porId, reintentar } = useCoincidenciasSeccion("bibliografia", termino);
   const filteredData = useMemo(() => {
     if (!termino) return data;
     return data.filter(d => porId.has(String(d.id)));
   }, [data, termino, porId]);
-  useDesplazarACoincidencia(termino && estadoBusqueda === "listo" ? termino : null);
+  useDesplazarACoincidencia(!loading && termino && estadoBusqueda === "listo" ? termino : null);
 
   const { items: sortedData, requestSort, sortConfig } = useSortableTable(filteredData);
 
@@ -109,6 +109,9 @@ export default function Bibliografia() {
               ? 'No se encontraron registros con los filtros aplicados.'
               : `Mostrando ${filteredData.length} de ${data.length} registros`}
       </output>
+      {!loading && termino && estadoBusqueda === 'error' && (
+        <p><button type="button" onClick={reintentar}>Reintentar</button></p>
+      )}
       {loading ? <p>Cargando datos...</p> : (
         <>
         <div className="tabla-desplazable">

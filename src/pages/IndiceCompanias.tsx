@@ -33,7 +33,7 @@ export default function IndiceCompanias() {
   const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
 
   const { crudo, termino, fijar, quitar } = useTerminoBusqueda();
-  const { estado: estadoBusqueda, porId } = useCoincidenciasSeccion("companias", termino);
+  const { estado: estadoBusqueda, porId, reintentar } = useCoincidenciasSeccion("companias", termino);
 
   const navigate = useNavigate();
 
@@ -159,7 +159,9 @@ export default function IndiceCompanias() {
     : termino && estadoBusqueda === "error"
       ? "No se pudo completar la búsqueda. Intente de nuevo."
       : termino ? "Buscando…" : "";
-  useDesplazarACoincidencia(termino && estadoBusqueda === "listo" ? termino : null);
+  useDesplazarACoincidencia(!loading && termino && estadoBusqueda === "listo" ? termino : null);
+  const buscando = Boolean(termino) && estadoBusqueda === "cargando" && porId.size === 0;
+  const falloBusqueda = Boolean(termino) && estadoBusqueda === "error";
 
   return (
     <div>
@@ -176,7 +178,11 @@ export default function IndiceCompanias() {
       
       <output aria-live="polite" className="visually-hidden">{loading ? "" : anuncioBusqueda}</output>
 
-      {!loading && <p style={{ color: 'var(--text-muted)' }}>Total registros: {sortedData.length}</p>}
+      {!loading && falloBusqueda && (
+        <p className="aviso-busqueda">No se pudo completar la búsqueda. <button type="button" onClick={reintentar}>Reintentar</button></p>
+      )}
+      {!loading && buscando && <p style={{ color: 'var(--text-muted)' }}>Buscando…</p>}
+      {!loading && !buscando && !falloBusqueda && <p style={{ color: 'var(--text-muted)' }}>Total registros: {sortedData.length}</p>}
       
       {loading ? <p>Cargando datos...</p> : (
         <div className="tabla-desplazable">

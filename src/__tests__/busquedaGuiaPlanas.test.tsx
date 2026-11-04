@@ -1,12 +1,14 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, cleanup, within } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, cleanup, within, renderHook, act } from '@testing-library/react';
 import IndiceCompanias from '../pages/IndiceCompanias';
 import Bibliografia from '../pages/Bibliografia';
-import { invalidarIndice } from '../utils/busquedaGuia/cargaIndice';
+import { useCoincidenciasSeccion } from '../hooks/useIndiceBusqueda';
+import { cargarIndice, invalidarIndice } from '../utils/busquedaGuia/cargaIndice';
 
 const ubicacion = vi.hoisted(() => ({ search: '' }));
 const navegar = vi.hoisted(() => vi.fn());
 let colecciones: Record<string, any[]> = {};
+const compuerta = vi.hoisted(() => ({ espera: null as Promise<void> | null }));
 
 vi.mock('../firebase', () => ({ db: {} }));
 vi.mock('../utils/audit', () => ({ logAction: vi.fn() }));
@@ -19,14 +21,18 @@ vi.mock('firebase/firestore', () => ({
   collection: (_db: unknown, nombre: string) => nombre,
   query: (nombre: string) => nombre,
   where: vi.fn(), doc: vi.fn(), deleteDoc: vi.fn(), updateDoc: vi.fn(), addDoc: vi.fn(),
-  getDocs: async (nombre: string) => ({
-    docs: (colecciones[nombre] ?? []).map(d => ({ id: d.id, data: () => d })),
-  }),
+  getDocs: async (nombre: string) => {
+    if (compuerta.espera && nombre === 'bibliografia') await compuerta.espera;
+    return {
+      docs: (colecciones[nombre] ?? []).map(d => ({ id: d.id, data: () => d })),
+    };
+  },
 }));
 
 beforeEach(() => {
   invalidarIndice();
   navegar.mockReset();
+  compuerta.espera = null;
   ubicacion.search = '';
   colecciones = {
     companias: [
@@ -111,5 +117,60 @@ describe('Bibliografía con la búsqueda guiada', () => {
     buscar('ab');
     expect(screen.getByRole('alert')).toBeTruthy();
     expect(screen.getByText('Mostrando 3 de 3 registros')).toBeTruthy();
+  });
+});
+
+describe('correcciones de la revisión', () => {
+  it('con el índice ya en caché y los datos de la página después, desplaza a la primera coincidencia', async () => {
+    await cargarIndice();
+    // Los datos de la propia página llegan después de que el índice (en caché) esté listo.
+    let abrir: () => void = () => {};
+    compuerta.espera = new Promise<void>(r => { abrir = r; });
+    ubicacion.search = '?q=garcia';
+    const desplazar = vi.fn();
+    const original = Element.prototype.scrollIntoView;
+    Element.prototype.scrollIntoView = desplazar;
+    try {
+      render(<div id="contenido"><Bibliografia /></div>);
+      await new Promise(r => setTimeout(r, 50));
+      expect(desplazar).not.toHaveBeenCalled();
+      abrir();
+      await screen.findByText('Mostrando 2 de 3 registros');
+      await waitFor(() => expect(desplazar).toHaveBeenCalled());
+      expect(document.querySelector('mark.coincidencia')).not.toBeNull();
+    } finally {
+      Element.prototype.scrollIntoView = original;
+    }
+  });
+
+  it('useCoincidenciasSeccion devuelve reintentar y recupera tras un error', async () => {
+    const fallo = vi.spyOn(colecciones.bibliografia, 'map').mockImplementationOnce(() => { throw new Error('fallo simulado'); });
+    const { result } = renderHook(() => useCoincidenciasSeccion('bibliografia', 'garcia'));
+    await waitFor(() => expect(result.current.estado).toBe('error'));
+    fallo.mockRestore();
+    act(() => result.current.reintentar());
+    await waitFor(() => expect(result.current.estado).toBe('listo'));
+    expect(result.current.porId.size).toBe(2);
+  });
+
+  it('el Índice muestra el error en pantalla con «Reintentar» y sin «Total registros: 0»', async () => {
+    const fallo = vi.spyOn(colecciones.bibliografia, 'map').mockImplementationOnce(() => { throw new Error('fallo simulado'); });
+    ubicacion.search = '?q=alarcon';
+    render(<IndiceCompanias />);
+    await screen.findByText('AB-1', {}, { timeout: 3000 }).catch(() => undefined);
+    await screen.findByRole('button', { name: 'Reintentar' });
+    expect(screen.queryByText(/Total registros/)).toBeNull();
+    fallo.mockRestore();
+    fireEvent.click(screen.getByRole('button', { name: 'Reintentar' }));
+    await screen.findByText('Total registros: 1');
+  });
+
+  it('una compañía puede listarse sin subrayado si la coincidencia está en un campo que la tabla no muestra', async () => {
+    // Decisión de diseño 6: el subrayado solo cubre texto visible; «Nombre Compañía» está indexado pero la tabla no lo muestra.
+    ubicacion.search = '?q=primera';
+    render(<IndiceCompanias />);
+    await waitFor(() => expect(screen.queryByText('CD-2')).toBeNull());
+    expect(screen.getByText('AB-1')).toBeTruthy();
+    expect(document.querySelector('mark.coincidencia')).toBeNull();
   });
 });
