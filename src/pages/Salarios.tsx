@@ -1,11 +1,11 @@
 import EditToggle from "../components/EditToggle";
 import { useEffect, useState, useMemo } from "react";
 import { collection, getDocs, query, deleteDoc, doc, updateDoc } from "firebase/firestore";
-import { useLocation, useNavigate } from "react-router";
 import { db } from "../firebase";
 import TransactionModal from "../components/TransactionModal";
 import DocumentModal from "../components/DocumentModal";
-import SearchBar, { type SearchFilter } from "../components/SearchBar";
+import CampoBusqueda from "../components/CampoBusqueda";
+import { Resaltado, TextoCoincidencia, CLASE_BOTON_COINCIDENCIA, CLASE_FILA_COINCIDENCIA } from "../components/Resaltado";
 import { cleanFirebaseData } from "../utils";
 import { useCanEdit } from "../hooks/useCanEdit";
 import CeldaAdmin from "../components/CeldaAdmin";
@@ -18,9 +18,11 @@ import { useRestoreFocusOnViewChange } from "../hooks/useRestoreFocusOnViewChang
 import SortableTh from "../components/SortableTh";
 import { contar } from "../utils/anuncios";
 import Tooltip from "../components/Tooltip";
-import { normalizarSigla, resolverCompania, siglaDeReferencia, textoVisibleCompania } from "../utils/referenciaCompania";
+import { resolverCompania, siglaDeReferencia, textoVisibleCompania } from "../utils/referenciaCompania";
 import DetailsModal from "../components/DetailsModal";
-import { esCampoRetirado } from "../utils/camposRetirados";
+import { useTerminoBusqueda, useNavegacionGuia } from "../hooks/useTerminoBusqueda";
+import { useCoincidenciasSeccion } from "../hooks/useIndiceBusqueda";
+import { useDesplazarACoincidencia } from "../hooks/useDesplazarACoincidencia";
 
 export default function Salarios() {
   const [data, setData] = useState<any[]>([]);
@@ -29,8 +31,9 @@ export default function Salarios() {
   const [loading, setLoading] = useState(true);
   const canEdit = useCanEdit();
   
-  const location = useLocation();
-  const navigate = useNavigate();
+  const { crudo, termino, fijar, quitar } = useTerminoBusqueda();
+  const { parametros, irA } = useNavegacionGuia();
+  const guia = useCoincidenciasSeccion('salarios', termino);
 
   const [recordToDelete, setRecordToDelete] = useState<any>(null);
   const [brokenLinkAlert, setBrokenLinkAlert] = useState<string | null>(null);
@@ -43,35 +46,23 @@ export default function Salarios() {
   const [activeDocuments, setActiveDocuments] = useState<string | number | null>(null);
   const [recordToView, setRecordToView] = useState<any | null>(null);
 
-  const [filters, setFilters] = useState<SearchFilter[]>([]);
-
-  const searchCategories = [
-    { id: 'Autores', label: 'Persona' },
-    { id: 'Ciudad', label: 'Ciudad' },
-    { id: 'Año', label: 'Año' },
-    { id: 'all', label: 'Texto libre' }
-  ];
-
   const [filterCompania, setFilterCompania] = useState('');
   const [filterTemporada, setFilterTemporada] = useState('');
   const [filterAmbito, setFilterAmbito] = useState('');
 
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const compania = params.get("compania");
-    if (compania) {
-      setSelectedCompId(compania);
-    }
-  }, [location.search]);
+    // Refleja la URL en la selección, también cuando el parámetro falta (botón Atrás).
+    setSelectedCompId(parametros.get("compania"));
+  }, [parametros]);
 
   useEffect(() => {
     async function fetchData() {
-      const qSal = query(collection(db, "salarios"));
-      const snapSal = await getDocs(qSal);
-      const docsSal = snapSal.docs.map(cleanFirebaseData).sort(
+      const qCaja = query(collection(db, "salarios"));
+      const snapCaja = await getDocs(qCaja);
+      const docsCaja = snapCaja.docs.map(cleanFirebaseData).sort(
         (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
       );
-      setData(docsSal);
+      setData(docsCaja);
 
       const qComp = query(collection(db, "companias"));
       const snapComp = await getDocs(qComp);
@@ -135,40 +126,22 @@ export default function Salarios() {
   const uniqueTemporadas = Array.from(new Set(companiasInData.map(c => c["Temporadas teatrales"]))).filter(Boolean).sort();
   const uniqueAmbitos = Array.from(new Set(companiasInData.map(c => c["Ámbito"]))).filter(Boolean).sort();
 
+  // Nivel 2: con un término válido solo se listan las compañías con coincidencia.
+  const conCoincidencia = new Set<unknown>(guia.unidades.map(u => resolverCompania(u.parametros.compania, companias)).filter(Boolean));
+
   const filteredCompanias = companiasInData.filter(c => {
+    if (termino && !conCoincidencia.has(c)) return false;
     if (filterCompania && String(c["Indicador de registro"]) !== filterCompania) return false;
     if (filterTemporada && c["Temporadas teatrales"] !== filterTemporada) return false;
     if (filterAmbito && c["Ámbito"] !== filterAmbito) return false;
     return true;
   });
 
-  const searchResults = useMemo(() => {
-    if (filters.length === 0) return [];
-    return data.filter(d => {
-      return filters.every(f => {
-        const q = f.query.toLowerCase();
-        if (f.category === 'all') {
-          return Object.entries(d).some(([k, v]) => !esCampoRetirado('salarios', k) && String(v).toLowerCase().includes(q));
-        }
-        if (f.category === 'Autores') {
-          const comp = resolverCompania(d["Sigla Compañía"], companias);
-          return (comp && comp["Autores"] && String(comp["Autores"]).toLowerCase().includes(q)) || 
-                 (d["Beneficiario "] && String(d["Beneficiario "]).toLowerCase().includes(q));
-        }
-        return d[f.category] && String(d[f.category]).toLowerCase().includes(q);
-      });
-    });
-  }, [data, filters, companias]);
-
-  // Campo derivado solo de presentación: la sigla resuelta, para que la columna «Compañía»
-  // ordene por lo que se ve y no por el número guardado. Nunca se persiste ni se exporta.
-  const searchResultsOrdenables = useMemo(
-    () => searchResults.map(d => ({ ...d, __sigla: normalizarSigla(siglaDeReferencia(d["Sigla Compañía"], companias)) })),
-    [searchResults, companias]
+  useRestoreFocusOnViewChange(
+    termino
+      ? (selectedCompId ? `detail:${selectedCompId}` : `search:${termino}`)
+      : selectedCompId ? `detail:${selectedCompId}` : 'list'
   );
-
-  const isSearching = filters.length > 0;
-  useRestoreFocusOnViewChange(isSearching ? 'search' : selectedCompId ? `detail:${selectedCompId}` : 'list');
   const siglaSeleccionada = siglaDeReferencia(selectedCompId, companias);
   const companiaSeleccionada = resolverCompania(selectedCompId, companias);
   const detailData = companiaSeleccionada
@@ -176,16 +149,29 @@ export default function Salarios() {
     : [];
 
   const { items: sortedFilteredCompanias, requestSort: sortComp, sortConfig: scComp } = useSortableTable(filteredCompanias);
-  const { items: sortedSearchResults, requestSort: sortSearch, sortConfig: scSearch } = useSortableTable(searchResultsOrdenables);
   const { items: sortedDetailData } = useSortableTable(detailData);
 
-  const anuncioResultados = isSearching
-    ? `Búsqueda: ${contar(sortedSearchResults.length, 'registro encontrado', 'registros encontrados')}`
-    : !selectedCompId
-    ? `Listado: ${contar(sortedFilteredCompanias.length, 'registro', 'registros')}`
+  const registrosConCoincidencia = termino ? sortedDetailData.filter(d => guia.porId.has(String(d.id))).length : 0;
+
+  const anuncioResultados = !selectedCompId
+    ? (termino
+      ? `Búsqueda: ${contar(sortedFilteredCompanias.length, 'compañía', 'compañías')} con «${crudo}»`
+      : `Listado: ${contar(sortedFilteredCompanias.length, 'registro', 'registros')}`)
     : !companiaSeleccionada
     ? 'No se encontró la compañía seleccionada'
+    : termino
+    ? `Detalle de ${siglaSeleccionada}: ${contar(sortedDetailData.length, 'registro', 'registros')}, ${registrosConCoincidencia} con «${crudo}»`
     : `Detalle de ${siglaSeleccionada}: ${contar(sortedDetailData.length, 'registro', 'registros')}`;
+
+  // Espera a los datos de la página y al índice: con el índice en caché el efecto correría antes de que existan las filas.
+  useDesplazarACoincidencia(!loading && termino && guia.estado === 'listo' && selectedCompId ? `${termino}|${selectedCompId}` : null);
+
+  const sinResultados = sortedFilteredCompanias.length === 0 && termino !== null;
+  const mensajeSinResultados = guia.estado === 'cargando' && guia.unidades.length === 0
+    ? 'Buscando…'
+    : guia.estado === 'error'
+    ? 'No se pudo realizar la búsqueda.'
+    : `No se encontró «${crudo}» en Remuneraciones.`;
 
   return (
     <div>
@@ -195,7 +181,7 @@ export default function Salarios() {
           <Tooltip label="Acerca de Remuneraciones" content="En esta sección se listan las remuneraciones y pagos específicos que la compañía efectuó a diversas personas (actores, músicos, tramoyistas, etc.) por su trabajo durante las diferentes temporadas." />
         </div>
         <div className="acciones-cabecera">
-          <SearchBar onSearch={(f) => { setFilters(f); setSelectedCompId(null); }} categories={searchCategories} />
+          <CampoBusqueda etiqueta="Buscar en esta sección" valorInicial={crudo} onBuscar={t => { setSelectedCompId(null); fijar(t); }} onLimpiar={quitar} />
           <EditToggle />
           {canEdit && (
             <button type="button" className="boton boton-editor" onClick={() => setIsCreateOpen(true)}>Nuevo registro</button>
@@ -205,72 +191,13 @@ export default function Salarios() {
 
       {!loading && <output aria-live="polite" className="visually-hidden">{anuncioResultados}</output>}
       
-      {(selectedCompId || isSearching) && (
-        <button onClick={() => { setSelectedCompId(null); setFilters([]); navigate(location.pathname, { replace: true }); }} style={{ padding: '0.5rem 1rem', marginBottom: '1rem' }}>Volver a listado inicial</button>
+      {selectedCompId && (
+        <button onClick={() => { setSelectedCompId(null); irA({ compania: null }); }} style={{ padding: '0.5rem 1rem', marginBottom: '1rem' }}>{termino ? 'Volver a los resultados' : 'Volver a listado inicial'}</button>
       )}
 
-      {!loading && !selectedCompId && !isSearching && <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Mostrando {sortedFilteredCompanias.length} registros</p>}
+      {!loading && !selectedCompId && <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Mostrando {sortedFilteredCompanias.length} registros</p>}
 
-      {loading ? <p>Cargando datos...</p> : isSearching ? (
-        <div>
-          <h2>Resultados de búsqueda ({sortedSearchResults.length} registros)</h2>
-          <div className="tabla-desplazable">
-            <table className="sortable">
-              <caption className="visually-hidden">Resultados de búsqueda en Remuneraciones</caption>
-              <thead>
-                <tr>
-                  <SortableTh label="Compañía" sortKey="__sigla" sortConfig={scSearch} onSort={sortSearch} />
-                  <SortableTh label="Ciudad" sortKey="Ciudad" sortConfig={scSearch} onSort={sortSearch} />
-                  <SortableTh label="Año" sortKey="Año" sortConfig={scSearch} onSort={sortSearch} />
-                  <th scope="col">Documentos</th>
-                  <th scope="col"><span className="visually-hidden">Transacción</span></th>
-                  {canEdit && <th scope="col">Admin</th>}
-                </tr>
-              </thead>
-              <tbody>
-                {sortedSearchResults.map(row => {
-                  const registro: any = { ...row };
-                  delete registro.__sigla;
-                  const comp = resolverCompania(row["Sigla Compañía"], companias);
-                  const sigla = siglaDeReferencia(row["Sigla Compañía"], companias);
-                  const fullName = comp && comp["Sigla Compañía"] && comp["Nombre Compañía"] ? `${sigla} / ${comp["Nombre Compañía"]}` : sigla;
-                  const isBroken = row["Transacción"] && !transaccionesMap.has(Number(row["Transacción"]));
-                  return (
-                  <tr key={row.id}>
-                    <td>{fullName}</td>
-                    <td>{row["Ciudad"]}</td>
-                    <td>{row["Año"]}</td>
-                    <td>
-                      {row["Transacción"] && !isBroken && (() => {
-                        const trans = transaccionesMap.get(Number(row["Transacción"]));
-                        if (!trans) return null;
-                        const docs = [1,2,3,4,5,6,7,8,9,10].map(i => trans[`Doc${i}`]).filter(Boolean);
-                        return (
-                          <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
-                            {docs.map((docCode, idx) => (
-                              <button key={idx} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.85rem', padding: '0.1rem 0.4rem', cursor: 'pointer', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px' }}>Doc. {docCode}</button>
-                            ))}
-                          </div>
-                        );
-                      })()}
-                    </td>
-                    <td><div className="acciones-celda">
-                      {row["Transacción"] && (
-                        isBroken ? 
-                          <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace roto</button>
-                        : (
-                          <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
-                        )
-                      )}
-                    </div></td>
-                    {canEdit && <CeldaAdmin onEditar={() => setRecordToEdit(registro)} onBorrar={() => attemptDelete(registro)} />}
-                  </tr>
-                )})}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      ) : !selectedCompId ? (
+      {loading ? <p>Cargando datos...</p> : !selectedCompId ? (
         <div>
           <div className="fila-filtros">
             <select
@@ -301,6 +228,7 @@ export default function Salarios() {
               {uniqueAmbitos.map(opt => <option key={opt} value={opt}>{opt}</option>)}
             </select>
           </div>
+          {sinResultados ? <p style={{ color: 'var(--text-muted)' }}>{mensajeSinResultados}</p> : (
           <div className="tabla-desplazable">
             <table className="sortable">
               <caption className="visually-hidden">Compañías de Remuneraciones</caption>
@@ -318,21 +246,25 @@ export default function Salarios() {
                   const fullName = c["Nombre Compañía"] ? `${c["Sigla Compañía"]} / ${c["Nombre Compañía"]}` : c["Sigla Compañía"];
                   return (
                   <tr key={i}>
-                    <td>{fullName}</td>
-                    <td>{c["Autores"]}</td>
-                    <td>{c["Temporadas teatrales"]}</td>
-                    <td>{c["Ámbito"]}</td>
-                    <td><button onClick={() => setSelectedCompId(String(c["Indicador de registro"]))}>TRATO</button></td>
+                    <td><Resaltado texto={fullName} termino={termino} /></td>
+                    <td><Resaltado texto={c["Autores"]} termino={termino} /></td>
+                    <td><Resaltado texto={c["Temporadas teatrales"]} termino={termino} anio /></td>
+                    <td><Resaltado texto={c["Ámbito"]} termino={termino} /></td>
+                    <td><button onClick={() => { const id = String(c["Indicador de registro"]); setSelectedCompId(id); irA({ compania: id }); }}>TRATO</button></td>
                   </tr>
                 )})}
               </tbody>
             </table>
           </div>
+          )}
         </div>
       ) : !companiaSeleccionada ? (
         <p style={{ color: 'var(--text-muted)' }}>Compañía no encontrada</p>
       ) : (
         <div className="tabla-desplazable">
+          {termino && guia.porId.size === 0 && (guia.estado === 'cargando' || guia.estado === 'error') && (
+            <p style={{ color: 'var(--text-muted)' }}>{guia.estado === 'cargando' ? 'Buscando…' : 'No se pudo realizar la búsqueda.'}</p>
+          )}
           <div style={{ marginBottom: '1rem' }}><p style={{ color: 'var(--text-muted)' }}>{sortedDetailData.length} registros para {siglaSeleccionada}</p></div>
           <table className="sortable">
             <caption className="visually-hidden">{`Remuneraciones de ${siglaSeleccionada}`}</caption>
@@ -351,13 +283,14 @@ export default function Salarios() {
             <tbody>
               {sortedDetailData.map(row => {
                 const isBroken = row["Transacción"] && !transaccionesMap.has(Number(row["Transacción"]));
+                const r = termino ? guia.porId.get(String(row.id)) : undefined;
                 return (
-                <tr key={row.id}>
-                  <td>{row["Ciudad"]}</td>
-                  <td>{row["Año"]}</td>
-                  <td>{row["Beneficiario "]}</td>
-                  <td>{row["Encargo"]}</td>
-                  <td>{row["Monto a pagar"]}</td>
+                <tr key={row.id} className={r ? CLASE_FILA_COINCIDENCIA : undefined}>
+                  <td><Resaltado texto={row["Ciudad"]} termino={termino} /></td>
+                  <td><Resaltado texto={row["Año"]} termino={termino} anio /></td>
+                  <td><Resaltado texto={row["Beneficiario "]} termino={termino} /></td>
+                  <td><Resaltado texto={row["Encargo"]} termino={termino} /></td>
+                  <td><Resaltado texto={row["Monto a pagar"]} termino={termino} /></td>
                   <td>
                     {row["Transacción"] && !isBroken && (() => {
                       const trans = transaccionesMap.get(Number(row["Transacción"]));
@@ -366,7 +299,7 @@ export default function Salarios() {
                       return (
                         <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
                           {docs.map((docCode, idx) => (
-                            <button key={idx} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.85rem', padding: '0.1rem 0.4rem', cursor: 'pointer', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px' }}>Doc. {docCode}</button>
+                            <button key={idx} onClick={() => setActiveDocuments(docCode)} className={r?.documentos.some(d => String(d) === String(docCode)) ? CLASE_BOTON_COINCIDENCIA : undefined} style={{ fontSize: '0.85rem', padding: '0.1rem 0.4rem', cursor: 'pointer', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px' }}>Doc. {docCode}{r?.documentos.some(d => String(d) === String(docCode)) && <TextoCoincidencia crudo={crudo} />}</button>
                           ))}
                         </div>
                       );
@@ -377,7 +310,7 @@ export default function Salarios() {
                       isBroken ? 
                         <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace roto</button>
                       : (
-                        <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
+                        <button onClick={() => setActiveTransaction(row["Transacción"])} className={r?.transaccion ? CLASE_BOTON_COINCIDENCIA : undefined}>Transacción{r?.transaccion && <TextoCoincidencia crudo={crudo} />}</button>
                       )
                     )}
                   </div></td>
@@ -388,8 +321,8 @@ export default function Salarios() {
           </table>
         </div>
       )}
-      {activeTransaction && <TransactionModal transactionCode={activeTransaction} onClose={() => setActiveTransaction(null)} />}
-      {activeDocuments && <DocumentModal documentCode={activeDocuments} onClose={() => setActiveDocuments(null)} />}
+      {activeTransaction && <TransactionModal transactionCode={activeTransaction} termino={termino} onClose={() => setActiveTransaction(null)} />}
+      {activeDocuments && <DocumentModal documentCode={activeDocuments} termino={termino} onClose={() => setActiveDocuments(null)} />}
       {recordToView && <DetailsModal record={recordToView} collectionName="salarios" onClose={() => setRecordToView(null)} />}
       
       {isCreateOpen && (
