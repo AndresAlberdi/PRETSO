@@ -6,7 +6,7 @@ export const CLASE_BOTON_COINCIDENCIA = 'boton-con-coincidencia';
 export const CLASE_FILA_COINCIDENCIA = 'fila-con-coincidencia';
 
 interface ResaltadoProps {
-  texto: unknown;
+  texto: string | number | null | undefined;
   termino: string | null;
   /** Campo de años: una consulta de cuatro cifras marca el rango completo. */
   anio?: boolean;
@@ -17,7 +17,9 @@ interface ResaltadoProps {
  * (nunca innerHTML). Recalcula los tramos sobre el texto visible.
  */
 export function Resaltado({ texto, termino, anio }: ResaltadoProps): JSX.Element {
-  if (texto === null || texto === undefined || texto === '') return <></>;
+  // Solo texto y números; booleanos y demás valores no producen salida (igual que React).
+  if (typeof texto !== 'string' && typeof texto !== 'number') return <></>;
+  if (texto === '') return <></>;
   const plano = String(texto);
   if (!termino) return <>{plano}</>;
   const tramos = buscarTramos(plano, termino, { anio });

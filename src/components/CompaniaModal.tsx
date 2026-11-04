@@ -4,7 +4,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import Modal from './Modal';
 import { Resaltado } from './Resaltado';
-import { RAIZ_MODAL, useDesplazarACoincidencia } from '../hooks/useDesplazarACoincidencia';
+import { raizDeModal, useDesplazarACoincidencia } from '../hooks/useDesplazarACoincidencia';
 import { etiquetaCampo } from '../utils/etiquetas';
 
 const overlayStyle: CSSProperties = {
@@ -33,7 +33,7 @@ export default function CompaniaModal({ sigla = '', compania: companiaDada, term
   const titleId = useId();
   const compania = companiaDada ?? consultada;
   const loading = companiaDada ? false : loadingConsulta;
-  useDesplazarACoincidencia(termino && !loading && compania ? `${termino}|${sigla}` : null, RAIZ_MODAL);
+  useDesplazarACoincidencia(termino && !loading && compania ? `${termino}|${sigla}` : null, raizDeModal(titleId));
 
   useEffect(() => {
     if (companiaDada) return;

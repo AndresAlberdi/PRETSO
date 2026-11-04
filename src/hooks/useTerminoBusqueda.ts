@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router';
-import { validarTermino } from '../utils/busquedaGuia/termino';
+import { LONGITUD_MAXIMA_TERMINO, validarTermino } from '../utils/busquedaGuia/termino';
 
-export const LONGITUD_MAXIMA_TERMINO = 100;
+export { LONGITUD_MAXIMA_TERMINO };
+
 /** Parámetros de URL que identifican la unidad abierta (nivel 3) de cada sección. */
 export const PARAMETROS_UNIDAD = ['compania', 'ciudad', 'anio', 'categoria'] as const;
 
@@ -30,28 +31,27 @@ export function useTerminoBusqueda(): EstadoTermino {
   const location = useLocation();
   const navigate = useNavigate();
   const search = location.search ?? '';
-  const [crudo, setCrudo] = useState(() => leerCrudo(search));
-
-  useEffect(() => {
-    setCrudo(leerCrudo(search));
-  }, [search]);
+  const desdeUrl = leerCrudo(search);
+  // Copia local válida solo mientras la URL no cambie: se deriva en render, sin efecto.
+  const [local, setLocal] = useState<{ search: string; crudo: string } | null>(null);
+  const crudo = local !== null && local.search === search ? local.crudo : desdeUrl;
 
   const fijar = useCallback((texto: string) => {
     const recortado = texto.trim().slice(0, LONGITUD_MAXIMA_TERMINO).trim();
     const params = new URLSearchParams(search);
     params.set('q', recortado);
     for (const p of PARAMETROS_UNIDAD) params.delete(p);
-    setCrudo(recortado);
-    navigate(`${location.pathname}?${params.toString()}`, { replace: true });
-  }, [search, location.pathname, navigate]);
+    setLocal({ search, crudo: recortado });
+    navigate(`${location.pathname}?${params.toString()}${location.hash ?? ''}`, { replace: true });
+  }, [search, location.pathname, location.hash, navigate]);
 
   const quitar = useCallback(() => {
     const params = new URLSearchParams(search);
     params.delete('q');
     const resto = params.toString();
-    setCrudo('');
-    navigate(resto ? `${location.pathname}?${resto}` : location.pathname, { replace: true });
-  }, [search, location.pathname, navigate]);
+    setLocal({ search, crudo: '' });
+    navigate(`${location.pathname}${resto ? `?${resto}` : ''}${location.hash ?? ''}`, { replace: true });
+  }, [search, location.pathname, location.hash, navigate]);
 
   const termino = useMemo(() => {
     const v = validarTermino(crudo);
@@ -78,8 +78,8 @@ export function useNavegacionGuia(): {
       else params.set(clave, valor);
     }
     const texto = params.toString();
-    navigate(texto ? `${location.pathname}?${texto}` : location.pathname, { replace: opciones.reemplazar === true });
-  }, [search, location.pathname, navigate]);
+    navigate(`${location.pathname}${texto ? `?${texto}` : ''}${location.hash ?? ''}`, { replace: opciones.reemplazar === true });
+  }, [search, location.pathname, location.hash, navigate]);
 
   return { parametros, irA };
 }

@@ -1,8 +1,8 @@
-import { useEffect, useId, useRef, useState } from 'react';
+import { useId, useRef, useState } from 'react';
 import type { FormEvent } from 'react';
 import { TEXTO_LIBRE } from '../utils/correctorOrtografico';
-import { validarTermino } from '../utils/busquedaGuia/termino';
-import { LONGITUD_MAXIMA_TERMINO } from '../hooks/useTerminoBusqueda';
+import { LONGITUD_MAXIMA_TERMINO, validarTermino } from '../utils/busquedaGuia/termino';
+import { avisoDe } from '../utils/busquedaGuia/avisoTermino';
 
 interface CampoBusquedaProps {
   etiqueta?: string;
@@ -10,18 +10,6 @@ interface CampoBusquedaProps {
   /** Solo se llama con un término válido, ya recortado. */
   onBuscar: (texto: string) => void;
   onLimpiar: () => void;
-}
-
-/** Texto del aviso según el motivo de rechazo; `texto` es lo escrito. */
-export function textoAviso(motivo: 'corto' | 'conector', texto: string): string {
-  if (motivo === 'corto') return 'Escriba al menos 3 letras, o un año de cuatro cifras.';
-  return `La palabra «${texto.trim()}» es muy común para buscarla sola; escriba un nombre, un lugar o un año.`;
-}
-
-function avisoDe(texto: string): string | null {
-  const v = validarTermino(texto);
-  if (v.ok || v.motivo === 'vacio') return null;
-  return textoAviso(v.motivo, texto);
 }
 
 /** Campo único de búsqueda: valida el término y no conoce el enrutador. */
@@ -32,10 +20,13 @@ export default function CampoBusqueda({ etiqueta = 'Buscar en la base de datos',
   const idCampo = useId();
   const idAviso = useId();
 
-  useEffect(() => {
+  // Resincronización con el valor de la URL durante el render (valor previo), sin efecto.
+  const [previo, setPrevio] = useState(valorInicial);
+  if (previo !== valorInicial) {
+    setPrevio(valorInicial);
     setTexto(valorInicial);
     setAviso(avisoDe(valorInicial));
-  }, [valorInicial]);
+  }
 
   const enviar = (e: FormEvent) => {
     e.preventDefault();

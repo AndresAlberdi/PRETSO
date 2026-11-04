@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { cargarIndice, suscribirIndice, versionIndice } from '../utils/busquedaGuia/cargaIndice';
 import { buscarEnIndice } from '../utils/busquedaGuia/indiceBusqueda';
 import type { IndiceBusqueda, ResultadoRegistro } from '../utils/busquedaGuia/indiceBusqueda';
@@ -6,25 +6,42 @@ import type { UnidadBusqueda } from '../utils/busquedaGuia/mapaSecciones';
 
 export type EstadoCarga = 'inactivo' | 'cargando' | 'listo' | 'error';
 
-/** Carga el índice compartido solo cuando `activo`; se recarga si se invalida. */
-export function useIndiceBusqueda(activo: boolean): { estado: EstadoCarga; indice: IndiceBusqueda | null } {
+interface ResultadoCarga {
+  clave: string;
+  indice: IndiceBusqueda | null;
+  error: boolean;
+}
+
+/**
+ * Carga el índice compartido solo cuando `activo`; se recarga si se invalida.
+ * Mientras recarga tras una invalidación conserva el último índice: en estado
+ * `cargando`, `indice` puede no ser nulo. Tras un error, `reintentar` vuelve a
+ * cargar, y desactivar y reactivar el hook también reintenta.
+ */
+export function useIndiceBusqueda(activo: boolean): { estado: EstadoCarga; indice: IndiceBusqueda | null; reintentar: () => void } {
   const version = useSyncExternalStore(suscribirIndice, versionIndice);
-  const [resultado, setResultado] = useState<{ clave: number; indice: IndiceBusqueda | null; error: boolean } | null>(null);
+  const [intento, setIntento] = useState(0);
+  const [resultado, setResultado] = useState<ResultadoCarga | null>(null);
+  const clave = `${version}.${intento}`;
+  const reintentar = useCallback(() => setIntento(n => n + 1), []);
+
+  // Al desactivarse, un error anterior se olvida para que reactivar vuelva a cargar.
+  if (!activo && resultado?.error) setResultado({ ...resultado, error: false, indice: null, clave: '' });
 
   useEffect(() => {
     if (!activo) return;
     let vigente = true;
     cargarIndice().then(
-      indice => { if (vigente) setResultado({ clave: version, indice, error: false }); },
-      () => { if (vigente) setResultado({ clave: version, indice: null, error: true }); },
+      indice => { if (vigente) setResultado({ clave, indice, error: false }); },
+      () => { if (vigente) setResultado(previo => ({ clave, indice: previo?.indice ?? null, error: true })); },
     );
     return () => { vigente = false; };
-  }, [activo, version]);
+  }, [activo, clave]);
 
-  if (!activo) return { estado: 'inactivo', indice: null };
-  if (!resultado || resultado.clave !== version) return { estado: 'cargando', indice: null };
-  if (resultado.error) return { estado: 'error', indice: null };
-  return { estado: 'listo', indice: resultado.indice };
+  if (!activo) return { estado: 'inactivo', indice: null, reintentar };
+  if (!resultado || resultado.clave !== clave) return { estado: 'cargando', indice: resultado?.indice ?? null, reintentar };
+  if (resultado.error) return { estado: 'error', indice: null, reintentar };
+  return { estado: 'listo', indice: resultado.indice, reintentar };
 }
 
 const SIN_REGISTROS: ReadonlyMap<string, ResultadoRegistro> = new Map();

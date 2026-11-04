@@ -1,6 +1,9 @@
 import { normalizarTexto } from '../filtrarRegistros';
 import { esConsultaAnio } from './anios';
 
+/** Longitud máxima de un término de búsqueda (también `maxLength` del campo). */
+export const LONGITUD_MAXIMA_TERMINO = 100;
+
 /** Longitud mínima de un término (un año de cuatro cifras ya la cumple). */
 export const LONGITUD_MINIMA = 3;
 

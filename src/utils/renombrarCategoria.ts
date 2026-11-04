@@ -1,6 +1,7 @@
 import { collection, getDocs, query, where, writeBatch, doc, serverTimestamp } from "firebase/firestore";
 import { auth, db } from "../firebase";
 import { normalizarTexto } from "./filtrarRegistros";
+import { invalidarIndice } from "./busquedaGuia/cargaIndice";
 
 export const MAX_LONGITUD_CATEGORIA = 200;
 // Cada documento cuesta 2 escrituras (indicador y bitácora); el límite de Firestore es 500 por lote.
@@ -62,6 +63,8 @@ export async function renombrarCategoria(anterior: string, nuevo: string): Promi
         });
       }
       await lote.commit();
+      // Las escrituras no pasan por logAction: se descarta aquí el índice de búsqueda en caché, también si luego falla un lote.
+      invalidarIndice();
     } catch (error) {
       // Si no se confirmó ningún lote, no hay cambio parcial: se informa el error tal cual.
       if (actualizados.length === 0) throw error;

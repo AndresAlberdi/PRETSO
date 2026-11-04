@@ -10,11 +10,16 @@ export const RUTA_COLECCION: Readonly<Record<string, string>> = {
   documentos: '/documentos',
 };
 
-/** URL de una sección con el término y, si se pide, los parámetros de unidad. Nunca concatena sin codificar. */
+/**
+ * URL de una sección con el término y, si se pide, los parámetros de unidad.
+ * Nunca concatena sin codificar; `q` se aplica al final y no lo pisan los parámetros.
+ * Una colección desconocida es un error de programación y lanza.
+ */
 export function enlaceSeccion(coleccion: string, crudo: string, parametros: Record<string, string> = {}): string {
-  const ruta = RUTA_COLECCION[coleccion] ?? '/buscar';
+  const ruta = RUTA_COLECCION[coleccion];
+  if (ruta === undefined) throw new Error(`Colección sin ruta de búsqueda: ${coleccion}`);
   const params = new URLSearchParams();
-  params.set('q', crudo);
   for (const [clave, valor] of Object.entries(parametros)) params.set(clave, valor);
+  params.set('q', crudo);
   return `${ruta}?${params.toString()}`;
 }
