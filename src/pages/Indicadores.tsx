@@ -20,6 +20,7 @@ import { useRestoreFocusOnViewChange } from "../hooks/useRestoreFocusOnViewChang
 import SortableTh from "../components/SortableTh";
 import { contar } from "../utils/anuncios";
 import Tooltip from "../components/Tooltip";
+import RenombrarCategoriaModal from "../components/RenombrarCategoriaModal";
 
 export default function Indicadores() {
   const [data, setData] = useState<any[]>([]);
@@ -51,6 +52,7 @@ export default function Indicadores() {
   ];
 
   const [filterCategoria, setFilterCategoria] = useState('');
+  const [categoriaARenombrar, setCategoriaARenombrar] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
@@ -237,13 +239,17 @@ export default function Indicadores() {
                 <tr>
                   <SortableTh label="Categoría" sortKey="Categoría" sortConfig={scCat} onSort={sortCat} />
                   <th scope="col"><span className="visually-hidden">Detalle</span></th>
+                  {canEdit && <th scope="col">Admin</th>}
                 </tr>
               </thead>
               <tbody>
-                {sortedFilteredCategorias.map((c, i) => (
-                  <tr key={i}>
+                {sortedFilteredCategorias.map((c) => (
+                  <tr key={c.Categoría}>
                     <td>{c.Categoría}</td>
                     <td><button onClick={() => setSelectedCategoria(c.Categoría)}>LISTA</button></td>
+                    {canEdit && (
+                      <td><button type="button" onClick={() => setCategoriaARenombrar(c.Categoría)}>Renombrar{" "}<span className="visually-hidden">{`la categoría ${c.Categoría}`}</span></button></td>
+                    )}
                   </tr>
                 ))}
               </tbody>
@@ -330,6 +336,24 @@ export default function Indicadores() {
           record={recordToEdit}
           onClose={() => setRecordToEdit(null)}
           onSave={handleSave}
+        />
+      )}
+
+      {categoriaARenombrar && (
+        <RenombrarCategoriaModal
+          categoria={categoriaARenombrar}
+          existentes={uniqueCategorias.map(String)}
+          cantidad={data.filter(d => d["Categorías"] === categoriaARenombrar).length}
+          onClose={() => setCategoriaARenombrar(null)}
+          onParcial={(ids, nuevo) => {
+            const hechos = new Set(ids);
+            setData(prev => prev.map(d => hechos.has(d.id) ? { ...d, "Categorías": nuevo } : d));
+          }}
+          onRenombrada={(anterior, nuevo) => {
+            setData(prev => prev.map(d => d["Categorías"] === anterior ? { ...d, "Categorías": nuevo } : d));
+            setFilterCategoria(f => f === anterior ? nuevo : f);
+            setSelectedCategoria(s => s === anterior ? nuevo : s);
+          }}
         />
       )}
 
