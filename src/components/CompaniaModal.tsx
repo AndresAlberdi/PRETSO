@@ -3,6 +3,8 @@ import type { CSSProperties } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import Modal from './Modal';
+import { Resaltado } from './Resaltado';
+import { RAIZ_MODAL, useDesplazarACoincidencia } from '../hooks/useDesplazarACoincidencia';
 import { etiquetaCampo } from '../utils/etiquetas';
 
 const overlayStyle: CSSProperties = {
@@ -21,15 +23,17 @@ interface CompaniaModalProps {
   sigla?: string;
   // Compañía ya resuelta: con ella no se consulta Firestore.
   compania?: any;
+  termino?: string | null;
   onClose: () => void;
 }
 
-export default function CompaniaModal({ sigla = '', compania: companiaDada, onClose }: CompaniaModalProps) {
+export default function CompaniaModal({ sigla = '', compania: companiaDada, termino = null, onClose }: CompaniaModalProps) {
   const [consultada, setConsultada] = useState<any | null>(null);
   const [loadingConsulta, setLoadingConsulta] = useState(true);
   const titleId = useId();
   const compania = companiaDada ?? consultada;
   const loading = companiaDada ? false : loadingConsulta;
+  useDesplazarACoincidencia(termino && !loading && compania ? `${termino}|${sigla}` : null, RAIZ_MODAL);
 
   useEffect(() => {
     if (companiaDada) return;
@@ -68,7 +72,7 @@ export default function CompaniaModal({ sigla = '', compania: companiaDada, onCl
               return (
                 <tr key={key} style={{ borderBottom: '1px solid var(--border-color)' }}>
                   <th scope="row" style={{ padding: '0.75rem', textAlign: 'left', width: '30%', color: 'var(--accent-color)' }}>{etiquetaCampo(key)}</th>
-                  <td style={{ padding: '0.75rem', textAlign: 'left' }}>{compania[key]}</td>
+                  <td style={{ padding: '0.75rem', textAlign: 'left' }}><Resaltado texto={compania[key]} termino={termino} anio={key === 'Temporadas teatrales'} /></td>
                 </tr>
               );
             })}
