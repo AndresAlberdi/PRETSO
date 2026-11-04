@@ -31,6 +31,7 @@ vi.mock('firebase/firestore', () => ({
 import {
   validarNuevoNombreCategoria, renombrarCategoria, RenombreParcialError, MAX_LONGITUD_CATEGORIA,
 } from '../utils/renombrarCategoria';
+import { versionIndice } from '../utils/busquedaGuia/cargaIndice';
 
 beforeEach(() => {
   commits.length = 0; lotes.length = 0; falloEnLote = -1; ids = [];
@@ -95,5 +96,12 @@ describe('renombrarCategoria', () => {
   it('sin documentos no hace commits', async () => {
     expect(await renombrarCategoria('Pan', 'Panes')).toBe(0);
     expect(lotes).toHaveLength(0);
+  });
+  it('invalida el índice de búsqueda tras cada lote confirmado, también en el parcial', async () => {
+    ids = Array.from({ length: 401 }, (_, i) => `d${i}`);
+    falloEnLote = 2;
+    const antes = versionIndice();
+    await renombrarCategoria('Pan', 'Panes').catch(() => undefined);
+    expect(versionIndice()).toBe(antes + 2);
   });
 });

@@ -319,6 +319,11 @@ main {
 .cabecera-pagina { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
 .acciones-cabecera { display: flex; gap: 1rem; align-items: center; }
 .barra-busqueda { display: flex; gap: 0.5rem; align-items: center; }
+/* Búsqueda guiada: aparición subrayada, botón y fila que llevan a una coincidencia */
+mark.coincidencia { background: transparent; color: inherit; text-decoration: underline 2px var(--accent-color); text-underline-offset: 0.2em; font-weight: 600; }
+.boton-con-coincidencia { outline: 3px solid var(--accent-color); outline-offset: 2px; font-weight: 700; }
+.fila-con-coincidencia > td:first-child { box-shadow: inset 4px 0 0 var(--accent-color); }
+.aviso-busqueda { flex-basis: 100%; margin: 0; color: var(--danger-color); font-size: 0.9rem; }
 .fila-filtros { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
 .fila-filtros select { max-width: 100%; }
 .titulo-pagina { display: flex; align-items: center; gap: 0.5rem; position: relative; }
