@@ -2,6 +2,7 @@ import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import ManejoCaja from '../pages/ManejoCaja';
 import Salarios from '../pages/Salarios';
+import { invalidarIndice } from '../utils/busquedaGuia/cargaIndice';
 
 const companias = [
   { id: 'c7', 'Indicador de registro': 7, 'Sigla Compañía': 'GA-JR', 'Nombre Compañía': 'Compañía de Alarcón', Autores: 'Alarcón y Ramírez' },
@@ -29,6 +30,7 @@ vi.mock('firebase/firestore', () => ({
 }));
 
 beforeEach(() => {
+  invalidarIndice();
   ubicacion.search = '';
   colecciones = {
     companias,
@@ -60,29 +62,22 @@ afterEach(() => {
 
 const region = () => document.querySelector('output.visually-hidden') as HTMLElement;
 
-function buscar(categoria: string, texto: string) {
-  const selects = screen.getAllByRole('combobox');
-  fireEvent.change(selects[0], { target: { value: categoria } });
-  fireEvent.change(screen.getByPlaceholderText('Añadir filtro...'), { target: { value: texto } });
-  fireEvent.click(screen.getAllByRole('button', { name: 'Buscar' })[0]);
-}
-
 describe.each([
   ['Manejo de caja', ManejoCaja],
   ['Remuneraciones', Salarios],
 ])('%s: anuncios de resultados', (_nombre, Pagina) => {
   it('anuncia el listado y la búsqueda en el mismo nodo persistente', async () => {
-    render(<Pagina />);
+    const { rerender } = render(<Pagina />);
     await screen.findByText(/Mostrando \d+ registros/);
     const nodo = region();
     expect(document.querySelectorAll('output.visually-hidden').length).toBe(1);
     expect(nodo.textContent).toBe('Listado: 2 registros');
-    buscar('Autores', 'Alarcón');
-    await screen.findByText('Resultados de búsqueda (1 registros)');
+    ubicacion.search = '?q=Potosí';
+    rerender(<Pagina />);
+    await vi.waitFor(() => expect(nodo.textContent).toBe('Búsqueda: 1 compañía con «Potosí»'));
     expect(region()).toBe(nodo);
-    expect(nodo.textContent).toBe('Búsqueda: 1 registro encontrado');
     expect(document.querySelectorAll('output.visually-hidden').length).toBe(1);
-    expect(screen.getAllByText(/Resultados de búsqueda \(1 registros\)/).length).toBe(1);
+    expect(screen.queryByText(/Resultados de búsqueda/)).toBeNull();
   });
 
   it('compañía inexistente: anuncia que no se encontró', async () => {
