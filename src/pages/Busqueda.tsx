@@ -1,235 +1,102 @@
-import { useState, useMemo, useEffect } from "react";
-import { collection, getDocs, query } from "firebase/firestore";
-import { db } from "../firebase";
-import { cleanFirebaseData } from "../utils";
-import SearchBar, { type SearchFilter } from "../components/SearchBar";
-import { useNavigate, Link } from "react-router";
+import { useMemo } from "react";
+import { Link } from "react-router";
+import CampoBusqueda from "../components/CampoBusqueda";
 import { useAdmin } from "../context/AdminContext";
+import { useIndiceBusqueda } from "../hooks/useIndiceBusqueda";
+import { useTerminoBusqueda } from "../hooks/useTerminoBusqueda";
 import { SECCIONES } from "../utils/secciones";
-import { nombreColeccion } from "../utils/etiquetas";
 import { contar } from "../utils/anuncios";
-import { esCampoRetirado } from "../utils/camposRetirados";
-import { textoResultadoBusqueda, textosCompaniaBuscables } from "../utils/textoResultadoBusqueda";
+import { buscarEnIndice } from "../utils/busquedaGuia/indiceBusqueda";
+import { enlaceSeccion } from "../utils/busquedaGuia/rutas";
 
-type SearchResultItem = {
-  id: string;
-  source: string;
-  label: string;
-  match: string;
-  data: any;
-  path: string;
-};
+const MENSAJE_ERROR = 'No se pudo cargar la base de datos para la búsqueda. Inténtelo de nuevo más tarde.';
+
+const FLECHA = (
+  <svg className="flecha-seccion" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+);
 
 export default function Busqueda() {
-  const [loading, setLoading] = useState(false);
-  const [filters, setFilters] = useState<SearchFilter[]>([]);
-  const [dbData, setDbData] = useState<{ [key: string]: any[] }>({});
-  const [loadError, setLoadError] = useState('');
-  const { isAdmin, adminLoading } = useAdmin();
-  
-  const navigate = useNavigate();
+  const { isAdmin } = useAdmin();
+  const { crudo, termino, fijar, quitar } = useTerminoBusqueda();
+  // Precarga al montar: el índice se comparte y se guarda en caché.
+  const { estado, indice, reintentar } = useIndiceBusqueda(true);
 
-  const searchCategories = [
-    { id: 'Persona', label: 'Persona' },
-    { id: 'Ciudad', label: 'Ciudad' },
-    { id: 'Año', label: 'Año' },
-    { id: 'all', label: 'Texto libre' }
-  ];
+  const resultados = useMemo(
+    () => (termino && indice ? buscarEnIndice(indice, termino, { incluirAdmin: isAdmin }) : []),
+    [termino, indice, isAdmin],
+  );
 
-  // Pre-load data to allow quick searching
-  useEffect(() => {
-    if (adminLoading) return;
-    let vigente = true;
-    async function loadAllData() {
-      setLoading(true);
-      setLoadError('');
-      const collections = [
-        "manejo_de_caja", "salarios", "corpus_christi",
-        "indicadores", "companias", "bibliografia",
-        ...(isAdmin ? ["transacciones", "documentos"] : [])
-      ];
-      const dataMap: { [key: string]: any[] } = {};
+  const buscando = termino !== null && estado !== 'error' && indice === null;
+  const hayError = estado === 'error';
+  const resuelto = termino !== null && !buscando && !hayError;
 
-      try {
-        await Promise.all(collections.map(async (collName) => {
-          const q = query(collection(db, collName));
-          const snap = await getDocs(q);
-          dataMap[collName] = snap.docs.map(cleanFirebaseData);
-        }));
-        if (!vigente) return;
-        setDbData(dataMap);
-      } catch (error) {
-        if (!vigente) return;
-        console.error('No se pudo cargar la base para la búsqueda:', (error as { code?: string })?.code);
-        setLoadError('No se pudo cargar la base de datos para la búsqueda. Inténtelo de nuevo más tarde.');
-      } finally {
-        if (vigente) setLoading(false);
-      }
-    }
-    loadAllData();
-    return () => { vigente = false; };
-  }, [isAdmin, adminLoading]);
-
-  const searchResults = useMemo(() => {
-    if (filters.length === 0 || Object.keys(dbData).length === 0) return [];
-    
-    let results: SearchResultItem[] = [];
-
-    const getPersonaFields = (data: any, coll: string) => {
-      if (coll === 'companias') return [data["Autores"], data["Nombre Compañía"], data["Sigla Compañía"]];
-      if (coll === 'salarios') return [data["Beneficiario "]];
-      if (coll === 'corpus_christi') return [data["Encargado "]];
-      if (coll === 'bibliografia') return [data["Autores"]];
-      return [];
-    };
-
-    const getPath = (coll: string) => {
-      switch (coll) {
-        case 'manejo_de_caja': return '/caja';
-        case 'salarios': return '/salarios';
-        case 'corpus_christi': return '/corpus';
-        case 'indicadores': return '/indicadores';
-        case 'companias': return '/companias';
-        case 'bibliografia': return '/bibliografia';
-        case 'transacciones': return '/transacciones';
-        case 'documentos': return '/documentos';
-        default: return '/';
-      }
-    };
-
-    const getLabel = nombreColeccion;
-
-    const companias = dbData.companias ?? [];
-    const cacheCompanias = new Map<string, string>();
-
-    const checkMatch = (data: any, coll: string, filter: SearchFilter) => {
-      const q = filter.query.toLowerCase();
-      
-      if (filter.category === 'all') {
-        return Object.entries(data).some(([k, v]) => !esCampoRetirado(coll, k) && String(v).toLowerCase().includes(q))
-          || textosCompaniaBuscables(data, coll, companias, cacheCompanias).some(t => t.toLowerCase().includes(q));
-      }
-      
-      if (filter.category === 'Persona') {
-        const fields = getPersonaFields(data, coll);
-        return fields.some(f => f && String(f).toLowerCase().includes(q));
-      }
-
-      if (filter.category === 'Ciudad') {
-        return data["Ciudad"] && String(data["Ciudad"]).toLowerCase().includes(q);
-      }
-
-      if (filter.category === 'Año') {
-        return (data["Año"] && String(data["Año"]).toLowerCase().includes(q)) || 
-               (data["Años"] && String(data["Años"]).toLowerCase().includes(q)) ||
-               (data["Temporadas teatrales"] && String(data["Temporadas teatrales"]).toLowerCase().includes(q));
-      }
-      
-      return false;
-    };
-
-    for (const [coll, items] of Object.entries(dbData)) {
-      for (const item of items) {
-        // Must match ALL filters
-        const matchesAll = filters.every(f => checkMatch(item, coll, f));
-        if (matchesAll) {
-          results.push({
-            id: item.id,
-            source: coll,
-            label: getLabel(coll),
-            match: textoResultadoBusqueda(item, coll, companias),
-            data: item,
-            path: getPath(coll)
-          });
-        }
-      }
-    }
-
-    return results;
-  }, [filters, dbData]);
+  const anuncio = !resuelto
+    ? ''
+    : resultados.length === 0
+      ? 'Búsqueda sin resultados'
+      : `Búsqueda: «${crudo}» aparece en ${contar(resultados.length, 'sección', 'secciones')}`;
 
   return (
     <div>
       <div style={{ textAlign: 'center', margin: '2rem 0' }}>
         <h1 className="titulo-busqueda">Búsqueda general</h1>
-        
+
         <div style={{ display: 'inline-block', textAlign: 'left', minWidth: 'min(300px, 100%)', maxWidth: '600px', width: '100%' }}>
-          <SearchBar 
-            onSearch={(f) => setFilters(f)} 
-            categories={searchCategories} 
+          <CampoBusqueda
+            etiqueta="Buscar en la base de datos"
+            valorInicial={crudo}
+            onBuscar={fijar}
+            onLimpiar={quitar}
           />
         </div>
       </div>
 
-      <output aria-live="polite" className="visually-hidden">
-        {!loading && filters.length > 0
-          ? (searchResults.length === 0
-            ? 'Búsqueda sin resultados'
-            : `Búsqueda: ${contar(searchResults.length, 'resultado', 'resultados')}`)
-          : ''}
-      </output>
+      <output aria-live="polite" className="visually-hidden">{anuncio}</output>
 
-      {loadError && <p role="alert">{loadError}</p>}
-
-      {loading && <div style={{ textAlign: 'center', marginTop: '2rem' }}>Cargando base de datos para búsqueda...</div>}
-
-      {!loading && filters.length > 0 && (
-        <div style={{ marginTop: '2rem' }}>
-          <h2>Resultados de búsqueda ({searchResults.length})</h2>
-          {searchResults.length === 0 ? (
-            <p>No se encontraron resultados que coincidan con su búsqueda.</p>
-          ) : (
-            <div style={{ display: 'grid', gap: '1rem' }}>
-              {searchResults.map(res => (
-                <div key={`${res.source}-${res.id}`} style={{ 
-                  background: 'var(--bg-card)', 
-                  border: '1px solid var(--border-color)', 
-                  padding: '1rem', 
-                  borderRadius: '8px',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  gap: '1rem',
-                  flexWrap: 'wrap'
-                }}>
-                  <div style={{ flex: '1 1 12rem', minWidth: 0, overflowWrap: 'anywhere' }}>
-                    <span style={{ 
-                      background: 'var(--primary-color)', 
-                      color: 'var(--on-primary)', 
-                      padding: '0.2rem 0.5rem', 
-                      borderRadius: '4px', 
-                      fontSize: '0.8rem', 
-                      fontWeight: 'bold',
-                      marginRight: '1rem' 
-                    }}>
-                      {res.label}
-                    </span>
-                    <span style={{ color: 'var(--text-primary)' }}>{res.match}</span>
-                  </div>
-                  <button 
-                    onClick={() => navigate(res.path)}
-                    style={{ background: 'transparent', border: '1px solid var(--border-color)', color: 'var(--text-primary)', padding: '0.4rem 1rem', borderRadius: '4px', cursor: 'pointer', flexShrink: 0, maxWidth: '100%' }}
-                  >
-                    Ir a la sección
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
+      {hayError && (
+        <div>
+          <p role="alert">{MENSAJE_ERROR}</p>
+          <button type="button" onClick={reintentar}>Reintentar</button>
         </div>
       )}
-      <p className="rotulo-secciones">Secciones</p>
-      <nav aria-label="Secciones de la base de datos">
-        <ol className="lista-secciones">
-          {SECCIONES.map((s, i) => (
-            <li key={s.ruta}><Link to={s.ruta} className="fila-seccion">
-              <span className="numero-seccion">{i + 1}</span>
-              <span className="nombre-seccion">{s.nombre}</span>
-              <svg className="flecha-seccion" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" focusable="false"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
-            </Link></li>
-          ))}
-        </ol>
-      </nav>
+
+      {buscando && <div style={{ textAlign: 'center', marginTop: '2rem' }}>Buscando en la base de datos...</div>}
+
+      {resuelto && resultados.length === 0 && (
+        <p style={{ marginTop: '2rem' }}>No se encontró «{crudo}» en ninguna sección.</p>
+      )}
+
+      {resuelto && resultados.length > 0 && (
+        <div style={{ marginTop: '2rem' }}>
+          <h2>Secciones con «{crudo}»</h2>
+          <ol className="lista-secciones">
+            {resultados.map((r, i) => (
+              <li key={r.coleccion}><Link to={enlaceSeccion(r.coleccion, crudo)} className="fila-seccion">
+                <span className="numero-seccion">{i + 1}</span>
+                <span className="nombre-seccion">{r.nombre} ({contar(r.registros.length, 'registro', 'registros')})</span>
+                {FLECHA}
+              </Link></li>
+            ))}
+          </ol>
+        </div>
+      )}
+
+      {termino === null && !hayError && (
+        <>
+          <p className="rotulo-secciones">Secciones</p>
+          <nav aria-label="Secciones de la base de datos">
+            <ol className="lista-secciones">
+              {SECCIONES.map((s, i) => (
+                <li key={s.ruta}><Link to={s.ruta} className="fila-seccion">
+                  <span className="numero-seccion">{i + 1}</span>
+                  <span className="nombre-seccion">{s.nombre}</span>
+                  {FLECHA}
+                </Link></li>
+              ))}
+            </ol>
+          </nav>
+        </>
+      )}
     </div>
   );
 }

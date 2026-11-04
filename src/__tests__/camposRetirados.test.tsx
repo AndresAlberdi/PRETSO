@@ -4,7 +4,6 @@ import { COLUMN_ORDERS } from '../utils/xlsxExport';
 import { translateField, generateDatabaseXml } from '../utils/backup';
 import { render, screen, cleanup } from '@testing-library/react';
 import DetailsModal from '../components/DetailsModal';
-import { textoResultadoBusqueda } from '../utils/textoResultadoBusqueda';
 
 const datos = vi.hoisted(() => ({
   salarios: [{
@@ -71,11 +70,5 @@ describe('campos retirados (Laura, 02/11/2026)', () => {
     expect(screen.queryByText('Días de ración en un año')).toBeNull();
     expect(screen.queryByText('365')).toBeNull();
     cleanup();
-  });
-
-  it('el resumen de /buscar no usa campos retirados', () => {
-    const t = textoResultadoBusqueda(
-      { 'Datos sobre normativa de manejo de caja': 'norma', Ingresos: 5 }, 'manejo_de_caja', []);
-    expect(t).toBe('Ingresos: 5');
   });
 });
