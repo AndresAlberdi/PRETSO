@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 /** Raíz de las páginas; los modales se montan fuera de `#contenido` y pasan su propia raíz. */
 export const RAIZ_PAGINA = '#contenido';
@@ -14,12 +14,17 @@ export function raizDeModal(idTitulo: string): () => Element | null {
  * coincidencia dentro de `raiz` (selector o función). No mueve el foco.
  */
 export function useDesplazarACoincidencia(clave: string | null, raiz: RaizDesplazamiento = RAIZ_PAGINA): void {
+  // `raiz` se guarda en una referencia: una función nueva en cada render no debe repetir el desplazamiento.
+  // Se actualiza en un efecto declarado antes, para que el de la clave lea siempre la raíz vigente.
+  const raizRef = useRef(raiz);
+  useEffect(() => {
+    raizRef.current = raiz;
+  }, [raiz]);
   useEffect(() => {
     if (clave === null) return;
-    const contenedor = typeof raiz === 'string' ? document.querySelector(raiz) : raiz();
+    const actual = raizRef.current;
+    const contenedor = typeof actual === 'string' ? document.querySelector(actual) : actual();
     const primera = contenedor?.querySelector('mark.coincidencia, .boton-con-coincidencia, .fila-con-coincidencia');
     if (primera && typeof primera.scrollIntoView === 'function') primera.scrollIntoView({ block: 'center' });
-    // `raiz` se lee al cambiar la clave; una función nueva en cada render no debe repetir el desplazamiento.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [clave]);
 }
