@@ -96,4 +96,14 @@ describe('RenombrarCategoriaModal', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Renombrar' }));
     await waitFor(() => expect(onRenombrada).toHaveBeenCalledWith('Pan', 'Panes'));
   });
+  it('tras un fallo parcial el nombre queda fijo (solo lectura)', async () => {
+    renombrar.mockRejectedValueOnce(new RenombreParcialError(['a'], new Error('x')));
+    montar();
+    const campo = screen.getByLabelText('Nombre nuevo') as HTMLInputElement;
+    expect(campo.readOnly).toBe(false);
+    fireEvent.change(campo, { target: { value: 'Panes' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Renombrar' }));
+    await screen.findByRole('alert');
+    expect(campo.readOnly).toBe(true);
+  });
 });

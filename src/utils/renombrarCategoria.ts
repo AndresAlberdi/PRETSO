@@ -63,6 +63,8 @@ export async function renombrarCategoria(anterior: string, nuevo: string): Promi
       }
       await lote.commit();
     } catch (error) {
+      // Si no se confirmó ningún lote, no hay cambio parcial: se informa el error tal cual.
+      if (actualizados.length === 0) throw error;
       throw new RenombreParcialError([...actualizados], error);
     }
     actualizados.push(...grupo);

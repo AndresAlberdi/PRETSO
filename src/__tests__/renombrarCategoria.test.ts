@@ -85,6 +85,13 @@ describe('renombrarCategoria', () => {
     expect(error.actualizados[0]).toBe('d0');
     expect(lotes).toHaveLength(2);
   });
+  it('si falla el primer lote relanza el error original, sin RENOMBRE_PARCIAL', async () => {
+    ids = Array.from({ length: 10 }, (_, i) => `d${i}`);
+    falloEnLote = 0;
+    const error = await renombrarCategoria('Pan', 'Panes').catch(e => e);
+    expect(error).not.toBeInstanceOf(RenombreParcialError);
+    expect(error.message).toBe('fallo');
+  });
   it('sin documentos no hace commits', async () => {
     expect(await renombrarCategoria('Pan', 'Panes')).toBe(0);
     expect(lotes).toHaveLength(0);

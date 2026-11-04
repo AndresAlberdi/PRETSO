@@ -105,6 +105,8 @@ export default function RenombrarCategoriaModal({ categoria, existentes, cantida
         maxLength={MAX_LONGITUD_CATEGORIA}
         value={valor}
         disabled={busy}
+        // Tras un fallo parcial el nombre queda fijo: cambiarlo repartiría los registros en dos categorías.
+        readOnly={nombreParcial.current !== null}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
         onChange={(e) => setValor(e.target.value)}
