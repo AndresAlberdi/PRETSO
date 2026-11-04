@@ -37,6 +37,7 @@ beforeEach(() => {
 afterEach(cleanup);
 
 const PAGINAS_SECCION = PAGINAS.filter(p => p.nombre === 'Índice de compañías' || p.nombre === 'Bibliografía');
+it('selecciona las secciones esperadas', () => { expect(PAGINAS_SECCION).toHaveLength(2); });
 
 describe.each(PAGINAS_SECCION)('modo edición en $nombre', (p) => {
   it('un lector con modo edición forzado no ve controles de edición', async () => {

@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
-import CampoBusqueda, { textoAviso } from '../components/CampoBusqueda';
+import CampoBusqueda from '../components/CampoBusqueda';
+import { textoAviso } from '../utils/busquedaGuia/avisoTermino';
 import { TEXTO_LIBRE } from '../utils/correctorOrtografico';
 
 afterEach(cleanup);
@@ -22,6 +23,13 @@ describe('CampoBusqueda', () => {
     enviar();
     expect(screen.getByRole('alert').textContent).toBe('Escriba al menos 3 letras, o un año de cuatro cifras.');
     expect(onBuscar).not.toHaveBeenCalled();
+  });
+
+  it('un envío inválido deja el foco en el campo', () => {
+    const { campo } = montar();
+    escribir(campo, 'ab');
+    enviar();
+    expect(document.activeElement).toBe(campo);
   });
 
   it('«de la» muestra el aviso de conector con la palabra', () => {

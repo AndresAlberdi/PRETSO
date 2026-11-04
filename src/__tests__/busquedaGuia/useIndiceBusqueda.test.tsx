@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { renderHook, waitFor, cleanup } from '@testing-library/react';
+import { renderHook, waitFor, cleanup, act } from '@testing-library/react';
 
 let colecciones: Record<string, Array<Record<string, unknown> & { id: string }>> = {};
 const getDocs = vi.hoisted(() => vi.fn());
@@ -33,7 +33,7 @@ beforeEach(() => {
 describe('useIndiceBusqueda', () => {
   it('inactivo no llama a getDocs', () => {
     const { result } = renderHook(() => useIndiceBusqueda(false));
-    expect(result.current).toEqual({ estado: 'inactivo', indice: null });
+    expect(result.current).toMatchObject({ estado: 'inactivo', indice: null });
     expect(getDocs).not.toHaveBeenCalled();
   });
 
@@ -55,6 +55,39 @@ describe('useIndiceBusqueda', () => {
     await new Promise(r => setTimeout(r, 0));
     expect(errores).not.toHaveBeenCalled();
     errores.mockRestore();
+  });
+
+  it('montado, recarga tras invalidarIndice y conserva el último índice mientras tanto', async () => {
+    const { result } = renderHook(() => useIndiceBusqueda(true));
+    await waitFor(() => expect(result.current.estado).toBe('listo'));
+    const primero = result.current.indice;
+    const llamadas = getDocs.mock.calls.length;
+    act(() => invalidarIndice());
+    expect(result.current.estado).toBe('cargando');
+    expect(result.current.indice).toBe(primero);
+    await waitFor(() => expect(result.current.estado).toBe('listo'));
+    expect(getDocs.mock.calls.length).toBeGreaterThan(llamadas);
+    expect(result.current.indice).not.toBe(primero);
+  });
+
+  it('tras un error permite reintentar', async () => {
+    getDocs.mockRejectedValue(new Error('sin red'));
+    const { result } = renderHook(() => useIndiceBusqueda(true));
+    await waitFor(() => expect(result.current.estado).toBe('error'));
+    getDocs.mockImplementation(async () => ({ docs: [] }));
+    act(() => result.current.reintentar());
+    expect(result.current.estado).toBe('cargando');
+    await waitFor(() => expect(result.current.estado).toBe('listo'));
+  });
+
+  it('desactivar y reactivar tras un error vuelve a cargar', async () => {
+    getDocs.mockRejectedValue(new Error('sin red'));
+    const { result, rerender } = renderHook(({ a }) => useIndiceBusqueda(a), { initialProps: { a: true } });
+    await waitFor(() => expect(result.current.estado).toBe('error'));
+    rerender({ a: false });
+    getDocs.mockImplementation(async () => ({ docs: [] }));
+    rerender({ a: true });
+    await waitFor(() => expect(result.current.estado).toBe('listo'));
   });
 
   it('un error de carga da el estado error', async () => {
