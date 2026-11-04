@@ -20,7 +20,7 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
-const montar = (ui: React.ReactElement) => render(<MemoryRouter>{ui}</MemoryRouter>);
+const montar = (ui: React.ReactElement, ruta = '/') => render(<MemoryRouter initialEntries={[ruta]}>{ui}</MemoryRouter>);
 
 describe('TopBar', () => {
   it('con cuenta muestra el correo y «Salir» cierra la sesión', () => {
@@ -39,6 +39,26 @@ describe('TopBar', () => {
   it('con volver muestra el enlace con su destino', () => {
     montar(<TopBar volver={{ to: '/administracion', texto: 'Atrás' }} />);
     expect(screen.getByRole('link', { name: 'Atrás' }).getAttribute('href')).toBe('/administracion');
+  });
+});
+
+describe('TopBar: conservar la búsqueda', () => {
+  const volver = { to: '/buscar', texto: 'Atrás' as const };
+  it('con conservarBusqueda y ?q=x enlaza a /buscar?q=x', () => {
+    montar(<TopBar conservarBusqueda volver={volver} />, '/caja?q=x');
+    expect(screen.getByRole('link', { name: 'Atrás' }).getAttribute('href')).toBe('/buscar?q=x');
+  });
+  it('codifica el término y descarta los demás parámetros', () => {
+    montar(<TopBar conservarBusqueda volver={volver} />, '/caja?compania=7&q=a%26b');
+    expect(screen.getByRole('link', { name: 'Atrás' }).getAttribute('href')).toBe('/buscar?q=a%26b');
+  });
+  it('sin ?q= enlaza a /buscar', () => {
+    montar(<TopBar conservarBusqueda volver={volver} />, '/caja');
+    expect(screen.getByRole('link', { name: 'Atrás' }).getAttribute('href')).toBe('/buscar');
+  });
+  it('sin conservarBusqueda ignora ?q=', () => {
+    montar(<TopBar volver={volver} />, '/caja?q=x');
+    expect(screen.getByRole('link', { name: 'Atrás' }).getAttribute('href')).toBe('/buscar');
   });
 });
 
