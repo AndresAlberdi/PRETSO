@@ -12,6 +12,7 @@ vi.mock('../utils/xlsxExport', () => ({ generateDatabaseXlsx: vi.fn(), downloadX
 vi.mock('react-router', () => ({
   Link: ({ children, to }: { children: React.ReactNode; to: string }) => <a href={to}>{children}</a>,
   useNavigate: () => vi.fn(),
+  useLocation: () => ({ pathname: '/x', search: '', state: null }),
 }));
 vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isAdmin: true, isEditMode: true }) }));
 vi.mock('firebase/firestore', () => ({
