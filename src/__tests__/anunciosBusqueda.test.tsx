@@ -1,6 +1,8 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import { MemoryRouter } from 'react-router';
 import Busqueda from '../pages/Busqueda';
+import { invalidarIndice } from '../utils/busquedaGuia/cargaIndice';
 
 const companias = [
   { id: 'c7', 'Indicador de registro': 7, 'Sigla Compañía': 'GA-JR', 'Nombre Compañía': 'Compañía de Alarcón', Autores: 'Alarcón y Ramírez' },
@@ -8,16 +10,9 @@ const companias = [
 ];
 
 let colecciones: Record<string, any[]> = {};
-const ubicacion = vi.hoisted(() => ({ search: '' }));
-
 vi.mock('../firebase', () => ({ db: {} }));
 vi.mock('../utils/audit', () => ({ logAction: vi.fn() }));
-vi.mock('react-router', () => ({
-  useNavigate: () => vi.fn(),
-  useLocation: () => ({ pathname: '/x', search: ubicacion.search, state: null }),
-  Link: ({ to, children, ...r }: any) => <a href={String(to)} {...r}>{children}</a>,
-}));
-vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isEditMode: false }) }));
+vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isAdmin: false, adminLoading: false }) }));
 vi.mock('firebase/firestore', () => ({
   collection: (_db: unknown, nombre: string) => nombre,
   query: (nombre: string) => nombre,
@@ -28,7 +23,7 @@ vi.mock('firebase/firestore', () => ({
 }));
 
 beforeEach(() => {
-  ubicacion.search = '';
+  invalidarIndice();
   colecciones = {
     companias,
     transacciones: [],
@@ -59,23 +54,21 @@ afterEach(() => {
 
 const region = () => document.querySelector('output.visually-hidden') as HTMLElement;
 
-function buscar(categoria: string, texto: string) {
-  const selects = screen.getAllByRole('combobox');
-  fireEvent.change(selects[0], { target: { value: categoria } });
-  fireEvent.change(screen.getByPlaceholderText('Añadir filtro...'), { target: { value: texto } });
-  fireEvent.click(screen.getAllByRole('button', { name: 'Buscar' })[0]);
-}
-
 describe('Búsqueda general: anuncio de la búsqueda general', () => {
-  it('vacío al inicio y «Búsqueda sin resultados» sin coincidencias', async () => {
-    render(<Busqueda />);
+  it('vacío al inicio, y se anuncia «Búsqueda sin resultados» o las secciones con coincidencias', async () => {
+    render(<MemoryRouter initialEntries={['/buscar']}><Busqueda /></MemoryRouter>);
     await screen.findByRole('heading', { name: 'Búsqueda general' });
-    await vi.waitFor(() => expect(screen.queryByText(/Cargando base de datos/)).toBeNull());
     const nodo = region();
     expect(nodo.textContent).toBe('');
-    buscar('all', 'zzzz-inexistente');
-    await screen.findByText(/No se encontraron resultados/);
+    fireEvent.change(screen.getByLabelText('Buscar en la base de datos'), { target: { value: 'zzzz-inexistente' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Buscar' }));
+    await screen.findByText(/No se encontró/);
     expect(region()).toBe(nodo);
     expect(nodo.textContent).toBe('Búsqueda sin resultados');
+    fireEvent.change(screen.getByLabelText('Buscar en la base de datos'), { target: { value: 'Potosí' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Buscar' }));
+    await screen.findByRole('heading', { level: 2, name: 'Secciones con «Potosí»' });
+    expect(region()).toBe(nodo);
+    expect(nodo.textContent).toBe('Búsqueda: «Potosí» aparece en 3 secciones');
   });
 });
