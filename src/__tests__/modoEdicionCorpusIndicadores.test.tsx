@@ -2,7 +2,7 @@ import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { screen, fireEvent, within, cleanup } from '@testing-library/react';
-import { PAGINAS, mostrarTabla, mostrarDetalle, crearColecciones } from './ayudas/paginasSeccion';
+import { PAGINAS, mostrarDetalle, crearColecciones } from './ayudas/paginasSeccion';
 import type { ColeccionesPrueba, Pagina } from './ayudas/paginasSeccion';
 
 const SRC = resolve(__dirname, '..');
@@ -34,7 +34,16 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
-const PAGINAS_SECCION = PAGINAS.filter(p => p.nombre === 'Corpus Christi' || p.nombre === 'Indicadores');
+// Desaparece la tabla de «Resultados de búsqueda»: la tabla con columna Admin es ahora la de detalle,
+// y cada página conserva un solo <CeldaAdmin>.
+const PAGINAS_SECCION = PAGINAS
+  .filter(p => p.nombre === 'Corpus Christi' || p.nombre === 'Indicadores')
+  .map(p => ({ ...p, celdas: 1 }));
+
+async function mostrarTabla(p: Pagina): Promise<HTMLElement> {
+  if (!p.detalle) throw new Error('La página debe tener tabla de detalle');
+  return mostrarDetalle({ ...p, detalle: p.detalle });
+}
 it('selecciona las secciones esperadas', () => { expect(PAGINAS_SECCION).toHaveLength(2); });
 
 describe.each(PAGINAS_SECCION)('modo edición en $nombre', (p) => {

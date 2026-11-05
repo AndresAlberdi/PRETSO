@@ -60,21 +60,17 @@ afterEach(() => {
 
 const region = () => document.querySelector('output.visually-hidden') as HTMLElement;
 
-function buscar(categoria: string, texto: string) {
-  const selects = screen.getAllByRole('combobox');
-  fireEvent.change(selects[0], { target: { value: categoria } });
-  fireEvent.change(screen.getByPlaceholderText('Añadir filtro...'), { target: { value: texto } });
-  fireEvent.click(screen.getAllByRole('button', { name: 'Buscar' })[0]);
-}
 
 describe('Corpus Christi e Indicadores: anuncios', () => {
   it('Corpus Christi: listado y búsqueda', async () => {
     render(<CorpusChristi />);
     await screen.findByText(/Mostrando \d+ registros/);
     expect(region().textContent).toBe('Listado: 2 registros');
-    buscar('Ciudad', 'Lima');
-    await screen.findByText(/Resultados de búsqueda \(/);
-    expect(region().textContent).toBe('Búsqueda: 1 registro encontrado');
+    cleanup();
+    ubicacion.search = '?q=Lima';
+    render(<CorpusChristi />);
+    await screen.findByRole('table', { name: 'Ciudades y años de Corpus Christi' });
+    expect(region().textContent).toBe('Búsqueda: 1 registro con «Lima»');
   });
 
   it('Corpus Christi: detalle de ciudad y año', async () => {
@@ -88,9 +84,11 @@ describe('Corpus Christi e Indicadores: anuncios', () => {
     render(<Indicadores />);
     await screen.findByText(/Mostrando \d+ categorías/);
     expect(region().textContent).toBe('Listado: 3 categorías');
-    buscar('all', 'Pan');
-    await screen.findByText(/Resultados de búsqueda \(/);
-    expect(region().textContent).toBe('Búsqueda: 1 registro encontrado');
+    cleanup();
+    ubicacion.search = '?q=Pan';
+    render(<Indicadores />);
+    await screen.findByRole('table', { name: 'Categorías de indicadores' });
+    expect(region().textContent).toBe('Búsqueda: 1 categoría con «Pan»');
   });
 
   it('Indicadores: detalle de categoría', async () => {
