@@ -3,6 +3,7 @@ import { render, screen, cleanup, fireEvent, waitFor, within } from '@testing-li
 
 const ubicacion = vi.hoisted(() => ({ search: '' }));
 const navegar = vi.hoisted(() => vi.fn());
+const getDocsSimulado = vi.hoisted(() => vi.fn());
 const permiso = vi.hoisted(() => ({ canEdit: false }));
 let colecciones: Record<string, Array<Record<string, unknown> & { id: string }>> = {};
 
@@ -22,7 +23,7 @@ vi.mock('firebase/firestore', () => ({
   collection: (_db: unknown, nombre: string) => nombre,
   query: (nombre: string) => nombre,
   where: vi.fn(), doc: vi.fn(), deleteDoc: vi.fn(), updateDoc: vi.fn(), addDoc: vi.fn(), writeBatch: vi.fn(),
-  getDocs: async (nombre: string) => ({ docs: (colecciones[nombre] ?? []).map(d => ({ id: d.id, data: () => d })) }),
+  getDocs: (nombre: string) => getDocsSimulado(nombre),
 }));
 
 import CorpusChristi from '../pages/CorpusChristi';
@@ -36,6 +37,8 @@ beforeEach(() => {
   invalidarIndice();
   ubicacion.search = '';
   navegar.mockReset();
+  getDocsSimulado.mockReset();
+  getDocsSimulado.mockImplementation(async (nombre: string) => ({ docs: (colecciones[nombre] ?? []).map(d => ({ id: d.id, data: () => d })) }));
   permiso.canEdit = false;
   colecciones = {
     companias: [{ id: 'c7', 'Indicador de registro': 7, 'Sigla Compañía': 'GA-JR', 'Nombre Compañía': 'Compañía de Alarcón' }],
@@ -61,6 +64,16 @@ describe('Corpus Christi: niveles 2 y 3', () => {
     await screen.findByText('Mostrando 3 registros');
     expect(screen.getAllByRole('button', { name: 'TRATO' })).toHaveLength(3);
     expect(screen.queryByText(/No se encontró/)).toBeNull();
+  });
+
+  it('sin q solo consulta las colecciones propias, companias y transacciones', async () => {
+    render(<CorpusChristi />);
+    await screen.findByText('Mostrando 3 registros');
+    cleanup();
+    render(<Indicadores />);
+    await screen.findByText('Mostrando 2 categorías');
+    const consultadas = new Set(getDocsSimulado.mock.calls.map(c => c[0]));
+    expect(consultadas).toEqual(new Set(['corpus_christi', 'indicadores', 'companias', 'transacciones']));
   });
 
   it('nivel 2: Lima 1600 aparece solo si contiene el término', async () => {
@@ -107,6 +120,46 @@ describe('Corpus Christi: niveles 2 y 3', () => {
     expect(navegar).toHaveBeenLastCalledWith('/x?q=Alberto', { replace: false });
   });
 
+  it('un término nuevo desde el nivel 3 borra la unidad', async () => {
+    ubicacion.search = '?q=Alberto&ciudad=Lima&anio=1600';
+    render(<CorpusChristi />);
+    const campo = await screen.findByLabelText('Buscar en esta sección');
+    fireEvent.change(campo, { target: { value: 'Marta' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Buscar' }));
+    expect(navegar).toHaveBeenLastCalledWith('/x?q=Marta', { replace: true });
+  });
+
+  it('nivel 3: resalta «Doc. 3» y no «Doc. 1»', async () => {
+    colecciones.corpus_christi = [
+      { id: 'd', 'Indicador de registro': 4, Ciudad: 'Lima', 'Año': 1620, 'Encargado ': 'Pedro', Encargo: 'Toros', 'Transacción': 8 },
+    ];
+    colecciones.transacciones = [{ id: 't8', Num: 8, Noticia: 'Pago de toros', Doc1: 1, Doc3: 3 }];
+    colecciones.documentos = [
+      { id: 'd1', Doc: 1, Documento: 'Recibo de tela' },
+      { id: 'd3', Doc: 3, Documento: 'Carta de Zorrilla' },
+    ];
+    ubicacion.search = '?q=Zorrilla&ciudad=Lima&anio=1620';
+    render(<CorpusChristi />);
+    await waitFor(() => expect(document.querySelector('button.boton-con-coincidencia')).not.toBeNull());
+    expect(screen.getByRole('button', { name: /^Doc\. 3/ }).classList.contains('boton-con-coincidencia')).toBe(true);
+    expect(screen.getByRole('button', { name: /^Doc\. 1/ }).classList.contains('boton-con-coincidencia')).toBe(false);
+  });
+
+  it('nivel 2: un grupo con espacios o año como cadena no se pierde', async () => {
+    colecciones.corpus_christi = [
+      { id: 'e', 'Indicador de registro': 1, Ciudad: 'Quito ', 'Año': ' 1650', 'Encargado ': 'Pedro de Quito' },
+    ];
+    ubicacion.search = '?q=Pedro';
+    render(<CorpusChristi />);
+    await waitFor(() => expect(screen.getAllByRole('button', { name: 'TRATO' })).toHaveLength(1));
+    expect(subrayados()).toEqual([]);
+    fireEvent.click(screen.getByRole('button', { name: 'TRATO' }));
+    ubicacion.search = '?q=Pedro&ciudad=Quito+&anio=+1650';
+    cleanup();
+    render(<CorpusChristi />);
+    await waitFor(() => expect(subrayados()).toEqual(['Pedro']));
+  });
+
   it('un ciudad sin anio se ignora', async () => {
     ubicacion.search = '?ciudad=Lima';
     render(<CorpusChristi />);
@@ -139,7 +192,16 @@ describe('Identificación de indicadores: niveles 2 y 3', () => {
     expect(navegar).toHaveBeenLastCalledWith('/x?q=1581&categoria=Pan', { replace: false });
   });
 
+  it('Volver conserva q', async () => {
+    ubicacion.search = '?q=1581&categoria=Pan';
+    render(<Indicadores />);
+    fireEvent.click(await screen.findByRole('button', { name: 'Volver a los resultados' }));
+    expect(navegar).toHaveBeenLastCalledWith('/x?q=1581', { replace: false });
+  });
+
   it('renombrar con la categoría abierta en la URL reemplaza la URL', async () => {
+    // Escenario: el modal «Renombrar» sigue abierto y el lector usa Atrás/Adelante, de modo que la
+    // URL pasa a tener la categoría que se está renombrando. Al terminar, la URL debe apuntar al nombre nuevo.
     permiso.canEdit = true;
     const { rerender } = render(<Indicadores />);
     fireEvent.click(await screen.findByRole('button', { name: 'Renombrar la categoría Pan' }));
