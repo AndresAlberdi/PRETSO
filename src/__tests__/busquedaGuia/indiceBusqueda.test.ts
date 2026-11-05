@@ -55,7 +55,8 @@ describe('buscarEnIndice', () => {
   it('«De 1580 a 1581» coincide con 1581 y con 1580', () => {
     const r = buscarEnIndice(indice, '1581');
     expect(r.map(s => s.coleccion)).toEqual(['manejo_de_caja', 'indicadores', 'companias']);
-    expect(colecciones('1580')).toEqual(['indicadores', 'companias']);
+    // Caja también coincide: los registros de la compañía 8 heredan sus «Temporadas teatrales».
+    expect(colecciones('1580')).toEqual(['manejo_de_caja', 'indicadores', 'companias']);
   });
   it('rango con mes: un año intermedio coincide', () => {
     expect(colecciones('1582')).toEqual(['indicadores']);
@@ -184,5 +185,37 @@ describe('rendimiento', () => {
     const r = buscarEnIndice(ind, 'músicos');
     expect(r[0].registros).toHaveLength(1000);
     expect(r[0].registros.every(x => x.transaccion)).toBe(true);
+  });
+});
+
+describe('campos de la compañía en Manejo de caja y Remuneraciones', () => {
+  const idx = construirIndice({
+    companias: [
+      { 'Indicador de registro': 1, 'Sigla Compañía': 'GA-JR', 'Nombre Compañía': 'Compañía de Alarcón', Autores: 'Ramírez', 'Ámbito': 'Regional', 'Temporadas teatrales': 'De 1590 a 1600' },
+    ],
+    manejo_de_caja: [{ id: 'a', 'Sigla Compañía': 1, Ciudad: 'Potosí', Año: 1595 }],
+    salarios: [{ id: 'b', 'Sigla Compañía': 1, Ciudad: 'Lima', Año: 1596 }],
+  });
+  const unidades = (t: string, coleccion: string) =>
+    buscarEnIndice(idx, t, { colecciones: [coleccion] })[0]?.unidades.length ?? 0;
+
+  it.each(['manejo_de_caja', 'salarios'])('%s: el nombre, los autores y el ámbito de la compañía hacen coincidir a sus registros', coleccion => {
+    expect(unidades('Alarcón', coleccion)).toBe(1);
+    expect(unidades('Ramírez', coleccion)).toBe(1);
+    expect(unidades('Regional', coleccion)).toBe(1);
+    expect(unidades('Quito', coleccion)).toBe(0);
+  });
+
+  it('las temporadas de la compañía se buscan como años', () => {
+    expect(unidades('1598', 'manejo_de_caja')).toBe(1);
+    expect(unidades('1650', 'manejo_de_caja')).toBe(0);
+  });
+
+  it('las demás secciones no reciben los campos de la compañía', () => {
+    const otro = construirIndice({
+      companias: [{ 'Indicador de registro': 1, 'Sigla Compañía': 'GA-JR', Autores: 'Ramírez' }],
+      corpus_christi: [{ Ciudad: 'Toledo', Año: 1585, Compañía: 1 }],
+    });
+    expect(buscarEnIndice(otro, 'Ramírez', { colecciones: ['corpus_christi'] })).toEqual([]);
   });
 });
