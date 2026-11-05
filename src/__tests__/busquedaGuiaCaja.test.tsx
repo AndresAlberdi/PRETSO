@@ -211,6 +211,19 @@ describe.each(PAGINAS)('$nombre: búsqueda guiada', ({ Pagina, coleccion, campo,
     expect(document.querySelector('output.visually-hidden')?.textContent).toBe('No se pudo realizar la búsqueda.');
   });
 
+  it('«Reintentar» vuelve a cargar el índice y muestra los resultados', async () => {
+    datos(coleccion, campo, base(campo));
+    consultadas.fallar = true;
+    ubicacion.search = '?q=Alberto';
+    render(<Pagina />);
+    await screen.findByText('No se pudo realizar la búsqueda.', { selector: 'p' });
+    consultadas.fallar = false;
+    fireEvent.click(screen.getByRole('button', { name: 'Reintentar' }));
+    expect(await screen.findByRole('table')).toBeTruthy();
+    expect(screen.queryByText('No se pudo realizar la búsqueda.')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Reintentar' })).toBeNull();
+  });
+
   it('quitar compania de la URL vuelve al nivel 2', async () => {
     datos(coleccion, campo, base(campo));
     ubicacion.search = '?q=Alberto&compania=12';

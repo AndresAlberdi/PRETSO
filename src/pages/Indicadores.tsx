@@ -189,7 +189,7 @@ export default function Indicadores() {
             </select>
           </div>
           {termino && buscando && <p>Buscando…</p>}
-          {termino && guia.estado === 'error' && <p role="alert">No se pudo realizar la búsqueda. Intente de nuevo más tarde.</p>}
+          {termino && guia.estado === 'error' && <p role="alert" className="aviso-busqueda">No se pudo completar la búsqueda. <button type="button" onClick={guia.reintentar}>Reintentar</button></p>}
           {termino && guia.estado === 'listo' && sortedFilteredCategorias.length === 0 && <p>No se encontró «{crudo}» en Identificación de indicadores.</p>}
           {!buscando && !(termino && sortedFilteredCategorias.length === 0) && (
           <div className="tabla-desplazable">

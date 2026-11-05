@@ -213,6 +213,27 @@ describe('Identificación de indicadores: niveles 2 y 3', () => {
   });
 });
 
+describe('«Reintentar» tras un fallo del índice', () => {
+  it.each([
+    { nombre: 'Corpus Christi', Pagina: CorpusChristi, q: 'Danzas', boton: 'TRATO' },
+    { nombre: 'Identificación de indicadores', Pagina: Indicadores, q: '1581', boton: 'LISTA' },
+  ])('$nombre vuelve a cargar y muestra resultados', async ({ Pagina, q, boton }) => {
+    ubicacion.search = `?q=${q}`;
+    const normal = getDocsSimulado.getMockImplementation()!;
+    getDocsSimulado.mockImplementation(async (nombre: string) => {
+      if (nombre === 'bibliografia') throw new Error('fallo simulado');
+      return normal(nombre);
+    });
+    render(<Pagina />);
+    await screen.findByRole('button', { name: 'Reintentar' });
+    getDocsSimulado.mockImplementation(normal);
+    fireEvent.click(screen.getByRole('button', { name: 'Reintentar' }));
+    expect(await screen.findAllByRole('button', { name: boton })).toHaveLength(1);
+    expect(screen.queryByRole('alert')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Reintentar' })).toBeNull();
+  });
+});
+
 describe('ListaSiglasCompania: término', () => {
   const companias = [{ id: 'c7', 'Indicador de registro': 7, 'Sigla Compañía': 'GA-JR' }];
   it('subraya la sigla que contiene el término', () => {

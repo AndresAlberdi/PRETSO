@@ -233,7 +233,12 @@ export default function ManejoCaja() {
               {uniqueAmbitos.map(opt => <option key={opt} value={opt}>{opt}</option>)}
             </select>
           </div>
-          {mensajeBusqueda ? <p style={{ color: 'var(--text-muted)' }}>{mensajeBusqueda}</p> : (
+          {mensajeBusqueda ? (
+            <>
+              <p style={{ color: 'var(--text-muted)' }}>{mensajeBusqueda}</p>
+              {guia.estado === 'error' && <p><button type="button" onClick={guia.reintentar}>Reintentar</button></p>}
+            </>
+          ) : (
           <div className="tabla-desplazable">
             <table className="sortable">
               <caption className="visually-hidden">Compañías de Manejo de caja</caption>
