@@ -19,6 +19,11 @@ export interface SeccionBuscable {
   /** Nombre visible de la sección. */
   nombre: string;
   campos: CampoBuscable[];
+  /**
+   * Campos de la compañía resuelta desde «Sigla Compañía» que el listado de la sección también
+   * muestra: se indexan en cada registro, de modo que la unidad (la compañía) coincide por ellos.
+   */
+  camposCompania?: CampoBuscable[];
   /** Solo se lista como sección a administradores (Transacciones y Documentos). */
   soloAdmin?: boolean;
   /** Unidad (compañía, ciudad y año, categoría) a la que pertenece un registro; null si no tiene. */
@@ -39,6 +44,7 @@ function unidadCompania(registro: Record<string, unknown>, companias: CompaniaRe
 const comp = (campo: string): CampoBuscable => ({ campo, compania: true });
 const anio = (campo: string): CampoBuscable => ({ campo, anio: true });
 const txt = (campo: string): CampoBuscable => ({ campo });
+const CAMPOS_COMPANIA_LISTADO: CampoBuscable[] = [txt('Nombre Compañía'), txt('Autores'), txt('Ámbito'), anio('Temporadas teatrales')];
 
 /**
  * Campos visibles de cada colección. Nunca se recorre `Object.entries` de un
@@ -50,6 +56,7 @@ export const MAPA_SECCIONES: readonly SeccionBuscable[] = [
     coleccion: 'manejo_de_caja',
     nombre: 'Manejo de caja',
     campos: [comp('Sigla Compañía'), anio('Año'), txt('Ciudad'), txt('Ingresos'), txt('Egresos'), txt('Otros bienes de la compañía')],
+    camposCompania: CAMPOS_COMPANIA_LISTADO,
     unidad: unidadCompania,
   },
   {
@@ -59,6 +66,7 @@ export const MAPA_SECCIONES: readonly SeccionBuscable[] = [
       comp('Sigla Compañía'), anio('Año'), txt('Ciudad'), txt('Beneficiario '), txt('Encargo'),
       txt('Monto a pagar'), txt('Ración diaria'), txt('Pago por representación'),
     ],
+    camposCompania: CAMPOS_COMPANIA_LISTADO,
     unidad: unidadCompania,
   },
   {

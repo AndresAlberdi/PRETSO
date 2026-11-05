@@ -4,7 +4,7 @@ import { MAPA_SECCIONES, type SeccionBuscable, type UnidadBusqueda } from './map
 import { normalizarTexto } from '../filtrarRegistros';
 import { esCampoRetirado } from '../camposRetirados';
 import { textosCompaniaBuscables } from '../textoResultadoBusqueda';
-import { canonizarReferencia, type CompaniaRef } from '../referenciaCompania';
+import { canonizarReferencia, resolverCompania, type CompaniaRef } from '../referenciaCompania';
 
 export type Registro = Record<string, unknown>;
 
@@ -107,6 +107,16 @@ function camposIndexados(
       for (const texto of textos) salida.push(campoIndexado(def.campo, texto, false));
     } else if (typeof valor === 'string' || typeof valor === 'number') {
       salida.push(campoIndexado(def.campo, String(valor), def.anio === true));
+    }
+  }
+  if (seccion.camposCompania) {
+    const compania = resolverCompania(registro['Sigla Compañía'], companias);
+    for (const def of seccion.camposCompania) {
+      if (!compania || esCampoRetirado('companias', def.campo)) continue;
+      const valor = compania[def.campo];
+      if (typeof valor === 'string' || typeof valor === 'number') {
+        if (valor !== '') salida.push(campoIndexado(def.campo, String(valor), def.anio === true));
+      }
     }
   }
   return salida;
