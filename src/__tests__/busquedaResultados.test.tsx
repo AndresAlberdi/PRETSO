@@ -1,15 +1,13 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
+import { MemoryRouter } from 'react-router';
 import Busqueda from '../pages/Busqueda';
+import { invalidarIndice } from '../utils/busquedaGuia/cargaIndice';
 
 let colecciones: Record<string, any[]> = {};
 const estado = vi.hoisted(() => ({ isAdmin: false }));
 
 vi.mock('../firebase', () => ({ db: {} }));
-vi.mock('react-router', () => ({
-  useNavigate: () => vi.fn(),
-  Link: ({ to, children, ...r }: any) => <a href={String(to)} {...r}>{children}</a>,
-}));
 vi.mock('../context/AdminContext', () => ({
   useAdmin: () => ({ isAdmin: estado.isAdmin, adminLoading: false }),
 }));
@@ -23,83 +21,92 @@ vi.mock('firebase/firestore', () => ({
 
 beforeEach(() => {
   estado.isAdmin = false;
+  invalidarIndice();
   colecciones = {
     companias: [
-      { id: 'c7', 'Indicador de registro': 7, 'Sigla Compañía': 'GA-JR', 'Nombre Compañía': 'Compañía de Alarcón' },
+      { id: 'c7', 'Indicador de registro': 7, 'Sigla Compañía': 'GA-JR', 'Nombre Compañía': 'Compañía de Alarcón', 'Temporadas teatrales': 'De 1580 a 1581' },
       { id: 'c12', 'Indicador de registro': 12, 'Sigla Compañía': '', 'Nombre Compañía': 'Compañía de Vargas' },
     ],
-    manejo_de_caja: [{ id: 'm1', 'Sigla Compañía': 7, Ciudad: 'Potosí', 'Año': 1600 }],
+    manejo_de_caja: [{ id: 'm1', 'Sigla Compañía': 7, Ciudad: 'Potosí', 'Año': 1600, 'Transacción': 12 }],
     salarios: [], indicadores: [], bibliografia: [], documentos: [],
     corpus_christi: [],
-    transacciones: [{ id: 't1', Num: 12, Noticia: 'Potosí' }],
+    transacciones: [{ id: 't1', Num: 12, Noticia: 'Pagó Alberto en Potosí' }],
   };
 });
 afterEach(cleanup);
 
-function buscar(categoria: string, texto: string) {
-  const selects = screen.getAllByRole('combobox');
-  fireEvent.change(selects[0], { target: { value: categoria } });
-  fireEvent.change(screen.getByPlaceholderText('Añadir filtro...'), { target: { value: texto } });
-  fireEvent.click(screen.getAllByRole('button', { name: 'Buscar' })[0]);
-}
-
-async function abrir(texto: string) {
-  render(<Busqueda />);
-  await screen.findByRole('heading', { name: 'Búsqueda general' });
-  await vi.waitFor(() => expect(screen.queryByText(/Cargando base de datos/)).toBeNull());
-  buscar('all', texto);
-  await screen.findByText(/Resultados de búsqueda/);
+function abrir(q: string) {
+  const ruta = q === '' ? '/buscar' : `/buscar?q=${encodeURIComponent(q)}`;
+  render(<MemoryRouter initialEntries={[ruta]}><Busqueda /></MemoryRouter>);
 }
 
 const region = () => document.querySelector('output.visually-hidden') as HTMLElement;
+const enlaces = () => screen.getAllByRole('link').map(a => a.getAttribute('href'));
 
-describe('Búsqueda general: texto de los resultados', () => {
-  it('buscar la sigla encuentra el registro que guarda el número de la compañía', async () => {
-    await abrir('ga-jr');
-    expect(screen.getByText('Compañía: GA-JR | Ciudad: Potosí | Año: 1600')).toBeTruthy();
+describe('Búsqueda general: nivel 1 (secciones con coincidencias)', () => {
+  it('lector: «Alberto» solo en una Noticia lista «Manejo de caja» y no «Transacciones»', async () => {
+    abrir('Alberto');
+    await screen.findByRole('heading', { level: 2, name: 'Secciones con «Alberto»' });
+    expect(screen.getByRole('link', { name: /Manejo de caja/ }).getAttribute('href')).toBe('/caja?q=Alberto');
+    expect(screen.getByRole('link', { name: /Manejo de caja/ }).textContent).toContain('1 registro');
+    expect(screen.queryByRole('link', { name: /Transacciones/ })).toBeNull();
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(region().textContent).toBe('Búsqueda: «Alberto» aparece en 1 sección');
+    expect(document.body.textContent).not.toContain('Pagó');
+    expect(document.body.textContent).not.toContain('Nro.');
+  });
+
+  it('administrador: aparece también «Transacciones»', async () => {
+    estado.isAdmin = true;
+    abrir('Alberto');
+    await screen.findByRole('link', { name: /Transacciones/ });
+    expect(screen.getByRole('link', { name: /Transacciones/ }).getAttribute('href')).toBe('/transacciones?q=Alberto');
+    expect(region().textContent).toBe('Búsqueda: «Alberto» aparece en 2 secciones');
+  });
+
+  it('«1581» encuentra «De 1580 a 1581» en «Índice de compañías»', async () => {
+    abrir('1581');
+    const enlace = await screen.findByRole('link', { name: /Índice de compañías/ });
+    expect(enlace.getAttribute('href')).toBe('/companias?q=1581');
+  });
+
+  it('codifica el término en el enlace', async () => {
+    colecciones.manejo_de_caja[0].Ciudad = 'Potosí & Lima';
+    abrir('Potosí & Lima');
+    const enlace = await screen.findByRole('link', { name: /Manejo de caja/ });
+    expect(enlace.getAttribute('href')).toBe('/caja?q=Potos%C3%AD+%26+Lima');
   });
 
   it('un texto que solo está en un campo retirado no encuentra el registro', async () => {
     colecciones.manejo_de_caja[0]['Datos sobre normativa de manejo de caja'] = 'norma secreta';
-    render(<Busqueda />);
-    await screen.findByRole('heading', { name: 'Búsqueda general' });
-    await vi.waitFor(() => expect(screen.queryByText(/Cargando base de datos/)).toBeNull());
-    buscar('all', 'norma secreta');
-    await screen.findByText(/Resultados de búsqueda/);
-    expect(screen.queryByText(/Ciudad: Potosí/)).toBeNull();
+    abrir('norma secreta');
+    await screen.findByText('No se encontró «norma secreta» en ninguna sección.');
+    expect(region().textContent).toBe('Búsqueda sin resultados');
   });
 
-  it('la sigla de otra compañía no trae el registro', async () => {
-    await abrir('zz-zz');
-    expect(screen.queryByText(/GA-JR/)).toBeNull();
+  it('sin coincidencias: mensaje y anuncio, sin lista de secciones', async () => {
+    abrir('zzzz-inexistente');
+    await screen.findByText('No se encontró «zzzz-inexistente» en ninguna sección.');
+    expect(screen.queryByRole('navigation', { name: 'Secciones de la base de datos' })).toBeNull();
   });
 
-  it('lector: sigla de la compañía y sin números de registro ni «Num»', async () => {
-    await abrir('Potosí');
-    expect(screen.getByText('Compañía: GA-JR | Ciudad: Potosí | Año: 1600')).toBeTruthy();
-    const cuerpo = document.body.textContent ?? '';
-    expect(cuerpo).not.toContain('Sigla Compañía:');
-    expect(cuerpo).not.toContain('Indicador de registro');
-    expect(cuerpo).not.toContain('Num:');
-    expect(screen.queryByText('Transacciones')).toBeNull();
-    expect(cuerpo).not.toContain('Nro.:');
-    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
-    expect(region().textContent).toBe('Búsqueda: 1 resultado');
+  it('«ab» muestra el aviso y no busca', async () => {
+    abrir('ab');
+    expect(await screen.findByRole('alert')).toBeTruthy();
+    expect(screen.getByRole('alert').textContent).toBe('Escriba al menos 3 letras, o un año de cuatro cifras.');
+    expect(screen.queryByText(/No se encontró/)).toBeNull();
+    expect(region().textContent).toBe('');
+    expect(screen.getByRole('navigation', { name: 'Secciones de la base de datos' })).toBeTruthy();
   });
 
-  it('administrador: «Nro.» en lugar de «Num»', async () => {
-    estado.isAdmin = true;
-    await abrir('Potosí');
-    expect(screen.getByText(/Nro\.: 12/)).toBeTruthy();
-    expect(document.body.textContent).not.toContain('Num: 12');
-  });
-
-  it('Corpus: compañía inexistente y compañía sin sigla', async () => {
-    colecciones.manejo_de_caja = [];
-    colecciones.corpus_christi = [{ id: 'k1', 'Compañía': 99, 'Compañía2': 12, Ciudad: 'Zzz' }];
-    await abrir('Zzz');
-    const texto = screen.getByText(/Compañía no encontrada/).textContent ?? '';
-    expect(texto).toContain('Compañía: Compañía no encontrada');
-    expect(texto).toContain('Compañía2: Compañía de Vargas');
+  it('enviar el campo busca y «Limpiar» vuelve a la lista de secciones', async () => {
+    abrir('');
+    fireEvent.change(screen.getByLabelText('Buscar en la base de datos'), { target: { value: 'Potosí' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Buscar' }));
+    await screen.findByRole('heading', { level: 2, name: 'Secciones con «Potosí»' });
+    expect(enlaces()).toContain('/caja?q=Potos%C3%AD');
+    fireEvent.click(screen.getByRole('button', { name: 'Limpiar' }));
+    await screen.findByRole('navigation', { name: 'Secciones de la base de datos' });
+    expect(region().textContent).toBe('');
   });
 });
