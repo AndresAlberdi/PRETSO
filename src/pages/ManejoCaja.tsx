@@ -153,7 +153,15 @@ export default function ManejoCaja() {
 
   const registrosConCoincidencia = termino ? sortedDetailData.filter(d => guia.porId.has(String(d.id))).length : 0;
 
-  const anuncioResultados = !selectedCompId
+  // Estado de la carga del índice con término: «Buscando…» solo si aún no hay resultado previo.
+  const avisoCarga = termino === null ? null
+    : guia.estado === 'error' ? 'No se pudo realizar la búsqueda.'
+    : guia.estado === 'cargando' && guia.unidades.length === 0 ? 'Buscando…'
+    : null;
+
+  const anuncioResultados = avisoCarga && (!selectedCompId || companiaSeleccionada)
+    ? avisoCarga
+    : !selectedCompId
     ? (termino
       ? `Búsqueda: ${contar(sortedFilteredCompanias.length, 'compañía', 'compañías')} con «${crudo}»`
       : `Listado: ${contar(sortedFilteredCompanias.length, 'registro', 'registros')}`)
@@ -166,12 +174,9 @@ export default function ManejoCaja() {
   // Espera a los datos de la página y al índice: con el índice en caché el efecto correría antes de que existan las filas.
   useDesplazarACoincidencia(!loading && termino && guia.estado === 'listo' && selectedCompId ? `${termino}|${selectedCompId}` : null);
 
-  const sinResultados = sortedFilteredCompanias.length === 0 && termino !== null;
-  const mensajeSinResultados = guia.estado === 'cargando' && guia.unidades.length === 0
-    ? 'Buscando…'
-    : guia.estado === 'error'
-    ? 'No se pudo realizar la búsqueda.'
-    : `No se encontró «${crudo}» en Manejo de caja.`;
+  // Sin coincidencias del término (no por los desplegables): se informa en lugar de mostrar la tabla vacía.
+  const sinCoincidencias = termino !== null && !companiasInData.some(c => conCoincidencia.has(c));
+  const mensajeBusqueda = avisoCarga ?? (sinCoincidencias ? `No se encontró «${crudo}» en Manejo de caja.` : null);
 
   return (
     <div>
@@ -195,7 +200,7 @@ export default function ManejoCaja() {
         <button onClick={() => { setSelectedCompId(null); irA({ compania: null }); }} style={{ padding: '0.5rem 1rem', marginBottom: '1rem' }}>{termino ? 'Volver a los resultados' : 'Volver a listado inicial'}</button>
       )}
 
-      {!loading && !selectedCompId && <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Mostrando {sortedFilteredCompanias.length} registros</p>}
+      {!loading && !selectedCompId && !mensajeBusqueda && <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Mostrando {sortedFilteredCompanias.length} registros</p>}
 
       {loading ? <p>Cargando datos...</p> : !selectedCompId ? (
         <div>
@@ -228,7 +233,7 @@ export default function ManejoCaja() {
               {uniqueAmbitos.map(opt => <option key={opt} value={opt}>{opt}</option>)}
             </select>
           </div>
-          {sinResultados ? <p style={{ color: 'var(--text-muted)' }}>{mensajeSinResultados}</p> : (
+          {mensajeBusqueda ? <p style={{ color: 'var(--text-muted)' }}>{mensajeBusqueda}</p> : (
           <div className="tabla-desplazable">
             <table className="sortable">
               <caption className="visually-hidden">Compañías de Manejo de caja</caption>
