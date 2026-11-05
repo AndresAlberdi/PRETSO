@@ -52,14 +52,15 @@ export function useCoincidenciasSeccion(coleccion: string, termino: string | nul
   estado: EstadoCarga;
   porId: ReadonlyMap<string, ResultadoRegistro>;
   unidades: readonly UnidadBusqueda[];
+  reintentar: () => void;
 } {
-  const { estado, indice } = useIndiceBusqueda(termino !== null);
+  const { estado, indice, reintentar } = useIndiceBusqueda(termino !== null);
   return useMemo(() => {
-    if (!indice || !termino) return { estado, porId: SIN_REGISTROS, unidades: SIN_UNIDADES };
+    if (!indice || !termino) return { estado, porId: SIN_REGISTROS, unidades: SIN_UNIDADES, reintentar };
     const seccion = buscarEnIndice(indice, termino, { colecciones: [coleccion], incluirAdmin: true })[0];
-    if (!seccion) return { estado, porId: SIN_REGISTROS, unidades: SIN_UNIDADES };
+    if (!seccion) return { estado, porId: SIN_REGISTROS, unidades: SIN_UNIDADES, reintentar };
     const porId = new Map<string, ResultadoRegistro>();
     for (const r of seccion.registros) porId.set(String(r.registro.id), r);
-    return { estado, porId, unidades: seccion.unidades };
-  }, [estado, indice, termino, coleccion]);
+    return { estado, porId, unidades: seccion.unidades, reintentar };
+  }, [estado, indice, termino, coleccion, reintentar]);
 }

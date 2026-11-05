@@ -1,8 +1,9 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import Documentos from '../pages/Documentos';
 import Transacciones from '../pages/Transacciones';
 import Bibliografia from '../pages/Bibliografia';
+import { invalidarIndice } from '../utils/busquedaGuia/cargaIndice';
 
 const colecciones: Record<string, any[]> = {
   bibliografia: [
@@ -10,6 +11,11 @@ const colecciones: Record<string, any[]> = {
     { id: 'b2', Autores: 'Pérez, Ana', 'Referencias bibliográficas': 'Estudio sobre García Lorca' },
     { id: 'b3', Autores: 'Ruiz, Luis', 'Referencias bibliográficas': 'Fiestas del Corpus' },
   ],
+  companias: [],
+  manejo_de_caja: [],
+  salarios: [],
+  corpus_christi: [],
+  indicadores: [],
   documentos: [
     { id: 'd1', Doc: 1, Documento: 'Carta de García sobre el carro' },
     { id: 'd2', Doc: 2, Documento: 'Recibo de tela' },
@@ -23,6 +29,10 @@ const colecciones: Record<string, any[]> = {
 };
 
 vi.mock('../firebase', () => ({ db: {} }));
+vi.mock('react-router', () => ({
+  useNavigate: () => vi.fn(),
+  useLocation: () => ({ pathname: '/x', search: '', state: null }),
+}));
 vi.mock('firebase/firestore', () => ({
   collection: (_db: unknown, nombre: string) => nombre,
   query: (c: string) => c,
@@ -137,25 +147,28 @@ describe('buscadores de administración', () => {
 });
 
 describe('buscador de Bibliografía', () => {
+  beforeEach(() => { invalidarIndice(); });
   afterEach(() => { cleanup(); });
-  it('encuentra «garcia» como «García», no busca autores en referencias y combina con AND', async () => {
+  const buscar = (texto: string) => {
+    fireEvent.change(screen.getByRole('searchbox', { name: 'Buscar en esta sección' }), { target: { value: texto } });
+    fireEvent.click(screen.getByRole('button', { name: 'Buscar' }));
+  };
+  it('encuentra «garcia» como «García», en autores y en referencias, y Limpiar restaura el total', async () => {
     render(<Bibliografia />);
     await waitFor(() => expect(screen.getByText('Mostrando 3 de 3 registros')).toBeTruthy());
-    filtrar('all', 'garcia');
-    expect(screen.getByText('Mostrando 2 de 3 registros')).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Limpiar' }));
-    filtrar('autores', 'garcia');
-    expect(screen.getByText('Mostrando 1 de 3 registros')).toBeTruthy();
-    expect(screen.queryByText('Estudio sobre García Lorca')).toBeNull();
-    fireEvent.click(screen.getByRole('button', { name: 'Limpiar' }));
-    filtrar('referencia', 'ruiz');
-    expect(screen.getByText('No se encontraron registros con los filtros aplicados.')).toBeTruthy();
-    fireEvent.click(screen.getByRole('button', { name: 'Limpiar' }));
-    filtrar('all', 'garcia');
-    filtrar('referencia', 'valencia');
-    expect(screen.getByText('Mostrando 1 de 3 registros')).toBeTruthy();
+    buscar('garcia');
+    await waitFor(() => expect(screen.getByText('Mostrando 2 de 3 registros')).toBeTruthy());
     expect(screen.getByText('Teatro en Valencia, 1990')).toBeTruthy();
+    expect(screen.queryByText('Fiestas del Corpus')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Limpiar' }));
     expect(screen.getByText('Mostrando 3 de 3 registros')).toBeTruthy();
+  });
+  it('sin coincidencias muestra el mensaje y «ab» da el aviso sin buscar', async () => {
+    render(<Bibliografia />);
+    await waitFor(() => expect(screen.getByText('Mostrando 3 de 3 registros')).toBeTruthy());
+    buscar('zzzzz');
+    await waitFor(() => expect(screen.getByText('No se encontraron registros con los filtros aplicados.')).toBeTruthy());
+    buscar('ab');
+    expect(screen.getByRole('alert').textContent).toBe('Escriba al menos 3 letras, o un año de cuatro cifras.');
   });
 });
