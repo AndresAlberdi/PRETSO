@@ -129,13 +129,15 @@ export default function Indicadores() {
 
   const claveDetalle = selectedCategoria ? `detail:${selectedCategoria}` : null;
   useRestoreFocusOnViewChange(termino ? (claveDetalle ?? `search:${termino}`) : (claveDetalle ?? 'list'));
-  const detailData = data.filter(d => d["Categorías"] === selectedCategoria);
+  const detailData = data.filter(d => selectedCategoria !== null && String(d["Categorías"] ?? '').trim() === selectedCategoria.trim());
 
   const { items: sortedFilteredCategorias, requestSort: sortCat, sortConfig: scCat } = useSortableTable(categoriasVisibles);
   const { items: sortedDetailData, requestSort: sortDetail, sortConfig: scDetail } = useSortableTable(detailData);
 
   const buscando = termino !== null && guia.estado === 'cargando' && guia.porId.size === 0;
-  const anuncioResultados = buscando
+  const anuncioResultados = termino && guia.estado === 'error'
+    ? 'No se pudo realizar la búsqueda.'
+    : buscando
     ? 'Buscando…'
     : !selectedCategoria
     ? termino
@@ -254,9 +256,12 @@ export default function Indicadores() {
                       const docs = [1,2,3,4,5,6,7,8,9,10].map(i => trans[`Doc${i}`]).filter(Boolean);
                       return (
                         <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
-                          {docs.map((docCode, idx) => (
-                            <button key={idx} className={coincidencia?.documentos.some(d => String(d) === String(docCode)) ? CLASE_BOTON_COINCIDENCIA : undefined} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.85rem', padding: '0.1rem 0.4rem', cursor: 'pointer', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px' }}>Doc. {docCode}{coincidencia?.documentos.some(d => String(d) === String(docCode)) && <TextoCoincidencia crudo={crudo} />}</button>
-                          ))}
+                          {docs.map((docCode, idx) => {
+                            const docCoincide = coincidencia?.documentos.some(d => String(d) === String(docCode)) === true;
+                            return (
+                            <button key={idx} className={docCoincide ? CLASE_BOTON_COINCIDENCIA : undefined} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.85rem', padding: '0.1rem 0.4rem', cursor: 'pointer', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px' }}>Doc. {docCode}{docCoincide && <TextoCoincidencia crudo={crudo} />}</button>
+                            );
+                          })}
                         </div>
                       );
                     })()}

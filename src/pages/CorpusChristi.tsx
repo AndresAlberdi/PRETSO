@@ -145,14 +145,18 @@ export default function CorpusChristi() {
   const claveDetalle = selectedCityYear ? `detail:${selectedCityYear.ciudad}|${selectedCityYear.año}` : null;
   useRestoreFocusOnViewChange(termino ? (claveDetalle ?? `search:${termino}`) : (claveDetalle ?? 'list'));
   const detailData = data.filter(d => 
-    selectedCityYear && d["Ciudad"] === selectedCityYear.ciudad && String(d["Año"]) === String(selectedCityYear.año)
+    selectedCityYear
+    && String(d["Ciudad"] ?? '').trim() === selectedCityYear.ciudad.trim()
+    && String(d["Año"] ?? '').trim() === String(selectedCityYear.año).trim()
   );
 
   const { items: sortedFilteredGroups, requestSort: sortGroup, sortConfig: scGroup } = useSortableTable(gruposVisibles);
   const { items: sortedDetailData } = useSortableTable(detailData);
 
   const buscando = termino !== null && guia.estado === 'cargando' && guia.porId.size === 0;
-  const anuncioResultados = buscando
+  const anuncioResultados = termino && guia.estado === 'error'
+    ? 'No se pudo realizar la búsqueda.'
+    : buscando
     ? 'Buscando…'
     : !selectedCityYear
     ? termino
@@ -277,9 +281,12 @@ export default function CorpusChristi() {
                       const docs = [1,2,3,4,5,6,7,8,9,10].map(i => trans[`Doc${i}`]).filter(Boolean);
                       return (
                         <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
-                          {docs.map((docCode, idx) => (
-                            <button key={idx} className={coincidencia?.documentos.some(d => String(d) === String(docCode)) ? CLASE_BOTON_COINCIDENCIA : undefined} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.85rem', padding: '0.1rem 0.4rem', cursor: 'pointer', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px' }}>Doc. {docCode}{coincidencia?.documentos.some(d => String(d) === String(docCode)) && <TextoCoincidencia crudo={crudo} />}</button>
-                          ))}
+                          {docs.map((docCode, idx) => {
+                            const docCoincide = coincidencia?.documentos.some(d => String(d) === String(docCode)) === true;
+                            return (
+                            <button key={idx} className={docCoincide ? CLASE_BOTON_COINCIDENCIA : undefined} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.85rem', padding: '0.1rem 0.4rem', cursor: 'pointer', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px' }}>Doc. {docCode}{docCoincide && <TextoCoincidencia crudo={crudo} />}</button>
+                            );
+                          })}
                         </div>
                       );
                     })()}
