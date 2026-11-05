@@ -116,7 +116,6 @@ export default function Documentos() {
       <div className="cabecera-pagina" style={{ flexWrap: 'wrap' }}>
         <div>
           <h1>Documentos</h1>
-          {canLoad && <p className="etiqueta-editor">Solo editores</p>}
         </div>
         <div className="acciones-cabecera">
           <SearchBar onSearch={setFilters} categories={SEARCH_CATEGORIES} />

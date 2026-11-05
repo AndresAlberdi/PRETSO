@@ -57,15 +57,15 @@ const region = () => document.querySelector('output.visually-hidden') as HTMLEle
 describe('Búsqueda general: anuncio de la búsqueda general', () => {
   it('vacío al inicio, y se anuncia «Búsqueda sin resultados» o las secciones con coincidencias', async () => {
     render(<MemoryRouter initialEntries={['/buscar']}><Busqueda /></MemoryRouter>);
-    await screen.findByRole('heading', { name: 'Búsqueda general' });
+    await screen.findByRole('heading', { name: 'Buscar en toda la base de datos' });
     const nodo = region();
     expect(nodo.textContent).toBe('');
-    fireEvent.change(screen.getByLabelText('Buscar en la base de datos'), { target: { value: 'zzzz-inexistente' } });
+    fireEvent.change(screen.getByLabelText('Buscar en toda la base de datos'), { target: { value: 'zzzz-inexistente' } });
     fireEvent.click(screen.getByRole('button', { name: 'Buscar' }));
     await screen.findByText(/No se encontró/);
     expect(region()).toBe(nodo);
     expect(nodo.textContent).toBe('Búsqueda sin resultados');
-    fireEvent.change(screen.getByLabelText('Buscar en la base de datos'), { target: { value: 'Potosí' } });
+    fireEvent.change(screen.getByLabelText('Buscar en toda la base de datos'), { target: { value: 'Potosí' } });
     fireEvent.click(screen.getByRole('button', { name: 'Buscar' }));
     await screen.findByRole('heading', { level: 2, name: 'Secciones con «Potosí»' });
     expect(region()).toBe(nodo);
