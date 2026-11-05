@@ -6,6 +6,8 @@ import { avisoDe } from '../utils/busquedaGuia/avisoTermino';
 
 interface CampoBusquedaProps {
   etiqueta?: string;
+  /** Oculta la etiqueta visualmente (sigue disponible para lectores de pantalla) cuando el título de la página ya la muestra. */
+  etiquetaOculta?: boolean;
   valorInicial: string;
   /** Solo se llama con un término válido, ya recortado. */
   onBuscar: (texto: string) => void;
@@ -13,7 +15,7 @@ interface CampoBusquedaProps {
 }
 
 /** Campo único de búsqueda: valida el término y no conoce el enrutador. */
-export default function CampoBusqueda({ etiqueta = 'Buscar en la base de datos', valorInicial, onBuscar, onLimpiar }: CampoBusquedaProps) {
+export default function CampoBusqueda({ etiqueta = 'Buscar en la base de datos', etiquetaOculta = false, valorInicial, onBuscar, onLimpiar }: CampoBusquedaProps) {
   const [texto, setTexto] = useState(valorInicial);
   const [aviso, setAviso] = useState<string | null>(() => avisoDe(valorInicial));
   const campoRef = useRef<HTMLInputElement>(null);
@@ -56,7 +58,7 @@ export default function CampoBusqueda({ etiqueta = 'Buscar en la base de datos',
   return (
     <search>
       <form className="barra-busqueda" onSubmit={enviar} noValidate>
-        <label htmlFor={idCampo}>{etiqueta}</label>
+        <label htmlFor={idCampo} className={etiquetaOculta ? 'visually-hidden' : undefined}>{etiqueta}</label>
         <input
           ref={campoRef}
           id={idCampo}

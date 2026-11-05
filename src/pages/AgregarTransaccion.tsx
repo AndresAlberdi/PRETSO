@@ -6,7 +6,6 @@ export default function AgregarTransaccion() {
   return (
     <div>
       <h1>Agregar transacción</h1>
-      <p className="etiqueta-editor">Solo editores</p>
       <p className="texto-agregar">Todo registro nuevo parte de una transacción. Después se añade en la sección correspondiente con Editar.</p>
       <nav aria-label="Herramientas de carga">
         <ul className="tarjetas-carga">

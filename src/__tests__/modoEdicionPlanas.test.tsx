@@ -152,11 +152,10 @@ describe.each(CARGA)('herramientas de carga en $nombre', (p) => {
     expect(screen.queryByRole('button', { name: 'Salir de edición' })).toBeNull();
   });
 
-  it('la cabecera pone «Solo editores» tras el h1 y el buscador antes de «Nuevo registro»', async () => {
+  it('la cabecera no lleva rótulo «Solo editores» y el buscador va antes de «Nuevo registro»', async () => {
     Object.assign(estado, { isAdmin: true, isEditMode: false });
     await mostrar();
-    const h1 = screen.getByRole('heading', { level: 1 });
-    expect(h1.nextElementSibling?.textContent).toBe('Solo editores');
+    expect(screen.queryByText('Solo editores')).toBeNull();
     const nuevo = screen.getByRole('button', { name: 'Nuevo registro' });
     const cabecera = nuevo.closest('.acciones-cabecera') as HTMLElement;
     expect(cabecera).not.toBeNull();

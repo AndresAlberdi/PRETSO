@@ -101,7 +101,7 @@ describe('Búsqueda general: nivel 1 (secciones con coincidencias)', () => {
 
   it('enviar el campo busca y «Limpiar» vuelve a la lista de secciones', async () => {
     abrir('');
-    fireEvent.change(screen.getByLabelText('Buscar en la base de datos'), { target: { value: 'Potosí' } });
+    fireEvent.change(screen.getByLabelText('Buscar en toda la base de datos'), { target: { value: 'Potosí' } });
     fireEvent.click(screen.getByRole('button', { name: 'Buscar' }));
     await screen.findByRole('heading', { level: 2, name: 'Secciones con «Potosí»' });
     expect(enlaces()).toContain('/caja?q=Potos%C3%AD');
