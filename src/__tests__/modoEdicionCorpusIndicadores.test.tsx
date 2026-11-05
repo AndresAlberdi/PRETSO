@@ -2,7 +2,7 @@ import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
 import { screen, fireEvent, within, cleanup } from '@testing-library/react';
-import { PAGINAS, mostrarDetalle, crearColecciones } from './ayudas/paginasSeccion';
+import { PAGINAS, mostrarTabla, mostrarDetalle, crearColecciones } from './ayudas/paginasSeccion';
 import type { ColeccionesPrueba, Pagina } from './ayudas/paginasSeccion';
 
 const SRC = resolve(__dirname, '..');
@@ -34,16 +34,7 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
-// Desaparece la tabla de «Resultados de búsqueda»: la tabla con columna Admin es ahora la de detalle,
-// y cada página conserva un solo <CeldaAdmin>.
-const PAGINAS_SECCION = PAGINAS
-  .filter(p => p.nombre === 'Corpus Christi' || p.nombre === 'Indicadores')
-  .map(p => ({ ...p, celdas: 1 }));
-
-async function mostrarTabla(p: Pagina): Promise<HTMLElement> {
-  if (!p.detalle) throw new Error('La página debe tener tabla de detalle');
-  return mostrarDetalle({ ...p, detalle: p.detalle });
-}
+const PAGINAS_SECCION = PAGINAS.filter(p => p.nombre === 'Corpus Christi' || p.nombre === 'Indicadores');
 it('selecciona las secciones esperadas', () => { expect(PAGINAS_SECCION).toHaveLength(2); });
 
 describe.each(PAGINAS_SECCION)('modo edición en $nombre', (p) => {
@@ -95,10 +86,8 @@ describe.each(PAGINAS_SECCION)('modo edición en $nombre', (p) => {
     expect(cabecera).not.toBeNull();
     expect(cabecera.contains(salir)).toBe(true);
     const sigue = (a: Node, b: Node) => Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
-    if (p.buscador === 'SearchBar' || p.buscador === 'barra') {
+    if (p.buscador === 'campo') {
       expect(sigue(cabecera.querySelector('form') as Node, salir)).toBe(true);
-    } else if (p.buscador === 'campo') {
-      expect(sigue(screen.getByRole('textbox', { name: 'Buscar por nombre o autores' }), salir)).toBe(true);
     } else {
       expect(cabecera.querySelector('input, form')).toBeNull();
     }
