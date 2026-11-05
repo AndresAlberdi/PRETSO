@@ -14,8 +14,8 @@ const ESPERADO: Record<string, string[]> = {
   'Documentos.tsx': ['Doc ID'],
   'IndiceCompanias.tsx': ['Sigla', 'Autores', 'Temporadas teatrales', 'Ámbito'],
   'Indicadores.tsx': ['Ciudad', 'Año', 'Concepto', 'Monto', 'Categoría', 'Ciudad', 'Años'],
-  'ManejoCaja.tsx': ['Compañía', 'Ciudad', 'Año', 'Compañía', 'Autores', 'Temporadas', 'Ámbito'],
-  'Salarios.tsx': ['Compañía', 'Ciudad', 'Año', 'Compañía', 'Autores', 'Temporadas', 'Ámbito'],
+  'ManejoCaja.tsx': ['Compañía', 'Autores', 'Temporadas', 'Ámbito'],
+  'Salarios.tsx': ['Compañía', 'Autores', 'Temporadas', 'Ámbito'],
   'Transacciones.tsx': ['Nro.'],
 };
 
@@ -124,9 +124,9 @@ describe('tablas: encabezados que ordenan', () => {
     }
   });
 
-  it('quedan 35 encabezados con orden en total', () => {
+  it('quedan 29 encabezados con orden en total', () => {
     const total = archivos.reduce((n, f) => n + etiquetasOrdenables(f).length, 0);
-    expect(total).toBe(35);
+    expect(total).toBe(29);
   });
 
   for (const archivo of MIGRADAS) {
@@ -146,8 +146,8 @@ describe('tablas: encabezados que ordenan', () => {
     'Transacciones.tsx': ['sortConfig/requestSort'],
     'CorpusChristi.tsx': ['scSearch/sortSearch', 'scGroup/sortGroup'],
     'Indicadores.tsx': ['scSearch/sortSearch', 'scCat/sortCat', 'scDetail/sortDetail'],
-    'ManejoCaja.tsx': ['scSearch/sortSearch', 'scComp/sortComp'],
-    'Salarios.tsx': ['scSearch/sortSearch', 'scComp/sortComp'],
+    'ManejoCaja.tsx': ['scComp/sortComp'],
+    'Salarios.tsx': ['scComp/sortComp'],
     'IndiceCompanias.tsx': ['sortConfig/requestSort'],
   };
 
