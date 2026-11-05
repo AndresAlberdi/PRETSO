@@ -10,7 +10,7 @@ type Fila = { id: string } & Record<string, unknown>;
 let colecciones: Record<string, Fila[]> = {};
 const ubicacion = vi.hoisted(() => ({ search: '' }));
 const navegar = vi.hoisted(() => vi.fn());
-const consultadas = vi.hoisted(() => ({ nombres: [] as string[] }));
+const consultadas = vi.hoisted(() => ({ nombres: [] as string[], fallar: false, retener: false }));
 
 vi.mock('../firebase', () => ({ db: {} }));
 vi.mock('../utils/audit', () => ({ logAction: vi.fn() }));
@@ -25,6 +25,9 @@ vi.mock('firebase/firestore', () => ({
   where: vi.fn(), doc: vi.fn(), deleteDoc: vi.fn(), updateDoc: vi.fn(), addDoc: vi.fn(),
   getDocs: async (nombre: string) => {
     consultadas.nombres.push(nombre);
+    // Solo el índice lee «bibliografia»: permite simular su fallo o su demora sin afectar a la página.
+    if (nombre === 'bibliografia' && consultadas.fallar) throw new Error('fallo simulado');
+    if (nombre === 'bibliografia' && consultadas.retener) await new Promise(() => {});
     return { docs: (colecciones[nombre] ?? []).map(d => ({ id: d.id, data: () => d })) };
   },
 }));
@@ -33,6 +36,8 @@ beforeEach(() => {
   invalidarIndice();
   navegar.mockClear();
   consultadas.nombres = [];
+  consultadas.fallar = false;
+  consultadas.retener = false;
   ubicacion.search = '';
   colecciones = {};
 });
@@ -156,6 +161,65 @@ describe.each(PAGINAS)('$nombre: búsqueda guiada', ({ Pagina, coleccion, campo,
     expect(url).not.toContain('compania');
     expect(opciones).toEqual({ replace: true });
     expect(screen.queryByRole('button', { name: 'Volver a los resultados' })).toBeNull();
+  });
+
+  it('nivel 2: el nombre de la compañía hace coincidir a sus registros', async () => {
+    datos(coleccion, campo, base(campo));
+    ubicacion.search = '?q=Alarcón';
+    render(<Pagina />);
+    const tabla = await screen.findByRole('table');
+    expect(within(tabla).getByText(/GA-JR/)).toBeTruthy();
+    expect(within(tabla).queryByText('JG')).toBeNull();
+    expect(screen.getByText('Alarcón', { selector: 'mark.coincidencia' })).toBeTruthy();
+  });
+
+  it('nivel 2: si la lista queda vacía por un desplegable, no dice «No se encontró»', async () => {
+    datos(coleccion, campo, base(campo));
+    ubicacion.search = '?q=Alberto';
+    render(<Pagina />);
+    await screen.findByRole('table');
+    fireEvent.change(screen.getByRole('combobox', { name: 'Filtrar por compañía' }), { target: { value: '7' } });
+    expect(screen.queryByText(/No se encontró/)).toBeNull();
+    expect(screen.getByText('Mostrando 0 registros')).toBeTruthy();
+  });
+
+  it('nivel 2: sin coincidencias no muestra «Mostrando 0 registros»', async () => {
+    datos(coleccion, campo, base(campo));
+    ubicacion.search = '?q=Zorrilla';
+    render(<Pagina />);
+    await screen.findByText(`No se encontró «Zorrilla» en ${nombre}.`);
+    expect(screen.queryByText(/Mostrando/)).toBeNull();
+  });
+
+  it('mientras carga el índice: «Buscando…» visible y anunciado', async () => {
+    datos(coleccion, campo, base(campo));
+    consultadas.retener = true;
+    ubicacion.search = '?q=Alberto';
+    render(<Pagina />);
+    expect(await screen.findByText('Buscando…', { selector: 'p' })).toBeTruthy();
+    expect(screen.queryByText(/Mostrando/)).toBeNull();
+    expect(document.querySelector('output.visually-hidden')?.textContent).toBe('Buscando…');
+  });
+
+  it('si el índice falla: mensaje visible y anunciado, no «No se encontró»', async () => {
+    datos(coleccion, campo, base(campo));
+    consultadas.fallar = true;
+    ubicacion.search = '?q=Alberto';
+    render(<Pagina />);
+    expect(await screen.findByText('No se pudo realizar la búsqueda.', { selector: 'p' })).toBeTruthy();
+    expect(screen.queryByText(/No se encontró/)).toBeNull();
+    expect(document.querySelector('output.visually-hidden')?.textContent).toBe('No se pudo realizar la búsqueda.');
+  });
+
+  it('quitar compania de la URL vuelve al nivel 2', async () => {
+    datos(coleccion, campo, base(campo));
+    ubicacion.search = '?q=Alberto&compania=12';
+    const { rerender } = render(<Pagina />);
+    await screen.findByRole('button', { name: 'Volver a los resultados' });
+    ubicacion.search = '?q=Alberto';
+    rerender(<Pagina />);
+    expect(screen.queryByRole('button', { name: 'Volver a los resultados' })).toBeNull();
+    expect(within(await screen.findByRole('table')).getByText('JG')).toBeTruthy();
   });
 
   it('sin q: comportamiento actual y ninguna lectura del índice', async () => {

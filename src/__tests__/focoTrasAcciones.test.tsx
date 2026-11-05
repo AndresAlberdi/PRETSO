@@ -6,6 +6,7 @@ import SearchBar from '../components/SearchBar';
 import GenericCreateModal from '../components/GenericCreateModal';
 import GenericEditModal from '../components/GenericEditModal';
 import ManejoCaja from '../pages/ManejoCaja';
+import { invalidarIndice } from '../utils/busquedaGuia/cargaIndice';
 import { useRestoreFocusOnViewChange } from '../hooks/useRestoreFocusOnViewChange';
 
 const colecciones: Record<string, any[]> = {
@@ -16,11 +17,12 @@ const colecciones: Record<string, any[]> = {
 };
 
 const setDoc = vi.hoisted(() => vi.fn());
+const ubicacion = vi.hoisted(() => ({ search: '' }));
 vi.mock('../firebase', () => ({ db: {} }));
 vi.mock('../utils/audit', () => ({ logAction: vi.fn() }));
 vi.mock('react-router', () => ({
   useNavigate: () => vi.fn(),
-  useLocation: () => ({ pathname: '/x', search: '', state: null }),
+  useLocation: () => ({ pathname: '/x', search: ubicacion.search, state: null }),
 }));
 vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isEditMode: false }) }));
 vi.mock('firebase/firestore', () => ({
@@ -34,7 +36,7 @@ vi.mock('firebase/firestore', () => ({
   }),
 }));
 
-beforeEach(() => { setDoc.mockReset().mockResolvedValue(undefined); });
+beforeEach(() => { setDoc.mockReset().mockResolvedValue(undefined); ubicacion.search = ''; });
 afterEach(cleanup);
 
 function agregar(texto: string) {
@@ -151,6 +153,17 @@ describe('Páginas de consulta', () => {
     fireEvent.click(caja);
     const volver = await screen.findByRole('button', { name: 'Volver a listado inicial' });
     expect(document.activeElement).toBe(document.getElementById('contenido'));
+    volver.focus();
+    fireEvent.click(volver);
+    await screen.findByRole('button', { name: 'CAJA' });
+    expect(document.activeElement).toBe(document.getElementById('contenido'));
+  });
+
+  it('ManejoCaja con término: «Volver a los resultados» lleva el foco a main', async () => {
+    invalidarIndice();
+    ubicacion.search = '?q=Potosí&compania=7';
+    render(<main id="contenido" tabIndex={-1}><ManejoCaja /></main>);
+    const volver = await screen.findByRole('button', { name: 'Volver a los resultados' });
     volver.focus();
     fireEvent.click(volver);
     await screen.findByRole('button', { name: 'CAJA' });
