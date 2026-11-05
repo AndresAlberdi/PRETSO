@@ -88,7 +88,7 @@ describe.each(PAGINAS_SECCION)('modo edición en $nombre', (p) => {
     expect(cabecera).not.toBeNull();
     expect(cabecera.contains(salir)).toBe(true);
     const sigue = (a: Node, b: Node) => Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
-    if (p.buscador === 'SearchBar' || p.buscador === 'barra' || p.buscador === 'campo') {
+    if (p.buscador === 'campo') {
       expect(sigue(cabecera.querySelector('form') as Node, salir)).toBe(true);
     } else {
       expect(cabecera.querySelector('input, form')).toBeNull();

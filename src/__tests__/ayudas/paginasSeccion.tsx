@@ -40,32 +40,29 @@ export interface Pagina {
   nombre: string;
   archivo: string;
   Componente: ComponentType;
-  /** 'barra': SearchBar sin tabla de resumen ni pantalla de detalle. */
-  buscador: 'SearchBar' | 'barra' | 'campo' | 'ninguno';
+  /** 'campo': la cabecera lleva el CampoBusqueda (un formulario). */
+  buscador: 'campo' | 'ninguno';
   filas: number;
-  /** Usos de <CeldaAdmin en el código de la página. */
+  /** Usos de <CeldaAdmin en el código de la página (una sola celda de acciones por página). */
   celdas: number;
   /** Botón de la lista que abre la tabla de detalle y nombre de esa tabla. */
   detalle?: { boton: string; tabla: RegExp };
 }
 export const PAGINAS: Pagina[] = [
-  { nombre: 'Manejo de caja', archivo: 'ManejoCaja.tsx', Componente: ManejoCaja, buscador: 'SearchBar', filas: 2, celdas: 2, detalle: { boton: 'CAJA', tabla: /^Registros de caja de / } },
-  { nombre: 'Remuneraciones', archivo: 'Salarios.tsx', Componente: Salarios, buscador: 'SearchBar', filas: 2, celdas: 2, detalle: { boton: 'TRATO', tabla: /^Remuneraciones de / } },
-  { nombre: 'Corpus Christi', archivo: 'CorpusChristi.tsx', Componente: CorpusChristi, buscador: 'SearchBar', filas: 2, celdas: 2, detalle: { boton: 'TRATO', tabla: /^Transacciones de Corpus Christi en / } },
-  { nombre: 'Indicadores', archivo: 'Indicadores.tsx', Componente: Indicadores, buscador: 'SearchBar', filas: 2, celdas: 2, detalle: { boton: 'LISTA', tabla: /^Indicadores de la categoría / } },
+  { nombre: 'Manejo de caja', archivo: 'ManejoCaja.tsx', Componente: ManejoCaja, buscador: 'campo', filas: 2, celdas: 1, detalle: { boton: 'CAJA', tabla: /^Registros de caja de / } },
+  { nombre: 'Remuneraciones', archivo: 'Salarios.tsx', Componente: Salarios, buscador: 'campo', filas: 2, celdas: 1, detalle: { boton: 'TRATO', tabla: /^Remuneraciones de / } },
+  { nombre: 'Corpus Christi', archivo: 'CorpusChristi.tsx', Componente: CorpusChristi, buscador: 'campo', filas: 2, celdas: 1, detalle: { boton: 'TRATO', tabla: /^Transacciones de Corpus Christi en / } },
+  { nombre: 'Indicadores', archivo: 'Indicadores.tsx', Componente: Indicadores, buscador: 'campo', filas: 2, celdas: 1, detalle: { boton: 'LISTA', tabla: /^Indicadores de la categoría / } },
   { nombre: 'Índice de compañías', archivo: 'IndiceCompanias.tsx', Componente: IndiceCompanias, buscador: 'campo', filas: 2, celdas: 1 },
-  { nombre: 'Bibliografía', archivo: 'Bibliografia.tsx', Componente: Bibliografia, buscador: 'barra', filas: 2, celdas: 1 },
+  { nombre: 'Bibliografía', archivo: 'Bibliografia.tsx', Componente: Bibliografia, buscador: 'campo', filas: 2, celdas: 1 },
 ];
 
-// Deja a la vista una tabla de datos: en las secciones con buscador, la de resultados.
+// Deja a la vista la tabla de datos: la de detalle en las secciones con lista de compañías, categorías o
+// ciudades, y la única tabla de la página en las demás.
 export async function mostrarTabla(p: Pagina): Promise<HTMLElement> {
+  if (p.detalle) return mostrarDetalle({ ...p, detalle: p.detalle });
   render(<p.Componente />);
-  if (p.buscador !== 'SearchBar') return (await screen.findAllByRole('table'))[0];
-  await screen.findAllByRole('table');
-  fireEvent.change(screen.getByRole('combobox', { name: 'Buscar en' }), { target: { value: 'all' } });
-  fireEvent.change(screen.getByPlaceholderText('Añadir filtro...'), { target: { value: 'Potosí' } });
-  fireEvent.click(screen.getAllByRole('button', { name: 'Buscar' })[0]);
-  return screen.findByRole('table', { name: /^Resultados de búsqueda/ });
+  return (await screen.findAllByRole('table'))[0];
 }
 
 // Deja a la vista la tabla de detalle de una sección con lista de compañías, categorías o ciudades.
