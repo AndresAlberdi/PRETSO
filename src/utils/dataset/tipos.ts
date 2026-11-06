@@ -65,6 +65,17 @@ export function contarAvisos(a: AvisosDataset): ResumenAvisos {
   };
 }
 
+/** Une los avisos de varias carpetas; una referencia repetida entre carpetas cuenta una sola vez. */
+export function combinarAvisos(...avisos: AvisosDataset[]): AvisosDataset {
+  const r = crearAvisos();
+  for (const a of avisos) {
+    a.transaccionesNoEncontradas.forEach((x) => r.transaccionesNoEncontradas.add(x));
+    a.documentosNoEncontrados.forEach((x) => r.documentosNoEncontrados.add(x));
+    r.registrosSinUnidad += a.registrosSinUnidad;
+  }
+  return r;
+}
+
 export interface ResultadoCarpeta {
   archivos: ArchivoDataset[];
   avisos: AvisosDataset;
