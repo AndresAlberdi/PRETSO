@@ -50,16 +50,30 @@ export function crearAvisos(): AvisosDataset {
   return { transaccionesNoEncontradas: new Set(), documentosNoEncontrados: new Set(), registrosSinUnidad: 0 };
 }
 
-export function contarAvisos(a: AvisosDataset): {
+/** Resumen numérico de los avisos, el que se publica en el README. */
+export interface ResumenAvisos {
   transaccionesNoEncontradas: number;
   documentosNoEncontrados: number;
   registrosSinUnidad: number;
-} {
+}
+
+export function contarAvisos(a: AvisosDataset): ResumenAvisos {
   return {
     transaccionesNoEncontradas: a.transaccionesNoEncontradas.size,
     documentosNoEncontrados: a.documentosNoEncontrados.size,
     registrosSinUnidad: a.registrosSinUnidad,
   };
+}
+
+/** Une los avisos de varias carpetas; una referencia repetida entre carpetas cuenta una sola vez. */
+export function combinarAvisos(...avisos: AvisosDataset[]): AvisosDataset {
+  const r = crearAvisos();
+  for (const a of avisos) {
+    a.transaccionesNoEncontradas.forEach((x) => r.transaccionesNoEncontradas.add(x));
+    a.documentosNoEncontrados.forEach((x) => r.documentosNoEncontrados.add(x));
+    r.registrosSinUnidad += a.registrosSinUnidad;
+  }
+  return r;
 }
 
 export interface ResultadoCarpeta {
@@ -71,7 +85,7 @@ export interface ResultadoCarpeta {
 export interface ResumenDataset {
   generadoEn: Date;
   carpetas: Array<{ carpeta: ClaveCarpeta; archivos: number; registros: number; unidadesSinRegistros: number }>;
-  avisos: AvisosDataset;
+  avisos: ResumenAvisos;
 }
 
 /** Nombres de los archivos de registros sin unidad (decisión D3). */
