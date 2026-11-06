@@ -1,8 +1,26 @@
 import type { CampoDataset } from './campos';
 import { CODIFICACION, NOMBRE_DATASET, VERSION_FORMATO, type Registro } from './tipos';
 
-// Caracteres prohibidos en XML 1.0 (controles, U+FFFE/U+FFFF) y sustitutos sueltos.
-const PROHIBIDOS = /[\u0000-\u0008\u000B\u000C\u000E-\u001F￾￿]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]/g;
+// Caracteres prohibidos en XML 1.0: controles (salvo tab, LF y CR), U+FFFE/U+FFFF y sustitutos sueltos.
+function quitarProhibidos(texto: string): string {
+  let salida = '';
+  for (let i = 0; i < texto.length; i++) {
+    const c = texto.charCodeAt(i);
+    if (c < 0x20 && c !== 0x09 && c !== 0x0a && c !== 0x0d) continue;
+    if (c === 0xfffe || c === 0xffff) continue;
+    if (c >= 0xd800 && c <= 0xdbff) {
+      const sig = texto.charCodeAt(i + 1);
+      if (sig >= 0xdc00 && sig <= 0xdfff) {
+        salida += texto[i] + texto[i + 1];
+        i++;
+      }
+      continue;
+    }
+    if (c >= 0xdc00 && c <= 0xdfff) continue;
+    salida += texto[i];
+  }
+  return salida;
+}
 
 const ESCAPES: Record<string, string> = {
   '&': '&amp;',
@@ -18,7 +36,7 @@ export function textoXml(valor: unknown): string {
   if (typeof valor === 'string') texto = valor;
   else if (typeof valor === 'number' || typeof valor === 'boolean') texto = String(valor);
   else return '';
-  return texto.normalize('NFC').replace(PROHIBIDOS, '').replace(/[&<>"']/g, (c) => ESCAPES[c]);
+  return quitarProhibidos(texto.normalize('NFC')).replace(/[&<>"']/g, (c) => ESCAPES[c]);
 }
 
 export function atributoXml(nombre: string, valor: string): string {

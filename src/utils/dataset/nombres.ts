@@ -4,7 +4,8 @@ const RESERVADOS = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i;
 export function sanearNombreArchivo(texto: string): string {
   let t = texto
     .normalize('NFC')
-    .replace(/[\u0000-\u001F\u007F]|[/\\:*?"<>|]/g, '-')
+    .split('').map((ch) => (ch.charCodeAt(0) < 0x20 || ch.charCodeAt(0) === 0x7f ? '-' : ch)).join('')
+    .replace(/[/\\:*?"<>|]/g, '-')
     .replace(/ {2,}/g, ' ')
     .replace(/-{2,}/g, '-')
     .replace(/^[ .-]+|[ .-]+$/g, '');
