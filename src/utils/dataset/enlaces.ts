@@ -12,17 +12,26 @@ export interface Enlaces {
 const claveEstricta = (v: unknown) => `${typeof v}:${String(v)}`;
 const CAMPOS_DOC = Array.from({ length: 10 }, (_, i) => `Doc${i + 1}`);
 
-const DEF_NUM = CAMPOS_DATASET.transacciones[0];
-const DEF_DOC = CAMPOS_DATASET.documentos[0];
+function definicion(coleccion: 'transacciones' | 'documentos', campo: string) {
+  const def = CAMPOS_DATASET[coleccion].find((d) => d.campo === campo);
+  if (!def) throw new Error(`Falta la definición del campo ${campo} en ${coleccion}`);
+  return def;
+}
+const DEF_NUM = definicion('transacciones', 'Num');
+const DEF_DOC = definicion('documentos', 'Doc');
+
+const esRegistro = (v: unknown): v is Registro => typeof v === 'object' && v !== null && !Array.isArray(v);
 
 export function construirEnlaces(datos: Pick<DatosDataset, 'transacciones' | 'documentos'>): Enlaces {
   const transacciones = new Map<string, Registro>();
   for (const t of datos.transacciones) {
+    if (!esRegistro(t)) continue;
     const clave = canonizarReferencia(t['Num']);
     if (clave !== '' && !transacciones.has(clave)) transacciones.set(clave, t);
   }
   const documentos = new Map<string, Registro>();
   for (const d of datos.documentos) {
+    if (!esRegistro(d)) continue;
     const clave = claveEstricta(d['Doc']);
     if (!documentos.has(clave)) documentos.set(clave, d);
   }
@@ -50,7 +59,7 @@ export function transaccionXml(ref: unknown, enlaces: Enlaces, sangria: number, 
   const margen = '  '.repeat(sangria);
   const tx = enlaces.transacciones.get(canon);
   if (!tx) {
-    avisos.transaccionesNoEncontradas += 1;
+    avisos.transaccionesNoEncontradas.add(canon);
     return (
       `${margen}<transaction${atributoXml('found', 'false')}>\n` +
       campoXml(DEF_NUM, canon, sangria + 1) +
@@ -68,7 +77,7 @@ export function transaccionXml(ref: unknown, enlaces: Enlaces, sangria: number, 
       if (doc) {
         salida += `${margen}    <document>\n` + camposXml(CAMPOS_DATASET.documentos, doc, sangria + 3) + `${margen}    </document>\n`;
       } else {
-        avisos.documentosNoEncontrados += 1;
+        avisos.documentosNoEncontrados.add(claveEstricta(id));
         salida +=
           `${margen}    <document${atributoXml('found', 'false')}>\n` +
           campoXml(DEF_DOC, id, sangria + 3) +

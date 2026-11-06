@@ -35,10 +35,31 @@ export interface ArchivoDataset {
   registros: number;
 }
 
+/**
+ * Avisos de la generación. Las referencias inexistentes se cuentan una vez por
+ * referencia única (no por aparición): por eso son conjuntos de claves
+ * (transacción: número canonizado; documento: clave estricta tipo:valor).
+ */
 export interface AvisosDataset {
+  transaccionesNoEncontradas: Set<string>;
+  documentosNoEncontrados: Set<string>;
+  registrosSinUnidad: number;
+}
+
+export function crearAvisos(): AvisosDataset {
+  return { transaccionesNoEncontradas: new Set(), documentosNoEncontrados: new Set(), registrosSinUnidad: 0 };
+}
+
+export function contarAvisos(a: AvisosDataset): {
   transaccionesNoEncontradas: number;
   documentosNoEncontrados: number;
   registrosSinUnidad: number;
+} {
+  return {
+    transaccionesNoEncontradas: a.transaccionesNoEncontradas.size,
+    documentosNoEncontrados: a.documentosNoEncontrados.size,
+    registrosSinUnidad: a.registrosSinUnidad,
+  };
 }
 
 export interface ResultadoCarpeta {

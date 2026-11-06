@@ -1,4 +1,4 @@
-const RESERVADOS = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])$/i;
+const RESERVADOS = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(\..*)?$/i;
 
 /** Convierte un texto en un nombre de archivo válido en Windows, macOS y Linux, conservando tildes y ñ. */
 export function sanearNombreArchivo(texto: string): string {
@@ -11,7 +11,10 @@ export function sanearNombreArchivo(texto: string): string {
     .replace(/^[ .-]+|[ .-]+$/g, '');
   t = Array.from(t).slice(0, 80).join('').replace(/^[ .-]+|[ .-]+$/g, '');
   if (t === '') return 'sin-nombre';
-  if (RESERVADOS.test(t)) t += '_';
+  if (RESERVADOS.test(t)) {
+    const punto = t.indexOf('.');
+    t = punto === -1 ? `${t}_` : `${t.slice(0, punto)}_${t.slice(punto)}`;
+  }
   return t;
 }
 

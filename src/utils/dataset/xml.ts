@@ -34,9 +34,12 @@ const ESCAPES: Record<string, string> = {
 export function textoXml(valor: unknown): string {
   let texto: string;
   if (typeof valor === 'string') texto = valor;
-  else if (typeof valor === 'number' || typeof valor === 'boolean') texto = String(valor);
+  else if (typeof valor === 'number') {
+    if (!Number.isFinite(valor)) return '';
+    texto = String(valor);
+  } else if (typeof valor === 'boolean') texto = String(valor);
   else return '';
-  return quitarProhibidos(texto.normalize('NFC')).replace(/[&<>"']/g, (c) => ESCAPES[c]);
+  return quitarProhibidos(texto).normalize('NFC').replace(/[&<>"']/g, (c) => ESCAPES[c]);
 }
 
 export function atributoXml(nombre: string, valor: string): string {
