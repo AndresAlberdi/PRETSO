@@ -48,7 +48,21 @@ describe('generarIndiceCompanias', () => {
     expect(doc.getElementsByTagName('company')).toHaveLength(3);
     expect(textos(doc, 'record_count')).toEqual(['3']);
     expect(a.contenido).not.toContain('record_indicator');
-    expect(a.contenido).not.toContain('x</');
+    const hijos = Array.from(doc.getElementsByTagName('company')[0].children).map((e) => e.tagName);
+    expect(hijos).toEqual(['company_code', 'company_name', 'authors', 'theatrical_seasons', 'company_index', 'scope']);
+  });
+
+  it('indicador vacío o nulo va al final, estable', () => {
+    const d2 = datos({
+      companias: [
+        { 'Indicador de registro': '', 'Sigla Compañía': 'V1' },
+        { 'Indicador de registro': 2, 'Sigla Compañía': 'B' },
+        { 'Indicador de registro': null, 'Sigla Compañía': 'V2' },
+        { 'Indicador de registro': 1, 'Sigla Compañía': 'A' },
+      ],
+    });
+    const doc = parsear(generarIndiceCompanias(d2, FECHA).archivos[0].contenido);
+    expect(textos(doc, 'company_code')).toEqual(['A', 'B', 'V1', 'V2']);
   });
 
   it('con datos vacíos produce un XML válido con cero registros', () => {
@@ -99,11 +113,46 @@ describe('generarListaTransacciones', () => {
     expect(contarAvisos(r.avisos).documentosNoEncontrados).toBe(1);
   });
 
-  it('no repite transacciones con el mismo número', () => {
-    const d = datos({ transacciones: [{ Num: 1, Noticia: 'primera' }, { Num: '1.0', Noticia: 'segunda' }, { Num: '' }] });
-    const r = generarListaTransacciones(d, construirEnlaces(d), FECHA);
-    expect(r.archivos[0].registros).toBe(1);
-    expect(textos(parsear(r.archivos[0].contenido), 'transaction_news')).toEqual(['primera']);
+  it('conserva las repetidas y sin número al final, con number_status', () => {
+    const d = datos({
+      transacciones: [
+        { Num: 1, Noticia: 'primera' },
+        { Num: '1.0', Noticia: 'segunda', Doc1: 'D1' },
+        { Num: '', Noticia: 'sin número' },
+        { Num: 0.5 - 0.5 + 2, Noticia: 'otra' },
+      ],
+      documentos: [{ Doc: 'D1', Documento: 'T' }],
+    });
+    const a = generarListaTransacciones(d, construirEnlaces(d), FECHA).archivos[0];
+    expect(a.registros).toBe(4);
+    const doc = parsear(a.contenido);
+    expect(textos(doc, 'record_count')).toEqual(['4']);
+    const tx = Array.from(doc.getElementsByTagName('transaction'));
+    expect(tx.map((x) => x.getAttribute('number_status'))).toEqual([null, null, 'duplicate', 'missing']);
+    expect(textos(doc, 'transaction_news')).toEqual(['primera', 'otra', 'segunda', 'sin número']);
+    expect(tx[2].querySelector('document_text')?.textContent).toBe('T');
+  });
+
+  it('indicador vacío o no numérico va al final, estable', () => {
+    const d = datos({ transacciones: [{ Num: 'x1' }, { Num: 3 }, { Num: 'x2' }, { Num: 1 }] });
+    const a = generarListaTransacciones(d, construirEnlaces(d), FECHA).archivos[0];
+    expect(textos(parsear(a.contenido), 'transaction_number')).toEqual(['1', '3', 'x1', 'x2']);
+  });
+
+  it('escapa &, < y comillas en el texto del documento', () => {
+    const d = datos({
+      transacciones: [{ Num: 1, Doc1: 'D1' }],
+      documentos: [{ Doc: 'D1', Documento: 'A & B <c> "d" \'e\'' }],
+    });
+    const a = generarListaTransacciones(d, construirEnlaces(d), FECHA).archivos[0];
+    expect(textos(parsear(a.contenido), 'document_text')).toEqual(['A & B <c> "d" \'e\'']);
+  });
+
+  it('sin transacciones emite <transactions/> y record_count 0', () => {
+    const a = generarListaTransacciones(datos({}), construirEnlaces(datos({})), FECHA).archivos[0];
+    const doc = parsear(a.contenido);
+    expect(doc.getElementsByTagName('transactions')[0].children).toHaveLength(0);
+    expect(textos(doc, 'record_count')).toEqual(['0']);
   });
 });
 
@@ -124,5 +173,13 @@ describe('generarBibliografia', () => {
     expect(textos(doc, 'authors')).toEqual(['Álvarez', 'Benítez', 'Zúñiga']);
     expect(textos(doc, 'record_count')).toEqual(['3']);
     expect(doc.getElementsByTagName('bibliography')).toHaveLength(3);
+  });
+
+  it('sin Autores va al final y sin datos emite <bibliographies/>', () => {
+    const d = datos({ bibliografia: [{ 'Referencias bibliográficas': 'S' }, { Autores: 'Zúñiga' }, { Autores: 'Álvarez' }] });
+    const doc = parsear(generarBibliografia(d, FECHA).archivos[0].contenido);
+    expect(textos(doc, 'authors')).toEqual(['Álvarez', 'Zúñiga', '']);
+    const vacio = parsear(generarBibliografia(datos({}), FECHA).archivos[0].contenido);
+    expect(vacio.getElementsByTagName('bibliographies')[0].children).toHaveLength(0);
   });
 });
