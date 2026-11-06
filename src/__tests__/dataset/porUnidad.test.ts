@@ -124,6 +124,25 @@ describe('generarCarpetaCompania', () => {
   });
 });
 
+describe('unidades: orden y referencias por sigla', () => {
+  it('ordena las compañías por indicador y agrupa la referencia por sigla de texto con la numérica', () => {
+    const datos = datosBase({
+      companias: [
+        { 'Indicador de registro': 9, 'Sigla Compañía': 'ZZ' },
+        gaspar,
+      ],
+      manejo_de_caja: [
+        { 'Indicador de registro': 1, 'Sigla Compañía': 'ZZ' },
+        { 'Indicador de registro': 2, 'Sigla Compañía': 'GA-AR' },
+        { 'Indicador de registro': 3, 'Sigla Compañía': 7 },
+      ],
+    });
+    const r = generarCarpetaCompania('caja', datos, enlacesVacios, FECHA);
+    expect(r.archivos.map((a) => a.nombre)).toEqual(['GA-AR', 'ZZ']);
+    expect(r.archivos[0].registros).toBe(2);
+  });
+});
+
 describe('ordenarPorIndicador', () => {
   it('es estable y deja los no numéricos al final', () => {
     const lista = [
@@ -197,6 +216,12 @@ describe('generarCarpetaCorpus', () => {
     expect(x).toContain('Compañía no encontrada');
     expect(x).not.toMatch(/<company_code[^>]*>(7|8|99)</);
     expect(sinErrores(x)).toBe(true);
+  });
+
+  it('99 y 100 no resueltas dan dos found="false"', () => {
+    const datos = datosBase({ companias, corpus_christi: [{ Ciudad: 'Madrid', Año: 1615, Compañía: 99, Cmp: 100 }] });
+    const x = generarCarpetaCorpus(datos, enlacesVacios, FECHA).archivos[0].contenido;
+    expect(x.match(/<company found="false">/g)).toHaveLength(2);
   });
 
   it('anida la transacción', () => {
