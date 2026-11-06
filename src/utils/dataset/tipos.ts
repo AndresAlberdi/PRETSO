@@ -50,11 +50,14 @@ export function crearAvisos(): AvisosDataset {
   return { transaccionesNoEncontradas: new Set(), documentosNoEncontrados: new Set(), registrosSinUnidad: 0 };
 }
 
-export function contarAvisos(a: AvisosDataset): {
+/** Resumen numérico de los avisos, el que se publica en el README. */
+export interface ResumenAvisos {
   transaccionesNoEncontradas: number;
   documentosNoEncontrados: number;
   registrosSinUnidad: number;
-} {
+}
+
+export function contarAvisos(a: AvisosDataset): ResumenAvisos {
   return {
     transaccionesNoEncontradas: a.transaccionesNoEncontradas.size,
     documentosNoEncontrados: a.documentosNoEncontrados.size,
@@ -71,7 +74,7 @@ export interface ResultadoCarpeta {
 export interface ResumenDataset {
   generadoEn: Date;
   carpetas: Array<{ carpeta: ClaveCarpeta; archivos: number; registros: number; unidadesSinRegistros: number }>;
-  avisos: AvisosDataset;
+  avisos: ResumenAvisos;
 }
 
 /** Nombres de los archivos de registros sin unidad (decisión D3). */
