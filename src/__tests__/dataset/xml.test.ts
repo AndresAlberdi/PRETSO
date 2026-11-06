@@ -3,6 +3,8 @@ import { cabeceraXml, campoXml, camposXml, CIERRE_XML, textoXml } from '../../ut
 
 const def = { campo: 'Egresos', elemento: 'expenses', etiqueta: 'Egresos' };
 
+const envuelto = (x: string) => `<r>${x}</r>`;
+
 function esXmlValido(x: string): boolean {
   const doc = new DOMParser().parseFromString(x, 'application/xml');
   return doc.getElementsByTagName('parsererror').length === 0;
@@ -23,13 +25,19 @@ describe('textoXml', () => {
     expect(textoXml(7)).toBe('7');
     expect(textoXml(null)).toBe('');
     expect(textoXml({})).toBe('');
+    expect(textoXml(NaN)).toBe('');
+    expect(textoXml(Infinity)).toBe('');
   });
 });
 
 describe('campoXml y cabeceraXml', () => {
   it('un campo vacío sale autocerrado', () => {
-    expect(campoXml(def, '', 1)).toBe('  <expenses label="Egresos"/>\n');
-    expect(campoXml(def, 'x & y', 0)).toBe('<expenses label="Egresos">x &amp; y</expenses>\n');
+    const vacio = campoXml(def, '', 1);
+    const lleno = campoXml(def, 'x & y', 0);
+    expect(vacio).toBe('  <expenses label="Egresos"/>\n');
+    expect(lleno).toBe('<expenses label="Egresos">x &amp; y</expenses>\n');
+    expect(esXmlValido(envuelto(vacio))).toBe(true);
+    expect(esXmlValido(envuelto(lleno))).toBe(true);
   });
   it('la cabecera lleva fecha UTC y conteo', () => {
     const c = cabeceraXml({ seccion: 'Manejo de caja', unidad: 'ABC', registros: 3, generadoEn: new Date('2026-11-06T12:00:00Z') });

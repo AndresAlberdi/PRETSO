@@ -8,6 +8,7 @@ describe('sanearNombreArchivo', () => {
   });
   it('evita nombres reservados y vacíos', () => {
     expect(sanearNombreArchivo('CON')).toBe('CON_');
+    expect(sanearNombreArchivo('CON.txt')).toBe('CON_.txt');
     expect(sanearNombreArchivo('')).toBe('sin-nombre');
   });
   it('corta a 80 caracteres y conserva tildes', () => {
