@@ -22,5 +22,6 @@ export async function leerDatosDataset(): Promise<DatosDataset> {
       return snap.docs.map((d) => cleanFirebaseData(d) as Registro);
     }),
   );
-  return Object.fromEntries(COLECCIONES_DATASET.map((n, i) => [n, lecturas[i]])) as unknown as DatosDataset;
+  const [companias, manejo_de_caja, salarios, corpus_christi, transacciones, documentos, bibliografia] = lecturas;
+  return { companias, manejo_de_caja, salarios, corpus_christi, transacciones, documentos, bibliografia };
 }

@@ -1,4 +1,4 @@
-import { CARPETAS, type ClaveCarpeta, type ResumenDataset } from './tipos';
+import { CARPETAS, SIN_UNIDAD, type ClaveCarpeta, type ResumenDataset } from './tipos';
 import {
   ACERCA_DEL_PROYECTO,
   CODIFICACION_TEXTO,
@@ -19,7 +19,7 @@ import {
 } from './readmeTexto';
 
 const FENCE = '```';
-const ORDEN: readonly ClaveCarpeta[] = ['caja', 'remuneraciones', 'corpus', 'companias', 'transacciones', 'bibliografia'];
+const ORDEN = Object.keys(CARPETAS) as ClaveCarpeta[];
 
 /** Fecha en formato `AAAA-MM-DD HH:MM` (UTC). */
 function fechaUtc(d: Date): string {
@@ -79,7 +79,7 @@ export function generarReadme(resumen: ResumenDataset): string {
     RELACIONES,
     '## Datos incompletos',
     `Transacciones citadas y no encontradas: ${a.transaccionesNoEncontradas}. Documentos citados y no encontrados: ${a.documentosNoEncontrados}. Se marcan con \`found="false"\`. ` +
-      `Registros sin compañía o sin ciudad y año: ${a.registrosSinUnidad}; están en \`Sin compañía identificada.xml\` y \`Sin ciudad o año.xml\`.`,
+      `Registros sin compañía o sin ciudad y año: ${a.registrosSinUnidad}; están en \`${SIN_UNIDAD.companias}.xml\` (puede existir en \`${CARPETAS.caja}/\` y en \`${CARPETAS.remuneraciones}/\`) y en \`${SIN_UNIDAD.corpus}.xml\` (en \`${CARPETAS.corpus}/\`).`,
     '## Qué no incluye',
     QUE_NO_INCLUYE,
     '## Cómo citar y licencia',

@@ -2,6 +2,8 @@
  * Textos editables del README del dataset. Sin lógica: Laura puede ajustar
  * cualquier constante sin tocar el generador (`readme.ts`).
  */
+import { CODIFICACION, NOMBRE_DATASET, VERSION_FORMATO } from './tipos';
+
 export const TITULO = '# PRETSO — Precios del Teatro del Siglo de Oro: dataset';
 
 export const ACERCA_DEL_PROYECTO =
@@ -44,13 +46,13 @@ const XML_ABRE = '<?xml version="1.0" encoding="UTF-8"?>\n<pretso_dataset>';
 const METADATA = (seccion: string, unidad: string): string =>
   [
     '  <metadata>',
-    '    <dataset_name>PRETSO — Precios del Teatro del Siglo de Oro</dataset_name>',
-    '    <format_version>1.0</format_version>',
+    `    <dataset_name>${NOMBRE_DATASET}</dataset_name>`,
+    `    <format_version>${VERSION_FORMATO}</format_version>`,
     '    <generated_at>2026-11-06T12:00:00.000Z</generated_at>',
     `    <section>${seccion}</section>`,
     `    <unit>${unidad}</unit>`,
     '    <record_count>1</record_count>',
-    '    <encoding>UTF-8</encoding>',
+    `    <encoding>${CODIFICACION}</encoding>`,
     '  </metadata>',
   ].join('\n');
 
