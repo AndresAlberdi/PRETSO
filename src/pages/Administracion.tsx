@@ -3,6 +3,8 @@ import { Link } from 'react-router';
 import { auth } from '../firebase';
 import { generateDatabaseXml, downloadXml, generateZipBlob, uploadToGoogleDrive } from '../utils/backup';
 import { generateDatabaseXlsx, downloadXlsx } from '../utils/xlsxExport';
+import { leerDatosDataset } from '../utils/dataset/leerDatos';
+import { generarDatasetZip } from '../utils/dataset/generarDataset';
 import { GOOGLE_CLIENT_ID_STORAGE_KEY, resolveGoogleClientId } from '../utils/googleClientId';
 import Modal from '../components/Modal';
 import { TEXTO_CODIGO } from '../utils/correctorOrtografico';
@@ -52,6 +54,24 @@ export default function Administracion() {
       console.error(err);
       setBackupStatus('error');
       setStatusMessage(`Error al generar XLSX: ${err.message || err}`);
+    }
+  };
+
+  const handleDownloadDataset = async () => {
+    try {
+      setBackupStatus('loading');
+      setStatusMessage('Generando el dataset; puede tardar unos minutos...');
+      const ahora = new Date();
+      const datos = await leerDatosDataset();
+      const { nombre, bytes } = await generarDatasetZip(datos, ahora);
+      downloadXlsx(new Blob([new Uint8Array(bytes)], { type: 'application/zip' }), nombre);
+      setBackupStatus('success');
+      setStatusMessage('¡Dataset descargado exitosamente!');
+      setTimeout(() => setBackupStatus('idle'), 3000);
+    } catch (err) {
+      console.error('Error al generar el dataset', err);
+      setBackupStatus('error');
+      setStatusMessage('No se pudo generar el dataset. Vuelva a intentarlo; si el error persiste, avise al equipo técnico.');
     }
   };
 
@@ -177,6 +197,13 @@ export default function Administracion() {
               disabled={backupStatus === 'loading'}
             >
               Descargar base de datos (XLSX)
+            </button>
+            <button 
+              onClick={handleDownloadDataset}
+              style={{ padding: '0.8rem 1.5rem', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+              disabled={backupStatus === 'loading'}
+            >
+              Descargar dataset (ZIP)
             </button>
             <button 
               onClick={handleGoogleDriveBackup}
