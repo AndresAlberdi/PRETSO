@@ -30,7 +30,7 @@ afterEach(cleanup);
 describe('descarga del dataset', () => {
   it('descarga el ZIP y anuncia el éxito', async () => {
     vi.mocked(leerDatosDataset).mockResolvedValue({} as never);
-    vi.mocked(generarDatasetZip).mockResolvedValue({ nombre: 'PRETSO_dataset_2026-11-06.zip', bytes: new Uint8Array([1, 2]), resumen: {} as never });
+    vi.mocked(generarDatasetZip).mockResolvedValue({ nombre: 'PRETSO_dataset_2026-11-06.zip', blob: new Blob(['x'], { type: 'application/zip' }), resumen: {} as never });
     render(<Administracion />);
     fireEvent.click(screen.getByRole('button', { name: BOTON }));
     await waitFor(() => expect(screen.getByRole('status').textContent).toContain('¡Dataset descargado exitosamente!'));
@@ -55,6 +55,25 @@ describe('descarga del dataset', () => {
     await waitFor(() => expect(screen.getByRole('status').textContent).toContain('Generando el dataset'));
     for (const nombre of [BOTON, /\(XML\)/, /\(XLSX\)/, /Google Drive/]) {
       expect((screen.getByRole('button', { name: nombre }) as HTMLButtonElement).disabled).toBe(true);
+    }
+  });
+});
+
+describe('reposo tras un éxito anterior', () => {
+  it('iniciar el dataset dentro de los 3 s mantiene los botones deshabilitados', async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      vi.mocked(leerDatosDataset).mockResolvedValueOnce({} as never);
+      vi.mocked(generarDatasetZip).mockResolvedValueOnce({ nombre: 'a.zip', blob: new Blob(['x']), resumen: {} as never });
+      render(<Administracion />);
+      fireEvent.click(screen.getByRole('button', { name: BOTON }));
+      await waitFor(() => expect(screen.getByRole('status').textContent).toContain('descargado exitosamente'));
+      vi.mocked(leerDatosDataset).mockReturnValue(new Promise(() => undefined));
+      fireEvent.click(screen.getByRole('button', { name: BOTON }));
+      await vi.advanceTimersByTimeAsync(3500);
+      expect((screen.getByRole('button', { name: BOTON }) as HTMLButtonElement).disabled).toBe(true);
+    } finally {
+      vi.useRealTimers();
     }
   });
 });

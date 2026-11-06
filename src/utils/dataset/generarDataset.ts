@@ -45,8 +45,8 @@ export function generarArchivosDataset(
 export async function generarDatasetZip(
   datos: DatosDataset,
   generadoEn: Date,
-): Promise<{ nombre: string; bytes: Uint8Array; resumen: ResumenDataset }> {
+): Promise<{ nombre: string; blob: Blob; resumen: ResumenDataset }> {
   const { entradas, resumen } = generarArchivosDataset(datos, generadoEn);
-  const bytes = await armarZip(entradas, generadoEn);
-  return { nombre: nombreZipDataset(generadoEn), bytes, resumen };
+  const blob = await armarZip(entradas, generadoEn);
+  return { nombre: nombreZipDataset(generadoEn), blob, resumen };
 }

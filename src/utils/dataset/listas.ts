@@ -1,7 +1,7 @@
 import { canonizarReferencia } from '../referenciaCompania';
 import { CAMPOS_DATASET } from './campos';
-import { esRegistro, idsDocumentos, transaccionXml, type Enlaces } from './enlaces';
-import { ordenarPorNumero } from './porUnidad';
+import { idsDocumentos, transaccionXml, type Enlaces } from './enlaces';
+import { esRegistro, ordenarPorNumero } from './orden';
 import { CARPETAS, crearAvisos, type AvisosDataset, type ClaveCarpeta, type DatosDataset, type Registro, type ResultadoCarpeta } from './tipos';
 import { atributoXml, cabeceraXml, campoXml, CIERRE_XML, camposXml } from './xml';
 

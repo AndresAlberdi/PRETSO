@@ -1,4 +1,4 @@
-import { useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { auth } from '../firebase';
 import { generateDatabaseXml, downloadXml, generateZipBlob, uploadToGoogleDrive } from '../utils/backup';
@@ -18,8 +18,17 @@ export default function Administracion() {
   const clientIdDescId = useId();
   const clientIdInputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
+  const idleTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  // Evita que un aviso de éxito anterior rehabilite los botones durante una nueva exportación.
+  useEffect(() => () => clearTimeout(idleTimer.current), []);
+  const programarReposo = () => {
+    clearTimeout(idleTimer.current);
+    idleTimer.current = setTimeout(() => setBackupStatus('idle'), 3000);
+  };
 
   const handleDownloadXml = async () => {
+    clearTimeout(idleTimer.current);
     try {
       setBackupStatus('loading');
       setStatusMessage('Generando volcado de base de datos XML...');
@@ -30,7 +39,7 @@ export default function Administracion() {
       downloadXml(xml, `pretso_database_${formattedDate}.xml`);
       setBackupStatus('success');
       setStatusMessage('¡Volcado XML descargado exitosamente!');
-      setTimeout(() => setBackupStatus('idle'), 3000);
+      programarReposo();
     } catch (err: any) {
       console.error(err);
       setBackupStatus('error');
@@ -39,6 +48,7 @@ export default function Administracion() {
   };
 
   const handleDownloadXlsx = async () => {
+    clearTimeout(idleTimer.current);
     try {
       setBackupStatus('loading');
       setStatusMessage('Generando volcado de base de datos XLSX...');
@@ -49,7 +59,7 @@ export default function Administracion() {
       downloadXlsx(blob, `pretso_database_${formattedDate}.xlsx`);
       setBackupStatus('success');
       setStatusMessage('¡Volcado XLSX descargado exitosamente!');
-      setTimeout(() => setBackupStatus('idle'), 3000);
+      programarReposo();
     } catch (err: any) {
       console.error(err);
       setBackupStatus('error');
@@ -58,16 +68,17 @@ export default function Administracion() {
   };
 
   const handleDownloadDataset = async () => {
+    clearTimeout(idleTimer.current);
     try {
       setBackupStatus('loading');
       setStatusMessage('Generando el dataset; puede tardar unos minutos...');
       const ahora = new Date();
       const datos = await leerDatosDataset();
-      const { nombre, bytes } = await generarDatasetZip(datos, ahora);
-      downloadXlsx(new Blob([new Uint8Array(bytes)], { type: 'application/zip' }), nombre);
+      const { nombre, blob } = await generarDatasetZip(datos, ahora);
+      downloadXlsx(blob, nombre);
       setBackupStatus('success');
       setStatusMessage('¡Dataset descargado exitosamente!');
-      setTimeout(() => setBackupStatus('idle'), 3000);
+      programarReposo();
     } catch (err) {
       console.error('Error al generar el dataset', err);
       setBackupStatus('error');

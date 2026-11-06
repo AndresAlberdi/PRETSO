@@ -1,5 +1,6 @@
 import { canonizarReferencia } from '../referenciaCompania';
 import { CAMPOS_DATASET } from './campos';
+import { esRegistro } from './orden';
 import type { AvisosDataset, DatosDataset, Registro } from './tipos';
 import { atributoXml, campoXml, camposXml } from './xml';
 
@@ -20,7 +21,6 @@ function definicion(coleccion: 'transacciones' | 'documentos', campo: string) {
 const DEF_NUM = definicion('transacciones', 'Num');
 const DEF_DOC = definicion('documentos', 'Doc');
 
-export const esRegistro = (v: unknown): v is Registro => typeof v === 'object' && v !== null && !Array.isArray(v);
 
 export function construirEnlaces(datos: Pick<DatosDataset, 'transacciones' | 'documentos'>): Enlaces {
   const transacciones = new Map<string, Registro>();
