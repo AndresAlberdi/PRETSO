@@ -1,5 +1,6 @@
 import {
   camposReferenciaCompania,
+  canonizarReferencia,
   resolverCompania,
   siglaParaExportar,
   textoVisibleCompania,
@@ -34,7 +35,7 @@ export function ordenarPorIndicador<T extends Registro>(registros: readonly T[])
     .map((e) => e.registro);
 }
 
-const recortado = (v: unknown) => String(v ?? '').trim();
+const recortado = (v: unknown) => String(v ?? '').normalize('NFC').trim();
 
 function elementoReferencia(sangria: number, nombre: string, etiqueta: string, valor: string): string {
   const margen = '  '.repeat(sangria);
@@ -85,7 +86,11 @@ export function generarCarpetaCompania(
   for (const r of registros) {
     const c = resolverCompania(r['Sigla Compañía'], datos.companias);
     if (!c) huerfanos.push(r);
-    else grupos.set(c, [...(grupos.get(c) ?? []), r]);
+    else {
+      const l = grupos.get(c);
+      if (l) l.push(r);
+      else grupos.set(c, [r]);
+    }
   }
   avisos.registrosSinUnidad = huerfanos.length;
 
@@ -96,6 +101,8 @@ export function generarCarpetaCompania(
       if (huerfano) {
         s += elementoReferencia(3, 'company_reference', 'Compañía', siglaParaExportar(r['Sigla Compañía'], datos.companias));
       }
+      // Los avisos son conjuntos de referencias únicas: B5 unirá los conjuntos de todas las carpetas
+      // (no suma tamaños), de modo que una misma referencia citada en varias carpetas no se infla.
       s += transaccionXml(r['Transacción'], enlaces, 3, avisos);
       s += `    </${elemento}>\n`;
     }
@@ -153,11 +160,14 @@ export function generarCarpetaCorpus(datos: DatosDataset, enlaces: Enlaces, gene
       if (c) {
         if (vistas.has(c)) continue;
         vistas.add(c);
-        s += '        <company>\n' + camposXml([defCodigo, defNombre], { ...c, 'Sigla Compañía': textoVisibleCompania(c) }, 5) + '        </company>\n';
+        // El nombre del archivo y <unit> usan textoVisibleCompania; company_code es el dato tal cual
+        // (igual que el Índice de compañías).
+        s += '        <company>\n' + camposXml([defCodigo, defNombre], c, 5) + '        </company>\n';
       } else {
         const texto = siglaParaExportar(valor, datos.companias);
-        if (huerfanasVistas.has(texto)) continue;
-        huerfanasVistas.add(texto);
+        const canon = canonizarReferencia(valor);
+        if (huerfanasVistas.has(canon)) continue;
+        huerfanasVistas.add(canon);
         s += `        <company${atributoXml('found', 'false')}>\n` + camposXml([defCodigo], { 'Sigla Compañía': texto }, 5) + '        </company>\n';
       }
     }
