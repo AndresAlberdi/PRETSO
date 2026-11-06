@@ -25,3 +25,12 @@ describe('asignarNombresUnicos', () => {
     expect(asignarNombresUnicos(['A', 'A', 'A-2'])).toEqual(['A', 'A-2', 'A-2-2']);
   });
 });
+
+describe('sanearNombreArchivo: caracteres de control y de formato', () => {
+  it('sustituye los bidireccionales, de ancho cero y C1 por guion', () => {
+    const r = sanearNombreArchivo('abc‮lmx.exe');
+    expect(r).not.toContain('‮');
+    expect(r).toBe('abc-lmx.exe');
+    expect(sanearNombreArchivo('a​b\u0085c﻿d⁦e')).toBe('a-b-c-d-e');
+  });
+});

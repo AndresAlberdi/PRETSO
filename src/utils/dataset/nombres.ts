@@ -1,10 +1,12 @@
+/** Controles C0 y C1, y caracteres de formato Unicode (bidireccionales, ancho cero, BOM). */
+const CONTROLES_Y_FORMATO = /[\p{Cc}\u200b-\u200f\u202a-\u202e\u2066-\u2069\ufeff]/gu;
 const RESERVADOS = /^(con|prn|aux|nul|com[1-9]|lpt[1-9])(\..*)?$/i;
 
 /** Convierte un texto en un nombre de archivo válido en Windows, macOS y Linux, conservando tildes y ñ. */
 export function sanearNombreArchivo(texto: string): string {
   let t = texto
     .normalize('NFC')
-    .split('').map((ch) => (ch.charCodeAt(0) < 0x20 || ch.charCodeAt(0) === 0x7f ? '-' : ch)).join('')
+    .replace(CONTROLES_Y_FORMATO, '-')
     .replace(/[/\\:*?"<>|]/g, '-')
     .replace(/ {2,}/g, ' ')
     .replace(/-{2,}/g, '-')

@@ -18,6 +18,7 @@ export default function Administracion() {
   const clientIdDescId = useId();
   const clientIdInputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
+  const enCurso = useRef(false);
   const idleTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   // Evita que un aviso de éxito anterior rehabilite los botones durante una nueva exportación.
@@ -68,6 +69,8 @@ export default function Administracion() {
   };
 
   const handleDownloadDataset = async () => {
+    if (enCurso.current) return;
+    enCurso.current = true;
     clearTimeout(idleTimer.current);
     try {
       setBackupStatus('loading');
@@ -83,6 +86,8 @@ export default function Administracion() {
       console.error('Error al generar el dataset', err);
       setBackupStatus('error');
       setStatusMessage('No se pudo generar el dataset. Vuelva a intentarlo; si el error persiste, avise al equipo técnico.');
+    } finally {
+      enCurso.current = false;
     }
   };
 
