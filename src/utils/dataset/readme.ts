@@ -79,6 +79,7 @@ export function generarReadme(resumen: ResumenDataset): string {
     RELACIONES,
     '## Datos incompletos',
     `Transacciones citadas y no encontradas: ${a.transaccionesNoEncontradas}. Documentos citados y no encontrados: ${a.documentosNoEncontrados}. Se marcan con \`found="false"\`. ` +
+      `Las transacciones cuyo número está repetido o vacío se incluyen igualmente en \`${CARPETAS.transacciones}\` con el atributo \`number_status="duplicate"\` o \`number_status="missing"\`. ` +
       `Registros sin compañía o sin ciudad y año: ${a.registrosSinUnidad}; están en \`${SIN_UNIDAD.companias}.xml\` (puede existir en \`${CARPETAS.caja}/\` y en \`${CARPETAS.remuneraciones}/\`) y en \`${SIN_UNIDAD.corpus}.xml\` (en \`${CARPETAS.corpus}/\`).`,
     '## Qué no incluye',
     QUE_NO_INCLUYE,

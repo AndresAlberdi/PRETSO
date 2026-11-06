@@ -47,6 +47,11 @@ describe('generarReadme', () => {
     expect(md).not.toContain('`Identificación de indicadores/`');
   });
 
+  it('explica las transacciones con número repetido o vacío', () => {
+    expect(md).toContain('number_status="duplicate"');
+    expect(md).toContain('number_status="missing"');
+  });
+
   it('incluye ejemplos de esquema y los marcadores de cita y licencia', () => {
     expect(md).toContain('<pretso_dataset>');
     expect(md).toContain('found="false"');
