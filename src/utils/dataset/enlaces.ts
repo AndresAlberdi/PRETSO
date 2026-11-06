@@ -20,7 +20,7 @@ function definicion(coleccion: 'transacciones' | 'documentos', campo: string) {
 const DEF_NUM = definicion('transacciones', 'Num');
 const DEF_DOC = definicion('documentos', 'Doc');
 
-const esRegistro = (v: unknown): v is Registro => typeof v === 'object' && v !== null && !Array.isArray(v);
+export const esRegistro = (v: unknown): v is Registro => typeof v === 'object' && v !== null && !Array.isArray(v);
 
 export function construirEnlaces(datos: Pick<DatosDataset, 'transacciones' | 'documentos'>): Enlaces {
   const transacciones = new Map<string, Registro>();
