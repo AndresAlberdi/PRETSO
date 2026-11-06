@@ -21,6 +21,22 @@ describe('armarZip', () => {
     expect(await zip.file('README.md')?.async('string')).toBe('# Título ñ\n');
   });
 
+  it('todas las entradas, carpetas incluidas, llevan la fecha de generación', async () => {
+    const fecha = new Date('2026-11-06T12:00:00Z');
+    const bytes = await armarZip([{ ruta: RUTA, contenido: CONTENIDO }, { ruta: 'README.md', contenido: 'x' }], fecha);
+    const zip = await JSZip.loadAsync(bytes);
+    const entradas = Object.values(zip.files);
+    expect(entradas.length).toBe(3);
+    for (const e of entradas) expect(e.date.getTime()).toBe(fecha.getTime());
+  });
+
+  it('el README no empieza con BOM', async () => {
+    const bytes = await armarZip([{ ruta: 'README.md', contenido: '# T\n' }], new Date());
+    const zip = await JSZip.loadAsync(bytes);
+    const crudo = await zip.file('README.md')!.async('uint8array');
+    expect(Array.from(crudo.slice(0, 3))).not.toEqual([0xef, 0xbb, 0xbf]);
+  });
+
   it('rechaza rutas duplicadas, también si solo difieren en mayúsculas o tildes', async () => {
     const fecha = new Date();
     await expect(
