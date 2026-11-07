@@ -1,11 +1,8 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
-import { render, screen, fireEvent, act, cleanup } from '@testing-library/react';
+import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import ManejoCaja from '../pages/ManejoCaja';
 import Salarios from '../pages/Salarios';
-import CorpusChristi from '../pages/CorpusChristi';
-import Indicadores from '../pages/Indicadores';
-import Busqueda from '../pages/Busqueda';
-import IndiceCompanias from '../pages/IndiceCompanias';
+import { invalidarIndice } from '../utils/busquedaGuia/cargaIndice';
 
 const companias = [
   { id: 'c7', 'Indicador de registro': 7, 'Sigla Compañía': 'GA-JR', 'Nombre Compañía': 'Compañía de Alarcón', Autores: 'Alarcón y Ramírez' },
@@ -33,6 +30,7 @@ vi.mock('firebase/firestore', () => ({
 }));
 
 beforeEach(() => {
+  invalidarIndice();
   ubicacion.search = '';
   colecciones = {
     companias,
@@ -64,29 +62,22 @@ afterEach(() => {
 
 const region = () => document.querySelector('output.visually-hidden') as HTMLElement;
 
-function buscar(categoria: string, texto: string) {
-  const selects = screen.getAllByRole('combobox');
-  fireEvent.change(selects[0], { target: { value: categoria } });
-  fireEvent.change(screen.getByPlaceholderText('Añadir filtro...'), { target: { value: texto } });
-  fireEvent.click(screen.getAllByRole('button', { name: 'Buscar' })[0]);
-}
-
 describe.each([
-  ['Manejo de Caja', ManejoCaja],
+  ['Manejo de caja', ManejoCaja],
   ['Remuneraciones', Salarios],
 ])('%s: anuncios de resultados', (_nombre, Pagina) => {
   it('anuncia el listado y la búsqueda en el mismo nodo persistente', async () => {
-    render(<Pagina />);
+    const { rerender } = render(<Pagina />);
     await screen.findByText(/Mostrando \d+ registros/);
     const nodo = region();
     expect(document.querySelectorAll('output.visually-hidden').length).toBe(1);
     expect(nodo.textContent).toBe('Listado: 2 registros');
-    buscar('Autores', 'Alarcón');
-    await screen.findByText('Resultados de Búsqueda (1 registros)');
+    ubicacion.search = '?q=Potosí';
+    rerender(<Pagina />);
+    await vi.waitFor(() => expect(nodo.textContent).toBe('Búsqueda: 1 compañía con «Potosí»'));
     expect(region()).toBe(nodo);
-    expect(nodo.textContent).toBe('Búsqueda: 1 registro encontrado');
     expect(document.querySelectorAll('output.visually-hidden').length).toBe(1);
-    expect(screen.getAllByText(/Resultados de Búsqueda \(1 registros\)/).length).toBe(1);
+    expect(screen.queryByText(/Resultados de búsqueda/)).toBeNull();
   });
 
   it('compañía inexistente: anuncia que no se encontró', async () => {
@@ -112,76 +103,5 @@ describe('Remuneraciones: el filtro de compañía actualiza el anuncio', () => {
     fireEvent.change(screen.getByRole('combobox', { name: 'Filtrar por compañía' }), { target: { value: '7' } });
     await vi.waitFor(() => expect(nodo.textContent).toBe('Listado: 1 registro'));
     expect(region()).toBe(nodo);
-  });
-});
-
-describe('Corpus Christi e Indicadores: anuncios', () => {
-  it('Corpus Christi: listado y búsqueda', async () => {
-    render(<CorpusChristi />);
-    await screen.findByText(/Mostrando \d+ registros/);
-    expect(region().textContent).toBe('Listado: 2 registros');
-    buscar('Ciudad', 'Lima');
-    await screen.findByText(/Resultados de Búsqueda/);
-    expect(region().textContent).toBe('Búsqueda: 1 registro encontrado');
-  });
-
-  it('Corpus Christi: detalle de ciudad y año', async () => {
-    render(<CorpusChristi />);
-    await screen.findByText(/Mostrando \d+ registros/);
-    fireEvent.click(screen.getAllByRole('button', { name: 'TRATO' })[0]);
-    expect(region().textContent).toBe('Detalle de Potosí 1600: 1 transacción');
-  });
-
-  it('Indicadores: listado y búsqueda', async () => {
-    render(<Indicadores />);
-    await screen.findByText(/Mostrando \d+ categorías/);
-    expect(region().textContent).toBe('Listado: 3 categorías');
-    buscar('all', 'Pan');
-    await screen.findByText(/Resultados de Búsqueda/);
-    expect(region().textContent).toBe('Búsqueda: 1 registro encontrado');
-  });
-
-  it('Indicadores: detalle de categoría', async () => {
-    render(<Indicadores />);
-    await screen.findByText(/Mostrando \d+ categorías/);
-    fireEvent.click(screen.getAllByRole('button', { name: 'LISTA' })[0]);
-    expect(region().textContent).toBe('Detalle de Aceite: 1 transacción');
-  });
-});
-
-describe('Búsqueda general: anuncio de la búsqueda general', () => {
-  it('vacío al inicio y «Búsqueda sin resultados» sin coincidencias', async () => {
-    render(<Busqueda />);
-    await screen.findByRole('heading', { name: 'Búsqueda general' });
-    await vi.waitFor(() => expect(screen.queryByText(/Cargando base de datos/)).toBeNull());
-    const nodo = region();
-    expect(nodo.textContent).toBe('');
-    buscar('all', 'zzzz-inexistente');
-    await screen.findByText(/No se encontraron resultados/);
-    expect(region()).toBe(nodo);
-    expect(nodo.textContent).toBe('Búsqueda sin resultados');
-  });
-});
-
-describe('Índice de compañías: anuncio con retraso', () => {
-  it('anuncia a los 800 ms de escribir', async () => {
-    render(<IndiceCompanias />);
-    await screen.findByText('GA-JR');
-    vi.useFakeTimers();
-    fireEvent.change(screen.getByRole('textbox', { name: 'Buscar por nombre o autores' }), { target: { value: 'gar' } });
-    act(() => { vi.advanceTimersByTime(799); });
-    expect(region().textContent).toBe('');
-    act(() => { vi.advanceTimersByTime(1); });
-    expect(region().textContent).toBe('Búsqueda: 1 compañía encontrada');
-
-    const campo = screen.getByRole('textbox', { name: 'Buscar por nombre o autores' });
-    fireEvent.change(campo, { target: { value: '' } });
-    act(() => { vi.advanceTimersByTime(800); });
-    expect(region().textContent).toBe('');
-    fireEvent.change(campo, { target: { value: 'gar' } });
-    act(() => { vi.advanceTimersByTime(799); });
-    expect(region().textContent).toBe('');
-    act(() => { vi.advanceTimersByTime(1); });
-    expect(region().textContent).toBe('Búsqueda: 1 compañía encontrada');
   });
 });

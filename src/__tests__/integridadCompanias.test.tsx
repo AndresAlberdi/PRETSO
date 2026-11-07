@@ -14,7 +14,10 @@ const fallo = vi.hoisted(() => ({ coleccion: null as string | null }));
 
 vi.mock('../firebase', () => ({ db: {} }));
 vi.mock('../utils/audit', () => ({ logAction: vi.fn() }));
-vi.mock('react-router', () => ({ useNavigate: () => vi.fn() }));
+vi.mock('react-router', () => ({
+  useNavigate: () => vi.fn(),
+  useLocation: () => ({ pathname: '/x', search: '', state: null }),
+}));
 vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isAdmin: true, isEditMode: true }) }));
 // Firestore simulado: igualdad estricta por campo, como las consultas `==` reales
 vi.mock('firebase/firestore', () => ({
@@ -50,14 +53,14 @@ async function intentarBorrar(sigla: string) {
 describe('borrado de compañías: integridad referencial', () => {
   it('una compañía sin referencias se puede borrar (pide confirmación)', async () => {
     await intentarBorrar('GA-JR');
-    expect(await screen.findByText('Confirmar Borrado', {}, { timeout: 4000 })).toBeTruthy();
+    expect(await screen.findByText('Confirmar borrado', {}, { timeout: 4000 })).toBeTruthy();
   });
 
   it('referenciada solo desde Corpus (campo Cmp2) NO se puede borrar', async () => {
     colecciones.corpus_christi = [{ id: 'k1', Cmp2: 7.0 }];
     await intentarBorrar('GA-JR');
     expect(await screen.findByText(/vinculada a 1 registro\(s\) \(1 en Corpus Christi\)/, {}, { timeout: 4000 })).toBeTruthy();
-    expect(screen.queryByText('Confirmar Borrado')).toBeNull();
+    expect(screen.queryByText('Confirmar borrado')).toBeNull();
   });
 
   it('referenciada solo desde Corpus (Compañía10) por sigla heredada NO se puede borrar', async () => {
@@ -74,7 +77,7 @@ describe('borrado de compañías: integridad referencial', () => {
     colecciones[coleccion] = [{ id: 'r1', 'Sigla Compañía': 12 }];
     await intentarBorrar('JG');
     expect(await screen.findByText(new RegExp(`1 en ${etiqueta}`), {}, { timeout: 4000 })).toBeTruthy();
-    expect(screen.queryByText('Confirmar Borrado')).toBeNull();
+    expect(screen.queryByText('Confirmar borrado')).toBeNull();
   });
 
   it('referencia por el texto del número (dato heredado) también bloquea', async () => {
@@ -90,7 +93,7 @@ describe('borrado de compañías: integridad referencial', () => {
     cleanup();
     colecciones.manejo_de_caja = [{ id: 'r1', 'Sigla Compañía': 7 }];
     await intentarBorrar('CERO');
-    expect(await screen.findByText('Confirmar Borrado', {}, { timeout: 4000 })).toBeTruthy();
+    expect(await screen.findByText('Confirmar borrado', {}, { timeout: 4000 })).toBeTruthy();
   });
 
   it('un mismo registro con varios campos hacia la compañía cuenta una sola vez', async () => {
@@ -107,14 +110,14 @@ describe('borrado de compañías: integridad referencial', () => {
     colecciones.salarios = [{ id: 'r1', 'Sigla Compañía': valor }];
     await intentarBorrar('GA-JR');
     expect(await screen.findByText(/1 en Remuneraciones/, {}, { timeout: 4000 })).toBeTruthy();
-    expect(screen.queryByText('Confirmar Borrado')).toBeNull();
+    expect(screen.queryByText('Confirmar borrado')).toBeNull();
   });
 
   it('una compañía sin referencias no se confunde con otra distinta referenciada', async () => {
     colecciones.manejo_de_caja = [{ id: 'r1', 'Sigla Compañía': 12 }, { id: 'r2', 'Sigla Compañía': 'jg' }];
     colecciones.corpus_christi = [{ id: 'k1', Cmp2: 12, 'Compañía10': 'JG' }];
     await intentarBorrar('GA-JR');
-    expect(await screen.findByText('Confirmar Borrado', {}, { timeout: 4000 })).toBeTruthy();
+    expect(await screen.findByText('Confirmar borrado', {}, { timeout: 4000 })).toBeTruthy();
     expect(screen.queryByText(/vinculada/)).toBeNull();
   });
 
@@ -122,7 +125,7 @@ describe('borrado de compañías: integridad referencial', () => {
     fallo.coleccion = 'corpus_christi';
     await intentarBorrar('GA-JR');
     expect(await screen.findByText(/No se pudo verificar si la compañía tiene registros vinculados; no se borró/, {}, { timeout: 4000 })).toBeTruthy();
-    expect(screen.queryByText('Confirmar Borrado')).toBeNull();
+    expect(screen.queryByText('Confirmar borrado')).toBeNull();
     expect(deleteDoc).not.toHaveBeenCalled();
     expect(screen.queryByText(/analizando/i)).toBeNull();
   });

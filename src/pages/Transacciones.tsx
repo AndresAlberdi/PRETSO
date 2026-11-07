@@ -155,7 +155,6 @@ export default function Transacciones() {
       <div className="cabecera-pagina" style={{ flexWrap: 'wrap' }}>
         <div>
           <h1>Transacciones</h1>
-          {canLoad && <p className="etiqueta-editor">Solo editores</p>}
         </div>
         <div className="acciones-cabecera">
           <SearchBar onSearch={setFilters} categories={SEARCH_CATEGORIES} />
@@ -225,7 +224,7 @@ export default function Transacciones() {
 
       {recordToDelete && (
         <ConfirmModal 
-          title="Confirmar Borrado"
+          title="Confirmar borrado"
           message={`¿Está seguro de que desea eliminar la transacción asociada a los documentos: ${getDocsForTransaction(recordToDelete)}?`}
           onConfirm={handleDelete}
           onCancel={() => setRecordToDelete(null)}
@@ -235,7 +234,7 @@ export default function Transacciones() {
 
       {deleteErrorAlert && (
         <ConfirmModal 
-          title="Error de Integridad"
+          title="Error de integridad"
           message={deleteErrorAlert}
           onCancel={() => setDeleteErrorAlert(null)}
           isAlertOnly={true}

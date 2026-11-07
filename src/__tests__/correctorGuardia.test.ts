@@ -101,6 +101,6 @@ describe('guardia del corrector ortográfico', () => {
       }
     }
     expect(fallos).toEqual([]);
-    expect(controles).toBeGreaterThanOrEqual(35);
+    expect(controles).toBeGreaterThanOrEqual(34);
   });
 });

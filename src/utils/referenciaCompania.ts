@@ -1,4 +1,4 @@
-// Referencia a una compañía en los registros de Manejo de Caja, Remuneraciones,
+// Referencia a una compañía en los registros de Manejo de caja, Remuneraciones,
 // Indicadores y Corpus Christi: la llave interna es el NÚMERO de registro
 // («Indicador de registro» de la colección `companias`); la sigla solo se muestra.
 
@@ -44,11 +44,16 @@ export function resolverCompania<T extends CompaniaRef>(valor: unknown, compania
   return companias.find(c => normalizarSigla(c['Sigla Compañía']) === sigla && sigla !== '') || null;
 }
 
-/** Sigla para mostrar: la de la compañía resuelta; si no resuelve, la referencia canonizada. */
+/**
+ * Texto para mostrar de una referencia: la sigla (o nombre) de la compañía
+ * resuelta; si no resuelve, «Compañía no encontrada» (nunca el número de
+ * registro) o, en datos heredados con letras, el texto guardado.
+ */
 export function siglaDeReferencia(valor: unknown, companias: CompaniaRef[]): string {
-  const c = resolverCompania(valor, companias);
-  return c ? String(c['Sigla Compañía'] ?? '') : canonizarReferencia(valor);
+  return siglaParaExportar(valor, companias);
 }
+
+export const TEXTO_COMPANIA_SIN_SIGLA = 'Compañía sin sigla';
 
 /**
  * Texto visible de una compañía resuelta: su sigla; si está vacía, su nombre; si
@@ -58,7 +63,7 @@ export function textoVisibleCompania(compania: CompaniaRef): string {
   const sigla = String(compania['Sigla Compañía'] ?? '').trim();
   if (sigla) return sigla;
   const nombre = String(compania['Nombre Compañía'] ?? '').trim();
-  return nombre || 'Compañía sin sigla';
+  return nombre || TEXTO_COMPANIA_SIN_SIGLA;
 }
 
 export const TEXTO_COMPANIA_NO_ENCONTRADA = 'Compañía no encontrada';
@@ -90,9 +95,11 @@ export function valorDeReferencia(compania: CompaniaRef): number | string {
   return NUMERICO.test(canon) ? Number(canon) : canon;
 }
 
-/** Etiqueta del selector: «sigla - autores». */
+/** Etiqueta del selector: «sigla / autores»; sin autores, solo la sigla. */
 export function etiquetaCompania(compania: CompaniaRef): string {
-  return `${compania['Sigla Compañía'] ?? ''} - ${compania['Autores'] ?? ''}`;
+  const sigla = textoVisibleCompania(compania).trim();
+  const autores = String(compania['Autores'] ?? '').trim();
+  return autores ? `${sigla} / ${autores}` : sigla;
 }
 
 /** Campos de Corpus Christi que referencian compañías (Compañía, Compañía2…, Cmp, Cmp2…). */

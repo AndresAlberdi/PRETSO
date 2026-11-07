@@ -1,4 +1,5 @@
 
+import { esCampoRetirado } from '../utils/camposRetirados';
 import { useId } from 'react';
 import type { CSSProperties } from 'react';
 import Modal from './Modal';
@@ -28,13 +29,14 @@ interface DetailsModalProps {
   record: any;
   onClose: () => void;
   title?: string;
+  collectionName?: string;
 }
 
-export default function DetailsModal({ record, onClose, title = "Detalles del Registro" }: DetailsModalProps) {
+export default function DetailsModal({ record, onClose, title = "Detalles del registro", collectionName }: DetailsModalProps) {
   const titleId = useId();
   if (!record) return null;
 
-  const fields = Object.entries(record).filter(([key]) => key !== 'id');
+  const fields = Object.entries(record).filter(([key]) => key !== 'id' && !(collectionName && esCampoRetirado(collectionName, key)));
 
   return (
     <Modal labelledBy={titleId} onEscape={onClose} overlayStyle={overlayStyle} panelStyle={panelStyle}>

@@ -12,6 +12,7 @@ vi.mock('../utils/xlsxExport', () => ({ generateDatabaseXlsx: vi.fn(), downloadX
 vi.mock('react-router', () => ({
   Link: ({ children, to }: { children: React.ReactNode; to: string }) => <a href={to}>{children}</a>,
   useNavigate: () => vi.fn(),
+  useLocation: () => ({ pathname: '/x', search: '', state: null }),
 }));
 vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isAdmin: true, isEditMode: true }) }));
 vi.mock('firebase/firestore', () => ({
@@ -51,13 +52,13 @@ describe('caracterización de los estilos de las capas de espera y del diálogo 
   it('diálogo del Client ID (Administración): fondo, panel, título, texto y campo', () => {
     render(<Administracion />);
     fireEvent.click(screen.getByRole('button', { name: /Configurar Client ID de Google/ }));
-    expect(capas('Configurar Google Client ID')).toMatchInlineSnapshot(`
+    expect(capas('Configurar el Client ID de Google')).toMatchInlineSnapshot(`
       {
         "overlay": "position: fixed; top: 0px; left: 0px; right: 0px; bottom: 0px; background: rgba(0, 0, 0, 0.8); display: flex; align-items: center; justify-content: center; z-index: 1000;",
         "panel": "background: var(--bg-card); padding: 2rem; border-radius: 8px; max-width: 500px; width: 90%;",
       }
     `);
-    expect(screen.getByText('Configurar Google Client ID').style.cssText).toMatchInlineSnapshot(`""`);
+    expect(screen.getByText('Configurar el Client ID de Google').style.cssText).toMatchInlineSnapshot(`""`);
     expect(screen.getByRole('textbox').style.cssText).toMatchInlineSnapshot(`"width: 100%; padding: 0.8rem; margin-bottom: 1.5rem; background: var(--bg-body, #222); border: 1px solid var(--input-border); color: var(--text-primary); border-radius: 4px;"`);
   });
 });

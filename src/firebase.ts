@@ -1,6 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
+import { getFunctions } from "firebase/functions";
 import { firebaseConfig, recaptchaSiteKey } from "@entorno/firebase";
 import { assertFirebaseConfig } from "./utils/firebaseConfig";
 import { startAppCheck } from "./utils/appCheck";
@@ -22,3 +23,4 @@ startAppCheck(app, recaptchaSiteKey, {
 });
 export const db = getFirestore(app);
 export const auth = getAuth(app);
+export const functions = getFunctions(app, "us-central1");
