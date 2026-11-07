@@ -44,8 +44,11 @@ const panelStyle: React.CSSProperties = {
   boxShadow: '0 8px 32px rgba(0,0,0,0.3)'
 };
 
+// Error cuyo mensaje, propio y en español, se puede mostrar tal cual al usuario (sin campo que marcar).
+class MensajeUsuarioError extends Error {}
+
 // Error de validación del formulario: indica el campo inválido para marcarlo y enlazarlo con el mensaje.
-class ValidationError extends Error {
+class ValidationError extends MensajeUsuarioError {
   readonly field: string;
   constructor(field: string, message: string) {
     super(message);
@@ -186,7 +189,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
           if (years.length === 0) setYearType('input');
         }
 
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.error('No se pudo cargar el contexto del formulario:', codigoError(err));
         setError("Error al cargar los datos del formulario.");
       } finally {
@@ -327,7 +330,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
           lista = await leerSiglasCompanias();
         } catch (e) {
           console.error('No se pudieron verificar las siglas de compañías:', codigoError(e));
-          throw new Error(MENSAJE_VERIFICACION_SIGLA);
+          throw new MensajeUsuarioError(MENSAJE_VERIFICACION_SIGLA);
         }
         // Se excluye el id ya reservado: un reintento idempotente no choca consigo mismo.
         const r = evaluarSigla(sigla, lista, docRefRef.current?.id ?? null);
@@ -366,13 +369,15 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
 
       onClose();
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       if (escritoRef.current) {
         // El documento ya existe: el error es posterior a la escritura y los cambios nuevos no se reescriben.
         setError("El registro ya se guardó; ciérrelo con «Cerrar».");
         setErrorField(null);
       } else {
-        setError(err.message || "Error al guardar el nuevo registro.");
+        // Solo los mensajes propios (de validación, en español) llegan al usuario; el resto, texto genérico.
+        if (!(err instanceof MensajeUsuarioError)) console.error('No se pudo guardar el nuevo registro:', codigoError(err));
+        setError(err instanceof MensajeUsuarioError ? err.message : "Error al guardar el nuevo registro.");
         setErrorField(err instanceof ValidationError ? err.field : null);
       }
     } finally {
