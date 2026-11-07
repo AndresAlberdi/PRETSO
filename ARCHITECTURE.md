@@ -7,10 +7,14 @@ Este documento describe la arquitectura y los patrones de diseño subyacentes de
 PRETSO utiliza una arquitectura **Serverless / Backend-as-a-Service (BaaS)** mediante **Firebase**. Toda la lógica de presentación y el ruteo ocurren en el cliente (SPA - Single Page Application), mientras que el almacenamiento de datos, autenticación y despliegue están delegados a la nube de Google.
 
 ### Diagrama de Alto Nivel
-- **Frontend (React)**: Maneja la UI, estados de componentes y comunicación directa con la API de Firebase.
+- **Frontend (React 19, TypeScript, Vite)**: Maneja la UI, estados de componentes y comunicación directa con la API de Firebase.
 - **Firebase Authentication**: Gestiona las credenciales de usuarios.
 - **Firebase Firestore (NoSQL)**: Almacena los registros estructurados en colecciones con reglas estrictas de seguridad.
 - **Firebase Hosting**: Entrega el paquete compilado (archivos estáticos, CSS, JS).
+- **Cloud Functions (2.ª generación)**: una sola función callable, `listAccounts` (véase la sección 5).
+- **App Check (reCAPTCHA Enterprise)**: acredita que las peticiones a Firestore vienen de la aplicación; en monitoreo salvo que la consola indique otra cosa.
+
+Hay dos ambientes: staging (`pretso-database`) y producción (`pretso-prod`); la configuración de cada uno está en `src/environments/<ambiente>/`.
 
 ## 2. Estructura del Directorio Frontend (`/src`)
 
@@ -20,7 +24,9 @@ El código fuente del frontend sigue una estructura modular orientada a componen
 - `/src/context/`: Contextos globales de React. `AdminContext` maneja el estado de la sesión, los permisos y habilita/deshabilita funciones de edición (modo lectura o administrador).
 - `/src/pages/`: Componentes principales de enrutamiento que representan las vistas completas (ManejoCaja, Salarios, CorpusChristi, etc.).
 - `/src/hooks/`: Hooks personalizados de React, destacando `useSortableTable` para unificar la lógica de ordenamiento de tablas.
-- `/src/utils/`: Funciones puras compartidas (limpieza de datos de Firebase `utils.ts`, sistema de logs de auditoría `audit.ts`).
+- `/src/utils/`: Funciones puras compartidas (limpieza de datos de Firebase `utils.ts`, sistema de logs de auditoría `audit.ts`, `dataset/` para el ZIP de XML, `busquedaGuia/` para la búsqueda guiada, `backup.ts` para el volcado XML y la copia a Drive).
+- `/functions/`: Cloud Functions (TypeScript, proyecto npm propio).
+- `/scripts/`: utilidades operativas en Python (por ejemplo `asignar_claim_admin.py`).
 - `/src/__tests__`: Batería de pruebas automatizadas (Vitest + jsdom).
 
 ## 3. Patrones de Diseño Utilizados
@@ -44,10 +50,15 @@ Los componentes de página en `/pages` usan el hook `useEffect` para consultar l
 El componente `SearchBar` se introdujo para permitir el filtrado por múltiples factores simultáneos.
 Mantiene un arreglo de "filtros" aplicados (por ejemplo: `[{ category: 'Ciudad', query: 'Lima' }, { category: 'Año', query: '1600' }]`). El componente padre evalúa este arreglo cruzándolo con los datos en memoria para generar el subconjunto `searchResults`.
 
-## 5. Reglas de Seguridad (Firestore)
-Las reglas están ubicadas en `firestore.rules` en la raíz del proyecto. Estas aseguran que:
-- Cualquier usuario autenticado (incluyendo lectores) puede leer los registros y el registro de auditoría (`audit_logs`).
-- Solamente la cuenta designada como administradora tiene permisos de escritura, actualización o eliminación en las colecciones de la base de datos.
+## 5. Roles y Reglas de Seguridad (Firestore)
+Roles reales:
+- **Visitante** (sin sesión): lectura pública de solo lectura del corpus. `[[PENDIENTE: vigente cuando se fusionen las reglas y las rutas del plan de lectura pública; hoy las reglas exigen sesión y la aplicación pide ingresar]]`.
+- **Lector**: custom claim `reader === true`; solo lectura.
+- **Administración**: custom claim `admin === true`; lectura y escritura, y acceso a Auditoría, Gestión de Usuarios y Administración.
+
+Las reglas están en `firestore.rules` en la raíz del proyecto. Estas aseguran que:
+- La lectura exige hoy el claim `admin` o `reader`; `logs` y `users` solo los lee la administración. Un usuario autenticado sin claim no lee nada.
+- Solamente la administración (claim `admin`) escribe, actualiza o elimina en las colecciones; `logs` solo admite altas válidas (autor = correo del token, hora del servidor).
 - Bloquea interacciones no autorizadas a nivel de servidor, independientemente de la interfaz que use el cliente.
 
 ### Lista de cuentas (`listAccounts`)
@@ -55,8 +66,9 @@ La pantalla «Gestión de Usuarios» muestra las cuentas (correo, rol, acceso co
 
 ## 6. Despliegue y Pipeline CI/CD
 
-El proceso está condensado en un script shell (`deploy.sh`), invocado vía `npm run deploy`, el cual consta de cuatro pasos lineales estrictos:
-1. **Pruebas Locales (Vitest)**: Garantizan la estabilidad de funciones internas y la persistencia de reglas de negocio.
-2. **Seguridad (Snyk)**: Verifica el árbol de dependencias (`package-lock.json`) en busca de vulnerabilidades antes de avanzar.
-3. **Build & Deploy**: Compila a través de Vite (modo producción) y hace *push* estático a Firebase (`firebase deploy --non-interactive`).
-4. **Sincronización Git**: Automatiza el commit y el `git push` a la rama `master`.
+El despliegue lo hace GitHub Actions (`.github/workflows/ci-node-firebase.yml`), con federación de identidad (WIF/OIDC) y sin claves de larga duración:
+1. **Pull request**: pruebas (Vitest), lint (oxlint), build (`tsc` y Vite) y análisis de seguridad estático.
+2. **Fusión a `main`** (squash): despliegue automático a staging (por defecto Hosting y reglas de Firestore; las Functions entran según la variable de repositorio `FIREBASE_DEPLOY_ONLY`; `[[PENDIENTE: confirmar su valor actual con gh variable list]]`).
+3. **Tag `vX.Y.Z`**: despliegue a producción tras la aprobación humana del Environment `production`.
+
+`deploy.sh staging` permite el despliegue manual a staging. Detalle de operación y rollback: `docs/operacion/runbook-operacion.md` y `docs/produccion/runbook-rollback.md`. Secretos, variables y WIF: `docs/seguridad/inventario-secretos.md`.
