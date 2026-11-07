@@ -3,6 +3,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import HomeRoute from './components/HomeRoute';
 import AdminRoute from './components/AdminRoute';
 import ReaderRoute from './components/ReaderRoute';
+import PublicReadRoute from './components/PublicReadRoute';
 import Portada from './pages/Portada';
 import Busqueda from './pages/Busqueda';
 import ManejoCaja from './pages/ManejoCaja';
@@ -49,14 +50,14 @@ export default function App() {
         <Routes>
           <Route path="/login" element={<Navigate to="/" replace />} />
           
-          <Route path="/" element={<HomeRoute signedOut={<Layout barra={<TopBar />}><Portada acceso /></Layout>} signedIn={<ReaderRoute><Layout barra={<TopBar conCuenta />}><Portada /></Layout></ReaderRoute>} />} />
-          <Route path="/buscar" element={<ProtectedRoute><ReaderRoute><Layout barra={<TopBar conAgregar volver={{ to: '/', texto: 'Inicio' }} />}><Busqueda /></Layout></ReaderRoute></ProtectedRoute>} />
-          <Route path="/caja" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><ManejoCaja /></Layout></ReaderRoute></ProtectedRoute>} />
-          <Route path="/salarios" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><Salarios /></Layout></ReaderRoute></ProtectedRoute>} />
-          <Route path="/corpus" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><CorpusChristi /></Layout></ReaderRoute></ProtectedRoute>} />
-          <Route path="/indicadores" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><Indicadores /></Layout></ReaderRoute></ProtectedRoute>} />
-          <Route path="/companias" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><IndiceCompanias /></Layout></ReaderRoute></ProtectedRoute>} />
-          <Route path="/bibliografia" element={<ProtectedRoute><ReaderRoute><Layout barra={ATRAS_BUSCAR}><Bibliografia /></Layout></ReaderRoute></ProtectedRoute>} />
+          <Route path="/" element={<HomeRoute signedOut={<Layout barra={<TopBar />}><Portada modo="visitante" /></Layout>} signedIn={<ReaderRoute><Layout barra={<TopBar conCuenta />}><Portada modo="sesion" /></Layout></ReaderRoute>} />} />
+          <Route path="/buscar" element={<PublicReadRoute><Layout barra={<TopBar conAgregar volver={{ to: '/', texto: 'Inicio' }} />}><Busqueda /></Layout></PublicReadRoute>} />
+          <Route path="/caja" element={<PublicReadRoute><Layout barra={ATRAS_BUSCAR}><ManejoCaja /></Layout></PublicReadRoute>} />
+          <Route path="/salarios" element={<PublicReadRoute><Layout barra={ATRAS_BUSCAR}><Salarios /></Layout></PublicReadRoute>} />
+          <Route path="/corpus" element={<PublicReadRoute><Layout barra={ATRAS_BUSCAR}><CorpusChristi /></Layout></PublicReadRoute>} />
+          <Route path="/indicadores" element={<PublicReadRoute><Layout barra={ATRAS_BUSCAR}><Indicadores /></Layout></PublicReadRoute>} />
+          <Route path="/companias" element={<PublicReadRoute><Layout barra={ATRAS_BUSCAR}><IndiceCompanias /></Layout></PublicReadRoute>} />
+          <Route path="/bibliografia" element={<PublicReadRoute><Layout barra={ATRAS_BUSCAR}><Bibliografia /></Layout></PublicReadRoute>} />
           <Route path="/agregar" element={<ProtectedRoute><ReaderRoute><AdminRoute><Layout barra={ATRAS_BUSCAR}><AgregarTransaccion /></Layout></AdminRoute></ReaderRoute></ProtectedRoute>} />
           <Route path="/transacciones" element={<ProtectedRoute><ReaderRoute><AdminRoute><Layout barra={ATRAS_AGREGAR}><Transacciones /></Layout></AdminRoute></ReaderRoute></ProtectedRoute>} />
           <Route path="/documentos" element={<ProtectedRoute><ReaderRoute><AdminRoute><Layout barra={ATRAS_AGREGAR}><Documentos /></Layout></AdminRoute></ReaderRoute></ProtectedRoute>} />
