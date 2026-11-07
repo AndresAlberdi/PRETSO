@@ -1,8 +1,10 @@
-import { useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { Link } from 'react-router';
 import { auth } from '../firebase';
 import { generateDatabaseXml, downloadXml, generateZipBlob, uploadToGoogleDrive } from '../utils/backup';
 import { generateDatabaseXlsx, downloadXlsx } from '../utils/xlsxExport';
+import { leerDatosDataset } from '../utils/dataset/leerDatos';
+import { generarDatasetZip } from '../utils/dataset/generarDataset';
 import { GOOGLE_CLIENT_ID_STORAGE_KEY, resolveGoogleClientId } from '../utils/googleClientId';
 import Modal from '../components/Modal';
 import { TEXTO_CODIGO } from '../utils/correctorOrtografico';
@@ -16,8 +18,18 @@ export default function Administracion() {
   const clientIdDescId = useId();
   const clientIdInputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
+  const enCurso = useRef(false);
+  const idleTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+
+  // Evita que un aviso de éxito anterior rehabilite los botones durante una nueva exportación.
+  useEffect(() => () => clearTimeout(idleTimer.current), []);
+  const programarReposo = () => {
+    clearTimeout(idleTimer.current);
+    idleTimer.current = setTimeout(() => setBackupStatus('idle'), 3000);
+  };
 
   const handleDownloadXml = async () => {
+    clearTimeout(idleTimer.current);
     try {
       setBackupStatus('loading');
       setStatusMessage('Generando volcado de base de datos XML...');
@@ -28,7 +40,7 @@ export default function Administracion() {
       downloadXml(xml, `pretso_database_${formattedDate}.xml`);
       setBackupStatus('success');
       setStatusMessage('¡Volcado XML descargado exitosamente!');
-      setTimeout(() => setBackupStatus('idle'), 3000);
+      programarReposo();
     } catch (err: any) {
       console.error(err);
       setBackupStatus('error');
@@ -37,6 +49,7 @@ export default function Administracion() {
   };
 
   const handleDownloadXlsx = async () => {
+    clearTimeout(idleTimer.current);
     try {
       setBackupStatus('loading');
       setStatusMessage('Generando volcado de base de datos XLSX...');
@@ -47,11 +60,34 @@ export default function Administracion() {
       downloadXlsx(blob, `pretso_database_${formattedDate}.xlsx`);
       setBackupStatus('success');
       setStatusMessage('¡Volcado XLSX descargado exitosamente!');
-      setTimeout(() => setBackupStatus('idle'), 3000);
+      programarReposo();
     } catch (err: any) {
       console.error(err);
       setBackupStatus('error');
       setStatusMessage(`Error al generar XLSX: ${err.message || err}`);
+    }
+  };
+
+  const handleDownloadDataset = async () => {
+    if (enCurso.current) return;
+    enCurso.current = true;
+    clearTimeout(idleTimer.current);
+    try {
+      setBackupStatus('loading');
+      setStatusMessage('Generando el dataset; puede tardar unos minutos...');
+      const ahora = new Date();
+      const datos = await leerDatosDataset();
+      const { nombre, blob } = await generarDatasetZip(datos, ahora);
+      downloadXlsx(blob, nombre);
+      setBackupStatus('success');
+      setStatusMessage('¡Dataset descargado exitosamente!');
+      programarReposo();
+    } catch (err) {
+      console.error('Error al generar el dataset', err);
+      setBackupStatus('error');
+      setStatusMessage('No se pudo generar el dataset. Vuelva a intentarlo; si el error persiste, avise al equipo técnico.');
+    } finally {
+      enCurso.current = false;
     }
   };
 
@@ -177,6 +213,13 @@ export default function Administracion() {
               disabled={backupStatus === 'loading'}
             >
               Descargar base de datos (XLSX)
+            </button>
+            <button 
+              onClick={handleDownloadDataset}
+              style={{ padding: '0.8rem 1.5rem', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+              disabled={backupStatus === 'loading'}
+            >
+              Descargar dataset (ZIP)
             </button>
             <button 
               onClick={handleGoogleDriveBackup}

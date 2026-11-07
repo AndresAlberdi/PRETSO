@@ -7,6 +7,7 @@ import {
 } from '../referenciaCompania';
 import { CAMPOS_DATASET, CAMPOS_ENCABEZADO_CORPUS } from './campos';
 import { transaccionXml, type Enlaces } from './enlaces';
+import { ordenarPorNumero } from './orden';
 import { asignarNombresUnicos, sanearNombreArchivo } from './nombres';
 import {
   CARPETAS,
@@ -23,16 +24,7 @@ const indicador = (r: Registro) => Number(r['Indicador de registro']);
 
 /** Orden estable por `Indicador de registro` ascendente; los no numéricos quedan al final. */
 export function ordenarPorIndicador<T extends Registro>(registros: readonly T[]): T[] {
-  return registros
-    .map((registro, posicion) => ({ registro, posicion, valor: indicador(registro) }))
-    .sort((a, b) => {
-      const na = Number.isNaN(a.valor);
-      const nb = Number.isNaN(b.valor);
-      if (na !== nb) return na ? 1 : -1;
-      if (!na && a.valor !== b.valor) return a.valor - b.valor;
-      return a.posicion - b.posicion;
-    })
-    .map((e) => e.registro);
+  return ordenarPorNumero(registros, indicador);
 }
 
 const recortado = (v: unknown) => String(v ?? '').normalize('NFC').trim();

@@ -8,7 +8,7 @@ import { asignarNombresUnicos } from './nombres';
 export async function armarZip(
   entradas: Array<{ ruta: string; contenido: string }>,
   fecha: Date,
-): Promise<Uint8Array> {
+): Promise<Blob> {
   const unicas = asignarNombresUnicos(entradas.map((e) => e.ruta));
   const repetida = unicas.findIndex((nombre, i) => nombre !== entradas[i].ruta);
   if (repetida !== -1) {
@@ -25,5 +25,5 @@ export async function armarZip(
   for (const { ruta, contenido } of entradas) {
     zip.file(ruta, contenido, { date: fecha, createFolders: false });
   }
-  return zip.generateAsync({ type: 'uint8array', compression: 'DEFLATE', compressionOptions: { level: 6 } });
+  return zip.generateAsync({ type: 'blob', compression: 'DEFLATE', compressionOptions: { level: 6 } });
 }

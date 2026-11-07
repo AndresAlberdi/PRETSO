@@ -7,14 +7,14 @@ const CONTENIDO = '<?xml version="1.0" encoding="UTF-8"?>\n<t>ñ á € Compañ�
 
 describe('armarZip', () => {
   it('conserva rutas y contenido con Í, ñ, á y € al reabrirlo', async () => {
-    const bytes = await armarZip(
+    const blob = await armarZip(
       [
         { ruta: 'README.md', contenido: '# Título ñ\n' },
         { ruta: RUTA, contenido: CONTENIDO },
       ],
       new Date('2026-11-06T12:00:00Z'),
     );
-    const zip = await JSZip.loadAsync(bytes);
+    const zip = await JSZip.loadAsync(await blob.arrayBuffer());
     expect(Object.keys(zip.files)).toContain(RUTA);
     expect(await zip.file(RUTA)?.async('string')).toBe(CONTENIDO);
     expect(zip.file('README.md')).not.toBeNull();
@@ -23,16 +23,16 @@ describe('armarZip', () => {
 
   it('todas las entradas, carpetas incluidas, llevan la fecha de generación', async () => {
     const fecha = new Date('2026-11-06T12:00:00Z');
-    const bytes = await armarZip([{ ruta: RUTA, contenido: CONTENIDO }, { ruta: 'README.md', contenido: 'x' }], fecha);
-    const zip = await JSZip.loadAsync(bytes);
+    const blob = await armarZip([{ ruta: RUTA, contenido: CONTENIDO }, { ruta: 'README.md', contenido: 'x' }], fecha);
+    const zip = await JSZip.loadAsync(await blob.arrayBuffer());
     const entradas = Object.values(zip.files);
     expect(entradas.length).toBe(3);
     for (const e of entradas) expect(e.date.getTime()).toBe(fecha.getTime());
   });
 
   it('el README no empieza con BOM', async () => {
-    const bytes = await armarZip([{ ruta: 'README.md', contenido: '# T\n' }], new Date());
-    const zip = await JSZip.loadAsync(bytes);
+    const blob = await armarZip([{ ruta: 'README.md', contenido: '# T\n' }], new Date());
+    const zip = await JSZip.loadAsync(await blob.arrayBuffer());
     const crudo = await zip.file('README.md')!.async('uint8array');
     expect(Array.from(crudo.slice(0, 3))).not.toEqual([0xef, 0xbb, 0xbf]);
   });

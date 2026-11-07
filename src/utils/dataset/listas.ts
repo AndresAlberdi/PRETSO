@@ -1,24 +1,9 @@
 import { canonizarReferencia } from '../referenciaCompania';
 import { CAMPOS_DATASET } from './campos';
 import { idsDocumentos, transaccionXml, type Enlaces } from './enlaces';
+import { esRegistro, ordenarPorNumero } from './orden';
 import { CARPETAS, crearAvisos, type AvisosDataset, type ClaveCarpeta, type DatosDataset, type Registro, type ResultadoCarpeta } from './tipos';
 import { atributoXml, cabeceraXml, campoXml, CIERRE_XML, camposXml } from './xml';
-
-const esRegistro = (v: unknown): v is Registro => typeof v === 'object' && v !== null && !Array.isArray(v);
-
-/** Orden estable por número; los valores no numéricos (NaN) van al final. */
-function ordenarPorNumero<T>(items: readonly T[], clave: (item: T) => number): T[] {
-  return items
-    .map((item, indice) => ({ item, indice, n: clave(item) }))
-    .sort((a, b) => {
-      const aNan = Number.isNaN(a.n);
-      const bNan = Number.isNaN(b.n);
-      if (aNan !== bNan) return aNan ? 1 : -1;
-      if (!aNan && a.n !== b.n) return a.n - b.n;
-      return a.indice - b.indice;
-    })
-    .map((x) => x.item);
-}
 
 /** Número para ordenar; vacío, nulo o no numérico da NaN (va al final). */
 function numeroOrdenable(v: unknown): number {
