@@ -88,6 +88,8 @@ describe.each(TODAS)('error al borrar en $nombre', ({ nombre, Componente }) => {
     for (const llamada of registro.mock.calls) {
       for (const arg of llamada) expect(typeof arg).toBe('string');
     }
+    fireEvent.click(within(aviso).getByRole('button', { name: 'Entendido' }));
+    await waitFor(() => expect(screen.queryByRole('alertdialog')).toBeNull());
   });
 
   it('registra «sin código» si el error no trae code ni name', async () => {

@@ -3,6 +3,7 @@ import { onAuthStateChanged, getIdTokenResult, signOut, type User } from 'fireba
 import { auth } from '../firebase';
 import { hasAdminClaim, hasReaderClaim, isAllowedAdminProvider } from '../utils/adminClaims';
 import { ADMIN_GOOGLE_ONLY_MESSAGE } from '../utils/authErrors';
+import { codigoError } from '../utils/codigoError';
 
 interface AdminContextProps {
   isAdmin: boolean;
@@ -69,7 +70,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           provider = result.signInProvider ?? null;
         } catch (error) {
           // Solo el código del error: el detalle puede contener datos personales.
-          console.error('No se pudo leer el claim de administrador:', (error as { code?: string })?.code);
+          console.error('No se pudo leer el claim de administrador:', codigoError(error));
         }
         // Descartar si llegó otra notificación de auth mientras se resolvía el token.
         if (generation.current !== current) return;
@@ -82,7 +83,7 @@ export const AdminProvider: React.FC<{ children: React.ReactNode }> = ({ childre
           try {
             await signOut(auth);
           } catch (error) {
-            console.error('No se pudo cerrar la sesión de administración:', (error as { code?: string })?.code);
+            console.error('No se pudo cerrar la sesión de administración:', codigoError(error));
             // Sin privilegios: aparece «Sin acceso», que tiene «Salir».
             if (generation.current === current) setAdminLoading(false);
           }
