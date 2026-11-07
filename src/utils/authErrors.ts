@@ -1,3 +1,5 @@
+import { codigoError } from './codigoError';
+
 const CONFIG_NOT_FOUND = 'auth/configuration-not-found';
 
 const CREDENTIAL_CODES = [
@@ -15,12 +17,7 @@ const GENERIC = 'No se pudo iniciar sesión. Inténtelo de nuevo.';
  * Nunca devuelve el mensaje, el correo ni la contraseña.
  */
 export function loginErrorCode(err: unknown): string {
-  if (typeof err === 'object' && err !== null) {
-    const raw = err as { code?: unknown; name?: unknown };
-    if (typeof raw.code === 'string' && raw.code !== '') return raw.code;
-    if (typeof raw.name === 'string' && raw.name !== '') return raw.name;
-  }
-  return 'sin código';
+  return codigoError(err);
 }
 
 /**

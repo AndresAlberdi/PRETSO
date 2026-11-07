@@ -6,6 +6,7 @@ import { cleanFirebaseData } from "../utils";
 import { useCanEdit } from "../hooks/useCanEdit";
 import CeldaAdmin from "../components/CeldaAdmin";
 import ConfirmModal from "../components/ConfirmModal";
+import { codigoError } from "../utils/codigoError";
 import BusyModal from "../components/BusyModal";
 import { deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { contarReferenciasACompania } from "../utils/integridadCompanias";
@@ -27,6 +28,7 @@ export default function IndiceCompanias() {
   const [loading, setLoading] = useState(true);
   const canEdit = useCanEdit();
   const [recordToDelete, setRecordToDelete] = useState<any>(null);
+  const [errorOperacion, setErrorOperacion] = useState<string | null>(null);
   const [alertMessage, setAlertMessage] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -91,7 +93,7 @@ export default function IndiceCompanias() {
         navigate(`${path}?compania=${item["Indicador de registro"]}`);
       }
     } catch (error) {
-      console.error("Error verificando registros vinculados: ", error);
+      console.error('No se pudo verificar los registros vinculados:', codigoError(error));
       setAlertMessage(MENSAJE_FALLO_NAVEGACION);
     } finally {
       setIsAnalyzing(false);
@@ -111,7 +113,7 @@ export default function IndiceCompanias() {
         setRecordToDelete(row);
       }
     } catch (error) {
-      console.error("Error verificando integridad referencial: ", error);
+      console.error('No se pudo verificar la integridad referencial:', codigoError(error));
       setAlertMessage(MENSAJE_FALLO_VERIFICACION);
     } finally {
       setIsAnalyzing(false);
@@ -126,7 +128,9 @@ export default function IndiceCompanias() {
       setData(data.filter(d => d.id !== recordToDelete.id));
       setRecordToDelete(null);
     } catch (error) {
-      console.error("Error deleting document: ", error);
+      console.error('No se pudo borrar la compañía:', codigoError(error));
+      setRecordToDelete(null);
+      setErrorOperacion('No se pudo borrar la compañía. Inténtelo de nuevo.');
     }
   };
 
@@ -140,7 +144,7 @@ export default function IndiceCompanias() {
       ));
       setRecordToEdit(null);
     } catch (error) {
-      console.error("Error updating document: ", error);
+      console.error('No se pudo actualizar la compañía:', codigoError(error));
       alert("Error al actualizar la compañía.");
     }
   };
@@ -257,6 +261,14 @@ export default function IndiceCompanias() {
           message={alertMessage}
           onCancel={() => setAlertMessage(null)}
           isAlertOnly={true}
+        />
+      )}
+      {errorOperacion && (
+        <ConfirmModal
+          title="No se pudo completar la operación"
+          message={errorOperacion}
+          onCancel={() => setErrorOperacion(null)}
+          isAlertOnly
         />
       )}
     </div>

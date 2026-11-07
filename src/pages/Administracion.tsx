@@ -8,6 +8,7 @@ import { generarDatasetZip } from '../utils/dataset/generarDataset';
 import { GOOGLE_CLIENT_ID_STORAGE_KEY, resolveGoogleClientId } from '../utils/googleClientId';
 import Modal from '../components/Modal';
 import { TEXTO_CODIGO } from '../utils/correctorOrtografico';
+import { codigoError } from '../utils/codigoError';
 
 export default function Administracion() {
   const [configuringClientId, setConfiguringClientId] = useState(false);
@@ -42,7 +43,7 @@ export default function Administracion() {
       setStatusMessage('¡Volcado XML descargado exitosamente!');
       programarReposo();
     } catch (err: any) {
-      console.error(err);
+      console.error('No se pudo descargar el volcado XML:', codigoError(err));
       setBackupStatus('error');
       setStatusMessage(`Error al generar XML: ${err.message || err}`);
     }
@@ -62,7 +63,7 @@ export default function Administracion() {
       setStatusMessage('¡Volcado XLSX descargado exitosamente!');
       programarReposo();
     } catch (err: any) {
-      console.error(err);
+      console.error('No se pudo descargar el volcado XLSX:', codigoError(err));
       setBackupStatus('error');
       setStatusMessage(`Error al generar XLSX: ${err.message || err}`);
     }
@@ -83,7 +84,7 @@ export default function Administracion() {
       setStatusMessage('¡Dataset descargado exitosamente!');
       programarReposo();
     } catch (err) {
-      console.error('Error al generar el dataset', err);
+      console.error('No se pudo generar el dataset:', codigoError(err));
       setBackupStatus('error');
       setStatusMessage('No se pudo generar el dataset. Vuelva a intentarlo; si el error persiste, avise al equipo técnico.');
     } finally {
@@ -136,7 +137,7 @@ export default function Administracion() {
               setBackupStatus('success');
               setStatusMessage(`¡Copia de seguridad guardada con éxito en Google Drive! (ID de archivo: ${fileId})`);
             } catch (uploadErr: any) {
-              console.error(uploadErr);
+              console.error('No se pudo guardar la copia de seguridad en Google Drive:', codigoError(uploadErr));
               setBackupStatus('error');
               setStatusMessage(`Error al guardar en Google Drive: ${uploadErr.message || uploadErr}`);
             }
@@ -148,7 +149,7 @@ export default function Administracion() {
       client.requestAccessToken(hint ? { login_hint: hint } : {});
 
     } catch (err: any) {
-      console.error(err);
+      console.error('No se pudo iniciar la copia de seguridad:', codigoError(err));
       setBackupStatus('error');
       setStatusMessage(`Error al iniciar backup: ${err.message || err}`);
     }

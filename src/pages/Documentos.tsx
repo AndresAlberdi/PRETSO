@@ -5,6 +5,7 @@ import { cleanFirebaseData } from "../utils";
 import { useCanLoad } from "../hooks/useCanEdit";
 import CeldaAdmin from "../components/CeldaAdmin";
 import ConfirmModal from "../components/ConfirmModal";
+import { codigoError } from "../utils/codigoError";
 import BusyModal from "../components/BusyModal";
 import { logAction } from "../utils/audit";
 import GenericCreateModal from "../components/GenericCreateModal";
@@ -26,6 +27,7 @@ export default function Documentos() {
   const [loading, setLoading] = useState(true);
   const canLoad = useCanLoad();
   const [recordToDelete, setRecordToDelete] = useState<any>(null);
+  const [errorOperacion, setErrorOperacion] = useState<string | null>(null);
   const [deleteErrorAlert, setDeleteErrorAlert] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -92,7 +94,9 @@ export default function Documentos() {
       setData(data.filter(d => d.id !== recordToDelete.id));
       setRecordToDelete(null);
     } catch (error) {
-      console.error("Error deleting document: ", error);
+      console.error('No se pudo borrar el documento:', codigoError(error));
+      setRecordToDelete(null);
+      setErrorOperacion('No se pudo borrar el documento. Inténtelo de nuevo.');
     }
   };
 
@@ -106,7 +110,7 @@ export default function Documentos() {
       ));
       setRecordToEdit(null);
     } catch (error) {
-      console.error("Error updating document: ", error);
+      console.error('No se pudo actualizar el documento:', codigoError(error));
       alert("Error al actualizar el documento.");
     }
   };
@@ -195,6 +199,14 @@ export default function Documentos() {
           message={deleteErrorAlert}
           onCancel={() => setDeleteErrorAlert(null)}
           isAlertOnly={true}
+        />
+      )}
+      {errorOperacion && (
+        <ConfirmModal
+          title="No se pudo completar la operación"
+          message={errorOperacion}
+          onCancel={() => setErrorOperacion(null)}
+          isAlertOnly
         />
       )}
     </div>

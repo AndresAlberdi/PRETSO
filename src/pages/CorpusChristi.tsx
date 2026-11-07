@@ -16,6 +16,7 @@ import { camposReferenciaCompania } from "../utils/referenciaCompania";
 import { useCanEdit } from "../hooks/useCanEdit";
 import CeldaAdmin from "../components/CeldaAdmin";
 import ConfirmModal from "../components/ConfirmModal";
+import { codigoError } from "../utils/codigoError";
 import { logAction } from "../utils/audit";
 import GenericCreateModal from "../components/GenericCreateModal";
 import GenericEditModal from "../components/GenericEditModal";
@@ -38,6 +39,7 @@ export default function CorpusChristi() {
   const guia = useCoincidenciasSeccion('corpus_christi', termino);
 
   const [recordToDelete, setRecordToDelete] = useState<any>(null);
+  const [errorOperacion, setErrorOperacion] = useState<string | null>(null);
   const [brokenLinkAlert, setBrokenLinkAlert] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
 
@@ -98,7 +100,9 @@ export default function CorpusChristi() {
       setData(data.filter(d => d.id !== recordToDelete.id));
       setRecordToDelete(null);
     } catch (error) {
-      console.error("Error deleting document: ", error);
+      console.error('No se pudo borrar el registro:', codigoError(error));
+      setRecordToDelete(null);
+      setErrorOperacion('No se pudo borrar el registro. Inténtelo de nuevo.');
     }
   };
 
@@ -112,7 +116,7 @@ export default function CorpusChristi() {
       ));
       setRecordToEdit(null);
     } catch (error) {
-      console.error("Error updating document: ", error);
+      console.error('No se pudo actualizar el registro:', codigoError(error));
       alert("Error al actualizar el registro.");
     }
   };
@@ -348,6 +352,14 @@ export default function CorpusChristi() {
           <p role="alert" style={{ margin: 0 }}>{brokenLinkAlert}</p>
           <button onClick={() => setBrokenLinkAlert(null)} style={{ marginTop: '0.5rem', background: 'var(--on-danger)', color: 'var(--danger-color)', border: 'none', padding: '0.2rem 0.5rem', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}>Cerrar</button>
         </div>
+      )}
+      {errorOperacion && (
+        <ConfirmModal
+          title="No se pudo completar la operación"
+          message={errorOperacion}
+          onCancel={() => setErrorOperacion(null)}
+          isAlertOnly
+        />
       )}
     </div>
   );

@@ -14,6 +14,7 @@ import Modal from './Modal';
 import ConfirmModal from './ConfirmModal';
 import { esCampoRetirado } from '../utils/camposRetirados';
 import { etiquetaCampo, nombreColeccion } from '../utils/etiquetas';
+import { codigoError } from '../utils/codigoError';
 
 interface GenericEditModalProps {
   collectionName: string;
@@ -91,7 +92,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
           const docList = snapDocs.docs.map(cleanFirebaseData).sort((a, b) => Number(a.Doc) - Number(b.Doc));
           setDocuments(docList);
         } catch (error) {
-          console.error("Error loading documents in GenericEditModal", error);
+          console.error('No se pudieron cargar los documentos:', codigoError(error));
         }
       }
     }
@@ -101,7 +102,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
           const snap = await getDocs(query(collection(db, 'companias')));
           setCompanias(snap.docs.map(cleanFirebaseData));
         } catch (error) {
-          console.error("Error loading companies in GenericEditModal", error);
+          console.error('No se pudieron cargar las compañías:', codigoError(error));
         } finally {
           setCompaniasCargadas(true);
         }
@@ -176,7 +177,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
           try {
             lista = await leerSiglasCompanias();
           } catch (err) {
-            console.error('Error verificando siglas de compañías', err);
+            console.error('No se pudieron verificar las siglas de compañías:', codigoError(err));
             setError(MENSAJE_VERIFICACION_SIGLA);
             return;
           }
