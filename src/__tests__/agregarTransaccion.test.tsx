@@ -23,9 +23,9 @@ describe('AgregarTransaccion', () => {
     expect(h1[0].textContent).toBe('Agregar transacción');
   });
 
-  it('«Solo editores» usa la clase etiqueta-editor', () => {
+  it('no muestra el rótulo «Solo editores»', () => {
     montar();
-    expect(screen.getByText('Solo editores').classList.contains('etiqueta-editor')).toBe(true);
+    expect(screen.queryByText('Solo editores')).toBeNull();
   });
 
   it('muestra el texto explicativo', () => {

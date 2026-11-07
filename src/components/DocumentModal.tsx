@@ -3,19 +3,23 @@ import type { CSSProperties } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import Modal from './Modal';
+import { Resaltado } from './Resaltado';
+import { raizDeModal, useDesplazarACoincidencia } from '../hooks/useDesplazarACoincidencia';
 
 const overlayStyle: CSSProperties = { position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.7)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' };
 const panelStyle: CSSProperties = { background: 'var(--bg-card)', padding: '2rem', borderRadius: '12px', width: '90%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', border: '1px solid var(--border-color)', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' };
 
 interface DocumentModalProps {
   documentCode: string | number;
+  termino?: string | null;
   onClose: () => void;
 }
 
-export default function DocumentModal({ documentCode, onClose }: DocumentModalProps) {
+export default function DocumentModal({ documentCode, termino = null, onClose }: DocumentModalProps) {
   const [document, setDocument] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const titleId = useId();
+  useDesplazarACoincidencia(termino && !loading && document ? `${termino}|${documentCode}` : null, raizDeModal(titleId));
 
   useEffect(() => {
     async function fetchDocumentDetails() {
@@ -51,7 +55,7 @@ export default function DocumentModal({ documentCode, onClose }: DocumentModalPr
       {!loading && document && (
         <div style={{ background: 'rgba(255,255,255,0.05)', padding: '1.5rem', borderRadius: '8px' }}>
           <p style={{ fontSize: '1.1rem', lineHeight: '1.6', whiteSpace: 'pre-wrap', margin: 0 }}>
-            {document['Documento'] || 'No hay texto registrado.'}
+            {document['Documento'] ? <Resaltado texto={document['Documento']} termino={termino} /> : 'No hay texto registrado.'}
           </p>
         </div>
       )}

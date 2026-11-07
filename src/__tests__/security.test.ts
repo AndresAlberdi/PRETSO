@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { hasAdminClaim } from '../utils/adminClaims';
+import { hasAdminClaim, isAllowedAdminProvider } from '../utils/adminClaims';
 
 describe('hasAdminClaim', () => {
   it('concede privilegio solo con admin === true', () => {
@@ -20,5 +20,14 @@ describe('hasAdminClaim', () => {
   it('deniega con null o undefined', () => {
     expect(hasAdminClaim(null)).toBe(false);
     expect(hasAdminClaim(undefined)).toBe(false);
+  });
+});
+
+describe('isAllowedAdminProvider', () => {
+  it('solo google.com habilita la administración', () => {
+    expect(isAllowedAdminProvider('google.com')).toBe(true);
+    for (const p of ['password', null, undefined, '', 'Google.com', 'custom', 'emailLink']) {
+      expect(isAllowedAdminProvider(p)).toBe(false);
+    }
   });
 });

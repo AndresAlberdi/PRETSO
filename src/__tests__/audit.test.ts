@@ -10,6 +10,7 @@ const authMock = vi.hoisted(() => ({ currentUser: null as { email: string } | nu
 vi.mock('../firebase', () => ({ auth: authMock, db: {} }));
 
 import { logAction } from '../utils/audit';
+import { versionIndice } from '../utils/busquedaGuia/cargaIndice';
 
 beforeEach(() => addDoc.mockReset());
 
@@ -39,5 +40,12 @@ describe('logAction', () => {
     authMock.currentUser = { email: 'persona@example.com' };
     await logAction('EDIT', 'companias', 'x4', { a: 1 });
     expect(addDoc.mock.calls[0][1].details).toEqual({ a: 1 });
+  });
+
+  it('invalida el índice de búsqueda en caché', async () => {
+    authMock.currentUser = { email: 'persona@example.com' };
+    const antes = versionIndice();
+    await logAction('EDIT', 'companias', 'x5');
+    expect(versionIndice()).toBe(antes + 1);
   });
 });

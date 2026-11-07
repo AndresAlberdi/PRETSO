@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { createUserErrorMessage, googleLoginErrorMessage, loginErrorCode, loginErrorMessage } from '../utils/authErrors';
+import { ADMIN_GOOGLE_ONLY_MESSAGE, createUserErrorMessage, googleLoginErrorMessage, loginErrorCode, loginErrorMessage } from '../utils/authErrors';
 
 const CRED = 'Correo o contraseña incorrectos. Si el problema persiste, comuníquese con la administración del proyecto.';
 const GENERICO = 'No se pudo iniciar sesión. Inténtelo de nuevo.';
@@ -140,7 +140,7 @@ describe('googleLoginErrorMessage', () => {
     ],
     [
       'auth/account-exists-with-different-credential',
-      'Su cuenta usa otro método de acceso. Inicie sesión con su correo y contraseña.',
+      'Su cuenta usa otro método de acceso. Comuníquese con la administración del proyecto.',
     ],
     ['auth/network-request-failed', 'No se pudo conectar. Revise su conexión e inténtelo de nuevo.'],
     ['auth/user-disabled', 'Su cuenta está deshabilitada. Comuníquese con la administración del proyecto.'],
@@ -183,5 +183,13 @@ describe('googleLoginErrorMessage', () => {
     for (const entrada of [new Error('x'), null, {}, 'x', { code: 42 }]) {
       expect(googleLoginErrorMessage(entrada)).toBe(GENERICO_GOOGLE);
     }
+  });
+});
+
+describe('ADMIN_GOOGLE_ONLY_MESSAGE', () => {
+  it('texto exacto y sin códigos de Firebase', () => {
+    expect(ADMIN_GOOGLE_ONLY_MESSAGE).toBe(
+      'Las cuentas de administración solo pueden entrar con «Continuar con Google». Se cerró la sesión; vuelva a entrar con Google.');
+    expect(ADMIN_GOOGLE_ONLY_MESSAGE).not.toContain('auth/');
   });
 });

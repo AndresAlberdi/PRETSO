@@ -24,6 +24,7 @@ vi.mock('firebase/auth', () => ({
     return { tipo: 'auth' };
   }),
 }));
+vi.mock('firebase/functions', () => ({ getFunctions: vi.fn(() => ({ tipo: 'functions' })) }));
 // En MODE «test» startAppCheck no hace nada; se simula para registrar el orden de llamadas sin pasar por red.
 vi.mock('../utils/appCheck', () => ({
   startAppCheck: vi.fn(() => {

@@ -23,16 +23,12 @@ export const CAMPOS_CODIGO: readonly string[] = [
 
 /**
  * Campos que en el alta son `input type="number"`: sin corrector, sea cual sea
- * el tipo con que llegó el valor importado. Los nombres replican los del alta,
- * incluidos los espacios del campo heredado de representaciones.
+ * el tipo con que llegó el valor importado. Los nombres replican los del alta.
  */
 export const CAMPOS_NUMERICOS: readonly string[] = [
   'Año',
   'Ración diaria',
   'Pago por representación',
-  'Días de ración en un año',
-  'Número estimado de representaciones por año',
-  'Número de representaciones  por año ',
 ];
 
 /**

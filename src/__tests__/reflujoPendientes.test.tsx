@@ -26,17 +26,13 @@ describe('reflujo a 320 px: pendientes F4', () => {
     expect(consulta.includes("overflowWrap: 'anywhere'")).toBe(true);
   });
 
-  it('las tarjetas de resultados de Búsqueda general pasan a otra línea cuando no caben', () => {
+  it('las filas de secciones de Búsqueda general pasan el nombre largo a otra línea', () => {
     const fuente = leer('pages/Busqueda.tsx');
-    const fin = fuente.indexOf('Ir a la sección');
-    const inicio = fuente.lastIndexOf("gap: '1rem'", fin);
-    expect(inicio).toBeGreaterThanOrEqual(0);
-    expect(fin).toBeGreaterThan(inicio);
-    const tarjeta = fuente.slice(inicio, fin);
-    expect(tarjeta.includes("flexWrap: 'wrap'")).toBe(true);
-    expect(tarjeta.includes("flex: '1 1 12rem'")).toBe(true);
-    expect(tarjeta.includes('flexShrink: 0')).toBe(true);
-    expect(tarjeta.includes("maxWidth: '100%'")).toBe(true);
+    expect(fuente.includes('className="lista-secciones"')).toBe(true);
+    expect(fuente.includes('className="fila-seccion"')).toBe(true);
+    expect(fuente.includes('className="nombre-seccion"')).toBe(true);
+    const css = leer('index.css');
+    expect(css.includes('.nombre-seccion { flex: 1; min-width: 0; overflow-wrap: anywhere;')).toBe(true);
   });
 
   it('una consulta larga sin espacios se renderiza con corte de palabra', () => {

@@ -2,10 +2,10 @@
 const SECCIONES: Record<string, string> = {
   '/': 'Inicio',
   '/buscar': 'Búsqueda general',
-  '/caja': 'Manejo de Caja',
+  '/caja': 'Manejo de caja',
   '/salarios': 'Remuneraciones',
   '/corpus': 'Corpus Christi',
-  '/indicadores': 'Identificación de Indicadores',
+  '/indicadores': 'Identificación de indicadores',
   '/companias': 'Compañías',
   '/bibliografia': 'Bibliografía',
   '/agregar': 'Agregar transacción',
@@ -14,7 +14,6 @@ const SECCIONES: Record<string, string> = {
   '/auditoria': 'Auditoría',
   '/administracion': 'Administración',
   '/usuarios': 'Usuarios',
-  '/login': 'Iniciar sesión',
 };
 
 const TITULO_POR_DEFECTO = 'PRETSO';

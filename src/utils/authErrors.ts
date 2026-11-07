@@ -39,7 +39,7 @@ export function loginErrorMessage(err: unknown): string {
   }
 
   if (code === CONFIG_NOT_FOUND || message.includes(CONFIG_NOT_FOUND)) {
-    return 'Autenticación por Correo/Contraseña no está habilitada en Firebase Console. Por favor, habilítela.';
+    return 'Autenticación por correo/contraseña no está habilitada en Firebase Console. Por favor, habilítela.';
   }
   if (CREDENTIAL_CODES.includes(code)) return 'Correo o contraseña incorrectos. Si el problema persiste, comuníquese con la administración del proyecto.';
   if (code === 'auth/too-many-requests') {
@@ -92,7 +92,7 @@ export function googleLoginErrorMessage(err: unknown): string {
     case 'auth/popup-blocked':
       return 'El navegador bloqueó la ventana de Google. Permita las ventanas emergentes para este sitio e inténtelo de nuevo.';
     case 'auth/account-exists-with-different-credential':
-      return 'Su cuenta usa otro método de acceso. Inicie sesión con su correo y contraseña.';
+      return 'Su cuenta usa otro método de acceso. Comuníquese con la administración del proyecto.';
     case 'auth/network-request-failed':
       return 'No se pudo conectar. Revise su conexión e inténtelo de nuevo.';
     case 'auth/user-disabled':
@@ -108,3 +108,6 @@ export function googleLoginErrorMessage(err: unknown): string {
       return GOOGLE_GENERIC;
   }
 }
+
+export const ADMIN_GOOGLE_ONLY_MESSAGE =
+  'Las cuentas de administración solo pueden entrar con «Continuar con Google». Se cerró la sesión; vuelva a entrar con Google.';

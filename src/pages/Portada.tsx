@@ -1,7 +1,8 @@
 import { Link } from 'react-router';
 import { useAdmin } from '../context/AdminContext';
+import AccesoForm from '../components/AccesoForm';
 
-export default function Portada() {
+export default function Portada({ acceso = false }: { acceso?: boolean }) {
   const { isAdmin } = useAdmin();
   return (
     <div className="portada">
@@ -20,13 +21,15 @@ export default function Portada() {
           <p>Proyecto: [101150056] — [THIS] — [HORIZON-MSCA-2023-PF-01]</p>
           <p>IP: Laura Paz Rescala</p>
         </div>
-        <div className="portada-acciones">
-          <Link to="/buscar" className="boton boton-primario">Realizar búsquedas</Link>
-          {isAdmin && (<>
-            <Link to="/buscar" className="boton boton-editor">Editar</Link>
-            <Link to="/administracion" className="boton boton-editor">Administración</Link>
-          </>)}
-        </div>
+        {acceso ? <AccesoForm /> : (
+          <div className="portada-acciones">
+            <Link to="/buscar" className="boton boton-primario">Realizar búsquedas</Link>
+            {isAdmin && (<>
+              <Link to="/buscar" className="boton boton-editor">Editar</Link>
+              <Link to="/administracion" className="boton boton-editor">Administración</Link>
+            </>)}
+          </div>
+        )}
       </section>
     </div>
   );

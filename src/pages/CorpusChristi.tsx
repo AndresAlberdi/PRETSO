@@ -1,11 +1,14 @@
 import EditToggle from "../components/EditToggle";
 import { useEffect, useState, useMemo } from "react";
 import { collection, getDocs, query, deleteDoc, doc, updateDoc } from "firebase/firestore";
-import { useLocation, useNavigate } from "react-router";
 import { db } from "../firebase";
 import TransactionModal from "../components/TransactionModal";
 import DocumentModal from "../components/DocumentModal";
-import SearchBar, { type SearchFilter } from "../components/SearchBar";
+import CampoBusqueda from "../components/CampoBusqueda";
+import { Resaltado, TextoCoincidencia, CLASE_BOTON_COINCIDENCIA, CLASE_FILA_COINCIDENCIA } from "../components/Resaltado";
+import { useTerminoBusqueda, useNavegacionGuia } from "../hooks/useTerminoBusqueda";
+import { useCoincidenciasSeccion } from "../hooks/useIndiceBusqueda";
+import { useDesplazarACoincidencia } from "../hooks/useDesplazarACoincidencia";
 import { cleanFirebaseData } from "../utils";
 import CompaniaModal from "../components/CompaniaModal";
 import ListaSiglasCompania from "../components/ListaSiglasCompania";
@@ -30,8 +33,9 @@ export default function CorpusChristi() {
   const [loading, setLoading] = useState(true);
   const canEdit = useCanEdit();
   
-  const location = useLocation();
-  const navigate = useNavigate();
+  const { crudo, termino, fijar, quitar } = useTerminoBusqueda();
+  const { parametros, irA } = useNavegacionGuia();
+  const guia = useCoincidenciasSeccion('corpus_christi', termino);
 
   const [recordToDelete, setRecordToDelete] = useState<any>(null);
   const [brokenLinkAlert, setBrokenLinkAlert] = useState<string | null>(null);
@@ -39,19 +43,22 @@ export default function CorpusChristi() {
 
   const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
 
-  const [selectedCityYear, setSelectedCityYear] = useState<{ ciudad: string, año: string } | null>(null);
+  // La unidad abierta (ciudad y año) se refleja en la URL: se lee, las dos o ninguna.
+  // Se resincroniza durante el render cuando cambia la URL, sin efecto.
+  const ciudadUrl = parametros.get('ciudad');
+  const anioUrl = parametros.get('anio');
+  const unidadUrl = ciudadUrl && anioUrl ? { ciudad: ciudadUrl, año: anioUrl } : null;
+  const claveUrl = unidadUrl ? `${unidadUrl.ciudad}|${unidadUrl.año}` : null;
+  const [selectedCityYear, setSelectedCityYear] = useState<{ ciudad: string, año: string } | null>(unidadUrl);
+  const [claveUrlPrevia, setClaveUrlPrevia] = useState<string | null>(claveUrl);
+  if (claveUrlPrevia !== claveUrl) {
+    setClaveUrlPrevia(claveUrl);
+    setSelectedCityYear(unidadUrl);
+  }
   const [activeTransaction, setActiveTransaction] = useState<string | number | null>(null);
   const [activeDocuments, setActiveDocuments] = useState<string | number | null>(null);
   const [activeCompania, setActiveCompania] = useState<any | null>(null);
   const [recordToView, setRecordToView] = useState<any | null>(null);
-
-  const [filters, setFilters] = useState<SearchFilter[]>([]);
-
-  const searchCategories = [
-    { id: 'Ciudad', label: 'Ciudad' },
-    { id: 'Año', label: 'Año' },
-    { id: 'all', label: 'Texto libre' }
-  ];
 
   const [filterCiudad, setFilterCiudad] = useState('');
   const [filterAno, setFilterAno] = useState('');
@@ -126,34 +133,38 @@ export default function CorpusChristi() {
     return true;
   });
 
-  const searchResults = useMemo(() => {
-    if (filters.length === 0) return [];
-    return data.filter(d => {
-      return filters.every(f => {
-        const q = f.query.toLowerCase();
-        if (f.category === 'all') {
-          return Object.values(d).some(v => String(v).toLowerCase().includes(q));
-        }
-        return d[f.category] && String(d[f.category]).toLowerCase().includes(q);
-      });
-    });
-  }, [data, filters]);
+  // Nivel 2: con término, solo los grupos (ciudad y año) que tienen coincidencia.
+  const conCoincidencia = useMemo(
+    () => new Set(guia.unidades.map(u => `${String(u.parametros.ciudad ?? '').trim()}|${String(u.parametros.anio ?? '').trim()}`)),
+    [guia.unidades],
+  );
+  const gruposVisibles = termino
+    ? filteredGroups.filter(g => conCoincidencia.has(`${String(g.ciudad).trim()}|${String(g.año).trim()}`))
+    : filteredGroups;
 
-  const isSearching = filters.length > 0;
-  useRestoreFocusOnViewChange(isSearching ? 'search' : selectedCityYear ? `detail:${selectedCityYear.ciudad}|${selectedCityYear.año}` : 'list');
+  const claveDetalle = selectedCityYear ? `detail:${selectedCityYear.ciudad}|${selectedCityYear.año}` : null;
+  useRestoreFocusOnViewChange(termino ? (claveDetalle ?? `search:${termino}`) : (claveDetalle ?? 'list'));
   const detailData = data.filter(d => 
-    selectedCityYear && d["Ciudad"] === selectedCityYear.ciudad && String(d["Año"]) === String(selectedCityYear.año)
+    selectedCityYear
+    && String(d["Ciudad"] ?? '').trim() === selectedCityYear.ciudad.trim()
+    && String(d["Año"] ?? '').trim() === String(selectedCityYear.año).trim()
   );
 
-  const { items: sortedFilteredGroups, requestSort: sortGroup, sortConfig: scGroup } = useSortableTable(filteredGroups);
-  const { items: sortedSearchResults, requestSort: sortSearch, sortConfig: scSearch } = useSortableTable(searchResults);
+  const { items: sortedFilteredGroups, requestSort: sortGroup, sortConfig: scGroup } = useSortableTable(gruposVisibles);
   const { items: sortedDetailData } = useSortableTable(detailData);
 
-  const anuncioResultados = isSearching
-    ? `Búsqueda: ${contar(sortedSearchResults.length, 'registro encontrado', 'registros encontrados')}`
+  const buscando = termino !== null && guia.estado === 'cargando' && guia.porId.size === 0;
+  const anuncioResultados = termino && guia.estado === 'error'
+    ? 'No se pudo realizar la búsqueda.'
+    : buscando
+    ? 'Buscando…'
     : !selectedCityYear
-    ? `Listado: ${contar(sortedFilteredGroups.length, 'registro', 'registros')}`
-    : `Detalle de ${selectedCityYear.ciudad} ${selectedCityYear.año}: ${contar(sortedDetailData.length, 'transacción', 'transacciones')}`;
+    ? termino
+      ? `Búsqueda: ${contar(sortedFilteredGroups.length, 'registro', 'registros')} con «${crudo}»`
+      : `Listado: ${contar(sortedFilteredGroups.length, 'registro', 'registros')}`
+    : `Detalle de ${selectedCityYear.ciudad} ${selectedCityYear.año}: ${contar(sortedDetailData.length, 'transacción', 'transacciones')}${termino ? `, ${sortedDetailData.filter(r => guia.porId.has(String(r.id))).length} con «${crudo}»` : ''}`;
+
+  useDesplazarACoincidencia(!loading && termino && guia.estado === 'listo' && selectedCityYear ? `${termino}|${selectedCityYear.ciudad}|${selectedCityYear.año}` : null);
 
   return (
     <div>
@@ -163,7 +174,12 @@ export default function CorpusChristi() {
           <Tooltip label="Acerca de Corpus Christi" content="Muestra los registros financieros y labores encargadas para la celebración del Corpus Christi por diversas ciudades en años específicos, detallando el pago y los fondos." />
         </div>
         <div className="acciones-cabecera">
-          <SearchBar onSearch={(f) => { setFilters(f); setSelectedCityYear(null); }} categories={searchCategories} />
+          <CampoBusqueda
+            etiqueta="Buscar en esta sección"
+            valorInicial={crudo}
+            onBuscar={t => { setSelectedCityYear(null); fijar(t); }}
+            onLimpiar={quitar}
+          />
           <EditToggle />
           {canEdit && (
             <button type="button" className="boton boton-editor" onClick={() => setIsCreateOpen(true)}>Nuevo registro</button>
@@ -173,69 +189,13 @@ export default function CorpusChristi() {
 
       {!loading && <output aria-live="polite" className="visually-hidden">{anuncioResultados}</output>}
       
-      {(selectedCityYear || isSearching) && (
-        <button onClick={() => { setSelectedCityYear(null); setFilters([]); navigate(location.pathname, { replace: true }); }} style={{ padding: '0.5rem 1rem', marginBottom: '1rem' }}>Volver a listado inicial</button>
+      {selectedCityYear && (
+        <button onClick={() => { setSelectedCityYear(null); irA({ ciudad: null, anio: null }); }} style={{ padding: '0.5rem 1rem', marginBottom: '1rem' }}>{termino ? 'Volver a los resultados' : 'Volver a listado inicial'}</button>
       )}
 
-      {!loading && !selectedCityYear && !isSearching && <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Mostrando {sortedFilteredGroups.length} registros</p>}
+      {!loading && !selectedCityYear && !termino && <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Mostrando {sortedFilteredGroups.length} registros</p>}
 
-      {loading ? <p>Cargando datos...</p> : isSearching ? (
-        <div>
-          <h2>Resultados de Búsqueda ({sortedSearchResults.length} registros)</h2>
-          <div className="tabla-desplazable">
-            <table className="sortable">
-              <caption className="visually-hidden">Resultados de búsqueda en Corpus Christi</caption>
-              <thead>
-                <tr>
-                  <SortableTh label="Ciudad" sortKey="Ciudad" sortConfig={scSearch} onSort={sortSearch} />
-                  <SortableTh label="Año" sortKey="Año" sortConfig={scSearch} onSort={sortSearch} />
-                  <SortableTh label="Encargado" sortKey="Encargado " sortConfig={scSearch} onSort={sortSearch} />
-                  <SortableTh label="Monto a pagar" sortKey="Monto a pagar" sortConfig={scSearch} onSort={sortSearch} />
-                  <th scope="col">Documentos</th>
-                  <th scope="col"><span className="visually-hidden">Transacción</span></th>
-                  {canEdit && <th scope="col">Admin</th>}
-                </tr>
-              </thead>
-              <tbody>
-                {sortedSearchResults.map(row => {
-                  const isBroken = row["Transacción"] && !transaccionesMap.has(Number(row["Transacción"]));
-                  return (
-                  <tr key={row.id}>
-                    <td>{row["Ciudad"]}</td>
-                    <td>{row["Año"]}</td>
-                    <td>{row["Encargado "]}</td>
-                    <td>{row["Monto a pagar"]}</td>
-                    <td>
-                      {row["Transacción"] && !isBroken && (() => {
-                        const trans = transaccionesMap.get(Number(row["Transacción"]));
-                        if (!trans) return null;
-                        const docs = [1,2,3,4,5,6,7,8,9,10].map(i => trans[`Doc${i}`]).filter(Boolean);
-                        return (
-                          <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
-                            {docs.map((docCode, idx) => (
-                              <button key={idx} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.85rem', padding: '0.1rem 0.4rem', cursor: 'pointer', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px' }}>Doc. {docCode}</button>
-                            ))}
-                          </div>
-                        );
-                      })()}
-                    </td>
-                    <td><div className="acciones-celda">
-                      {row["Transacción"] && (
-                        isBroken ? 
-                          <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
-                        : (
-                          <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
-                        )
-                      )}
-                    </div></td>
-                    {canEdit && <CeldaAdmin onEditar={() => setRecordToEdit(row)} onBorrar={() => attemptDelete(row)} />}
-                  </tr>
-                )})}
-              </tbody>
-            </table>
-          </div>
-        </div>
-      ) : !selectedCityYear ? (
+      {loading ? <p>Cargando datos...</p> : !selectedCityYear ? (
         <div>
           <div className="fila-filtros">
             <select
@@ -243,7 +203,7 @@ export default function CorpusChristi() {
               onChange={e => setFilterCiudad(e.target.value)}
               aria-label="Filtrar por ciudad"
             >
-              <option value="">Todas las Ciudades</option>
+              <option value="">Todas las ciudades</option>
               {uniqueCiudades.map(opt => <option key={String(opt)} value={String(opt)}>{String(opt)}</option>)}
             </select>
             <select
@@ -251,10 +211,14 @@ export default function CorpusChristi() {
               onChange={e => setFilterAno(e.target.value)}
               aria-label="Filtrar por año"
             >
-              <option value="">Todos los Años</option>
+              <option value="">Todos los años</option>
               {uniqueAnos.map(opt => <option key={String(opt)} value={String(opt)}>{String(opt)}</option>)}
             </select>
           </div>
+          {termino && buscando && <p>Buscando…</p>}
+          {termino && guia.estado === 'error' && <p role="alert" className="aviso-busqueda">No se pudo completar la búsqueda. <button type="button" onClick={guia.reintentar}>Reintentar</button></p>}
+          {termino && guia.estado === 'listo' && sortedFilteredGroups.length === 0 && <p>No se encontró «{crudo}» en Corpus Christi.</p>}
+          {!buscando && !(termino && sortedFilteredGroups.length === 0) && (
           <div className="tabla-desplazable">
             <table className="sortable">
               <caption className="visually-hidden">Ciudades y años de Corpus Christi</caption>
@@ -268,14 +232,15 @@ export default function CorpusChristi() {
               <tbody>
                 {sortedFilteredGroups.map((g, i) => (
                   <tr key={i}>
-                    <td>{g.ciudad}</td>
-                    <td>{g.año}</td>
-                    <td><button onClick={() => setSelectedCityYear(g)}>TRATO</button></td>
+                    <td><Resaltado texto={g.ciudad} termino={termino} /></td>
+                    <td><Resaltado texto={g.año} termino={termino} anio /></td>
+                    <td><button onClick={() => { setSelectedCityYear(g); irA({ ciudad: g.ciudad, anio: String(g.año) }); }}>TRATO</button></td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
+          )}
         </div>
       ) : (
         <div className="tabla-desplazable">
@@ -298,16 +263,17 @@ export default function CorpusChristi() {
               {sortedDetailData.map(row => {
                 const isBroken = row["Transacción"] && !transaccionesMap.has(Number(row["Transacción"]));
                 const referenciasCompania = camposReferenciaCompania('corpus_christi').map(campo => row[campo]);
+                const coincidencia = termino ? guia.porId.get(String(row.id)) : undefined;
                 
                 return (
-                <tr key={row.id}>
-                  <td>{row["Encargo"]}</td>
-                  <td>{row["Encargado "]}</td>
+                <tr key={row.id} className={coincidencia ? CLASE_FILA_COINCIDENCIA : undefined}>
+                  <td><Resaltado texto={row["Encargo"]} termino={termino} /></td>
+                  <td><Resaltado texto={row["Encargado "]} termino={termino} /></td>
                   <td>
-                    <ListaSiglasCompania referencias={referenciasCompania} companias={companias} onAbrir={setActiveCompania} />
+                    <ListaSiglasCompania referencias={referenciasCompania} companias={companias} onAbrir={setActiveCompania} termino={termino} />
                   </td>
-                  <td>{row["Monto a pagar"]}</td>
-                  <td>{row["Fondos"]}</td>
+                  <td><Resaltado texto={row["Monto a pagar"]} termino={termino} /></td>
+                  <td><Resaltado texto={row["Fondos"]} termino={termino} /></td>
                   <td>
                     {row["Transacción"] && !isBroken && (() => {
                       const trans = transaccionesMap.get(Number(row["Transacción"]));
@@ -315,9 +281,12 @@ export default function CorpusChristi() {
                       const docs = [1,2,3,4,5,6,7,8,9,10].map(i => trans[`Doc${i}`]).filter(Boolean);
                       return (
                         <div style={{ display: 'flex', gap: '0.3rem', flexWrap: 'wrap' }}>
-                          {docs.map((docCode, idx) => (
-                            <button key={idx} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.85rem', padding: '0.1rem 0.4rem', cursor: 'pointer', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px' }}>Doc. {docCode}</button>
-                          ))}
+                          {docs.map((docCode, idx) => {
+                            const docCoincide = coincidencia?.documentos.some(d => String(d) === String(docCode)) === true;
+                            return (
+                            <button key={idx} className={docCoincide ? CLASE_BOTON_COINCIDENCIA : undefined} onClick={() => setActiveDocuments(docCode)} style={{ fontSize: '0.85rem', padding: '0.1rem 0.4rem', cursor: 'pointer', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px' }}>Doc. {docCode}{docCoincide && <TextoCoincidencia crudo={crudo} />}</button>
+                            );
+                          })}
                         </div>
                       );
                     })()}
@@ -325,9 +294,9 @@ export default function CorpusChristi() {
                   <td><div className="acciones-celda">
                     {row["Transacción"] && (
                       isBroken ? 
-                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace Roto</button>
+                        <button style={{ background: '#ff4d4f' }} onClick={() => setBrokenLinkAlert(`El enlace a la transacción ${row["Transacción"]} está roto.`)}>Enlace roto</button>
                       : (
-                        <button onClick={() => setActiveTransaction(row["Transacción"])}>Transacción</button>
+                        <button className={coincidencia?.transaccion ? CLASE_BOTON_COINCIDENCIA : undefined} onClick={() => setActiveTransaction(row["Transacción"])}>Transacción{coincidencia?.transaccion && <TextoCoincidencia crudo={crudo} />}</button>
                       )
                     )}
                   </div></td>
@@ -338,8 +307,8 @@ export default function CorpusChristi() {
           </table>
         </div>
       )}
-      {activeTransaction && <TransactionModal transactionCode={activeTransaction} onClose={() => setActiveTransaction(null)} />}
-      {activeDocuments && <DocumentModal documentCode={activeDocuments} onClose={() => setActiveDocuments(null)} />}
+      {activeTransaction && <TransactionModal transactionCode={activeTransaction} termino={termino} onClose={() => setActiveTransaction(null)} />}
+      {activeDocuments && <DocumentModal documentCode={activeDocuments} termino={termino} onClose={() => setActiveDocuments(null)} />}
       {recordToView && <DetailsModal record={recordToView} onClose={() => setRecordToView(null)} />}
       
       {isCreateOpen && (
@@ -363,11 +332,11 @@ export default function CorpusChristi() {
         />
       )}
 
-      {activeCompania && <CompaniaModal compania={activeCompania} onClose={() => setActiveCompania(null)} />}
+      {activeCompania && <CompaniaModal compania={activeCompania} termino={termino} onClose={() => setActiveCompania(null)} />}
       
       {recordToDelete && (
         <ConfirmModal 
-          title="Confirmar Eliminación"
+          title="Confirmar eliminación"
           message={`¿Estás seguro de que deseas eliminar este registro para ${recordToDelete["Encargado "]}?`}
           onConfirm={handleDelete}
           onCancel={() => setRecordToDelete(null)}

@@ -150,8 +150,8 @@ describe('reflujo: componentes', () => {
 
   it('las tarjetas de Búsqueda y la barra evitan el desbordamiento', () => {
     const inicio = leer('pages/Busqueda.tsx');
-    expect(inicio).toContain('flexShrink: 0');
-    expect(inicio).toContain("minWidth: 0, overflowWrap: 'anywhere'");
+    expect(inicio).toContain('className="fila-seccion"');
+    expect(leer('index.css')).toContain('.nombre-seccion { flex: 1; min-width: 0; overflow-wrap: anywhere;');
     expect(leer('index.css')).toContain('.barra-superior { display: flex; flex-wrap: wrap;');
   });
 });

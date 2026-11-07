@@ -47,12 +47,6 @@ const LISTA_BLANCA: Permitido[] = [
     veces: 1,
     motivo: 'mensaje «Cargando...» directamente sobre el fondo oscuro de la página',
   },
-  {
-    archivo: 'pages/IndiceCompanias.tsx',
-    fragmento: "background: 'rgba(255,255,255,0.05)', color: 'white', minWidth",
-    veces: 1,
-    motivo: 'campo con fondo rgba blanco 5 % sobre el fondo oscuro de la página',
-  },
 ];
 
 function tsx(dir: string): string[] {
