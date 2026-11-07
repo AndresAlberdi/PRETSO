@@ -35,10 +35,10 @@ describe('Acceso (formulario de la portada)', () => {
   it('declara el autocompletado y anuncia cada fallo', async () => {
     vi.mocked(signInWithEmailAndPassword).mockRejectedValue(new Error('fallo'));
     render(<AccesoForm />);
-    expect(screen.getByLabelText('Correo Electrónico').getAttribute('autocomplete')).toBe('username');
+    expect(screen.getByLabelText('Correo electrónico').getAttribute('autocomplete')).toBe('username');
     expect(screen.getByLabelText('Contraseña').getAttribute('autocomplete')).toBe('current-password');
     expect(screen.queryByRole('alert')).toBeNull();
-    const form = screen.getByLabelText('Correo Electrónico').closest('form') as HTMLFormElement;
+    const form = screen.getByLabelText('Correo electrónico').closest('form') as HTMLFormElement;
     fireEvent.submit(form);
     expect((await screen.findByRole('alert')).textContent).toContain('No se pudo iniciar sesión. Inténtelo de nuevo.');
     await waitFor(() => expect(screen.getByRole('button', { name: 'Entrar' })).toBeTruthy());
@@ -57,9 +57,9 @@ describe('Acceso (formulario de la portada)', () => {
       .mockRejectedValueOnce({ code: 'auth/user-not-found', message: 'Firebase: Error (auth/user-not-found).' })
       .mockRejectedValueOnce({ code: 'auth/wrong-password', message: 'Firebase: Error (auth/wrong-password).' });
     render(<AccesoForm />);
-    fireEvent.change(screen.getByLabelText('Correo Electrónico'), { target: { value: correo } });
+    fireEvent.change(screen.getByLabelText('Correo electrónico'), { target: { value: correo } });
     fireEvent.change(screen.getByLabelText('Contraseña'), { target: { value: clave } });
-    const form = screen.getByLabelText('Correo Electrónico').closest('form') as HTMLFormElement;
+    const form = screen.getByLabelText('Correo electrónico').closest('form') as HTMLFormElement;
 
     fireEvent.submit(form);
     const primera = (await screen.findByRole('alert')).textContent;
@@ -84,7 +84,7 @@ describe('Acceso (formulario de la portada)', () => {
 describe('UserManagement', () => {
   it('asocia etiquetas, no autocompleta el correo ajeno y anuncia el resultado', async () => {
     render(<UserManagement />);
-    const correo = screen.getByLabelText('Correo Electrónico (Lector)') as HTMLInputElement;
+    const correo = screen.getByLabelText('Correo electrónico (lector)') as HTMLInputElement;
     const clave = screen.getByLabelText('Contraseña') as HTMLInputElement;
     expect(correo.type).toBe('email');
     expect(correo.getAttribute('autocomplete')).toBe('off');
@@ -112,7 +112,7 @@ describe('UserManagement', () => {
       })
       .mockRejectedValueOnce({ code: 'auth/weak-password', message: 'Firebase: Error (auth/weak-password).' });
     render(<UserManagement />);
-    const correo = screen.getByLabelText('Correo Electrónico (Lector)') as HTMLInputElement;
+    const correo = screen.getByLabelText('Correo electrónico (lector)') as HTMLInputElement;
     fireEvent.change(correo, { target: { value: 'persona@example.com' } });
     fireEvent.change(screen.getByLabelText('Contraseña'), { target: { value: '123456' } });
     const form = correo.closest('form') as HTMLFormElement;

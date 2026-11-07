@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, afterEach } from 'vitest';
+import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
@@ -10,11 +10,13 @@ const colecciones: Record<string, any[]> = {
   salarios: [{ id: 's1', 'Sigla Compañía': 7, Ciudad: 'Potosí', 'Año': 1600, 'Transacción': 999 }],
 };
 
+const ubicacion = vi.hoisted(() => ({ search: '' }));
+
 vi.mock('../firebase', () => ({ db: {} }));
 vi.mock('../utils/audit', () => ({ logAction: vi.fn() }));
 vi.mock('react-router', () => ({
   useNavigate: () => vi.fn(),
-  useLocation: () => ({ pathname: '/x', search: '', state: null }),
+  useLocation: () => ({ pathname: '/x', search: ubicacion.search, state: null }),
 }));
 vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isEditMode: false }) }));
 vi.mock('firebase/firestore', () => ({
@@ -26,18 +28,16 @@ vi.mock('firebase/firestore', () => ({
   }),
 }));
 
+beforeEach(() => { ubicacion.search = ''; });
 afterEach(cleanup);
 
 const leer = (ruta: string) => readFileSync(resolve(__dirname, ruta), 'utf8');
 
 describe('aviso de enlace roto en Remuneraciones', () => {
   it('se anuncia como alerta y su botón «Cerrar» usa los tokens de contraste', async () => {
+    ubicacion.search = '?compania=7';
     render(<Salarios />);
-    await screen.findByText(/Mostrando \d+ registros/);
-    fireEvent.change(screen.getAllByRole('combobox')[0], { target: { value: 'Autores' } });
-    fireEvent.change(screen.getByPlaceholderText('Añadir filtro...'), { target: { value: 'Alarcón' } });
-    fireEvent.click(screen.getAllByRole('button', { name: 'Buscar' })[0]);
-    fireEvent.click(await screen.findByRole('button', { name: 'Enlace Roto' }));
+    fireEvent.click(await screen.findByRole('button', { name: 'Enlace roto' }));
     const alerta = screen.getByRole('alert');
     expect(alerta.textContent).toBe('El enlace a la transacción 999 está roto.');
     const cerrar = screen.getByRole('button', { name: 'Cerrar' });

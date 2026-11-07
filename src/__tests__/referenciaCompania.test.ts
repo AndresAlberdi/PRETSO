@@ -67,8 +67,18 @@ describe('siglaDeReferencia y etiquetas', () => {
   it('si no resuelve y es una sigla heredada con letras, la muestra tal cual', () => {
     expect(siglaDeReferencia('XX-YY', companias)).toBe('XX-YY');
   });
-  it('arma la etiqueta «sigla - autores»', () => {
-    expect(etiquetaCompania(companias[0])).toBe('GA-JR - Alarcón y Ramírez');
+  it('arma la etiqueta «sigla / autores»', () => {
+    expect(etiquetaCompania(companias[0])).toBe('GA-JR / Alarcón y Ramírez');
+  });
+
+  it('sin autores etiqueta solo la sigla', () => {
+    expect(etiquetaCompania({ ...companias[0], Autores: '' })).toBe('GA-JR');
+    expect(etiquetaCompania({ 'Sigla Compañía': 'GA-JR' })).toBe('GA-JR');
+  });
+
+  it('con sigla vacía usa el rótulo de compañía sin sigla', () => {
+    expect(etiquetaCompania({ 'Sigla Compañía': '', Autores: '' })).toBe('Compañía sin sigla');
+    expect(etiquetaCompania({ 'Sigla Compañía': '  ', Autores: 'Juan' })).toBe('Compañía sin sigla / Juan');
   });
   it('normaliza siglas', () => {
     expect(normalizarSigla(' Ñandú ')).toBe('nandu');
@@ -87,7 +97,7 @@ describe('valorDeReferencia', () => {
 describe('esCampoCompaniaCorpus', () => {
   it('reconoce los campos de compañía de Corpus Christi', () => {
     for (const k of ['Compañía', 'Compañía2', 'Compañía10', 'Cmp', 'Cmp2']) expect(esCampoCompaniaCorpus(k)).toBe(true);
-    for (const k of ['Ciudad', 'Sigla Compañía', 'Compañía Principal']) expect(esCampoCompaniaCorpus(k)).toBe(false);
+    for (const k of ['Ciudad', 'Sigla Compañía', 'Compañía principal']) expect(esCampoCompaniaCorpus(k)).toBe(false);
   });
 });
 

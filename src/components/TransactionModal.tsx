@@ -3,20 +3,24 @@ import type { CSSProperties } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import Modal from './Modal';
+import { Resaltado } from './Resaltado';
+import { raizDeModal, useDesplazarACoincidencia } from '../hooks/useDesplazarACoincidencia';
 
 const overlayStyle: CSSProperties = { position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.7)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' };
 const panelStyle: CSSProperties = { background: 'var(--bg-card)', padding: '2rem', borderRadius: '12px', width: '90%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', border: '1px solid var(--border-color)', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' };
 
 interface TransactionModalProps {
   transactionCode: string | number;
+  termino?: string | null;
   onClose: () => void;
 }
 
-export default function TransactionModal({ transactionCode, onClose }: TransactionModalProps) {
+export default function TransactionModal({ transactionCode, termino = null, onClose }: TransactionModalProps) {
   const [transaction, setTransaction] = useState<any>(null);
   const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const titleId = useId();
+  useDesplazarACoincidencia(termino && !loading && transaction ? `${termino}|${transactionCode}` : null, raizDeModal(titleId));
 
   useEffect(() => {
     async function fetchTransactionDetails() {
@@ -68,7 +72,7 @@ export default function TransactionModal({ transactionCode, onClose }: Transacti
   return (
     <Modal labelledBy={titleId} onEscape={onClose} overlayStyle={overlayStyle} panelStyle={panelStyle}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
-        <h2 id={titleId} style={{ margin: 0, color: 'var(--primary-color)' }}>Detalle de Transacción {transactionCode}</h2>
+        <h2 id={titleId} style={{ margin: 0, color: 'var(--primary-color)' }}>Detalle de transacción {transactionCode}</h2>
         <button onClick={onClose} style={{ padding: '0.4rem 1rem', background: '#e74c3c', color: 'var(--on-danger)', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Cerrar</button>
       </div>
 
@@ -76,13 +80,13 @@ export default function TransactionModal({ transactionCode, onClose }: Transacti
       {!loading && transaction && (
         <div>
           <div style={{ marginBottom: '2rem' }}>
-            <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>Información General</h3>
-            <p><strong>Noticia:</strong> {transaction['Noticia'] || 'N/A'}</p>
-            <p><strong>Fuentes para la generación:</strong> {transaction['Fuentes para la generación del dato'] || 'N/A'}</p>
+            <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>Información general</h3>
+            <p><strong>Noticia:</strong> {transaction['Noticia'] ? <Resaltado texto={transaction['Noticia']} termino={termino} /> : 'N/A'}</p>
+            <p><strong>Fuentes para la generación:</strong> {transaction['Fuentes para la generación del dato'] ? <Resaltado texto={transaction['Fuentes para la generación del dato']} termino={termino} /> : 'N/A'}</p>
           </div>
 
           <div>
-            <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>Documentos Asociados</h3>
+            <h3 style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>Documentos asociados</h3>
             {documents.length === 0 ? <p>No hay documentos asociados.</p> : (
               <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '1rem' }}>
                 <caption className="visually-hidden">Documentos asociados</caption>
@@ -96,7 +100,7 @@ export default function TransactionModal({ transactionCode, onClose }: Transacti
                   {documents.map((doc, idx) => (
                     <tr key={idx} style={{ borderBottom: '1px solid var(--border-color)' }}>
                       <td style={{ padding: '0.5rem' }}>{doc['Doc']}</td>
-                      <td style={{ padding: '0.5rem' }}>{doc['Documento']}</td>
+                      <td style={{ padding: '0.5rem' }}><Resaltado texto={doc['Documento']} termino={termino} /></td>
                     </tr>
                   ))}
                 </tbody>

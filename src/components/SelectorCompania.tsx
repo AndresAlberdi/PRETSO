@@ -20,7 +20,7 @@ interface SelectorCompaniaProps {
   ariaDescribedBy?: string;
 }
 
-// Selector de compañía: muestra «sigla - autores» y entrega el número de registro.
+// Selector de compañía: muestra «sigla / autores» y entrega el número de registro.
 export default function SelectorCompania({
   companias, value, onChange, required, disabled, cargando, textoVacio = 'Ninguna', style, ariaLabel, id,
   ariaInvalid, ariaDescribedBy,

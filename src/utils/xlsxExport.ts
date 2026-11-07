@@ -2,18 +2,7 @@ import { collection, getDocs, query, type DocumentData, type QueryDocumentSnapsh
 import { db } from "../firebase";
 import ExcelJS from "exceljs";
 import { camposReferenciaCompania, siglaParaExportar } from "./referenciaCompania";
-
-// Sheet names in Spanish for the tabs
-const SHEET_NAMES: Record<string, string> = {
-  documentos: 'Documentos',
-  companias: 'Compañías',
-  transacciones: 'Transacciones',
-  manejo_de_caja: 'Manejo de Caja',
-  salarios: 'Remuneraciones',
-  corpus_christi: 'Corpus Christi',
-  indicadores: 'Indicadores',
-  bibliografia: 'Bibliografía'
-};
+import { NOMBRES_COLECCION, nombreColeccion } from "./etiquetas";
 
 // Column ordering for each sheet to display them logically
 export const COLUMN_ORDERS: Record<string, string[]> = {
@@ -41,7 +30,7 @@ const XLSX_OMITTED_COLUMNS: Record<string, string[]> = {
 
 export async function generateDatabaseXlsx(): Promise<Blob> {
   const wb = new ExcelJS.Workbook();
-  const collections = Object.keys(SHEET_NAMES);
+  const collections = Object.keys(NOMBRES_COLECCION);
 
   // Primera pasada: se lee UNA vez cada colección; las compañías se necesitan para
   // resolver las referencias de las demás hojas.
@@ -98,7 +87,7 @@ export async function generateDatabaseXlsx(): Promise<Blob> {
     });
 
     // 3. Create worksheet and append to workbook
-    const ws = wb.addWorksheet(SHEET_NAMES[collName]);
+    const ws = wb.addWorksheet(nombreColeccion(collName));
     
     let columns = (COLUMN_ORDERS[collName] || []).filter(c => !omitted.includes(c));
     if (columns.length === 0 && formattedRows.length > 0) {

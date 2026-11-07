@@ -3,6 +3,9 @@ import type { CSSProperties } from 'react';
 import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import Modal from './Modal';
+import { Resaltado } from './Resaltado';
+import { raizDeModal, useDesplazarACoincidencia } from '../hooks/useDesplazarACoincidencia';
+import { etiquetaCampo } from '../utils/etiquetas';
 
 const overlayStyle: CSSProperties = {
   position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
@@ -20,15 +23,17 @@ interface CompaniaModalProps {
   sigla?: string;
   // Compañía ya resuelta: con ella no se consulta Firestore.
   compania?: any;
+  termino?: string | null;
   onClose: () => void;
 }
 
-export default function CompaniaModal({ sigla = '', compania: companiaDada, onClose }: CompaniaModalProps) {
+export default function CompaniaModal({ sigla = '', compania: companiaDada, termino = null, onClose }: CompaniaModalProps) {
   const [consultada, setConsultada] = useState<any | null>(null);
   const [loadingConsulta, setLoadingConsulta] = useState(true);
   const titleId = useId();
   const compania = companiaDada ?? consultada;
   const loading = companiaDada ? false : loadingConsulta;
+  useDesplazarACoincidencia(termino && !loading && compania ? `${termino}|${sigla}` : null, raizDeModal(titleId));
 
   useEffect(() => {
     if (companiaDada) return;
@@ -52,7 +57,7 @@ export default function CompaniaModal({ sigla = '', compania: companiaDada, onCl
   return (
     <Modal labelledBy={titleId} onEscape={onClose} overlayStyle={overlayStyle} panelStyle={panelStyle}>
       <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem', alignItems: 'center' }}>
-        <h2 id={titleId}>Detalle de Compañía</h2>
+        <h2 id={titleId}>Detalle de compañía</h2>
         <button onClick={onClose} style={{ padding: '0.5rem 1rem' }}>Cerrar</button>
       </div>
       
@@ -66,8 +71,8 @@ export default function CompaniaModal({ sigla = '', compania: companiaDada, onCl
               if (!compania[key] || compania[key] === '') return null;
               return (
                 <tr key={key} style={{ borderBottom: '1px solid var(--border-color)' }}>
-                  <th scope="row" style={{ padding: '0.75rem', textAlign: 'left', width: '30%', color: 'var(--accent-color)' }}>{key}</th>
-                  <td style={{ padding: '0.75rem', textAlign: 'left' }}>{compania[key]}</td>
+                  <th scope="row" style={{ padding: '0.75rem', textAlign: 'left', width: '30%', color: 'var(--accent-color)' }}>{etiquetaCampo(key)}</th>
+                  <td style={{ padding: '0.75rem', textAlign: 'left' }}><Resaltado texto={compania[key]} termino={termino} anio={key === 'Temporadas teatrales'} /></td>
                 </tr>
               );
             })}

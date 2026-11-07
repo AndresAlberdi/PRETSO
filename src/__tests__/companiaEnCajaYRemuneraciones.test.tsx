@@ -3,6 +3,7 @@ import { render, screen, fireEvent, within, cleanup } from '@testing-library/rea
 import ManejoCaja from '../pages/ManejoCaja';
 import Salarios from '../pages/Salarios';
 import { contarReferenciasACompania } from '../utils/integridadCompanias';
+import { invalidarIndice } from '../utils/busquedaGuia/cargaIndice';
 
 const companias = [
   { id: 'c7', 'Indicador de registro': 7, 'Sigla Compañía': 'GA-JR', 'Nombre Compañía': 'Compañía de Alarcón', Autores: 'Alarcón y Ramírez' },
@@ -30,6 +31,7 @@ vi.mock('firebase/firestore', () => ({
 }));
 
 beforeEach(() => {
+  invalidarIndice();
   ubicacion.search = '';
   admin.isEditMode = false;
   colecciones = {
@@ -47,39 +49,37 @@ beforeEach(() => {
 });
 afterEach(cleanup);
 
-function buscar(categoria: string, texto: string) {
-  const selects = screen.getAllByRole('combobox');
-  fireEvent.change(selects[0], { target: { value: categoria } });
-  fireEvent.change(screen.getByPlaceholderText('Añadir filtro...'), { target: { value: texto } });
-  fireEvent.click(screen.getAllByRole('button', { name: 'Buscar' })[0]);
-}
-
 describe.each([
-  ['Manejo de Caja', ManejoCaja, 'Alarcón', 'Alarcón'],
-  ['Remuneraciones', Salarios, 'Alarcón', 'Alarcón'],
-])('%s: la compañía se resuelve por número en los resultados y la búsqueda', (_nombre, Pagina, consulta) => {
-  it('la búsqueda por persona encuentra el registro con referencia numérica', async () => {
+  ['Manejo de caja', ManejoCaja],
+  ['Remuneraciones', Salarios],
+])('%s: la compañía se resuelve por número en el listado de la búsqueda', (_nombre, Pagina) => {
+  it('el término en un registro con referencia numérica lista a su compañía y no a las demás', async () => {
+    ubicacion.search = '?q=Potosí';
     render(<Pagina />);
-    await screen.findByText(/Mostrando \d+ registros/);
-    buscar('Autores', consulta);
-    expect(await screen.findByText('Resultados de Búsqueda (1 registros)')).toBeTruthy();
+    const tabla = await screen.findByRole('table');
+    expect(within(tabla).getByText('GA-JR / Compañía de Alarcón')).toBeTruthy();
+    expect(within(tabla).queryByText('JG')).toBeNull();
   });
 
-  it('los resultados muestran «sigla - nombre completo» y no el número', async () => {
+  it('el listado muestra «sigla / nombre completo» y no el número', async () => {
+    ubicacion.search = '?q=Potosí';
     render(<Pagina />);
-    await screen.findByText(/Mostrando \d+ registros/);
-    buscar('Autores', consulta);
-    expect(await screen.findByText('GA-JR - Compañía de Alarcón')).toBeTruthy();
-    const fila = screen.getByText('GA-JR - Compañía de Alarcón').closest('tr') as HTMLElement;
-    expect(within(fila).queryByText('7')).toBeNull();
+    const celda = await screen.findByText('GA-JR / Compañía de Alarcón');
+    expect(celda.closest('tr')?.textContent).not.toMatch(/\b7\b/);
   });
 
-  it('sin nombre completo, los resultados muestran la sigla', async () => {
+  it('la lista maestra de compañías muestra «sigla / nombre completo»', async () => {
     render(<Pagina />);
     await screen.findByText(/Mostrando \d+ registros/);
-    buscar('Autores', 'Juan');
-    expect(await screen.findByText('JG')).toBeTruthy();
-    expect(screen.queryByText('12')).toBeNull();
+    expect(await screen.findByText('GA-JR / Compañía de Alarcón')).toBeTruthy();
+  });
+
+  it('sin nombre completo, el listado muestra la sigla', async () => {
+    ubicacion.search = '?q=Lima';
+    render(<Pagina />);
+    const tabla = await screen.findByRole('table');
+    expect(within(tabla).getByText('JG')).toBeTruthy();
+    expect(within(tabla).queryByText('12')).toBeNull();
   });
 
   it('el título de la lista muestra la sigla y no el número', async () => {
@@ -90,17 +90,18 @@ describe.each([
   });
 });
 
-describe('Remuneraciones: la búsqueda por persona también mira al beneficiario', () => {
+describe('Remuneraciones: el término también mira al beneficiario', () => {
   it('encuentra por beneficiario', async () => {
+    ubicacion.search = '?q=Ruiz';
     render(<Salarios />);
-    await screen.findByText(/Mostrando \d+ registros/);
-    buscar('Autores', 'Ruiz');
-    expect(await screen.findByText('Resultados de Búsqueda (1 registros)')).toBeTruthy();
+    const tabla = await screen.findByRole('table');
+    expect(within(tabla).getByText('JG')).toBeTruthy();
+    expect(within(tabla).queryByText('GA-JR / Compañía de Alarcón')).toBeNull();
   });
 });
 
 describe.each([
-  ['Manejo de Caja', ManejoCaja, 'manejo_de_caja'],
+  ['Manejo de caja', ManejoCaja, 'manejo_de_caja'],
   ['Remuneraciones', Salarios, 'salarios'],
 ])('%s: el filtro ?compania= muestra lo mismo que cuenta el índice de compañías', (_nombre, Pagina, coleccion) => {
   it('incluye número, variante heredada «7.0», número en texto y sigla heredada; excluye otras compañías', async () => {
@@ -128,48 +129,7 @@ describe.each([
 });
 
 describe.each([
-  ['Manejo de Caja', ManejoCaja, 'manejo_de_caja'],
-  ['Remuneraciones', Salarios, 'salarios'],
-])('%s: la columna «Compañía» de los resultados ordena por sigla', (_nombre, Pagina, coleccion) => {
-  it('ordena alfabéticamente por sigla y no por número guardado, en ambos sentidos', async () => {
-    // Número y sigla en orden contrario: 7 -> ZZ, 12 -> AA.
-    colecciones.companias = [
-      { id: 'c7', 'Indicador de registro': 7, 'Sigla Compañía': 'ZZ', Autores: 'Z' },
-      { id: 'c12', 'Indicador de registro': 12, 'Sigla Compañía': 'AA', Autores: 'A' },
-      { id: 'c30', 'Indicador de registro': 30, 'Sigla Compañía': 'mm', Autores: 'M' },
-    ];
-    colecciones[coleccion] = [
-      { id: 'a', 'Sigla Compañía': 7, Ciudad: 'Potosí', 'Año': 1600 },
-      { id: 'b', 'Sigla Compañía': 12, Ciudad: 'Lima', 'Año': 1610 },
-      { id: 'c', 'Sigla Compañía': 30, Ciudad: 'Quito', 'Año': 1620 },
-    ];
-    render(<Pagina />);
-    await screen.findByText(/Mostrando \d+ registros/);
-    buscar('Año', '16');
-    await screen.findByText('Resultados de Búsqueda (3 registros)');
-    const columna = () => screen.getAllByRole('row').slice(1).map(r => within(r).getAllByRole('cell')[0].textContent);
-    const encabezado = () => screen.getByRole('columnheader', { name: /Compañía/ });
-    fireEvent.click(screen.getByRole('button', { name: /Compañía/ }));
-    expect(columna()).toEqual(['AA', 'mm', 'ZZ']);
-    expect(encabezado().getAttribute('aria-sort')).toBe('ascending');
-    fireEvent.click(screen.getByRole('button', { name: /Compañía/ }));
-    expect(columna()).toEqual(['ZZ', 'mm', 'AA']);
-    expect(encabezado().getAttribute('aria-sort')).toBe('descending');
-  });
-
-  it('el campo derivado de orden no llega al registro que se edita', async () => {
-    admin.isEditMode = true;
-    render(<Pagina />);
-    await screen.findByText(/Mostrando \d+ registros/);
-    buscar('Ciudad', 'Lima');
-    await screen.findByText('Resultados de Búsqueda (1 registros)');
-    fireEvent.click(screen.getByRole('button', { name: 'Editar' }));
-    expect(document.body.innerHTML).not.toContain('__sigla');
-  });
-});
-
-describe.each([
-  ['Manejo de Caja', ManejoCaja],
+  ['Manejo de caja', ManejoCaja],
   ['Remuneraciones', Salarios],
 ])('%s: enlace con una compañía inexistente', (_nombre, Pagina) => {
   it('muestra «Compañía no encontrada» y no «0 registros para 99»', async () => {
@@ -181,13 +141,12 @@ describe.each([
   });
 });
 
-describe('Manejo de Caja: el mensaje de borrado dice la sigla', () => {
+describe('Manejo de caja: el mensaje de borrado dice la sigla', () => {
   it('«registro de caja de GA-JR (1600)» y no el número', async () => {
     admin.isEditMode = true;
+    ubicacion.search = '?compania=7';
     render(<ManejoCaja />);
-    await screen.findByText(/Mostrando \d+ registros/);
-    buscar('Ciudad', 'Potosí');
-    await screen.findByText('Resultados de Búsqueda (1 registros)');
+    await screen.findByText(/1 registros para GA-JR/);
     fireEvent.click(screen.getByRole('button', { name: 'Borrar' }));
     expect(await screen.findByText(/eliminar este registro de caja de GA-JR \(1600\)\?/)).toBeTruthy();
     expect(screen.queryByText(/caja de 7 /)).toBeNull();

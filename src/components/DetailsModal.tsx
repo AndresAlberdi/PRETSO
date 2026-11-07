@@ -32,7 +32,7 @@ interface DetailsModalProps {
   collectionName?: string;
 }
 
-export default function DetailsModal({ record, onClose, title = "Detalles del Registro", collectionName }: DetailsModalProps) {
+export default function DetailsModal({ record, onClose, title = "Detalles del registro", collectionName }: DetailsModalProps) {
   const titleId = useId();
   if (!record) return null;
 

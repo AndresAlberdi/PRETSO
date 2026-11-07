@@ -276,3 +276,22 @@ describe('reglas: bitácora logs', () => {
     }
   })
 })
+
+describe('reglas: indicadores (renombrar categorías)', () => {
+  const sembrarIndicador = () =>
+    entorno.sembrar(async (db) => {
+      await setDoc(doc(db, 'indicadores/i1'), { 'Categorías': 'Pan' })
+    })
+
+  it('{reader:true} lee pero no actualiza un indicador', async () => {
+    await sembrarIndicador()
+    const db = contexto({ reader: true })
+    await assertSucceeds(getDoc(doc(db, 'indicadores/i1')))
+    await assertFails(updateDoc(doc(db, 'indicadores/i1'), { 'Categorías': 'Panes' }))
+  })
+
+  it('admin actualiza un indicador', async () => {
+    await sembrarIndicador()
+    await assertSucceeds(updateDoc(doc(contexto({ admin: true }), 'indicadores/i1'), { 'Categorías': 'Panes' }))
+  })
+})

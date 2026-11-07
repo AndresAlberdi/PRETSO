@@ -24,7 +24,7 @@ import EditModeRouteReset from './components/EditModeRouteReset';
 import { SkipLink } from './components/SkipLink';
 import { TopBar } from './components/TopBar';
 
-const ATRAS_BUSCAR = <TopBar volver={{ to: '/buscar', texto: 'Atrás' }} />;
+const ATRAS_BUSCAR = <TopBar conservarBusqueda volver={{ to: '/buscar', texto: 'Atrás' }} />;
 const ATRAS_ADMIN = <TopBar volver={{ to: '/administracion', texto: 'Atrás' }} />;
 const ATRAS_AGREGAR = <TopBar volver={{ to: '/agregar', texto: 'Atrás' }} />;
 

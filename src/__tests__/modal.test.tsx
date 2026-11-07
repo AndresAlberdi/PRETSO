@@ -543,7 +543,7 @@ describe('ventanas de lectura y confirmación', () => {
   it('DetailsModal: nombre accesible, «×» con nombre y Escape cierra', () => {
     const onClose = vi.fn();
     render(<DetailsModal record={{ id: 'a', Campo: 'valor' }} onClose={onClose} />);
-    expect(screen.getByRole('dialog', { name: 'Detalles del Registro' })).toBeTruthy();
+    expect(screen.getByRole('dialog', { name: 'Detalles del registro' })).toBeTruthy();
     const botones = screen.getAllByRole('button', { name: 'Cerrar' });
     expect(botones).toHaveLength(2);
     expect(document.activeElement).toBe(botones[0]);
@@ -558,8 +558,15 @@ describe('ventanas de lectura y confirmación', () => {
 
   it('CompaniaModal: nombre accesible y foco en «Cerrar»', () => {
     render(<CompaniaModal compania={{ 'Sigla Compañía': 'JG' }} onClose={() => {}} />);
-    expect(screen.getByRole('dialog', { name: 'Detalle de Compañía' })).toBeTruthy();
+    expect(screen.getByRole('dialog', { name: 'Detalle de compañía' })).toBeTruthy();
     expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Cerrar' }));
+  });
+
+  it('CompaniaModal: muestra «Nombre de la compañía» como encabezado de la fila', () => {
+    render(<CompaniaModal compania={{ 'Sigla Compañía': 'JG', 'Nombre Compañía': 'Compañía de Prueba' }} onClose={() => {}} />);
+    const fila = screen.getByRole('rowheader', { name: 'Nombre de la compañía' }).closest('tr') as HTMLElement;
+    expect(fila.textContent).toContain('Compañía de Prueba');
+    expect(screen.queryByRole('rowheader', { name: 'Nombre Compañía' })).toBeNull();
   });
 
   it('DocumentModal: nombre accesible y Escape cierra', async () => {
@@ -574,7 +581,7 @@ describe('ventanas de lectura y confirmación', () => {
   it('TransactionModal: nombre accesible y Escape cierra', async () => {
     const onClose = vi.fn();
     render(<TransactionModal transactionCode={7} onClose={onClose} />);
-    expect(screen.getByRole('dialog', { name: 'Detalle de Transacción 7' })).toBeTruthy();
+    expect(screen.getByRole('dialog', { name: 'Detalle de transacción 7' })).toBeTruthy();
     await screen.findByText(/No se encontró información/);
     fireEvent.keyDown(document.activeElement as Element, { key: 'Escape' });
     expect(onClose).toHaveBeenCalledTimes(1);

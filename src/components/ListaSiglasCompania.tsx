@@ -1,3 +1,4 @@
+import { Resaltado } from './Resaltado';
 import { canonizarReferencia, resolverCompania, siglaParaExportar, textoVisibleCompania, type CompaniaRef } from '../utils/referenciaCompania';
 
 interface ListaSiglasCompaniaProps {
@@ -5,6 +6,8 @@ interface ListaSiglasCompaniaProps {
   referencias: unknown[];
   companias: CompaniaRef[];
   onAbrir: (compania: CompaniaRef) => void;
+  // Término de la búsqueda guiada: si existe, subraya la coincidencia en la sigla visible.
+  termino?: string | null;
 }
 
 interface Elemento {
@@ -17,7 +20,7 @@ interface Elemento {
 // Una compañía repetida entre varios campos del registro (p. ej. `Compañía` y `Cmp`) se
 // muestra una sola vez. Un valor que no resuelve a ninguna compañía se muestra atenuado,
 // sin botón: es un dato roto que el administrador debe ver.
-export default function ListaSiglasCompania({ referencias, companias, onAbrir }: ListaSiglasCompaniaProps) {
+export default function ListaSiglasCompania({ referencias, companias, onAbrir, termino = null }: ListaSiglasCompaniaProps) {
   const vistos = new Set<string>();
   const elementos: Elemento[] = [];
   for (const valor of referencias) {
@@ -41,10 +44,10 @@ export default function ListaSiglasCompania({ referencias, companias, onAbrir }:
               onClick={() => onAbrir(e.compania as CompaniaRef)}
               style={{ padding: '0.2rem 0.5rem', background: 'var(--accent-color)', color: 'var(--on-accent)', borderRadius: '4px', border: 'none', cursor: 'pointer', fontSize: '0.9rem' }}
             >
-              {e.texto}
+              <Resaltado texto={e.texto} termino={termino} />
             </button>
           ) : (
-            <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }} title="Compañía no encontrada">{e.texto}</span>
+            <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }} title="Compañía no encontrada"><Resaltado texto={e.texto} termino={termino} /></span>
           )}
         </div>
       ))}

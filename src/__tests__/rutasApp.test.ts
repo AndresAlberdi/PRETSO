@@ -63,6 +63,11 @@ describe('rutas de App.tsx', () => {
     expect(R.get('/agregar')!).toContain('ATRAS_BUSCAR');
   });
 
+  it('ATRAS_BUSCAR conserva el término de la búsqueda', () => {
+    const fuente = readFileSync(join(__dirname, '..', 'App.tsx'), 'utf8');
+    expect(fuente).toMatch(/const ATRAS_BUSCAR = <TopBar conservarBusqueda /);
+  });
+
   it('solo la ruta "/" usa conCuenta', () => {
     for (const [p, t] of R) {
       if (p === '/') expect(sinEspacios(t)).toContain('conCuenta');
