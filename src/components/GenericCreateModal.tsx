@@ -14,6 +14,7 @@ import SelectorCompania from './SelectorCompania';
 import { nombreColeccion } from '../utils/etiquetas';
 import Modal from './Modal';
 import ConfirmModal from './ConfirmModal';
+import { codigoError } from '../utils/codigoError';
 
 interface GenericCreateModalProps {
   collectionName: string;
@@ -186,7 +187,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
         }
 
       } catch (err: any) {
-        console.error("Error loading create modal context", err);
+        console.error('No se pudo cargar el contexto del formulario:', codigoError(err));
         setError("Error al cargar los datos del formulario.");
       } finally {
         setLoading(false);
@@ -325,7 +326,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
         try {
           lista = await leerSiglasCompanias();
         } catch (e) {
-          console.error('Error verificando siglas de compañías', e);
+          console.error('No se pudieron verificar las siglas de compañías:', codigoError(e));
           throw new Error(MENSAJE_VERIFICACION_SIGLA);
         }
         // Se excluye el id ya reservado: un reintento idempotente no choca consigo mismo.

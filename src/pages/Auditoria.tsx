@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { collection, getDocs, query, orderBy } from "firebase/firestore";
 import { db } from "../firebase";
+import { codigoError } from '../utils/codigoError';
 
 export default function Auditoria() {
   const [logs, setLogs] = useState<any[]>([]);
@@ -19,7 +20,7 @@ export default function Auditoria() {
         }));
         setLogs(logData);
       } catch (error) {
-        console.error("Error fetching logs:", error);
+        console.error('No se pudo leer el registro de auditoría:', codigoError(error));
       } finally {
         setLoading(false);
       }

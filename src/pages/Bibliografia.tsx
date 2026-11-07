@@ -7,6 +7,7 @@ import { cleanFirebaseData } from "../utils";
 import { useCanEdit } from "../hooks/useCanEdit";
 import CeldaAdmin from "../components/CeldaAdmin";
 import ConfirmModal from "../components/ConfirmModal";
+import { codigoError } from "../utils/codigoError";
 import BusyModal from "../components/BusyModal";
 import { logAction } from "../utils/audit";
 import GenericCreateModal from "../components/GenericCreateModal";
@@ -25,6 +26,7 @@ export default function Bibliografia() {
   const [loading, setLoading] = useState(true);
   const canEdit = useCanEdit();
   const [recordToDelete, setRecordToDelete] = useState<any>(null);
+  const [errorOperacion, setErrorOperacion] = useState<string | null>(null);
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
@@ -67,7 +69,9 @@ export default function Bibliografia() {
       setData(data.filter(d => d.id !== recordToDelete.id));
       setRecordToDelete(null);
     } catch (error) {
-      console.error("Error deleting bibliography record: ", error);
+      console.error('No se pudo borrar el registro:', codigoError(error));
+      setRecordToDelete(null);
+      setErrorOperacion('No se pudo borrar el registro. Inténtelo de nuevo.');
     }
   };
 
@@ -81,7 +85,7 @@ export default function Bibliografia() {
       ));
       setRecordToEdit(null);
     } catch (error) {
-      console.error("Error updating document: ", error);
+      console.error('No se pudo actualizar el registro:', codigoError(error));
       alert("Error al actualizar la referencia bibliográfica.");
     }
   };
@@ -168,6 +172,14 @@ export default function Bibliografia() {
           onConfirm={handleDelete}
           onCancel={() => setRecordToDelete(null)}
           confirmText="Borrar"
+        />
+      )}
+      {errorOperacion && (
+        <ConfirmModal
+          title="No se pudo completar la operación"
+          message={errorOperacion}
+          onCancel={() => setErrorOperacion(null)}
+          isAlertOnly
         />
       )}
     </div>

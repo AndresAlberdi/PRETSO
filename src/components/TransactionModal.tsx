@@ -5,6 +5,7 @@ import { db } from '../firebase';
 import Modal from './Modal';
 import { Resaltado } from './Resaltado';
 import { raizDeModal, useDesplazarACoincidencia } from '../hooks/useDesplazarACoincidencia';
+import { codigoError } from '../utils/codigoError';
 
 const overlayStyle: CSSProperties = { position: 'fixed', top: 0, left: 0, width: '100vw', height: '100vh', background: 'rgba(0,0,0,0.7)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center' };
 const panelStyle: CSSProperties = { background: 'var(--bg-card)', padding: '2rem', borderRadius: '12px', width: '90%', maxWidth: '800px', maxHeight: '90vh', overflowY: 'auto', border: '1px solid var(--border-color)', boxShadow: '0 8px 32px rgba(0,0,0,0.5)' };
@@ -61,7 +62,7 @@ export default function TransactionModal({ transactionCode, termino = null, onCl
           setDocuments(dSnapshot.docs.map(d => d.data()));
         }
       } catch (error) {
-        console.error("Error fetching transaction", error);
+        console.error('No se pudo leer la transacción:', codigoError(error));
       } finally {
         setLoading(false);
       }
