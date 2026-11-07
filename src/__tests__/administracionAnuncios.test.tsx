@@ -31,7 +31,9 @@ describe('anuncios del estado del respaldo', () => {
     render(<Administracion />);
     const alerta = screen.getByRole('alert');
     fireEvent.click(screen.getByRole('button', { name: /Descargar base de datos \(XML\)/ }));
-    await waitFor(() => expect(alerta.textContent).toContain('Error al generar XML: boom'));
+    await waitFor(() => expect(alerta.textContent).toContain('No se pudo generar el volcado XML.'));
+    // Texto fijo: el mensaje técnico de la excepción no llega a la pantalla.
+    expect(alerta.textContent).not.toContain('boom');
     expect(screen.getByRole('alert')).toBe(alerta);
   });
 
