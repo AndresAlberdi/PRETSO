@@ -1,6 +1,7 @@
 import { canonizarReferencia } from '../referenciaCompania';
+import { claveEstricta, idsDocumentos } from '../documentosTransaccion';
 import { CAMPOS_DATASET } from './campos';
-import { idsDocumentos, transaccionXml, type Enlaces } from './enlaces';
+import { transaccionXml, type Enlaces } from './enlaces';
 import { esRegistro, ordenarPorNumero } from './orden';
 import { CARPETAS, crearAvisos, type AvisosDataset, type ClaveCarpeta, type DatosDataset, type Registro, type ResultadoCarpeta } from './tipos';
 import { atributoXml, cabeceraXml, campoXml, CIERRE_XML, camposXml } from './xml';
@@ -44,7 +45,6 @@ export function generarIndiceCompanias(datos: DatosDataset, generadoEn: Date): R
 }
 
 const DEF_DOC = CAMPOS_DATASET.documentos.find((d) => d.campo === 'Doc');
-const claveEstricta = (v: unknown) => `${typeof v}:${String(v)}`;
 
 /**
  * Transacción cuyo número está vacío o repetido: no entra en los enlaces, pero
