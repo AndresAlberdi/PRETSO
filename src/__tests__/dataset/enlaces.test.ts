@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { construirEnlaces, idsDocumentos, transaccionXml } from '../../utils/dataset/enlaces';
+import { construirEnlaces, transaccionXml } from '../../utils/dataset/enlaces';
+import { idsDocumentos } from '../../utils/documentosTransaccion';
 import { contarAvisos, crearAvisos } from '../../utils/dataset/tipos';
 
 const valido = (x: string) =>

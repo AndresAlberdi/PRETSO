@@ -1,4 +1,5 @@
 import { canonizarReferencia } from '../referenciaCompania';
+import { claveEstricta, idsDocumentos } from '../documentosTransaccion';
 import { CAMPOS_DATASET } from './campos';
 import { esRegistro } from './orden';
 import type { AvisosDataset, DatosDataset, Registro } from './tipos';
@@ -8,10 +9,6 @@ export interface Enlaces {
   transacciones: Map<string, Registro>;
   documentos: Map<string, Registro>;
 }
-
-// Mismo criterio que indiceBusqueda.ts (allí no se exportan): comparación estricta de tipo y valor.
-const claveEstricta = (v: unknown) => `${typeof v}:${String(v)}`;
-const CAMPOS_DOC = Array.from({ length: 10 }, (_, i) => `Doc${i + 1}`);
 
 function definicion(coleccion: 'transacciones' | 'documentos', campo: string) {
   const def = CAMPOS_DATASET[coleccion].find((d) => d.campo === campo);
@@ -36,21 +33,6 @@ export function construirEnlaces(datos: Pick<DatosDataset, 'transacciones' | 'do
     if (!documentos.has(clave)) documentos.set(clave, d);
   }
   return { transacciones, documentos };
-}
-
-/** Doc1..Doc10 en orden, sin repetidos; salta lo que no es texto ni número, `''` y `0`. */
-export function idsDocumentos(tx: Registro): Array<string | number> {
-  const ids: Array<string | number> = [];
-  const vistos = new Set<string>();
-  for (const campo of CAMPOS_DOC) {
-    const id = tx[campo];
-    if ((typeof id !== 'string' && typeof id !== 'number') || id === '' || id === 0) continue;
-    const clave = claveEstricta(id);
-    if (vistos.has(clave)) continue;
-    vistos.add(clave);
-    ids.push(id);
-  }
-  return ids;
 }
 
 export function transaccionXml(ref: unknown, enlaces: Enlaces, sangria: number, avisos: AvisosDataset): string {

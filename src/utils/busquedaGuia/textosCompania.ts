@@ -1,4 +1,4 @@
-import { camposReferenciaCompania, esCampoCompaniaCorpus, siglaParaExportar, TEXTO_COMPANIA_NO_ENCONTRADA, TEXTO_COMPANIA_SIN_SIGLA, canonizarReferencia, type CompaniaRef } from './referenciaCompania';
+import { camposReferenciaCompania, esCampoCompaniaCorpus, siglaParaExportar, TEXTO_COMPANIA_NO_ENCONTRADA, TEXTO_COMPANIA_SIN_SIGLA, canonizarReferencia, type CompaniaRef } from '../referenciaCompania';
 
 /**
  * Textos de compañía por los que se puede encontrar un registro: la sigla (o el
