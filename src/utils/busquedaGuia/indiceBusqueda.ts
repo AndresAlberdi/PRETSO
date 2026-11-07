@@ -153,7 +153,6 @@ interface Mapas {
   nodosDocumento: Map<Registro, NodoEnlace>;
 }
 
-
 function nodoDe(cache: Map<Registro, NodoEnlace>, r: Registro, nombres: readonly string[]): NodoEnlace {
   let nodo = cache.get(r);
   if (!nodo) {
