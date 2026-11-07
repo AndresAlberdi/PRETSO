@@ -15,7 +15,7 @@ Almacena el registro maestro de las compañías, corporaciones o gremios registr
 
 ### 2. `manejo_de_caja`
 Registra ingresos, egresos y el manejo de bienes económicos asociados a las compañías.
-*   **`Sigla Compañía`** (String): Relación a `companias`.
+*   **`Sigla Compañía`** (Number): número del `Indicador de registro` de `companias`; se acepta "7.0" y siglas heredadas (`resolverCompania`). Si no se resuelve, se muestra «Compañía no encontrada».
 *   **`Ciudad`** (String): Ciudad donde ocurrió la operación de caja.
 *   **`Año`** (String): Año de la operación.
 *   **`Ingresos`** (String): Valor numérico o texto indicando los ingresos obtenidos.
@@ -25,13 +25,14 @@ Registra ingresos, egresos y el manejo de bienes económicos asociados a las com
 
 ### 3. `salarios`
 Registros de salarios o pagos emitidos a individuos, autores o miembros del gremio.
-*   **`Sigla Compañía`** (String): Relación a `companias`.
+*   **`Sigla Compañía`** (Number): número del `Indicador de registro` de `companias`; se acepta "7.0" y siglas heredadas (`resolverCompania`). Si no se resuelve, se muestra «Compañía no encontrada».
 *   **`Ciudad`** (String): Ciudad de pago.
 *   **`Año`** (String): Año del salario.
 *   **`Beneficiario `** (String): Persona que recibe el pago.
 *   **`Encargo`** (String): Motivo, labor u ocupación justificada del pago.
 *   **`Monto a pagar`** (String): Valor liquidado.
-*   **`Moneda`** (String): Divisa empleada.
+*   **`Ración diaria`** (String): Ración diaria asignada.
+*   **`Pago por representación`** (String): Pago por cada representación.
 *   **`Transacción`** (Number/String): Código de vínculo con `transacciones`.
 
 ### 4. `corpus_christi`
@@ -40,20 +41,20 @@ Registros históricos sobre representaciones, contratos y gastos por las festivi
 *   **`Año`** (String): Año de la celebración.
 *   **`Encargo`** (String): Labor encomendada (e.g. elaboración de carros, danza, etc.).
 *   **`Encargado `** (String): Persona contratada o responsable.
-*   **`Compañía`** a **`Compañía10`** (String): Múltiples columnas (también llamadas `Cmp1`, `Cmp2`) que vinculan `Sigla Compañía` involucradas.
+*   **`Compañía`** a **`Compañía10`** (Number): número del `Indicador de registro` de `companias`; se acepta "7.0" y siglas heredadas (`resolverCompania`). Si no se resuelve, se muestra «Compañía no encontrada». Múltiples columnas con las compañías involucradas.
 *   **`Monto a pagar`** (String): Valor acordado.
 *   **`Fondos`** (String): Origen de los fondos.
 *   **`Transacción`** (Number/String): Código de vínculo con `transacciones`.
 
 ### 5. `indicadores`
 Registros financieros consolidados categorizados para su análisis métrico (Indicadores Económicos).
-*   **`Categorías`** (String): Categoría principal del indicador.
+*   **`Categoría`** (String): Categoría principal del indicador.
 *   **`Ciudad`** (String): Localidad aplicable.
 *   **`Años`** (String): Período temporal.
 *   **`Concepto`** (String): Concepto específico del indicador (sub-categoría).
 *   **`Monto`** (String): Valor del indicador.
 *   **`Nota`** (String): Notas aclaratorias adicionales.
-*   **`Sigla Compañía`** (String): Relación a `companias` (opcional).
+*   **`Sigla Compañía`** (Number): número del `Indicador de registro` de `companias`; se acepta "7.0" y siglas heredadas (`resolverCompania`). Si no se resuelve, se muestra «Compañía no encontrada». Opcional.
 *   **`Transacción`** (Number/String): Código de vínculo con `transacciones`.
 
 ### 6. `transacciones`
@@ -68,6 +69,11 @@ Textos primarios transcritos que respaldan la información.
 *   **`Doc`** (Number): Identificador único del documento (Llave primaria referenciada por `transacciones.DocX`).
 *   **`Documento`** (String): Transcripción paleográfica o texto del documento original en extenso.
 
+### 8. `bibliografia`
+Referencias bibliográficas de la investigación.
+*   **`Autores`** (String): Autores de la obra citada.
+*   **`Referencias bibliográficas`** (String): Referencia completa.
+
 ## Flujo Relacional Típico
 
 1.  Una vista maestra (e.g., `IndiceCompanias`) lista `companias`.
@@ -75,3 +81,21 @@ Textos primarios transcritos que respaldan la información.
 3.  El registro de detalle tiene un campo `Transacción`.
 4.  Si el usuario desea más contexto, consulta `transacciones` donde `Num == Transacción`.
 5.  La `Transacción` específica puede contener referencias a uno o más documentos (campos `Doc1...Doc10`), los cuales se consultan en la colección `documentos`.
+
+## Campos retirados
+
+Algunos campos se retiraron del sistema: la interfaz y las exportaciones los ignoran, aunque los registros importados los conserven hasta que un script los borre de la base. La lista vigente está en [`src/utils/camposRetirados.ts`](src/utils/camposRetirados.ts) y no se repite aquí.
+
+## Dataset XML
+
+El administrador descarga un ZIP con un XML por unidad de registro y listas de un solo XML. El código vive en `src/utils/dataset/`. Solo se exportan los campos de la lista blanca `CAMPOS_DATASET` (`src/utils/dataset/campos.ts`), en orden fijo; nunca se recorren las claves de un registro, de modo que los campos retirados quedan fuera. Los nombres de elemento XML están en inglés. El ZIP incluye un README en español que genera `src/utils/dataset/readmeTexto.ts`; su contenido no se duplica aquí.
+
+## Búsqueda guiada
+
+Reglas fijas, tomadas de las decisiones del cliente del 04/11/2026:
+*   Se usa un solo campo de búsqueda.
+*   Dos palabras se tratan como una frase exacta.
+*   Un año dentro de un intervalo cuenta como coincidencia.
+*   La guía tiene niveles 1 a 3.
+*   `transacciones` y `documentos` no son secciones visibles para el lector.
+*   Se busca por la sigla de la compañía, no por su número.
