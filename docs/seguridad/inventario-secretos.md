@@ -2,6 +2,7 @@
 
 | Versión | Fecha | Alcance | Control |
 |---|---|---|---|
+| 1.5 | 2026-11-07 | Repositorio `AndresAlberdi/PRETSO`, proyectos Firebase `pretso-database` (staging) y `pretso-prod` (producción) | Secreto S2 de avisos por correo (anexo 15, AL-01/AL-02); mantiene SEC-01 |
 | 1.4 | 2026-10-03 | Repositorio `AndresAlberdi/PRETSO`, proyectos Firebase `pretso-database` (staging) y `pretso-prod` (producción) | NUB-G06 (App Check en monitoreo): site key de producción en el código (SEC-P05); mantiene SEC-01 |
 | 1.3 | 2026-10-02 | Repositorio `AndresAlberdi/PRETSO`, proyectos Firebase `pretso-database` (staging) y `pretso-prod` (producción) | NUB-G06 (App Check en monitoreo): site key de reCAPTCHA Enterprise (SEC-P05) y token de depuración local; mantiene SEC-01 |
 | 1.2 | 2026-10-02 UTC (2026-10-01 hora de Bolivia) | Repositorio `AndresAlberdi/PRETSO`, proyectos Firebase `pretso-database` (staging) y `pretso-prod` (producción) | SEC-07 de `05-checklist-pase-a-produccion.md` (capas 1 y 2 de WIF de producción aplicadas y verificadas con dos pruebas negativas); mantiene SEC-01 |
@@ -13,13 +14,13 @@ Propietario de todo lo listado: **Andres Alberdi** (único propietario y adminis
 
 ## 1. Resumen
 
-PRETSO prácticamente no tiene secretos de larga duración: el despliegue usa federación de identidad (WIF/OIDC) y la aplicación no lee ninguna variable de entorno ni credencial en tiempo de ejecución. Lo único que se guarda como secreto son **cinco identificadores de clase S3** en GitHub (cuatro hasta el 2026-10-01 (hora de Bolivia), cuando se añadió `GCP_WIF_PROVIDER_PROD`). No hay secretos S0 (prohibidos), S1 (críticos) ni S2 (tokens de terceros) en uso.
+PRETSO prácticamente no tiene secretos de larga duración: el despliegue usa federación de identidad (WIF/OIDC) y la aplicación no lee ninguna variable de entorno ni credencial en tiempo de ejecución. Lo que se guarda como secreto en GitHub son **cinco identificadores de clase S3** (cuatro hasta el 2026-10-01 (hora de Bolivia), cuando se añadió `GCP_WIF_PROVIDER_PROD`), más un secreto de clase S2 (`RESEND_API_KEY`) y un dato personal (`AVISOS_PARA`), ambos en el Environment `avisos`. No hay secretos S0 (prohibidos) ni S1 (críticos) en uso.
 
 Estado del control SEC-01: **Verde**. Las verificaciones que este inventario no pudo medir (condición de confianza del provider WIF y roles de las cuentas de despliegue) se siguen en SEC-07 del plan de migración, y el segundo factor de las cuentas de GitHub en la sección 10.
 
 ## 2. Secretos de GitHub
 
-Lectura hecha con `gh secret list` el 2026-10-01 (solo nombres y fechas).
+Lectura hecha con `gh secret list` el 2026-10-01 (solo nombres y fechas); no cubre SEC-006 ni SEC-007, que se anotan a partir del diseño y se verifican al cargarlos.
 
 | ID | Nombre | Clase | Propósito | Dónde vive | Consumidor | Propietario | Creación | Próxima rotación | Procedimiento de rotación |
 |---|---|---|---|---|---|---|---|---|---|
@@ -28,6 +29,8 @@ Lectura hecha con `gh secret list` el 2026-10-01 (solo nombres y fechas).
 | SEC-003 | `GCP_WIF_PROVIDER` (Environment `production`) | S3 | Provider WIF del proyecto `pretso-prod` | Secreto de Environment `production` | `google-github-actions/auth` en los jobs de producción (solo tras aprobación) | Andres Alberdi | 2026-09-25 | Al cambiar el pool o el proyecto | Ídem |
 | SEC-004 | `GCP_SA_DEPLOY_PROD` | S3 | Cuenta de servicio a impersonar para desplegar a producción (`deploy-production@pretso-prod`) | Secreto de Environment `production` | `google-github-actions/auth` (despliegue y rollback de producción) | Andres Alberdi | 2026-09-25 | Al cambiar la cuenta | Ídem |
 | SEC-005 | `GCP_WIF_PROVIDER_PROD` | S3 | Ruta del provider WIF del pool `github` de `pretso-prod` (identificador, no credencial), para la prueba negativa | Secreto de repositorio (a propósito fuera del Environment: la prueba corre sin él) | Solo `probar-identidad-negativa.yml` | Andres Alberdi | 2026-10-02 UTC (2026-10-01 en hora de Bolivia) | Al cambiar la infraestructura (pool, provider o proyecto) | Recargar con `gh secret set` (por la sesión, con autorización de Andres), sin mostrar el valor |
+| SEC-006 | `RESEND_API_KEY` | S2 | Enviar los avisos de disponibilidad por Resend; clave de solo envío (`sending_access`) restringida al dominio de avisos | Secreto del Environment `avisos`, con política de ramas «solo `main`» | Job `avisar` de `vigilar-disponibilidad.yml` | Andres Alberdi | Pendiente de carga | Creación + 180 días | Andres crea una clave nueva en el panel de Resend y la pega en el Environment; la sesión lanza la prueba manual; luego se revoca la anterior |
+| SEC-007 | `AVISOS_PARA` | P (dato personal, no credencial) | Destinatario de los avisos | Secreto del Environment `avisos` | Job `avisar` de `vigilar-disponibilidad.yml` | Andres Alberdi | Pendiente de carga | Al cambiar el buzón | La sesión lo recarga sin mostrar el valor |
 
 Notas:
 
@@ -35,8 +38,9 @@ Notas:
 - Existen dos secretos distintos con el mismo nombre `GCP_WIF_PROVIDER` (uno de repositorio para staging, otro de Environment para producción); el de Environment prevalece en los jobs con `environment: production`.
 - `GCP_WIF_PROVIDER_PROD` contiene la misma ruta que el `GCP_WIF_PROVIDER` del Environment `production`, pero como secreto de repositorio: así un job **sin** Environment puede intentar el intercambio y comprobar que se le niega. Conocer la ruta no da acceso (véase la sección 4).
 - La barrera real no es el secreto sino la condición de confianza del provider WIF y el binding de cada cuenta de despliegue (sección 4), que restringen qué ejecuciones pueden obtener credenciales.
+- `AVISOS_PARA` (Environment `avisos`) no es una credencial: es un dato personal guardado como secreto para que GitHub lo enmascare en los logs.
 - No existen secretos de Dependabot ni de Codespaces (`gh secret list --app dependabot` y `--app codespaces`, vacíos).
-- El Environment `staging` y el `production` no tienen variables propias.
+- El Environment `staging` y el `production` no tienen variables propias. El Environment `avisos` (solo `main`) tiene la variable `AVISOS_DE` y los secretos SEC-006 y SEC-007.
 
 ### Secretos que los workflows referencian pero NO existen
 

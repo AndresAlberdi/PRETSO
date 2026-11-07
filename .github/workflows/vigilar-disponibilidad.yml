@@ -1,0 +1,267 @@
+# =============================================================================
+# vigilar-disponibilidad.yml — Vigilancia programada de la disponibilidad de
+#                              PRETSO con avisos por correo (avisos-correo/v1)
+# -----------------------------------------------------------------------------
+# Qué hace. Cada 2 horas comprueba por HTTP que staging responde 200 con la
+# página de PRETSO (`<title>PRETSO</title>`) en menos de 8 s, y que la función
+# `listAccounts` de staging rechaza una llamada sin sesión con 401 (un 403
+# indicaría que cambió el IAM del invocador; la falta de respuesta, que la
+# función se cayó). Producción se vigila solo si la variable de repositorio
+# VIGILAR_PRODUCCION vale `true` (después del primer tag). Cada comprobación
+# hace 3 intentos con 20 s de pausa antes de declarar una falla.
+#
+# Dos canales de aviso:
+#   1. Segundo canal: si algún objetivo no está bien, el job `comprobar`
+#      termina en rojo y GitHub manda su propio correo de fallo (inmediato y
+#      sin gastar el cupo de Resend).
+#   2. Resend, con el contrato avisos-correo/v1, solo en ranuras fijas.
+#
+# Cupo de correos: 3 ranuras/día × 1 + 1 prueba/día (idempotencia
+# `prueba-<fecha>`) = 4 por construcción, sin guardar estado.
+#   - '17 */2 * * *'  solo comprueba; nunca usa Resend.
+#   - '47 1,9 * * *', '47 17 * * 0,2-6' y '47 17 * * 1' son las ranuras de
+#     aviso (3 por día, cada una envía como máximo 1 correo). La del lunes
+#     (13:47 en Bolivia) es además la del latido semanal «PRETSO vigilado»; si
+#     en esa ranura hay una falla, sale la alerta en su lugar.
+#   - `workflow_dispatch` (sin inputs, para no ampliar la excepción CKV_GHA_7)
+#     corre siempre en modo prueba: una segunda prueba el mismo día UTC recibe
+#     409 de Resend y falla a propósito.
+#
+# Re-ejecuciones: `avisar` no envía en `schedule` si `github.run_attempt` es
+# mayor que 1 (una re-ejecución manual no debe gastar cupo); `workflow_dispatch`
+# sí envía, como prueba.
+#
+# Regla de Dos (anexo 15, AL-04): `comprobar` NO tiene secretos y es el único
+# que lee texto de terceros (el HTML), del que solo emite enumeraciones y
+# números validados. `avisar` tiene la clave y no lee nada de terceros.
+#
+# Secretos y variables:
+#   - Environment `avisos` (solo `main`): secretos RESEND_API_KEY y AVISOS_PARA
+#     (el destinatario es un dato personal; como secreto GitHub lo enmascara) y
+#     variable AVISOS_DE.
+#   - Variables de repositorio: STAGING_URL, PROD_URL, VIGILAR_PRODUCCION y
+#     LISTACCOUNTS_URL_STAGING.
+#
+# Qué NO se comprueba y por qué:
+#   - Cabeceras de seguridad: solo cambian al desplegar y ya las verifica
+#     `dast-y-humo` en cada despliegue.
+#   - `/health`: firebase.json reescribe `**` a /index.html, así que siempre
+#     devuelve 200 y no distingue nada.
+#
+# Pruebas: tests/workflows/test_vigilar_disponibilidad.py y tests/vigilancia/.
+# =============================================================================
+name: vigilar-disponibilidad
+
+on:
+  schedule:
+    - cron: '17 */2 * * *'
+    - cron: '47 1,9 * * *'
+    - cron: '47 17 * * 0,2-6'
+    - cron: '47 17 * * 1'
+  workflow_dispatch:
+
+permissions: {}
+
+# Sin bloque `concurrency` (opción más simple): un grupo único cancelaría o
+# pondría en cola ejecuciones distintas, y los duplicados de correo ya los
+# cubre la idempotencia de Resend (`Idempotency-Key` = pretso:<id_unico>).
+
+jobs:
+  comprobar:
+    name: comprobar
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    permissions:
+      actions: read
+    outputs:
+      estado_staging: ${{ steps.sitios.outputs.estado_staging }}
+      http_staging: ${{ steps.sitios.outputs.http_staging }}
+      ms_staging: ${{ steps.sitios.outputs.ms_staging }}
+      estado_produccion: ${{ steps.sitios.outputs.estado_produccion }}
+      http_produccion: ${{ steps.sitios.outputs.http_produccion }}
+      ms_produccion: ${{ steps.sitios.outputs.ms_produccion }}
+      estado_funcion: ${{ steps.sitios.outputs.estado_funcion }}
+      http_funcion: ${{ steps.sitios.outputs.http_funcion }}
+      ocurrido_en: ${{ steps.sitios.outputs.ocurrido_en }}
+      hay_fallo: ${{ steps.sitios.outputs.hay_fallo }}
+      ejecuciones_7d: ${{ steps.conteo.outputs.ejecuciones_7d }}
+      fallidas_7d: ${{ steps.conteo.outputs.fallidas_7d }}
+    steps:
+      - name: Comprobar sitios
+        id: sitios
+        env:
+          URL_STAGING: ${{ vars.STAGING_URL }}
+          URL_PRODUCCION: ${{ vars.PROD_URL }}
+          VIGILAR_PRODUCCION: ${{ vars.VIGILAR_PRODUCCION }}
+          URL_FUNCION: ${{ vars.LISTACCOUNTS_URL_STAGING }}
+        run: |
+          set -euo pipefail
+          salida="$GITHUB_OUTPUT"
+          echo "ocurrido_en=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$salida"
+          if [[ -z "${URL_STAGING:-}" ]]; then
+            echo "::error::Falta la variable de repositorio STAGING_URL."
+            exit 1
+          fi
+          cuerpo="$(mktemp)"
+          trap 'rm -f "$cuerpo"' EXIT
+          hay_fallo=false
+
+          # comprobar_sitio <prefijo> <url>: hasta 3 intentos, 20 s entre ellos.
+          # Deja estado_<prefijo>, http_<prefijo> y ms_<prefijo> como variables
+          # y devuelve 0 solo si el estado es `ok`. Dentro de una función
+          # llamada con `||` set -e no actúa: todo se comprueba a mano.
+          comprobar_sitio() {
+            local prefijo="$1" url="$2" estado="" codigo="000" ms="0" intento resultado t
+            for intento in 1 2 3; do
+              : > "$cuerpo"
+              resultado="$(curl -sS -L --proto '=https' --max-redirs 3 --connect-timeout 10 --max-time 20 -o "$cuerpo" -w '%{http_code} %{time_total}' "${url%/}/" 2>/dev/null || true)"
+              if [[ -z "$resultado" ]]; then resultado="000 0"; fi
+              codigo="${resultado%% *}"
+              t="${resultado##* }"
+              ms="$(awk -v t="$t" 'BEGIN { printf "%d", t * 1000 }')"
+              if ! [[ "$codigo" =~ ^[0-9]{3}$ ]]; then codigo="000"; fi
+              if ! [[ "$ms" =~ ^[0-9]{1,5}$ ]]; then ms="0"; fi
+              if [[ "$codigo" == "000" ]]; then
+                estado="sin_respuesta"
+              elif [[ "$codigo" != "200" ]]; then
+                estado="http_error"
+              elif ! grep -qF '<title>PRETSO</title>' "$cuerpo"; then
+                estado="contenido"
+              elif (( ms > 8000 )); then
+                estado="lento"
+              else
+                estado="ok"
+                break
+              fi
+              if (( intento < 3 )); then sleep 20; fi
+            done
+            printf -v "estado_${prefijo}" '%s' "$estado"
+            printf -v "http_${prefijo}" '%s' "$codigo"
+            printf -v "ms_${prefijo}" '%s' "$ms"
+            [[ "$estado" == "ok" ]]
+          }
+
+          comprobar_sitio staging "$URL_STAGING" || hay_fallo=true
+
+          if [[ "${VIGILAR_PRODUCCION:-}" == "true" ]]; then
+            if [[ -z "${URL_PRODUCCION:-}" ]]; then
+              echo "::error::VIGILAR_PRODUCCION es true pero falta la variable PROD_URL."
+              exit 1
+            fi
+            comprobar_sitio produccion "$URL_PRODUCCION" || hay_fallo=true
+          else
+            estado_produccion="no_vigilado"
+            http_produccion="000"
+            ms_produccion="0"
+          fi
+
+          if [[ -n "${URL_FUNCION:-}" ]]; then
+            estado_funcion="sin_respuesta"
+            http_funcion="000"
+            for intento in 1 2 3; do
+              http_funcion="$(curl -sS -o /dev/null -w '%{http_code}' -X POST -H 'Content-Type: application/json' --data '{"data":{}}' --proto '=https' --connect-timeout 10 --max-time 20 "$URL_FUNCION" 2>/dev/null || true)"
+              if ! [[ "$http_funcion" =~ ^[0-9]{3}$ ]]; then http_funcion="000"; fi
+              case "$http_funcion" in
+                401) estado_funcion="ok" ;;
+                000) estado_funcion="sin_respuesta" ;;
+                *) estado_funcion="respuesta_inesperada" ;;
+              esac
+              if [[ "$estado_funcion" == "ok" ]]; then break; fi
+              if (( intento < 3 )); then sleep 20; fi
+            done
+            if [[ "$estado_funcion" != "ok" ]]; then hay_fallo=true; fi
+          else
+            estado_funcion="no_vigilado"
+            http_funcion="000"
+          fi
+
+          {
+            echo "estado_staging=$estado_staging"
+            echo "http_staging=$http_staging"
+            echo "ms_staging=$ms_staging"
+            echo "estado_produccion=$estado_produccion"
+            echo "http_produccion=$http_produccion"
+            echo "ms_produccion=$ms_produccion"
+            echo "estado_funcion=$estado_funcion"
+            echo "http_funcion=$http_funcion"
+            echo "hay_fallo=$hay_fallo"
+          } >> "$salida"
+
+          {
+            echo "### Vigilancia de disponibilidad"
+            echo ""
+            echo "| Objetivo | Estado | HTTP | ms |"
+            echo "|---|---|---|---|"
+            echo "| Staging | $estado_staging | $http_staging | $ms_staging |"
+            echo "| Producción | $estado_produccion | $http_produccion | $ms_produccion |"
+            echo "| Función (staging) | $estado_funcion | $http_funcion | - |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Contar ejecuciones de 7 días
+        id: conteo
+        if: github.event_name == 'workflow_dispatch' || github.event.schedule == '47 17 * * 1'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          desde="$(date -u -d '7 days ago' +%F)"
+          ejecuciones=""
+          fallidas=""
+          if conteo="$(gh run list -R "$GITHUB_REPOSITORY" --workflow vigilar-disponibilidad.yml --created ">=$desde" --limit 200 --json conclusion | jq -r '[([.[] | select(.conclusion == "success" or .conclusion == "failure")] | length), ([.[] | select(.conclusion == "failure")] | length)] | @tsv')"; then
+            read -r ejecuciones fallidas <<< "$conteo"
+            if ! [[ "$ejecuciones" =~ ^[0-9]{1,3}$ && "$fallidas" =~ ^[0-9]{1,3}$ ]]; then
+              ejecuciones=""
+              fallidas=""
+            fi
+          else
+            echo "::warning::No se pudo contar las ejecuciones de 7 días."
+          fi
+          {
+            echo "ejecuciones_7d=$ejecuciones"
+            echo "fallidas_7d=$fallidas"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Fallar si algún objetivo no está ok
+        if: steps.sitios.outputs.hay_fallo == 'true'
+        run: |
+          echo "::error::Vigilancia: hay objetivos fuera de servicio (ver resumen)."
+          exit 1
+
+  avisar:
+    name: avisar
+    needs: comprobar
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    environment: avisos
+    permissions:
+      contents: read
+    if: always() && needs.comprobar.result != 'cancelled' && needs.comprobar.outputs.ocurrido_en != '' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'schedule' && github.run_attempt == 1 && (github.event.schedule == '47 17 * * 1' || (github.event.schedule != '17 */2 * * *' && needs.comprobar.outputs.hay_fallo == 'true'))))
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7
+        with:
+          node-version: ${{ vars.NODE_VERSION || '22' }}
+
+      - name: Enviar aviso (avisos-correo/v1)
+        env:
+          MODO: ${{ github.event_name == 'workflow_dispatch' && 'prueba' || (github.event.schedule == '47 17 * * 1' && 'latido' || 'ranura') }}
+          ESTADO_STAGING: ${{ needs.comprobar.outputs.estado_staging }}
+          HTTP_STAGING: ${{ needs.comprobar.outputs.http_staging }}
+          MS_STAGING: ${{ needs.comprobar.outputs.ms_staging }}
+          ESTADO_PRODUCCION: ${{ needs.comprobar.outputs.estado_produccion }}
+          HTTP_PRODUCCION: ${{ needs.comprobar.outputs.http_produccion }}
+          MS_PRODUCCION: ${{ needs.comprobar.outputs.ms_produccion }}
+          ESTADO_FUNCION: ${{ needs.comprobar.outputs.estado_funcion }}
+          HTTP_FUNCION: ${{ needs.comprobar.outputs.http_funcion }}
+          OCURRIDO_EN: ${{ needs.comprobar.outputs.ocurrido_en }}
+          EJECUCIONES_7D: ${{ needs.comprobar.outputs.ejecuciones_7d }}
+          FALLIDAS_7D: ${{ needs.comprobar.outputs.fallidas_7d }}
+          ID_EJECUCION: ${{ github.run_id }}
+          ENLACE: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          AVISOS_RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          AVISOS_PARA: ${{ secrets.AVISOS_PARA }}
+          AVISOS_DE: ${{ vars.AVISOS_DE }}
+        run: node scripts/vigilancia/aviso-disponibilidad.mjs
