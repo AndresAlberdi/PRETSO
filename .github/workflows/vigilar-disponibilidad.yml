@@ -27,6 +27,10 @@
 #     corre siempre en modo prueba: una segunda prueba el mismo día UTC recibe
 #     409 de Resend y falla a propósito.
 #
+# Re-ejecuciones: `avisar` no envía en `schedule` si `github.run_attempt` es
+# mayor que 1 (una re-ejecución manual no debe gastar cupo); `workflow_dispatch`
+# sí envía, como prueba.
+#
 # Regla de Dos (anexo 15, AL-04): `comprobar` NO tiene secretos y es el único
 # que lee texto de terceros (el HTML), del que solo emite enumeraciones y
 # números validados. `avisar` tiene la clave y no lee nada de terceros.
@@ -58,9 +62,9 @@ on:
 
 permissions: {}
 
-concurrency:
-  group: vigilar-disponibilidad
-  cancel-in-progress: false
+# Sin bloque `concurrency` (opción más simple): un grupo único cancelaría o
+# pondría en cola ejecuciones distintas, y los duplicados de correo ya los
+# cubre la idempotencia de Resend (`Idempotency-Key` = pretso:<id_unico>).
 
 jobs:
   comprobar:
@@ -231,7 +235,7 @@ jobs:
     environment: avisos
     permissions:
       contents: read
-    if: always() && needs.comprobar.result != 'cancelled' && needs.comprobar.outputs.ocurrido_en != '' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'schedule' && (github.event.schedule == '47 17 * * 1' || (github.event.schedule != '17 */2 * * *' && needs.comprobar.outputs.hay_fallo == 'true'))))
+    if: always() && needs.comprobar.result != 'cancelled' && needs.comprobar.outputs.ocurrido_en != '' && (github.event_name == 'workflow_dispatch' || (github.event_name == 'schedule' && github.run_attempt == 1 && (github.event.schedule == '47 17 * * 1' || (github.event.schedule != '17 */2 * * *' && needs.comprobar.outputs.hay_fallo == 'true'))))
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

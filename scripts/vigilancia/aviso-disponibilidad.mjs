@@ -8,6 +8,12 @@
 // posterior reemplaza `validarAviso`, `renderizar` y `enviar` y conserva
 // `construirAviso`.
 //
+// Los detectores del ADR-011 (credenciales, números largos, `@`, `://`...) se
+// comprueban en la prueba exhaustiva sobre asunto, que_paso y la expectativa.
+// `id_unico` (lleva el run_id, de 10 u 11 dígitos) y `enlace` (lleva `://`) se
+// validan con su patrón propio; queda PENDIENTE confirmar ese trato contra el
+// ADR-011 al migrar al artefacto fijado (PR-2).
+//
 // Nunca se imprime la clave, el destinatario, el asunto ni el cuerpo: la única
 // salida es una línea JSON con códigos.
 //
@@ -264,8 +270,9 @@ const largo = (s) => [...s].length
 /**
  * Valida la forma del contrato v1. Lanza AvisoInvalido(campo).
  * @param {Aviso} a
+ * @param {Date} [ahora] instante de referencia para el rango de `ocurrido_en`
  */
-export function validarAviso(a) {
+export function validarAviso(a, ahora = new Date()) {
   const claves = [
     'contrato',
     'nivel',
@@ -301,6 +308,11 @@ export function validarAviso(a) {
   }
   if (a.enlace !== null && !enlaceValido(a.enlace)) throw new AvisoInvalido('enlace')
   if (typeof a.ocurrido_en !== 'string' || !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/.test(a.ocurrido_en)) {
+    throw new AvisoInvalido('ocurrido_en')
+  }
+  // Entre 30 días atrás y 10 minutos en el futuro.
+  const t = Date.parse(a.ocurrido_en)
+  if (Number.isNaN(t) || t < ahora.getTime() - 30 * 86400000 || t > ahora.getTime() + 10 * 60000) {
     throw new AvisoInvalido('ocurrido_en')
   }
   if (typeof a.id_unico !== 'string' || !/^[A-Za-z0-9][A-Za-z0-9._:-]{7,119}$/.test(a.id_unico)) {
@@ -449,7 +461,7 @@ async function leerNombreError(resp) {
 
 /**
  * @param {Record<string, string | undefined>} env
- * @param {{fetchImpl?: typeof fetch, esperar?: (ms: number) => Promise<void>}} deps
+ * @param {{fetchImpl?: typeof fetch, esperar?: (ms: number) => Promise<void>, ahora?: Date}} deps
  * @returns {Promise<{linea: string, codigoSalida: number}>}
  */
 export async function ejecutar(env, deps) {
@@ -467,7 +479,7 @@ export async function ejecutar(env, deps) {
   try {
     const aviso = construirAviso(leerEntrada(env))
     if (aviso === null) return salida(null, null, 'nada', 'sin_novedad', 0)
-    validarAviso(aviso)
+    validarAviso(aviso, deps.ahora)
     const r = await enviar(aviso, {
       apiKey: env.AVISOS_RESEND_API_KEY,
       de: env.AVISOS_DE,
