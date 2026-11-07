@@ -54,7 +54,7 @@ describe('descarga del dataset', () => {
     fireEvent.click(screen.getByRole('button', { name: BOTON }));
     await waitFor(() => expect(screen.getByRole('status').textContent).toContain('Generando el dataset'));
     for (const nombre of [BOTON, /\(XML\)/, /\(XLSX\)/, /Google Drive/]) {
-      expect((screen.getByRole('button', { name: nombre }) as HTMLButtonElement).disabled).toBe(true);
+      expect(screen.getByRole('button', { name: nombre }).getAttribute('aria-disabled')).toBe('true');
     }
   });
 });
@@ -71,7 +71,7 @@ describe('reposo tras un éxito anterior', () => {
       vi.mocked(leerDatosDataset).mockReturnValue(new Promise(() => undefined));
       fireEvent.click(screen.getByRole('button', { name: BOTON }));
       await vi.advanceTimersByTimeAsync(3500);
-      expect((screen.getByRole('button', { name: BOTON }) as HTMLButtonElement).disabled).toBe(true);
+      expect(screen.getByRole('button', { name: BOTON }).getAttribute('aria-disabled')).toBe('true');
     } finally {
       vi.useRealTimers();
     }

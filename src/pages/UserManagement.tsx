@@ -10,7 +10,7 @@ let secondaryAuth: any;
 try {
   secondaryApp = initializeApp(firebaseConfig, "SecondaryApp");
   secondaryAuth = getAuth(secondaryApp);
-} catch (e) {
+} catch {
   // Ignorar errores de app ya inicializada
 }
 
@@ -25,6 +25,7 @@ export default function UserManagement() {
 
   const handleCreateUser = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (loading) return;
     setLoading(true);
     setStatus({ message: '', type: '' });
     
@@ -92,7 +93,7 @@ export default function UserManagement() {
 
         <button 
           type="submit" 
-          disabled={loading}
+          aria-disabled={loading || undefined}
           style={{ padding: '1rem', marginTop: '1rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer' }}
         >
           {loading ? 'Creando...' : 'Crear usuario lector'}
