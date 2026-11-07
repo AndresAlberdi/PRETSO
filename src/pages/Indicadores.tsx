@@ -31,6 +31,7 @@ export default function Indicadores() {
   const [companias, setCompanias] = useState<any[]>([]);
   const [transaccionesMap, setTransaccionesMap] = useState<Map<number, any>>(new Map());
   const [loading, setLoading] = useState(true);
+  const [errorCarga, setErrorCarga] = useState(false);
   const canEdit = useCanEdit();
   
   const { crudo, termino, fijar, quitar } = useTerminoBusqueda();
@@ -61,23 +62,28 @@ export default function Indicadores() {
 
   useEffect(() => {
     async function fetchData() {
-      const qInd = query(collection(db, "indicadores"));
-      const snapInd = await getDocs(qInd);
-      const docsInd = snapInd.docs.map(cleanFirebaseData).sort(
-        (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
-      );
-      setData(docsInd);
+      try {
+        const qInd = query(collection(db, "indicadores"));
+        const snapInd = await getDocs(qInd);
+        const docsInd = snapInd.docs.map(cleanFirebaseData).sort(
+          (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
+        );
+        setData(docsInd);
 
-      const snapComp = await getDocs(query(collection(db, "companias")));
-      setCompanias(snapComp.docs.map(cleanFirebaseData));
+        const snapComp = await getDocs(query(collection(db, "companias")));
+        setCompanias(snapComp.docs.map(cleanFirebaseData));
 
-      const qTrans = query(collection(db, "transacciones"));
-      const snapTrans = await getDocs(qTrans);
-      const tMap = new Map<number, any>();
-      snapTrans.docs.forEach(d => tMap.set(Number(d.data().Num), d.data()));
-      setTransaccionesMap(tMap);
+        const qTrans = query(collection(db, "transacciones"));
+        const snapTrans = await getDocs(qTrans);
+        const tMap = new Map<number, any>();
+        snapTrans.docs.forEach(d => tMap.set(Number(d.data().Num), d.data()));
+        setTransaccionesMap(tMap);
 
-      setLoading(false);
+        setLoading(false);
+      } catch (error) {
+        console.error('No se pudieron cargar los datos:', codigoError(error));
+        setErrorCarga(true);
+      }
     }
     fetchData();
   }, []);
@@ -180,7 +186,7 @@ export default function Indicadores() {
 
       {!loading && !selectedCategoria && !termino && <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Mostrando {sortedFilteredCategorias.length} categorías</p>}
 
-      {loading ? <p>Cargando datos...</p> : !selectedCategoria ? (
+      {errorCarga ? <p role="alert">No se pudieron cargar los datos. Recargue la página; si el error persiste, avise al equipo técnico.</p> : loading ? <p>Cargando datos...</p> : !selectedCategoria ? (
         <div>
           <div className="fila-filtros">
             <select
