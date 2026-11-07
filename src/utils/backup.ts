@@ -1,6 +1,7 @@
 import { collection, getDocs, query } from "firebase/firestore";
 import { db } from "../firebase";
 import JSZip from "jszip";
+import { esCampoRetirado } from "./camposRetirados";
 
 // Translation mapping from Spanish to English field names
 const FIELD_TRANSLATIONS: Record<string, Record<string, string>> = {
@@ -39,8 +40,7 @@ const FIELD_TRANSLATIONS: Record<string, Record<string, string>> = {
     'Ingresos': 'income',
     'Egresos': 'expenses',
     'Otros bienes de la compañía': 'other_company_assets',
-    'Transacción': 'transaction_ref',
-    'Datos sobre normativa de manejo de caja': 'cash_management_regulations'
+    'Transacción': 'transaction_ref'
   },
   salarios: {
     'Indicador de registro': 'record_indicator',
@@ -52,10 +52,7 @@ const FIELD_TRANSLATIONS: Record<string, Record<string, string>> = {
     'Monto a pagar': 'amount_paid',
     'Transacción': 'transaction_ref',
     'Ración diaria': 'daily_allowance',
-    'Pago por representación': 'performance_pay',
-    'Días de ración en un año': 'daily_allowance_days_per_year',
-    'Número estimado de representaciones por año': 'estimated_performances_per_year',
-    'Número de representaciones  por año ': 'performances_per_year'
+    'Pago por representación': 'performance_pay'
   },
   corpus_christi: {
     'Indicador de registro': 'record_indicator',
@@ -178,6 +175,7 @@ export async function generateDatabaseXml(): Promise<string> {
       // Ensure fields are output in sorted order for determinism and readability
       Object.keys(data).sort().forEach(key => {
         if (key === 'id') return; // ignore document reference ID
+        if (esCampoRetirado(collName, key)) return;
         const engKey = translateField(collName, key);
         const val = data[key];
         

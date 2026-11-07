@@ -74,7 +74,7 @@ async function abrirEdicion(opciones: { onSave?: () => Promise<void>; onClose?: 
     </Arnes>,
   );
   const origen = abrir('Editar');
-  await screen.findByRole('dialog', { name: /Editar Registro/ });
+  await screen.findByRole('dialog', { name: /Editar registro/ });
   return { origen, onClose, onSave };
 }
 
@@ -92,7 +92,7 @@ async function abrirAlta(opciones: { coleccion?: string; onClose?: () => void } 
     </Arnes>,
   );
   const origen = abrir('Nuevo Registro');
-  await screen.findByRole('dialog', { name: /Nuevo Registro - / });
+  await screen.findByRole('dialog', { name: /Nuevo registro: / });
   await waitFor(() => expect(screen.queryByText('Cargando opciones...')).toBeNull());
   return { origen, onClose };
 }
@@ -100,7 +100,7 @@ async function abrirAlta(opciones: { coleccion?: string; onClose?: () => void } 
 describe('GenericEditModal: accesibilidad', () => {
   it('es un diálogo con nombre accesible y el foco inicial va al primer campo editable', async () => {
     await abrirEdicion();
-    expect(screen.getByRole('dialog', { name: 'Editar Registro - BIBLIOGRAFÍA' }).getAttribute('aria-modal')).toBe('true');
+    expect(screen.getByRole('dialog', { name: 'Editar registro: BIBLIOGRAFÍA' }).getAttribute('aria-modal')).toBe('true');
     expect(document.activeElement).toBe(screen.getByDisplayValue('Autor'));
   });
 
@@ -152,7 +152,7 @@ describe('GenericEditModal: accesibilidad', () => {
     expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Seguir editando' }));
     escape();
     expect(screen.queryByRole('alertdialog')).toBeNull();
-    expect(screen.getByRole('dialog', { name: /Editar Registro/ })).toBeTruthy();
+    expect(screen.getByRole('dialog', { name: /Editar registro/ })).toBeTruthy();
     expect(onClose).not.toHaveBeenCalled();
   });
 
@@ -170,12 +170,12 @@ describe('GenericEditModal: accesibilidad', () => {
     const onSave = vi.fn(() => new Promise<void>(res => { terminar = res; }));
     const { onClose } = await abrirEdicion({ onSave });
     fireEvent.change(screen.getByDisplayValue('Autor'), { target: { value: 'Otro' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Guardar Cambios' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar cambios' }));
     await screen.findByRole('button', { name: 'Guardando...' });
     escape();
     expect(onClose).not.toHaveBeenCalled();
     expect(screen.queryByRole('alertdialog')).toBeNull();
-    expect(screen.getByRole('dialog', { name: /Editar Registro/ })).toBeTruthy();
+    expect(screen.getByRole('dialog', { name: /Editar registro/ })).toBeTruthy();
     terminar();
     await waitFor(() => expect(screen.queryByRole('button', { name: 'Guardando...' })).toBeNull());
   });
@@ -197,7 +197,7 @@ describe('GenericEditModal: accesibilidad', () => {
 describe('GenericCreateModal: accesibilidad', () => {
   it('es un diálogo con nombre accesible y el foco inicial va a «Cerrar»', async () => {
     await abrirAlta();
-    expect(screen.getByRole('dialog', { name: 'Nuevo Registro - BIBLIOGRAFÍA' }).getAttribute('aria-modal')).toBe('true');
+    expect(screen.getByRole('dialog', { name: 'Nuevo registro: BIBLIOGRAFÍA' }).getAttribute('aria-modal')).toBe('true');
     expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Cerrar' }));
   });
 
@@ -256,7 +256,7 @@ describe('GenericCreateModal: accesibilidad', () => {
     escape();
     escape();
     expect(screen.queryByRole('alertdialog')).toBeNull();
-    expect(screen.getByRole('dialog', { name: /Nuevo Registro/ })).toBeTruthy();
+    expect(screen.getByRole('dialog', { name: /Nuevo registro/ })).toBeTruthy();
     expect(onClose).not.toHaveBeenCalled();
   });
 

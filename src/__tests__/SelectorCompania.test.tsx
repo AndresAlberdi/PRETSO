@@ -21,7 +21,7 @@ describe('SelectorCompania', () => {
   it('excluye las compañías sin número de registro y conserva el 0', () => {
     const { selector } = montar(null);
     const textos = Array.from(selector.options).map(o => o.text);
-    expect(textos).toEqual(['Ninguna', 'GA-JR - Alarcón', 'CERO - Cero']);
+    expect(textos).toEqual(['Ninguna', 'GA-JR / Alarcón', 'CERO / Cero']);
     expect(Array.from(selector.options).some(o => o.value === '' && o.text !== 'Ninguna')).toBe(false);
   });
 

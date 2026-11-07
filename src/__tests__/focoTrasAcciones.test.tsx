@@ -6,6 +6,7 @@ import SearchBar from '../components/SearchBar';
 import GenericCreateModal from '../components/GenericCreateModal';
 import GenericEditModal from '../components/GenericEditModal';
 import ManejoCaja from '../pages/ManejoCaja';
+import { invalidarIndice } from '../utils/busquedaGuia/cargaIndice';
 import { useRestoreFocusOnViewChange } from '../hooks/useRestoreFocusOnViewChange';
 
 const colecciones: Record<string, any[]> = {
@@ -16,11 +17,12 @@ const colecciones: Record<string, any[]> = {
 };
 
 const setDoc = vi.hoisted(() => vi.fn());
+const ubicacion = vi.hoisted(() => ({ search: '' }));
 vi.mock('../firebase', () => ({ db: {} }));
 vi.mock('../utils/audit', () => ({ logAction: vi.fn() }));
 vi.mock('react-router', () => ({
   useNavigate: () => vi.fn(),
-  useLocation: () => ({ pathname: '/x', search: '', state: null }),
+  useLocation: () => ({ pathname: '/x', search: ubicacion.search, state: null }),
 }));
 vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isEditMode: false }) }));
 vi.mock('firebase/firestore', () => ({
@@ -34,7 +36,7 @@ vi.mock('firebase/firestore', () => ({
   }),
 }));
 
-beforeEach(() => { setDoc.mockReset().mockResolvedValue(undefined); });
+beforeEach(() => { setDoc.mockReset().mockResolvedValue(undefined); ubicacion.search = ''; });
 afterEach(cleanup);
 
 function agregar(texto: string) {
@@ -157,6 +159,17 @@ describe('Páginas de consulta', () => {
     expect(document.activeElement).toBe(document.getElementById('contenido'));
   });
 
+  it('ManejoCaja con término: «Volver a los resultados» lleva el foco a main', async () => {
+    invalidarIndice();
+    ubicacion.search = '?q=Potosí&compania=7';
+    render(<main id="contenido" tabIndex={-1}><ManejoCaja /></main>);
+    const volver = await screen.findByRole('button', { name: 'Volver a los resultados' });
+    volver.focus();
+    fireEvent.click(volver);
+    await screen.findByRole('button', { name: 'CAJA' });
+    expect(document.activeElement).toBe(document.getElementById('contenido'));
+  });
+
   it.each(['ManejoCaja', 'Salarios', 'CorpusChristi', 'Indicadores'])('%s usa el hook de foco', nombre => {
     const fuente = readFileSync(`src/pages/${nombre}.tsx`, 'utf8');
     expect(fuente.includes('useRestoreFocusOnViewChange(')).toBe(true);
@@ -169,11 +182,11 @@ describe('Botones de guardar', () => {
     let rechazar: (e: Error) => void = () => {};
     setDoc.mockImplementation(() => ({ then: (_ok: unknown, ko: (e: Error) => void) => { rechazar = ko; } }));
     render(<GenericCreateModal collectionName="bibliografia" onClose={vi.fn()} onCreated={vi.fn()} />);
-    await screen.findByRole('dialog', { name: /Nuevo Registro - / });
+    await screen.findByRole('dialog', { name: /Nuevo registro: / });
     await waitFor(() => expect(screen.queryByText('Cargando opciones...')).toBeNull());
     fireEvent.change(screen.getByPlaceholderText('Autores del documento...'), { target: { value: 'Alguien' } });
     fireEvent.change(screen.getByPlaceholderText('Detalles bibliográficos...'), { target: { value: 'Ref' } });
-    const enviar = screen.getByRole('button', { name: 'Crear Registro' });
+    const enviar = screen.getByRole('button', { name: 'Crear registro' });
     enviar.focus();
     fireEvent.submit(document.querySelector('form') as HTMLFormElement);
     const guardando = await screen.findByRole('button', { name: 'Guardando...' });
@@ -181,7 +194,7 @@ describe('Botones de guardar', () => {
     expect((guardando as HTMLButtonElement).disabled).toBe(false);
     expect(document.activeElement).toBe(guardando);
     rechazar(new Error('fallo'));
-    const tras = await screen.findByRole('button', { name: 'Crear Registro' });
+    const tras = await screen.findByRole('button', { name: 'Crear registro' });
     expect(tras.getAttribute('aria-disabled')).toBeNull();
     expect(document.activeElement).toBe(tras);
   });
@@ -197,7 +210,7 @@ describe('Botones de guardar', () => {
         onClose={vi.fn()}
       />,
     );
-    await screen.findByRole('dialog', { name: /Editar Registro/ });
+    await screen.findByRole('dialog', { name: /Editar registro/ });
     const campo = screen.getAllByRole('textbox')[0];
     campo.focus();
     const form = document.querySelector('form') as HTMLFormElement;
@@ -208,10 +221,10 @@ describe('Botones de guardar', () => {
     fireEvent.submit(form);
     expect(onSave).toHaveBeenCalledTimes(1);
     terminar();
-    await screen.findByRole('button', { name: 'Guardar Cambios' });
+    await screen.findByRole('button', { name: 'Guardar cambios' });
   });
 
-  it('edición: si onSave rechaza, vuelve «Guardar Cambios» sin aria-disabled y se puede reenviar', async () => {
+  it('edición: si onSave rechaza, vuelve «Guardar cambios» sin aria-disabled y se puede reenviar', async () => {
     const onSave = vi.fn().mockImplementation(() => ({ then: (_ok: unknown, ko: (e: Error) => void) => { ko(new Error('fallo')); } }));
     render(
       <GenericEditModal
@@ -221,7 +234,7 @@ describe('Botones de guardar', () => {
         onClose={vi.fn()}
       />,
     );
-    await screen.findByRole('dialog', { name: /Editar Registro/ });
+    await screen.findByRole('dialog', { name: /Editar registro/ });
     const form = document.querySelector('form') as HTMLFormElement;
     // El rechazo se propaga desde el manejador; se captura aquí para no ensuciar la ejecución.
     const previos = process.listeners('unhandledRejection');
@@ -229,10 +242,10 @@ describe('Botones de guardar', () => {
     const capturados: unknown[] = [];
     process.on('unhandledRejection', motivo => { capturados.push(motivo); });
     fireEvent.submit(form);
-    const boton = await screen.findByRole('button', { name: 'Guardar Cambios' });
+    const boton = await screen.findByRole('button', { name: 'Guardar cambios' });
     expect(boton.getAttribute('aria-disabled')).toBeNull();
     fireEvent.submit(form);
-    await screen.findByRole('button', { name: 'Guardar Cambios' });
+    await screen.findByRole('button', { name: 'Guardar cambios' });
     expect(onSave).toHaveBeenCalledTimes(2);
     await new Promise(r => setTimeout(r, 0));
     process.removeAllListeners('unhandledRejection');

@@ -10,12 +10,12 @@ const PAGINAS = join(SRC, 'pages');
 // prueba falla y obliga a justificarlo. «Resultados de búsqueda» y listas principales se conservan.
 const ESPERADO: Record<string, string[]> = {
   'Bibliografia.tsx': ['Autores', 'Referencias bibliográficas'],
-  'CorpusChristi.tsx': ['Ciudad', 'Año', 'Encargado', 'Monto a pagar', 'Ciudad', 'Año'],
+  'CorpusChristi.tsx': ['Ciudad', 'Año'],
   'Documentos.tsx': ['Doc ID'],
-  'IndiceCompanias.tsx': ['Sigla (Compañías)', 'Autores', 'Temporadas Teatrales', 'Ámbito'],
-  'Indicadores.tsx': ['Ciudad', 'Año', 'Concepto', 'Monto', 'Categoría', 'Ciudad', 'Años'],
-  'ManejoCaja.tsx': ['Compañía', 'Ciudad', 'Año', 'Compañía', 'Autores', 'Temporadas', 'Ámbito'],
-  'Salarios.tsx': ['Compañía', 'Ciudad', 'Año', 'Compañía', 'Autores', 'Temporadas', 'Ámbito'],
+  'IndiceCompanias.tsx': ['Sigla', 'Autores', 'Temporadas teatrales', 'Ámbito'],
+  'Indicadores.tsx': ['Categoría', 'Ciudad', 'Años'],
+  'ManejoCaja.tsx': ['Compañía', 'Autores', 'Temporadas', 'Ámbito'],
+  'Salarios.tsx': ['Compañía', 'Autores', 'Temporadas', 'Ámbito'],
   'Transacciones.tsx': ['Nro.'],
 };
 
@@ -124,9 +124,9 @@ describe('tablas: encabezados que ordenan', () => {
     }
   });
 
-  it('quedan 35 encabezados con orden en total', () => {
+  it('quedan 21 encabezados con orden en total', () => {
     const total = archivos.reduce((n, f) => n + etiquetasOrdenables(f).length, 0);
-    expect(total).toBe(35);
+    expect(total).toBe(21);
   });
 
   for (const archivo of MIGRADAS) {
@@ -144,10 +144,10 @@ describe('tablas: encabezados que ordenan', () => {
     'Bibliografia.tsx': ['sortConfig/requestSort'],
     'Documentos.tsx': ['sortConfig/requestSort'],
     'Transacciones.tsx': ['sortConfig/requestSort'],
-    'CorpusChristi.tsx': ['scSearch/sortSearch', 'scGroup/sortGroup'],
-    'Indicadores.tsx': ['scSearch/sortSearch', 'scCat/sortCat', 'scDetail/sortDetail'],
-    'ManejoCaja.tsx': ['scSearch/sortSearch', 'scComp/sortComp'],
-    'Salarios.tsx': ['scSearch/sortSearch', 'scComp/sortComp'],
+    'CorpusChristi.tsx': ['scGroup/sortGroup'],
+    'Indicadores.tsx': ['scCat/sortCat', 'scDetail/sortDetail'],
+    'ManejoCaja.tsx': ['scComp/sortComp'],
+    'Salarios.tsx': ['scComp/sortComp'],
     'IndiceCompanias.tsx': ['sortConfig/requestSort'],
   };
 
@@ -203,7 +203,7 @@ describe('«Num» se muestra como «Nro.»', () => {
     const etiquetas = readFileSync(join(SRC, 'utils', 'etiquetas.ts'), 'utf-8');
     expect(etiquetas).toContain("'Num': 'Nro.'");
     const modal = readFileSync(join(SRC, 'components', 'GenericEditModal.tsx'), 'utf-8');
-    expect(modal).toContain("import { etiquetaCampo } from '../utils/etiquetas'");
+    expect(modal).toContain("import { etiquetaCampo, nombreColeccion } from '../utils/etiquetas'");
     expect(modal).toContain('etiquetaCampo(key)');
     expect(modal).not.toContain('FIELD_LABEL_MAP');
   });
