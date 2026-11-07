@@ -1,0 +1,3 @@
+Contact: mailto:[[PENDIENTE: correo de seguridad de la Universidad]]
+Expires: [[PENDIENTE: fecha ISO 8601, máximo 1 año]]
+Preferred-Languages: es, it, en
