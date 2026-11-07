@@ -113,10 +113,17 @@ export default function Administracion() {
       const client = google.accounts.oauth2.initTokenClient({
         client_id: clientId,
         scope: 'https://www.googleapis.com/auth/drive.file',
+        // Cerrar la ventana de Google o bloquearla no invoca el callback: sin esto los botones quedarían bloqueados.
+        error_callback: (e: { type?: string }) => {
+          console.error('La ventana de autorización de Google se cerró o falló:', e?.type);
+          setBackupStatus('error');
+          setStatusMessage('No se completó la autorización de Google Drive. Vuelva a intentarlo.');
+        },
         callback: async (tokenResponse: any) => {
           if (tokenResponse.error) {
             setBackupStatus('error');
-            setStatusMessage(`Error de autorización Google: ${tokenResponse.error_description || tokenResponse.error}`);
+            console.error('Autorización de Google Drive rechazada:', tokenResponse.error);
+            setStatusMessage('No se autorizó el acceso a Google Drive. Vuelva a intentarlo; si el error persiste, avise al equipo técnico.');
             return;
           }
 
@@ -206,28 +213,28 @@ export default function Administracion() {
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '1rem' }}>
             <button 
               onClick={handleDownloadXml}
-              style={{ padding: '0.8rem 1.5rem', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+              style={{ padding: '0.8rem 1.5rem', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px', cursor: backupStatus === 'loading' ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}
               aria-disabled={backupStatus === 'loading' || undefined}
             >
               Descargar base de datos (XML)
             </button>
             <button 
               onClick={handleDownloadXlsx}
-              style={{ padding: '0.8rem 1.5rem', background: '#28a745', color: 'var(--on-success)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+              style={{ padding: '0.8rem 1.5rem', background: '#28a745', color: 'var(--on-success)', border: 'none', borderRadius: '4px', cursor: backupStatus === 'loading' ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}
               aria-disabled={backupStatus === 'loading' || undefined}
             >
               Descargar base de datos (XLSX)
             </button>
             <button 
               onClick={handleDownloadDataset}
-              style={{ padding: '0.8rem 1.5rem', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+              style={{ padding: '0.8rem 1.5rem', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px', cursor: backupStatus === 'loading' ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}
               aria-disabled={backupStatus === 'loading' || undefined}
             >
               Descargar dataset (ZIP)
             </button>
             <button 
               onClick={handleGoogleDriveBackup}
-              style={{ padding: '0.8rem 1.5rem', background: '#4285F4', color: 'var(--on-accent)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
+              style={{ padding: '0.8rem 1.5rem', background: '#4285F4', color: 'var(--on-accent)', border: 'none', borderRadius: '4px', cursor: backupStatus === 'loading' ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}
               aria-disabled={backupStatus === 'loading' || undefined}
             >
               Copia a Google Drive

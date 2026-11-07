@@ -70,6 +70,15 @@ describe('botones ocupados conservan el foco', () => {
     await pulsarDosVeces(screen.getByRole('button', { name: 'Entrar' }), vi.mocked(signInWithEmailAndPassword));
   });
 
+  it('con Google pendiente, enviar el formulario no inicia sesión con correo', async () => {
+    vi.mocked(signInWithPopup).mockReturnValue(new Promise(() => undefined));
+    const { container } = render(<AccesoForm />);
+    fireEvent.click(screen.getByRole('button', { name: 'Continuar con Google' }));
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Conectando con Google...' })).toBeTruthy());
+    fireEvent.submit(container.querySelector('form') as HTMLFormElement);
+    expect(signInWithEmailAndPassword).not.toHaveBeenCalled();
+  });
+
   it('Continuar con Google', async () => {
     vi.mocked(signInWithPopup).mockReturnValue(new Promise(() => undefined));
     render(<AccesoForm />);
