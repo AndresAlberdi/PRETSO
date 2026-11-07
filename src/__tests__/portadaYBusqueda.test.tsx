@@ -1,9 +1,14 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, within, cleanup, act } from '@testing-library/react';
+import { render, screen, within, cleanup, act, fireEvent } from '@testing-library/react';
 import { MemoryRouter } from 'react-router';
 
-vi.mock('../firebase', () => ({ db: {} }));
-let estado: { isAdmin: boolean; adminLoading: boolean } = { isAdmin: false, adminLoading: false };
+vi.mock('../firebase', () => ({ db: {}, auth: {} }));
+vi.mock('firebase/auth', () => ({
+  signInWithEmailAndPassword: vi.fn(),
+  signInWithPopup: vi.fn(),
+  GoogleAuthProvider: vi.fn(function GoogleAuthProvider() {}),
+}));
+let estado: { isAdmin: boolean; adminLoading: boolean; authNotice?: string | null; clearAuthNotice?: () => void } = { isAdmin: false, adminLoading: false, authNotice: null, clearAuthNotice: () => undefined };
 vi.mock('../context/AdminContext', () => ({ useAdmin: () => estado }));
 
 const consultadas: string[] = [];
@@ -23,12 +28,14 @@ vi.mock('firebase/firestore', () => ({
 import Portada from '../pages/Portada';
 import Busqueda from '../pages/Busqueda';
 import { SECCIONES } from '../utils/secciones';
+import { invalidarIndice } from '../utils/busquedaGuia/cargaIndice';
 
 beforeEach(() => {
   consultadas.length = 0;
+  invalidarIndice();
   fallar = false;
   retener = null;
-  estado = { isAdmin: false, adminLoading: false };
+  estado = { isAdmin: false, adminLoading: false, authNotice: null, clearAuthNotice: () => undefined };
   vi.spyOn(console, 'error').mockImplementation(() => {});
 });
 afterEach(() => {
@@ -66,6 +73,20 @@ describe('Portada', () => {
   });
 });
 
+describe('Portada con acceso (sin sesión)', () => {
+  it('muestra título, logos y el acceso, sin botones de la aplicación', () => {
+    enRouter(<Portada acceso />);
+    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('PRETSO');
+    expect(screen.getAllByRole('img')).toHaveLength(3);
+    expect(screen.getByRole('heading', { level: 2, name: 'Iniciar sesión' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Continuar con Google' })).toBeTruthy();
+    expect(screen.queryByRole('link', { name: 'Realizar búsquedas' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Editar' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Administración' })).toBeNull();
+  });
+});
+
 describe('Búsqueda general', () => {
   it('lista las seis secciones en orden con sus rutas', async () => {
     enRouter(<Busqueda />);
@@ -76,17 +97,17 @@ describe('Búsqueda general', () => {
       expect(e.getAttribute('href')).toBe(SECCIONES[i].ruta);
       expect(e.textContent).toContain(SECCIONES[i].nombre);
     });
-    await vi.waitFor(() => expect(screen.queryByText(/Cargando base de datos/)).toBeNull());
+    await vi.waitFor(() => expect(consultadas.length).toBe(8));
   });
 
-  it('el lector no consulta transacciones ni documentos', async () => {
+  it('el lector sí consulta transacciones y documentos para subir la coincidencia a su caja', async () => {
     enRouter(<Busqueda />);
-    await vi.waitFor(() => expect(consultadas.length).toBe(6));
-    expect(consultadas).not.toContain('transacciones');
-    expect(consultadas).not.toContain('documentos');
+    await vi.waitFor(() => expect(consultadas.length).toBe(8));
+    expect(consultadas).toContain('transacciones');
+    expect(consultadas).toContain('documentos');
   });
 
-  it('el administrador sí las consulta', async () => {
+  it('el administrador consulta las mismas ocho colecciones', async () => {
     estado = { isAdmin: true, adminLoading: false };
     enRouter(<Busqueda />);
     await vi.waitFor(() => expect(consultadas.length).toBe(8));
@@ -99,14 +120,32 @@ describe('Búsqueda general', () => {
     enRouter(<Busqueda />);
     const alerta = await screen.findByRole('alert');
     expect(alerta.textContent).toBe('No se pudo cargar la base de datos para la búsqueda. Inténtelo de nuevo más tarde.');
-    expect(screen.queryByText(/Cargando base de datos/)).toBeNull();
+    expect(screen.queryByText(/Buscando en la base de datos/)).toBeNull();
+  });
+
+  it('con fallo de carga y sin término sigue mostrando la lista de secciones', async () => {
+    fallar = true;
+    enRouter(<Busqueda />);
+    expect(await screen.findByRole('alert')).toBeTruthy();
+    expect(screen.getByRole('navigation', { name: 'Secciones de la base de datos' })).toBeTruthy();
+  });
+
+  it('«Reintentar» vuelve a cargar y, si ahora funciona, quita el aviso', async () => {
+    fallar = true;
+    enRouter(<Busqueda />);
+    await screen.findByRole('alert');
+    fallar = false;
+    consultadas.length = 0;
+    fireEvent.click(screen.getByRole('button', { name: 'Reintentar' }));
+    await vi.waitFor(() => expect(screen.queryByRole('alert')).toBeNull());
+    expect(consultadas.length).toBe(8);
   });
 
   it('si se desmonta antes de resolver getDocs no actualiza estado ni registra error', async () => {
     let liberar!: () => void;
     retener = new Promise<void>((r) => { liberar = r; });
     const { unmount } = enRouter(<Busqueda />);
-    await vi.waitFor(() => expect(consultadas.length).toBe(6));
+    await vi.waitFor(() => expect(consultadas.length).toBe(8));
     unmount();
     await act(async () => {
       liberar();
@@ -120,7 +159,7 @@ describe('Búsqueda general', () => {
     let liberar!: () => void;
     retener = new Promise<void>((r) => { liberar = r; });
     const { unmount } = enRouter(<Busqueda />);
-    await vi.waitFor(() => expect(consultadas.length).toBe(6));
+    await vi.waitFor(() => expect(consultadas.length).toBe(8));
     unmount();
     await act(async () => {
       liberar();

@@ -11,19 +11,9 @@ import {
 } from '../utils/siglas';
 import { TEXTO_LIBRE, TEXTO_CODIGO } from '../utils/correctorOrtografico';
 import SelectorCompania from './SelectorCompania';
+import { nombreColeccion } from '../utils/etiquetas';
 import Modal from './Modal';
 import ConfirmModal from './ConfirmModal';
-
-const COLLECTION_LABELS: Record<string, string> = {
-  documentos: 'Documentos',
-  companias: 'Compañias',
-  transacciones: 'Transacciones',
-  manejo_de_caja: 'Manejo de Caja',
-  salarios: 'Remuneraciones',
-  corpus_christi: 'Corpus Christi',
-  indicadores: 'Indicadores',
-  bibliografia: 'Bibliografía'
-};
 
 interface GenericCreateModalProps {
   collectionName: string;
@@ -143,13 +133,13 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
         }
 
         // 2. Load associations depending on collection requirements
-        // We always need companies for Salarios, Manejo de Caja, Indicadores, Corpus Christi
+        // We always need companies for Salarios, Manejo de caja, Indicadores, Corpus Christi
         const qComp = query(collection(db, 'companias'));
         const snapComp = await getDocs(qComp);
         const compList = snapComp.docs.map(cleanFirebaseData);
         setCompanies(compList);
 
-        // We need transactions for Indicadores, Corpus Christi, Salarios, Manejo de Caja
+        // We need transactions for Indicadores, Corpus Christi, Salarios, Manejo de caja
         const qTrans = query(collection(db, 'transacciones'));
         const snapTrans = await getDocs(qTrans);
         const transList = snapTrans.docs.map(cleanFirebaseData).sort((a, b) => Number(a.Num) - Number(b.Num));
@@ -303,7 +293,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
         if (recordToSave['Pago por representación'] !== undefined) recordToSave['Pago por representación'] = Number(recordToSave['Pago por representación']) || null;
       }
 
-      // Manejo de Caja
+      // Manejo de caja
       if (collectionName === 'manejo_de_caja') {
         if (canonizarReferencia(recordToSave['Sigla Compañía']) === '') {
           throw new ValidationError('Sigla Compañía', "Debe elegir una compañía existente.");
@@ -401,7 +391,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
     <>
       <Modal labelledBy={titleId} onEscape={handleEscape} initialFocus={closeRef} overlayStyle={overlayStyle} panelStyle={panelStyle}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem', marginBottom: '1.5rem' }}>
-          <h2 id={titleId} style={{ marginTop: 0, color: 'var(--primary-color)' }}>Nuevo Registro - {(COLLECTION_LABELS[collectionName] || collectionName).toUpperCase()}</h2>
+          <h2 id={titleId} style={{ marginTop: 0, color: 'var(--primary-color)' }}>Nuevo registro: {nombreColeccion(collectionName).toUpperCase()}</h2>
           <button ref={closeRef} onClick={onClose} disabled={saving} style={{ padding: '0.4rem 0.8rem', background: '#ccc', color: '#333', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Cerrar</button>
         </div>
 
@@ -411,7 +401,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
             {/* 1. Show Correlative ID if applicable */}
             {nextIndex !== null && (
               <div style={{ background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '6px', border: '1px solid var(--border-color)' }}>
-                <span style={{ fontWeight: 'bold' }}>Índice Autogenerado: </span>
+                <span style={{ fontWeight: 'bold' }}>Índice autogenerado: </span>
                 <span style={{ fontSize: '1.1rem', color: 'var(--primary-color)', fontWeight: 'bold' }}>{nextIndex}</span>
               </div>
             )}
@@ -460,7 +450,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                 </label>
                 
                 <fieldset style={fieldsetStyle}>
-                  <legend style={legendStyle}>Asociar Documentos (Hasta 10)</legend>
+                  <legend style={legendStyle}>Asociar documentos (hasta 10)</legend>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(200px, 100%), 1fr))', gap: '0.8rem' }}>
                     {Array.from({ length: 10 }).map((_, i) => (
                       <div key={i} style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
@@ -575,7 +565,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
             {collectionName === 'manejo_de_caja' && (
               <>
                 <label htmlFor={`${fieldId}-compania`} style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <strong>Sigla Compañía (Obligatorio)</strong>
+                  <strong>Sigla de la compañía (obligatorio)</strong>
                   <SelectorCompania
                     id={`${fieldId}-compania`}
                     required
@@ -589,7 +579,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   />
                 </label>
                 <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <strong>Transacción Relacionada (Obligatorio)</strong>
+                  <strong>Transacción relacionada (obligatorio)</strong>
                   <select
                     required
                     {...invalidProps('Transacción')}
@@ -648,15 +638,6 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                     onChange={e => handleChange('Otros bienes de la compañía', e.target.value)}
                   />
                 </label>
-                <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <strong>Datos sobre normativa de manejo de caja</strong>
-                  <input
-                    type="text"
-                    {...TEXTO_LIBRE}
-                    value={formData['Datos sobre normativa de manejo de caja'] || ''}
-                    onChange={e => handleChange('Datos sobre normativa de manejo de caja', e.target.value)}
-                  />
-                </label>
               </>
             )}
 
@@ -664,7 +645,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
             {collectionName === 'salarios' && (
               <>
                 <label htmlFor={`${fieldId}-compania`} style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <strong>Sigla Compañía (Obligatorio)</strong>
+                  <strong>Sigla de la compañía (obligatorio)</strong>
                   <SelectorCompania
                     id={`${fieldId}-compania`}
                     required
@@ -678,7 +659,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   />
                 </label>
                 <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <strong>Transacción Relacionada (Obligatorio)</strong>
+                  <strong>Transacción relacionada (obligatorio)</strong>
                   <select
                     required
                     {...invalidProps('Transacción')}
@@ -750,30 +731,6 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                     type="number"
                     value={formData['Pago por representación'] || ''}
                     onChange={e => handleChange('Pago por representación', e.target.value)}
-                  />
-                </label>
-                <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <strong>Días de ración en un año</strong>
-                  <input
-                    type="number"
-                    value={formData['Días de ración en un año'] || ''}
-                    onChange={e => handleChange('Días de ración en un año', e.target.value)}
-                  />
-                </label>
-                <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <strong>Número estimado de representaciones por año</strong>
-                  <input
-                    type="number"
-                    value={formData['Número estimado de representaciones por año'] || ''}
-                    onChange={e => handleChange('Número estimado de representaciones por año', e.target.value)}
-                  />
-                </label>
-                <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <strong>Número de representaciones por año</strong>
-                  <input
-                    type="number"
-                    value={formData['Número de representaciones  por año '] || ''}
-                    onChange={e => handleChange('Número de representaciones  por año ', e.target.value)}
                   />
                 </label>
               </>
@@ -858,7 +815,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                 </fieldset>
 
                 <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <strong>Transacción Relacionada (Obligatorio)</strong>
+                  <strong>Transacción relacionada (obligatorio)</strong>
                   <select
                     required
                     {...invalidProps('Transacción')}
@@ -908,7 +865,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                   />
                 </label>
                 <label htmlFor={`${fieldId}-compania`} style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <strong>Compañía Principal</strong>
+                  <strong>Compañía principal</strong>
                   <SelectorCompania
                     id={`${fieldId}-compania`}
                     companias={companies}
@@ -962,7 +919,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                 </fieldset>
 
                 <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <strong>Transacción Relacionada (Obligatorio)</strong>
+                  <strong>Transacción relacionada (obligatorio)</strong>
                   <select
                     required
                     {...invalidProps('Transacción')}
@@ -1050,7 +1007,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
                 aria-disabled={saving || undefined}
                 style={{ padding: '0.5rem 1.2rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', cursor: saving ? 'not-allowed' : 'pointer' }}
               >
-                {saving ? 'Guardando...' : 'Crear Registro'}
+                {saving ? 'Guardando...' : 'Crear registro'}
               </button>
             </div>
 

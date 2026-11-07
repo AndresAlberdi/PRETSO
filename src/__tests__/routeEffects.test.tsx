@@ -56,13 +56,13 @@ describe('RouteEffects', () => {
     render(<MemoryRouter initialEntries={['/']}><Shell /></MemoryRouter>);
     expect(document.title).toBe('Inicio — PRETSO');
     act(() => { navegar('/caja'); });
-    expect(document.title).toBe('Manejo de Caja — PRETSO');
+    expect(document.title).toBe('Manejo de caja — PRETSO');
   });
 
   it('un cambio de ruta con REPLACE no mueve el foco', () => {
     render(<MemoryRouter initialEntries={['/']}><Shell /></MemoryRouter>);
     act(() => { navegar('/caja', { replace: true }); });
-    expect(document.title).toBe('Manejo de Caja — PRETSO');
+    expect(document.title).toBe('Manejo de caja — PRETSO');
     expect(document.activeElement).not.toBe(document.getElementById('contenido'));
   });
 

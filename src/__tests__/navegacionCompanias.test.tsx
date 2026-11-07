@@ -10,7 +10,10 @@ const fallo = vi.hoisted(() => ({ coleccion: null as string | null }));
 
 vi.mock('../firebase', () => ({ db: {} }));
 vi.mock('../utils/audit', () => ({ logAction: vi.fn() }));
-vi.mock('react-router', () => ({ useNavigate: () => navegar }));
+vi.mock('react-router', () => ({
+  useNavigate: () => navegar,
+  useLocation: () => ({ pathname: '/companias', search: '', state: null }),
+}));
 vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isEditMode: false }) }));
 vi.mock('firebase/firestore', () => ({
   collection: (_db: unknown, nombre: string) => nombre,

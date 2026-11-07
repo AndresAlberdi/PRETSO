@@ -261,6 +261,8 @@ firebase functions:delete createReaderUser --project pretso-database
 firebase deploy --only functions:createReaderUser --project pretso-database --non-interactive
 ```
 
+**Actualización 2026-11-02:** la función antigua se retiró de staging el 2026-10-01 y `createReaderUser` se eliminó del código (PR de la lista de usuarios); la opción B ya no existe. El único export de `functions/` es `listAccounts`.
+
 Mientras tanto, el hueco de `reader` (2.4) depende de esta decisión. Para otras funciones futuras: `git revert` del cambio de `functions/` + PR + `firebase deploy --only functions:<nombre>`; Firebase no ofrece rollback de versión de una función sin redesplegar, y el rollback automático del pipeline no las cubre. El workflow ya detecta fallos de Functions que `firebase deploy` informa con código 0.
 
 ### 2.6 Configuración e IAM

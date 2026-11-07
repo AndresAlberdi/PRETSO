@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
-import Login from '../pages/Login';
+import AccesoForm from '../components/AccesoForm';
 
-const navigateMock = vi.hoisted(() => vi.fn());
+const avisoMock = vi.hoisted(() => ({ aviso: null as string | null, limpiar: vi.fn() }));
 
 vi.mock('firebase/app', () => ({ initializeApp: vi.fn(() => ({})) }));
 vi.mock('firebase/auth', () => ({
@@ -13,7 +13,9 @@ vi.mock('firebase/auth', () => ({
   GoogleAuthProvider: vi.fn(function GoogleAuthProvider() {}),
 }));
 vi.mock('../firebase', () => ({ auth: {}, firebaseConfig: {} }));
-vi.mock('react-router', () => ({ useNavigate: () => navigateMock }));
+vi.mock('../context/AdminContext', () => ({
+  useAdmin: () => ({ authNotice: avisoMock.aviso, clearAuthNotice: avisoMock.limpiar }),
+}));
 
 const NO_AUTORIZADA =
   'Esta cuenta de Google no está autorizada en PRETSO. Solicite el acceso a la administración del proyecto.';
@@ -23,7 +25,8 @@ let errorSpy: ReturnType<typeof vi.spyOn>;
 
 beforeEach(() => {
   vi.mocked(signInWithPopup).mockReset();
-  navigateMock.mockReset();
+  avisoMock.aviso = null;
+  avisoMock.limpiar.mockReset();
   errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
 });
 
@@ -33,14 +36,15 @@ afterEach(() => {
 });
 
 describe('Login con Google', () => {
-  it('éxito: abre el popup una vez y navega a la raíz', async () => {
+  it('éxito: abre el popup una vez, sin navegar ni mostrar alertas', async () => {
     vi.mocked(signInWithPopup).mockResolvedValue({} as never);
-    render(<Login />);
+    render(<AccesoForm />);
     fireEvent.click(screen.getByRole('button', { name: 'Continuar con Google' }));
     // Sin await previo: el navegador solo permite el popup si sale del propio clic.
     expect(signInWithPopup).toHaveBeenCalledTimes(1);
-    await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/', { replace: true }));
+    await waitFor(() => expect((screen.getByRole('button', { name: 'Continuar con Google' }) as HTMLButtonElement).disabled).toBe(false));
     expect(signInWithPopup).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole('alert')).toBeNull();
     const [authArg, provider] = vi.mocked(signInWithPopup).mock.calls[0];
     expect(authArg).toEqual({});
     expect(provider).toBeInstanceOf(GoogleAuthProvider);
@@ -49,7 +53,7 @@ describe('Login con Google', () => {
 
   it('pendiente: ambos botones quedan deshabilitados', async () => {
     vi.mocked(signInWithPopup).mockReturnValue(new Promise(() => undefined));
-    render(<Login />);
+    render(<AccesoForm />);
     fireEvent.click(screen.getByRole('button', { name: 'Continuar con Google' }));
     const google = await screen.findByRole('button', { name: 'Conectando con Google...' });
     expect((google as HTMLButtonElement).disabled).toBe(true);
@@ -61,13 +65,12 @@ describe('Login con Google', () => {
       code: 'auth/admin-restricted-operation',
       customData: { email: 'persona@example.com' },
     });
-    render(<Login />);
+    render(<AccesoForm />);
     fireEvent.click(screen.getByRole('button', { name: 'Continuar con Google' }));
     const alerts = await screen.findAllByRole('alert');
     expect(alerts).toHaveLength(1);
     expect(alerts[0].textContent).toBe(NO_AUTORIZADA);
     expect(errorSpy.mock.calls).toEqual([['Error al iniciar sesión con Google:', 'auth/admin-restricted-operation']]);
-    expect(navigateMock).not.toHaveBeenCalled();
     expect(document.body.textContent).not.toContain('persona@example.com');
     expect((screen.getByRole('button', { name: 'Continuar con Google' }) as HTMLButtonElement).disabled).toBe(false);
   });
@@ -75,7 +78,7 @@ describe('Login con Google', () => {
   it('popup cerrado: muestra su texto y un segundo clic limpia el alert', async () => {
     vi.mocked(signInWithPopup).mockRejectedValueOnce({ code: 'auth/popup-closed-by-user' });
     vi.mocked(signInWithPopup).mockReturnValueOnce(new Promise(() => undefined));
-    render(<Login />);
+    render(<AccesoForm />);
     fireEvent.click(screen.getByRole('button', { name: 'Continuar con Google' }));
     expect((await screen.findByRole('alert')).textContent).toBe(CERRADA);
     fireEvent.click(screen.getByRole('button', { name: 'Continuar con Google' }));
@@ -83,14 +86,37 @@ describe('Login con Google', () => {
   });
 
   it('el botón es type="button" y el envío del formulario no abre el popup', () => {
-    const { container } = render(<Login />);
+    const { container } = render(<AccesoForm />);
     expect(screen.getByRole('button', { name: 'Continuar con Google' }).getAttribute('type')).toBe('button');
     fireEvent.submit(container.querySelector('form') as HTMLFormElement);
     expect(signInWithPopup).not.toHaveBeenCalled();
   });
 
-  it('tiene un solo h1', () => {
-    render(<Login />);
-    expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
+  it('no tiene h1 (lo pone la portada) y sí el h2 «Iniciar sesión»', () => {
+    render(<AccesoForm />);
+    expect(screen.queryAllByRole('heading', { level: 1 })).toHaveLength(0);
+    expect(screen.getByRole('heading', { level: 2, name: 'Iniciar sesión' })).toBeTruthy();
+  });
+
+  it('con aviso de la administración: un alert con el texto y el foco en él', () => {
+    avisoMock.aviso = 'Aviso de prueba';
+    render(<AccesoForm />);
+    const alerta = screen.getByRole('alert');
+    expect(alerta.textContent).toBe('Aviso de prueba');
+    expect(document.activeElement).toBe(alerta);
+  });
+
+  it('un intento nuevo (Google o formulario) limpia el aviso', () => {
+    vi.mocked(signInWithPopup).mockReturnValue(new Promise(() => undefined));
+    const { container } = render(<AccesoForm />);
+    fireEvent.click(screen.getByRole('button', { name: 'Continuar con Google' }));
+    expect(avisoMock.limpiar).toHaveBeenCalledTimes(1);
+    fireEvent.submit(container.querySelector('form') as HTMLFormElement);
+    expect(avisoMock.limpiar).toHaveBeenCalledTimes(2);
+  });
+
+  it('el marcador del correo no sugiere una cuenta de administración', () => {
+    render(<AccesoForm />);
+    expect(screen.getByLabelText('Correo electrónico').getAttribute('placeholder')).toBe('nombre@example.com');
   });
 });

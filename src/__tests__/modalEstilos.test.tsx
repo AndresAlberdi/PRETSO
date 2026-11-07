@@ -50,7 +50,7 @@ describe('caracterización de los estilos de las ventanas modales', () => {
 
   it('DetailsModal', () => {
     render(<DetailsModal record={{ id: 'a', Campo: 'valor' }} onClose={() => {}} />);
-    expect(capas('Detalles del Registro')).toMatchInlineSnapshot(`
+    expect(capas('Detalles del registro')).toMatchInlineSnapshot(`
       {
         "overlay": "position: fixed; top: 0px; left: 0px; right: 0px; bottom: 0px; background-color: rgba(0, 0, 0, 0.5); display: flex; align-items: center; justify-content: center; z-index: 1000;",
         "panel": "background: var(--bg-card); padding: 2rem; border-radius: 8px; width: 90%; max-width: 600px; max-height: 90vh; overflow-y: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.15);",
@@ -70,7 +70,7 @@ describe('caracterización de los estilos de las ventanas modales', () => {
 
   it('TransactionModal', () => {
     render(<TransactionModal transactionCode={5} onClose={() => {}} />);
-    expect(capas('Detalle de Transacción 5')).toMatchInlineSnapshot(`
+    expect(capas('Detalle de transacción 5')).toMatchInlineSnapshot(`
       {
         "overlay": "position: fixed; top: 0px; left: 0px; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.7); z-index: 9999; display: flex; align-items: center; justify-content: center;",
         "panel": "background: var(--bg-card); padding: 2rem; border-radius: 12px; width: 90%; max-width: 800px; max-height: 90vh; overflow-y: auto; border: 1px solid var(--border-color); box-shadow: 0 8px 32px rgba(0,0,0,0.5);",
@@ -80,7 +80,7 @@ describe('caracterización de los estilos de las ventanas modales', () => {
 
   it('CompaniaModal con la compañía ya resuelta', () => {
     render(<CompaniaModal compania={{ 'Sigla Compañía': 'JG' }} onClose={() => {}} />);
-    expect(capas('Detalle de Compañía')).toMatchInlineSnapshot(`
+    expect(capas('Detalle de compañía')).toMatchInlineSnapshot(`
       {
         "overlay": "position: fixed; top: 0px; left: 0px; right: 0px; bottom: 0px; background-color: rgba(0, 0, 0, 0.7); display: flex; align-items: center; justify-content: center; z-index: 1000;",
         "panel": "background: var(--bg-color); padding: 2rem; border-radius: 1rem; max-width: 800px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.5);",

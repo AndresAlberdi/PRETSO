@@ -52,3 +52,6 @@ tfplan*
 .claude/worktrees/
 .claude/settings.local.json
 .claude/*.local.*
+
+# Salida compilada de Cloud Functions (se genera en el predeploy)
+functions/lib/

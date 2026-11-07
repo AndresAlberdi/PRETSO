@@ -116,7 +116,6 @@ export default function Documentos() {
       <div className="cabecera-pagina" style={{ flexWrap: 'wrap' }}>
         <div>
           <h1>Documentos</h1>
-          {canLoad && <p className="etiqueta-editor">Solo editores</p>}
         </div>
         <div className="acciones-cabecera">
           <SearchBar onSearch={setFilters} categories={SEARCH_CATEGORIES} />
@@ -182,7 +181,7 @@ export default function Documentos() {
 
       {recordToDelete && (
         <ConfirmModal 
-          title="Confirmar Borrado"
+          title="Confirmar borrado"
           message={`¿Está seguro de que desea eliminar el documento ${recordToDelete["Doc"]}?`}
           onConfirm={handleDelete}
           onCancel={() => setRecordToDelete(null)}
@@ -192,7 +191,7 @@ export default function Documentos() {
 
       {deleteErrorAlert && (
         <ConfirmModal 
-          title="Error de Integridad"
+          title="Error de integridad"
           message={deleteErrorAlert}
           onCancel={() => setDeleteErrorAlert(null)}
           isAlertOnly={true}
