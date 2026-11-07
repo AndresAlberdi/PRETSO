@@ -10,10 +10,9 @@ rules_version = '2';
 // 1. El privilegio de escritura deja de depender de un correo escrito de forma
 //    fija ('pretsodatabase@gmail.com') y pasa a un custom claim `admin` que se
 //    administra desde el backend sin editar ni redesplegar reglas.
-// 2. La lectura deja de ser «cualquier usuario autenticado»: con el registro
-//    abierto por la apiKey pública, cualquiera podría leer todo. Ahora exige
-//    administrador o el claim `reader` (función lector()); `logs` y `users`
-//    solo los lee el administrador.
+// 2. La lectura del corpus es pública (lista cerrada de 8 colecciones, contrato
+//    con Ca' Foscari); el resto exige administrador o el claim `reader`; `logs`
+//    y `users` solo los lee el administrador.
 // 3. `logs` solo admite altas válidas (autor = correo del token, hora del
 //    servidor); nadie la edita ni la borra desde el cliente.
 //
@@ -68,6 +67,18 @@ service cloud.firestore {
       allow read: if esAdmin();
       allow create, update: if esAdmin();
       allow delete: if esAdmin();
+    }
+
+    // Interfaz pública de solo lectura (contrato con la Università Ca' Foscari Venezia).
+    // Lista cerrada: una colección nueva NO queda pública sin editar esta lista.
+    // Nunca incluye logs ni users. No alcanza subcolecciones ni concede escritura.
+    function coleccionPublica(coleccion) {
+      return coleccion in ['bibliografia', 'companias', 'corpus_christi', 'documentos',
+                           'indicadores', 'manejo_de_caja', 'salarios', 'transacciones'];
+    }
+
+    match /{coleccion}/{docId} {
+      allow read: if coleccionPublica(coleccion);
     }
 
     // ------------------------------------------------------------------
