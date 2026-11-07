@@ -3,7 +3,8 @@ import { buscarTramosPreparado, coincideNormalizado, type Tramo } from './coinci
 import { MAPA_SECCIONES, type SeccionBuscable, type UnidadBusqueda } from './mapaSecciones';
 import { normalizarTexto } from '../filtrarRegistros';
 import { esCampoRetirado } from '../camposRetirados';
-import { textosCompaniaBuscables } from '../textoResultadoBusqueda';
+import { claveEstricta, idsDocumentos } from '../documentosTransaccion';
+import { textosCompaniaBuscables } from './textosCompania';
 import { canonizarReferencia, resolverCompania, type CompaniaRef } from '../referenciaCompania';
 
 export type Registro = Record<string, unknown>;
@@ -42,7 +43,6 @@ export interface EntradaIndice {
 /** Colecciones cuyos registros enlazan una transacción por el campo «Transacción». */
 const COLECCIONES_CON_TRANSACCION = ['manejo_de_caja', 'salarios', 'corpus_christi', 'indicadores'];
 const CAMPOS_TRANSACCION = ['Noticia', 'Fuentes para la generación del dato'];
-const CAMPOS_DOC = Array.from({ length: 10 }, (_, i) => `Doc${i + 1}`);
 
 export interface CoincidenciasRegistro {
   campos: CoincidenciaCampo[];
@@ -153,8 +153,6 @@ interface Mapas {
   nodosDocumento: Map<Registro, NodoEnlace>;
 }
 
-const claveEstricta = (v: unknown) => `${typeof v}:${String(v)}`;
-
 function nodoDe(cache: Map<Registro, NodoEnlace>, r: Registro, nombres: readonly string[]): NodoEnlace {
   let nodo = cache.get(r);
   if (!nodo) {
@@ -176,14 +174,8 @@ function enlazar(coleccion: string, registro: Registro, m: Mapas): EnlaceIndexad
   const transaccion = ref === '' ? undefined : m.transacciones.get(ref);
   if (!transaccion) return ENLACE_VACIO;
   const docs: EnlaceIndexado['documentos'] = [];
-  const vistos = new Set<string>();
-  for (const campoDoc of CAMPOS_DOC) {
-    const id = transaccion[campoDoc];
-    if ((typeof id !== 'string' && typeof id !== 'number') || id === '' || id === 0) continue;
-    const clave = claveEstricta(id);
-    if (vistos.has(clave)) continue;
-    vistos.add(clave);
-    const doc = m.documentos.get(clave);
+  for (const id of idsDocumentos(transaccion)) {
+    const doc = m.documentos.get(claveEstricta(id));
     if (doc) docs.push({ id, nodo: nodoDe(m.nodosDocumento, doc, ['Documento']) });
   }
   return { transaccion: nodoDe(m.nodosTransaccion, transaccion, CAMPOS_TRANSACCION), documentos: docs };

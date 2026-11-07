@@ -1,3 +1,4 @@
+import { CAMPOS_DOC } from '../documentosTransaccion';
 import { textoVisibleCompania, canonizarReferencia, resolverCompania, siglaParaExportar, type CompaniaRef } from '../referenciaCompania';
 
 export interface CampoBuscable {
@@ -110,7 +111,7 @@ export const MAPA_SECCIONES: readonly SeccionBuscable[] = [
     soloAdmin: true,
     campos: [
       txt('Num'), txt('Noticia'), txt('Fuentes para la generación del dato'),
-      ...Array.from({ length: 10 }, (_, i) => txt(`Doc${i + 1}`)),
+      ...CAMPOS_DOC.map((c) => txt(c)),
     ],
     unidad: sinUnidad,
   },

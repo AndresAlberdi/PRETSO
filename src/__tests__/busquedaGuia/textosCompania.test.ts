@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { textosCompaniaBuscables } from '../utils/textoResultadoBusqueda';
+import { textosCompaniaBuscables } from '../../utils/busquedaGuia/textosCompania';
 
 const companias = [
   { 'Indicador de registro': 7, 'Sigla Compañía': 'GA-JR', 'Nombre Compañía': 'Compañía de Alarcón' },
