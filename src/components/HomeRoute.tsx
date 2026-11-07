@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { useAdmin } from '../context/AdminContext';
 
-// Guarda de «/»: sin sesión muestra el acceso; con sesión, la portada. Solo consulta el
+// Guarda de «/»: sin sesión muestra la portada de visitante; con sesión, la portada de sesión. Solo consulta el
 // contexto (un único escuchador de auth) y no monta nada mientras se resuelve el claim.
 export default function HomeRoute({ signedOut, signedIn }: { signedOut: React.ReactNode; signedIn: React.ReactNode }) {
   const { user, adminLoading, authNotice } = useAdmin();
