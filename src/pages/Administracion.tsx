@@ -30,6 +30,7 @@ export default function Administracion() {
   };
 
   const handleDownloadXml = async () => {
+    if (backupStatus === 'loading') return;
     clearTimeout(idleTimer.current);
     try {
       setBackupStatus('loading');
@@ -42,14 +43,15 @@ export default function Administracion() {
       setBackupStatus('success');
       setStatusMessage('¡Volcado XML descargado exitosamente!');
       programarReposo();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('No se pudo descargar el volcado XML:', codigoError(err));
       setBackupStatus('error');
-      setStatusMessage(`Error al generar XML: ${err.message || err}`);
+      setStatusMessage('No se pudo generar el volcado XML. Vuelva a intentarlo; si el error persiste, avise al equipo técnico.');
     }
   };
 
   const handleDownloadXlsx = async () => {
+    if (backupStatus === 'loading') return;
     clearTimeout(idleTimer.current);
     try {
       setBackupStatus('loading');
@@ -62,15 +64,15 @@ export default function Administracion() {
       setBackupStatus('success');
       setStatusMessage('¡Volcado XLSX descargado exitosamente!');
       programarReposo();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('No se pudo descargar el volcado XLSX:', codigoError(err));
       setBackupStatus('error');
-      setStatusMessage(`Error al generar XLSX: ${err.message || err}`);
+      setStatusMessage('No se pudo generar el volcado XLSX. Vuelva a intentarlo; si el error persiste, avise al equipo técnico.');
     }
   };
 
   const handleDownloadDataset = async () => {
-    if (enCurso.current) return;
+    if (backupStatus === 'loading' || enCurso.current) return;
     enCurso.current = true;
     clearTimeout(idleTimer.current);
     try {
@@ -93,6 +95,7 @@ export default function Administracion() {
   };
 
   const handleGoogleDriveBackup = async () => {
+    if (backupStatus === 'loading') return;
     if (!clientId) {
       setConfiguringClientId(true);
       return;
@@ -110,10 +113,17 @@ export default function Administracion() {
       const client = google.accounts.oauth2.initTokenClient({
         client_id: clientId,
         scope: 'https://www.googleapis.com/auth/drive.file',
+        // Cerrar la ventana de Google o bloquearla no invoca el callback: sin esto los botones quedarían bloqueados.
+        error_callback: (e: { type?: string }) => {
+          console.error('La ventana de autorización de Google se cerró o falló:', e?.type);
+          setBackupStatus('error');
+          setStatusMessage('No se completó la autorización de Google Drive. Vuelva a intentarlo.');
+        },
         callback: async (tokenResponse: any) => {
           if (tokenResponse.error) {
             setBackupStatus('error');
-            setStatusMessage(`Error de autorización Google: ${tokenResponse.error_description || tokenResponse.error}`);
+            console.error('Autorización de Google Drive rechazada:', tokenResponse.error);
+            setStatusMessage('No se autorizó el acceso a Google Drive. Vuelva a intentarlo; si el error persiste, avise al equipo técnico.');
             return;
           }
 
@@ -136,10 +146,10 @@ export default function Administracion() {
 
               setBackupStatus('success');
               setStatusMessage(`¡Copia de seguridad guardada con éxito en Google Drive! (ID de archivo: ${fileId})`);
-            } catch (uploadErr: any) {
+            } catch (uploadErr: unknown) {
               console.error('No se pudo guardar la copia de seguridad en Google Drive:', codigoError(uploadErr));
               setBackupStatus('error');
-              setStatusMessage(`Error al guardar en Google Drive: ${uploadErr.message || uploadErr}`);
+              setStatusMessage('No se pudo guardar la copia en Google Drive. Vuelva a intentarlo; si el error persiste, avise al equipo técnico.');
             }
           }
         }
@@ -148,10 +158,10 @@ export default function Administracion() {
       const hint = auth.currentUser?.email;
       client.requestAccessToken(hint ? { login_hint: hint } : {});
 
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('No se pudo iniciar la copia de seguridad:', codigoError(err));
       setBackupStatus('error');
-      setStatusMessage(`Error al iniciar backup: ${err.message || err}`);
+      setStatusMessage('No se pudo iniciar la copia de seguridad. Verifique su conexión y vuelva a intentarlo.');
     }
   };
 
@@ -203,29 +213,29 @@ export default function Administracion() {
           <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '1rem' }}>
             <button 
               onClick={handleDownloadXml}
-              style={{ padding: '0.8rem 1.5rem', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-              disabled={backupStatus === 'loading'}
+              style={{ padding: '0.8rem 1.5rem', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px', cursor: backupStatus === 'loading' ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}
+              aria-disabled={backupStatus === 'loading' || undefined}
             >
               Descargar base de datos (XML)
             </button>
             <button 
               onClick={handleDownloadXlsx}
-              style={{ padding: '0.8rem 1.5rem', background: '#28a745', color: 'var(--on-success)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-              disabled={backupStatus === 'loading'}
+              style={{ padding: '0.8rem 1.5rem', background: '#28a745', color: 'var(--on-success)', border: 'none', borderRadius: '4px', cursor: backupStatus === 'loading' ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}
+              aria-disabled={backupStatus === 'loading' || undefined}
             >
               Descargar base de datos (XLSX)
             </button>
             <button 
               onClick={handleDownloadDataset}
-              style={{ padding: '0.8rem 1.5rem', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-              disabled={backupStatus === 'loading'}
+              style={{ padding: '0.8rem 1.5rem', background: 'var(--accent-color)', color: 'var(--on-accent)', border: 'none', borderRadius: '4px', cursor: backupStatus === 'loading' ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}
+              aria-disabled={backupStatus === 'loading' || undefined}
             >
               Descargar dataset (ZIP)
             </button>
             <button 
               onClick={handleGoogleDriveBackup}
-              style={{ padding: '0.8rem 1.5rem', background: '#4285F4', color: 'var(--on-accent)', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}
-              disabled={backupStatus === 'loading'}
+              style={{ padding: '0.8rem 1.5rem', background: '#4285F4', color: 'var(--on-accent)', border: 'none', borderRadius: '4px', cursor: backupStatus === 'loading' ? 'not-allowed' : 'pointer', fontWeight: 'bold' }}
+              aria-disabled={backupStatus === 'loading' || undefined}
             >
               Copia a Google Drive
             </button>

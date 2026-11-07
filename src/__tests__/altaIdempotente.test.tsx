@@ -68,7 +68,7 @@ describe('alta idempotente', () => {
     const { form, onClose, onCreated } = await abrirAlta('bibliografia');
     llenarBibliografia();
     fireEvent.submit(form);
-    expect(await screen.findByText('sin red')).toBeTruthy();
+    expect(await screen.findByText('Error al guardar el nuevo registro.')).toBeTruthy();
     expect(onCreated).not.toHaveBeenCalled();
     expect(onClose).not.toHaveBeenCalled();
     fireEvent.change(screen.getByPlaceholderText('Autores del documento...'), { target: { value: 'Ana B' } });
@@ -105,7 +105,7 @@ describe('alta idempotente', () => {
     const consultasAlAbrir = getDocs.mock.calls.length;
     fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Carta' } });
     fireEvent.submit(form);
-    await screen.findByText('sin red');
+    await screen.findByText('Error al guardar el nuevo registro.');
     // Otro usuario crea un documento mientras tanto: el índice del reintento no cambia.
     colecciones.documentos.push({ id: 'd2', Doc: 5, Documento: 'z' });
     fireEvent.submit(form);

@@ -56,8 +56,8 @@ describe('Login con Google', () => {
     render(<AccesoForm />);
     fireEvent.click(screen.getByRole('button', { name: 'Continuar con Google' }));
     const google = await screen.findByRole('button', { name: 'Conectando con Google...' });
-    expect((google as HTMLButtonElement).disabled).toBe(true);
-    expect((screen.getByRole('button', { name: 'Entrar' }) as HTMLButtonElement).disabled).toBe(true);
+    expect(google.getAttribute('aria-disabled')).toBe('true');
+    expect(screen.getByRole('button', { name: 'Entrar' }).getAttribute('aria-disabled')).toBe('true');
   });
 
   it('rechazo no autorizado: un alert, registro solo con el código y sin navegar', async () => {
@@ -106,11 +106,13 @@ describe('Login con Google', () => {
     expect(document.activeElement).toBe(alerta);
   });
 
-  it('un intento nuevo (Google o formulario) limpia el aviso', () => {
-    vi.mocked(signInWithPopup).mockReturnValue(new Promise(() => undefined));
+  it('un intento nuevo (Google o formulario) limpia el aviso', async () => {
+    vi.mocked(signInWithPopup).mockResolvedValue({} as never);
     const { container } = render(<AccesoForm />);
     fireEvent.click(screen.getByRole('button', { name: 'Continuar con Google' }));
     expect(avisoMock.limpiar).toHaveBeenCalledTimes(1);
+    // El intento previo debe terminar: con una acción en curso se ignoran los nuevos intentos.
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Continuar con Google' })).toBeTruthy());
     fireEvent.submit(container.querySelector('form') as HTMLFormElement);
     expect(avisoMock.limpiar).toHaveBeenCalledTimes(2);
   });

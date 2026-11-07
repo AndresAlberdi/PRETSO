@@ -1,6 +1,7 @@
+import { useEffect } from 'react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, cleanup, act } from '@testing-library/react';
-import { MemoryRouter, Routes, Route, useNavigate } from 'react-router';
+import { MemoryRouter, Routes, Route, useNavigate, type NavigateFunction } from 'react-router';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
@@ -38,9 +39,11 @@ describe('EditToggle', () => {
   });
 });
 
-let navegar: ReturnType<typeof useNavigate>;
+const capturado: { navegar?: NavigateFunction } = {};
 function Capturador() {
-  navegar = useNavigate();
+  const navegar = useNavigate();
+  // Se guarda en un efecto, no al dibujar, para no mutar valores externos durante el render.
+  useEffect(() => { capturado.navegar = navegar; }, [navegar]);
   return null;
 }
 
@@ -64,13 +67,13 @@ describe('EditModeRouteReset', () => {
 
   it('lo apaga al cambiar de ruta', () => {
     montar();
-    act(() => { navegar('/corpus'); });
+    act(() => { capturado.navegar?.('/corpus'); });
     expect(setIsEditMode).toHaveBeenCalledWith(false);
   });
 
   it('no lo apaga al navegar a la misma ruta', () => {
     montar();
-    act(() => { navegar('/caja', { replace: true }); });
+    act(() => { capturado.navegar?.('/caja', { replace: true }); });
     expect(setIsEditMode).not.toHaveBeenCalled();
   });
 });

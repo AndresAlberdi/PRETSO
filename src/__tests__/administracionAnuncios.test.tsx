@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, cleanup, act } from '@testing-library/react';
 import Administracion from '../pages/Administracion';
 import { generateDatabaseXml } from '../utils/backup';
 
@@ -31,7 +31,9 @@ describe('anuncios del estado del respaldo', () => {
     render(<Administracion />);
     const alerta = screen.getByRole('alert');
     fireEvent.click(screen.getByRole('button', { name: /Descargar base de datos \(XML\)/ }));
-    await waitFor(() => expect(alerta.textContent).toContain('Error al generar XML: boom'));
+    await waitFor(() => expect(alerta.textContent).toContain('No se pudo generar el volcado XML.'));
+    // Texto fijo: el mensaje técnico de la excepción no llega a la pantalla.
+    expect(alerta.textContent).not.toContain('boom');
     expect(screen.getByRole('alert')).toBe(alerta);
   });
 
@@ -42,5 +44,36 @@ describe('anuncios del estado del respaldo', () => {
     fireEvent.click(screen.getByRole('button', { name: /Descargar base de datos \(XML\)/ }));
     await waitFor(() => expect(estado.textContent).toContain('¡Volcado XML descargado exitosamente!'));
     expect(screen.getByRole('status')).toBe(estado);
+  });
+
+  describe('autorización de Google Drive', () => {
+    type Config = { callback: (r: unknown) => void; error_callback: (e: unknown) => void };
+    let config: Config;
+    beforeEach(() => {
+      localStorage.setItem('google_client_id', 'cliente-de-prueba');
+      (window as unknown as { google: unknown }).google = {
+        accounts: { oauth2: { initTokenClient: (c: Config) => { config = c; return { requestAccessToken: vi.fn() }; } } },
+      };
+    });
+    afterEach(() => { delete (window as unknown as { google?: unknown }).google; });
+
+    it('un rechazo muestra texto fijo, sin el detalle de Google', async () => {
+      render(<Administracion />);
+      fireEvent.click(screen.getByRole('button', { name: /Copia a Google Drive/ }));
+      await act(async () => { await config.callback({ error: 'access_denied', error_description: 'x-detalle' }); });
+      const alerta = screen.getByRole('alert');
+      expect(alerta.textContent).toContain('No se autorizó el acceso a Google Drive.');
+      expect(document.body.textContent).not.toContain('x-detalle');
+    });
+
+    it('cerrar la ventana de Google no deja los botones bloqueados', () => {
+      render(<Administracion />);
+      const boton = screen.getByRole('button', { name: /Copia a Google Drive/ });
+      fireEvent.click(boton);
+      expect(boton.getAttribute('aria-disabled')).toBe('true');
+      act(() => config.error_callback({ type: 'popup_closed' }));
+      expect(boton.getAttribute('aria-disabled')).toBeNull();
+      expect(screen.getByRole('alert').textContent).toContain('No se completó la autorización');
+    });
   });
 });

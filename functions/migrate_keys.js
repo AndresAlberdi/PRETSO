@@ -1,5 +1,4 @@
 const admin = require('firebase-admin');
-const path = require('path');
 
 process.env.FIRESTORE_EMULATOR_HOST = undefined;
 admin.initializeApp({

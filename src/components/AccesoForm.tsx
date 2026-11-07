@@ -20,6 +20,7 @@ export default function AccesoForm() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (pending !== null) return;
     setError(null);
     clearAuthNotice();
     setPending('email');
@@ -35,6 +36,7 @@ export default function AccesoForm() {
   }
 
   async function handleGoogle() {
+    if (pending !== null) return;
     setError(null);
     clearAuthNotice();
     setPending('google');
@@ -78,12 +80,12 @@ export default function AccesoForm() {
             placeholder="••••••••"
           />
         </label>
-        <button type="submit" disabled={pending !== null}>
+        <button type="submit" aria-disabled={pending !== null || undefined}>
           {pending === 'email' ? 'Cargando...' : 'Entrar'}
         </button>
       </form>
       <p className="acceso-separador">o</p>
-      <button type="button" className="boton boton-secundario acceso-google" onClick={handleGoogle} disabled={pending !== null}>
+      <button type="button" className="boton boton-secundario acceso-google" onClick={handleGoogle} aria-disabled={pending !== null || undefined}>
         {pending === 'google' ? 'Conectando con Google...' : 'Continuar con Google'}
       </button>
     </div>

@@ -47,6 +47,8 @@ export default function RenombrarCategoriaModal({ categoria, existentes, cantida
   const nombreParcial = useRef<string | null>(null);
   const [valor, setValor] = useState(categoria);
   const [busy, setBusy] = useState(false);
+  // Tras un fallo parcial el nombre queda fijo (estado, no ref, para poder leerlo al dibujar).
+  const [nombreFijo, setNombreFijo] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const enviar = async () => {
@@ -74,6 +76,7 @@ export default function RenombrarCategoriaModal({ categoria, existentes, cantida
         const nuevo = valor.trim();
         hechos.current += e.actualizados.length;
         nombreParcial.current = nuevo;
+        setNombreFijo(true);
         onParcial(e.actualizados, nuevo);
         setError(`Se renombraron ${hechos.current} de ${total} registros. Vuelva a intentarlo ahora, sin cerrar esta ventana, para completar el cambio.`);
       } else {
@@ -104,9 +107,9 @@ export default function RenombrarCategoriaModal({ categoria, existentes, cantida
         {...TEXTO_LIBRE}
         maxLength={MAX_LONGITUD_CATEGORIA}
         value={valor}
-        disabled={busy}
-        // Tras un fallo parcial el nombre queda fijo: cambiarlo repartiría los registros en dos categorías.
-        readOnly={nombreParcial.current !== null}
+        // Solo lectura (no disabled) para conservar el foco; con nombre fijo tras un fallo parcial,
+        // cambiarlo repartiría los registros en dos categorías.
+        readOnly={busy || nombreFijo}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? errorId : undefined}
         onChange={(e) => setValor(e.target.value)}
@@ -121,7 +124,7 @@ export default function RenombrarCategoriaModal({ categoria, existentes, cantida
       {error && <p id={errorId} role="alert" style={{ color: "var(--danger-color)" }}>{error}</p>}
       <div style={{ display: "flex", gap: "1rem", justifyContent: "flex-end" }}>
         <button type="button" onClick={onClose} disabled={busy}>Cancelar</button>
-        <button type="button" onClick={() => void enviar()} disabled={busy}>{busy ? "Renombrando..." : "Renombrar"}</button>
+        <button type="button" onClick={() => void enviar()} aria-disabled={busy || undefined}>{busy ? "Renombrando..." : "Renombrar"}</button>
       </div>
     </Modal>
   );
