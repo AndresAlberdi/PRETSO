@@ -19,11 +19,12 @@ import { crearEntorno } from './helpers.ts'
 const REGLAS = 'firestore.rules'
 const entorno = crearEntorno('demo-pruebas-claim', REGLAS)
 
-const RUTAS = ['corpus_christi/c1', 'corpus_christi/c1/sub/s1', 'logs/l1', 'users/u1']
+// «interna» representa una colección no incluida en la lista pública de las reglas.
+const RUTAS = ['interna/c1', 'interna/c1/sub/s1', 'logs/l1', 'users/u1']
 // Rutas cubiertas por el bloque global (lectura con lector()).
-const RUTAS_GLOBALES = ['corpus_christi/c1', 'corpus_christi/c1/sub/s1']
+const RUTAS_GLOBALES = ['interna/c1', 'interna/c1/sub/s1']
 // Rutas donde el administrador escribe sin restricción adicional (logs tiene su bloque aparte).
-const RUTAS_ESCRIBIBLES = ['corpus_christi/c1', 'corpus_christi/c1/sub/s1', 'users/u1']
+const RUTAS_ESCRIBIBLES = ['interna/c1', 'interna/c1/sub/s1', 'users/u1']
 const RUTAS_RESTRINGIDAS = ['logs/l1', 'users/u1']
 
 const sembrarDocs = () =>
@@ -107,22 +108,22 @@ describe('reglas: lectura', () => {
 
   it('{reader:true} lee por consulta getDocs(collection)', async () => {
     await sembrarDocs()
-    await assertSucceeds(getDocs(collection(contexto({ reader: true }), 'corpus_christi')))
+    await assertSucceeds(getDocs(collection(contexto({ reader: true }), 'interna')))
   })
 
   it('admin lee por consulta getDocs(collection)', async () => {
     await sembrarDocs()
-    await assertSucceeds(getDocs(collection(contexto({ admin: true }), 'corpus_christi')))
+    await assertSucceeds(getDocs(collection(contexto({ admin: true }), 'interna')))
   })
 
   it('autenticado sin claims no lee por consulta', async () => {
     await sembrarDocs()
-    await assertFails(getDocs(collection(contexto({}), 'corpus_christi')))
+    await assertFails(getDocs(collection(contexto({}), 'interna')))
   })
 
   it('anónimo no lee por consulta', async () => {
     await sembrarDocs()
-    await assertFails(getDocs(collection(contexto(), 'corpus_christi')))
+    await assertFails(getDocs(collection(contexto(), 'interna')))
   })
 
   // Solo el booleano true concede lectura: cualquier otro valor del claim reader debe fallar.
