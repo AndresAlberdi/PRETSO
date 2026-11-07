@@ -92,6 +92,13 @@ Nueve colecciones (`users` no existe en el origen; decisión de Andres del 2026-
 - `.firebaserc`: hoy declara solo `default: pretso-database`; añadir alias `staging` y `production`.
 - **App Check:** primero en modo monitoreo; se pasa a bloqueo solo cuando las métricas muestren tráfico legítimo (NUB-G06 es bloqueante con datos personales). **Hecho en monitoreo (`UNENFORCED`) el 2026-10-03 por API:** APIs, clave reCAPTCHA Enterprise `pretso-prod-web` y proveedor; la site key está en el código y la puerta `assertAppCheckPublishable` ya no bloquea el primer tag. El monitoreo empezará cuando se publique; el bloqueo de Firestore queda para después de al menos 7 días de monitoreo.
 
+#### Prerrequisitos del primer despliegue de funciones en producción
+Antes de añadir `functions:listAccounts` a producción (en staging ya está desplegada y estos puntos se cumplieron allí), con autorización de Andres:
+- Habilitar las APIs `run`, `eventarc` y `cloudbilling` en `pretso-prod`.
+- Crear la cuenta de servicio `fn-usuarios@<proyecto>.iam.gserviceaccount.com` con solo `roles/firebaseauth.viewer`.
+- Dar a `deploy-prod` `roles/iam.serviceAccountUser` acotado a tres cuentas, no a nivel de proyecto: `fn-usuarios@`, la de App Engine por defecto (`<proyecto>@appspot.gserviceaccount.com`) y la de Compute por defecto (`<número-de-proyecto>-compute@developer.gserviceaccount.com`). El CLI exige actAs sobre las por defecto aunque la función corra con otra.
+- Añadir `functions:listAccounts` a `FIREBASE_DEPLOY_ONLY` del Environment `production`.
+
 ### Paso 7 — Ensayo antes de mover a nadie
 - Desplegar el sitio a un **canal de vista previa** de Hosting de `pretso-prod` (no al canal `live`) y probar: inicio de sesión del administrador y de un lector, lectura de cada colección, una edición y su reversión, copia a Drive con el cliente nuevo, y ZAP baseline contra la URL de la vista previa.
 - Restauración real de un respaldo en un proyecto de prueba, con fecha y duración registradas (APP-13).
