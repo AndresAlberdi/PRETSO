@@ -154,6 +154,13 @@ jobs:
       - name: Lint
         run: npm run lint --if-present
 
+      - name: Compilar Cloud Functions
+        # functions/ tiene su propio lockfile y no lo cubre la instalación de
+        # la raíz: un error de tipos ahí solo aparecería al desplegar.
+        run: |
+          npm ci --prefix functions
+          npm --prefix functions run build
+
       - name: Verificación de tipos (si existe el script)
         run: npm run typecheck --if-present
 

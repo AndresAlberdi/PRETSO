@@ -1,4 +1,5 @@
-import * as admin from "firebase-admin";
+import { initializeApp } from "firebase-admin/app";
+import { getAuth } from "firebase-admin/auth";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
 import {
   listAccounts as listAccountsCore,
@@ -7,7 +8,7 @@ import {
   errorCodeOf,
 } from "./accounts";
 
-admin.initializeApp();
+initializeApp();
 
 // Lista de cuentas para la pantalla «Gestión de usuarios». Solo administradores; sin parámetros de
 // entrada (no se puede consultar por correo) y sin uid, hashes ni claims crudos en la respuesta.
@@ -24,7 +25,7 @@ export const listAccounts = onCall(
   async (request) => {
     try {
       const result = await listAccountsCore(request.auth?.token as Record<string, unknown> | undefined, (t) =>
-        admin.auth().listUsers(PAGE_SIZE, t)
+        getAuth().listUsers(PAGE_SIZE, t)
       );
       console.info("listAccounts", { total: result.accounts.length, truncated: result.truncated, appCheck: Boolean(request.app) });
       return result;
