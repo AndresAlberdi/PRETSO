@@ -14,6 +14,7 @@ import {
   validarAviso,
 } from '../../scripts/vigilancia/aviso-disponibilidad.mjs'
 
+const AHORA = new Date('2026-11-09T17:50:00Z')
 const ENLACE = 'https://github.com/AndresAlberdi/PRETSO/actions/runs/25123456789'
 const CLAVE = 're_CLAVE_DE_PRUEBA_que_no_debe_aparecer'
 const PARA = 'destinatario.secreto@example.org'
@@ -155,7 +156,7 @@ describe('exhaustiva de combinaciones', () => {
                   })
                   if (a === null) continue
                   avisos++
-                  validarAviso(a)
+                  validarAviso(a, AHORA)
                   // `enlace` e `id_unico` tienen su propia validación de forma (el id lleva el run_id).
                   for (const campo of [a.asunto, a.que_paso, a.que_se_espera_de_andres, a.ocurrido_en]) {
                     for (const [nombre, patron] of DETECTORES) {
@@ -208,7 +209,7 @@ describe('validarAviso', () => {
   const rechaza = (cambio: Record<string, unknown>, campo: string, valor?: string) => {
     let error: unknown
     try {
-      validarAviso({ ...base, ...cambio } as typeof base)
+      validarAviso({ ...base, ...cambio } as typeof base, AHORA)
     } catch (e) {
       error = e
     }
@@ -217,7 +218,7 @@ describe('validarAviso', () => {
     if (valor) expect((error as Error).message).not.toContain(valor)
   }
   it('acepta el aviso base', () => {
-    expect(() => validarAviso(base)).not.toThrow()
+    expect(() => validarAviso(base, AHORA)).not.toThrow()
   })
   it('rechaza una clave extra', () => rechaza({ extra: 'valor-secreto-extra' }, 'claves', 'valor-secreto-extra'))
   it('rechaza enlace con consulta', () => rechaza({ enlace: 'https://github.com/a/b?x=1' }, 'enlace', 'x=1'))
@@ -226,6 +227,25 @@ describe('validarAviso', () => {
   it('rechaza ocurrido_en con fracciones', () => rechaza({ ocurrido_en: '2026-11-09T17:47:03.123Z' }, 'ocurrido_en', '.123'))
   it('rechaza id_unico de 7 caracteres', () => rechaza({ id_unico: 'abcdefg' }, 'id_unico', 'abcdefg'))
   it('rechaza asunto con salto de línea', () => rechaza({ asunto: 'uno\ndos' }, 'asunto', 'uno'))
+  it('rechaza enlaces con puerto, fragmento, usuario, mayúsculas o punto final', () => {
+    for (const enlace of [
+      'https://github.com:443/a/b',
+      'https://github.com/a/b#frag',
+      'https://usuario@github.com/a/b',
+      'https://GITHUB.COM/a/b',
+      'https://github.com./a/b',
+    ]) {
+      expect(() => validarAviso({ ...base, enlace }, AHORA), enlace).toThrow(AvisoInvalido)
+    }
+  })
+  it('acota ocurrido_en: 30 días atrás y 10 minutos adelante', () => {
+    const ok = (ocurrido_en: string) => expect(() => validarAviso({ ...base, ocurrido_en }, AHORA)).not.toThrow()
+    const mal = (ocurrido_en: string) => rechaza({ ocurrido_en }, 'ocurrido_en')
+    ok('2026-10-10T17:50:00Z')
+    mal('2026-10-10T17:49:59Z')
+    ok('2026-11-09T18:00:00Z')
+    mal('2026-11-09T18:00:01Z')
+  })
   it('rechaza primera línea de más de 110', () => rechaza({ que_paso: 'x'.repeat(111) }, 'que_paso'))
   it('rechaza más de 30 líneas', () => rechaza({ que_paso: Array(31).fill('a').join('\n') }, 'que_paso'))
 })
@@ -332,6 +352,22 @@ describe('enviar', () => {
     expect(r).toEqual({ resultado: 'error', detalle: 'idempotencia_distinta', codigoSalida: 13 })
   })
 
+  it('409 sin name o con name fuera de la lista: rechazo_proveedor 13', async () => {
+    for (const cuerpo of [{}, { name: 'otro_error' }]) {
+      const f = vi.fn(async () => resp(409, cuerpo))
+      const r = await enviar(a, opciones(f))
+      expect(f).toHaveBeenCalledTimes(1)
+      expect(r).toEqual({ resultado: 'error', detalle: 'rechazo_proveedor', codigoSalida: 13 })
+    }
+  })
+
+  it('500 tres veces: reintentos_agotados 12', async () => {
+    const f = vi.fn(async () => resp(500))
+    const r = await enviar(a, opciones(f))
+    expect(f).toHaveBeenCalledTimes(3)
+    expect(r).toEqual({ resultado: 'error', detalle: 'reintentos_agotados', codigoSalida: 12 })
+  })
+
   it('configuración inválida: código 13 sin llamar a fetch', async () => {
     for (const malo of [
       { apiKey: '' },
@@ -353,7 +389,7 @@ describe('ejecutar', () => {
     AVISOS_PARA: PARA,
     AVISOS_DE: DE,
   })
-  const deps = (f: unknown) => ({ fetchImpl: f as typeof fetch, esperar: async () => {} })
+  const deps = (f: unknown) => ({ fetchImpl: f as typeof fetch, esperar: async () => {}, ahora: AHORA })
 
   it('la línea tiene exactamente 7 claves y no filtra datos', async () => {
     const f = vi.fn(async () => ({ status: 200, json: async () => ({}) }) as unknown as Response)

@@ -263,17 +263,83 @@ class EstructuraTest(unittest.TestCase):
             for s in job["steps"]:
                 self.assertNotIn("${{", s.get("run", ""), s.get("name"))
 
-    def test_if_de_avisar_y_concurrency(self):
+    def test_if_de_avisar_y_sin_concurrency(self):
         cond = self.d["jobs"]["avisar"]["if"]
         self.assertIn("'17 */2 * * *'", cond)
         self.assertIn("'47 17 * * 1'", cond)
-        self.assertEqual(
-            self.d["concurrency"], {"group": "vigilar-disponibilidad", "cancel-in-progress": False}
-        )
+        self.assertIn("github.run_attempt == 1", cond)
+        self.assertNotIn("concurrency", self.d)
 
     def test_sin_continue_on_error_ni_credenciales_de_nube(self):
         self.assertNotIn("continue-on-error", self.texto)
         self.assertNotIn("GCP_", self.texto)
+
+
+def evaluar(expr, contexto):
+    """Evaluador mínimo de expresiones de Actions: ==, !=, &&, ||, always() y contextos.
+
+    Solo admite las formas presentes en el workflow; otra forma falla la prueba.
+    """
+    py = expr.replace("&&", " and ").replace("||", " or ").replace("always()", "True")
+    py = re.sub(r"(?<![\w'.])((?:github|needs)\.[\w.]+)", lambda m: f"C[{m.group(1)!r}]", py)
+    resto = re.sub(r"C\['[^']*'\]|'[^']*'", "", py)
+    resto = re.sub(r"\b(and|or|True)\b|[0-9]|[\s()]|==|!=", "", resto)
+    if resto:
+        raise AssertionError(f"expresión no soportada: {expr}")
+    return eval(py, {"__builtins__": {}}, {"C": contexto})  # noqa: S307 (entrada propia del repo)
+
+
+class CondicionAvisarTest(unittest.TestCase):
+    def setUp(self):
+        self.d = cargar()
+        self.cond = self.d["jobs"]["avisar"]["if"]
+        self.modo = self.d["jobs"]["avisar"]["steps"][-1]["env"]["MODO"]
+
+    def ctx(self, evento, cron="", fallo="false", result="success", intento=1, ocurrido="2026-11-09T17:47:03Z"):
+        return {
+            "github.event_name": evento,
+            "github.event.schedule": cron,
+            "github.run_attempt": intento,
+            "needs.comprobar.result": result,
+            "needs.comprobar.outputs.ocurrido_en": ocurrido,
+            "needs.comprobar.outputs.hay_fallo": fallo,
+        }
+
+    def avisa(self, *a, **k):
+        return bool(evaluar(self.cond, self.ctx(*a, **k)))
+
+    def test_tabla_de_decision(self):
+        for fallo in ("true", "false"):
+            for result in ("success", "failure"):
+                # La comprobación de 2 h nunca avisa.
+                self.assertFalse(self.avisa("schedule", CRON_COMPROBACION, fallo, result))
+                # La del lunes (latido) siempre.
+                self.assertTrue(self.avisa("schedule", CRON_LATIDO, fallo, result))
+                # Las otras ranuras, solo con fallo.
+                for cron in ("47 1,9 * * *", "47 17 * * 0,2-6"):
+                    self.assertEqual(self.avisa("schedule", cron, fallo, result), fallo == "true")
+                # La prueba manual siempre.
+                self.assertTrue(self.avisa("workflow_dispatch", "", fallo, result))
+
+    def test_cancelado_nunca_y_sin_hora_nunca(self):
+        for cron in CRONES:
+            self.assertFalse(self.avisa("schedule", cron, "true", "cancelled"))
+            self.assertFalse(self.avisa("schedule", cron, "true", "failure", ocurrido=""))
+        self.assertFalse(self.avisa("workflow_dispatch", "", "false", "cancelled"))
+
+    def test_reejecucion_no_avisa_en_schedule_pero_dispatch_si(self):
+        for cron in CRONES:
+            self.assertFalse(self.avisa("schedule", cron, "true", "failure", intento=2))
+        self.assertTrue(self.avisa("workflow_dispatch", "", "false", "success", intento=2))
+
+    def test_modo(self):
+        def modo(evento, cron=""):
+            return evaluar(self.modo.strip()[3:-2].strip(), self.ctx(evento, cron))
+
+        self.assertEqual(modo("workflow_dispatch"), "prueba")
+        self.assertEqual(modo("schedule", CRON_LATIDO), "latido")
+        self.assertEqual(modo("schedule", "47 1,9 * * *"), "ranura")
+        self.assertEqual(modo("schedule", CRON_COMPROBACION), "ranura")
 
 
 class CupoTest(unittest.TestCase):
