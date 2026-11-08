@@ -1,9 +1,17 @@
+import { useState } from 'react';
 import { Link } from 'react-router';
 import { useAdmin } from '../context/AdminContext';
 import AccesoForm from '../components/AccesoForm';
 
-export default function Portada({ acceso = false }: { acceso?: boolean }) {
-  const { isAdmin } = useAdmin();
+export default function Portada({ modo }: { modo: 'visitante' | 'sesion' }) {
+  const { isAdmin, authNotice } = useAdmin();
+  // El panel de acceso empieza abierto si hay un aviso pendiente y se abre cuando llega uno.
+  const [abierto, setAbierto] = useState(Boolean(authNotice));
+  const [avisoVisto, setAvisoVisto] = useState<string | null>(authNotice);
+  if (authNotice && authNotice !== avisoVisto) {
+    setAvisoVisto(authNotice);
+    setAbierto(true);
+  }
   return (
     <div className="portada">
       <section className="portada-hero" aria-labelledby="titulo-portada">
@@ -21,7 +29,15 @@ export default function Portada({ acceso = false }: { acceso?: boolean }) {
           <p>Proyecto: [101150056] — [THIS] — [HORIZON-MSCA-2023-PF-01]</p>
           <p>IP: Laura Paz Rescala</p>
         </div>
-        {acceso ? <AccesoForm /> : (
+        {modo === 'visitante' ? (<>
+          <div className="portada-acciones">
+            <Link to="/buscar" className="boton boton-primario">Realizar búsquedas</Link>
+            <button type="button" className="boton boton-secundario" aria-expanded={abierto} aria-controls="acceso-panel" onClick={() => setAbierto((v) => !v)}>Acceso para administración</button>
+          </div>
+          <div id="acceso-panel" className="portada-acceso-panel" hidden={!abierto}>
+            <AccesoForm />
+          </div>
+        </>) : (
           <div className="portada-acciones">
             <Link to="/buscar" className="boton boton-primario">Realizar búsquedas</Link>
             {isAdmin && (<>

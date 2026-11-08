@@ -24,6 +24,7 @@ import { useDesplazarACoincidencia } from "../hooks/useDesplazarACoincidencia";
 export default function Bibliografia() {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorCarga, setErrorCarga] = useState(false);
   const canEdit = useCanEdit();
   const [recordToDelete, setRecordToDelete] = useState<any>(null);
   const [errorOperacion, setErrorOperacion] = useState<string | null>(null);
@@ -43,13 +44,18 @@ export default function Bibliografia() {
 
   useEffect(() => {
     async function fetchData() {
-      const q = query(collection(db, "bibliografia"));
-      const snapshot = await getDocs(q);
-      const sorted = snapshot.docs.map(cleanFirebaseData).sort(
-        (a, b) => String(a["Autores"] || '').localeCompare(String(b["Autores"] || ''))
-      );
-      setData(sorted);
-      setLoading(false);
+      try {
+        const q = query(collection(db, "bibliografia"));
+        const snapshot = await getDocs(q);
+        const sorted = snapshot.docs.map(cleanFirebaseData).sort(
+          (a, b) => String(a["Autores"] || '').localeCompare(String(b["Autores"] || ''))
+        );
+        setData(sorted);
+        setLoading(false);
+      } catch (error) {
+        console.error('No se pudieron cargar los datos:', codigoError(error));
+        setErrorCarga(true);
+      }
     }
     fetchData();
   }, []);
@@ -116,7 +122,7 @@ export default function Bibliografia() {
       {!loading && termino && estadoBusqueda === 'error' && (
         <p><button type="button" onClick={reintentar}>Reintentar</button></p>
       )}
-      {loading ? <p>Cargando datos...</p> : (
+      {errorCarga ? <p role="alert">No se pudieron cargar los datos. Recargue la página; si el error persiste, avise al equipo técnico.</p> : loading ? <p>Cargando datos...</p> : (
         <>
         <div className="tabla-desplazable">
           <table className="sortable">

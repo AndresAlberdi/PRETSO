@@ -26,6 +26,7 @@ import { useDesplazarACoincidencia } from "../hooks/useDesplazarACoincidencia";
 export default function IndiceCompanias() {
   const [data, setData] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorCarga, setErrorCarga] = useState(false);
   const canEdit = useCanEdit();
   const [recordToDelete, setRecordToDelete] = useState<any>(null);
   const [errorOperacion, setErrorOperacion] = useState<string | null>(null);
@@ -41,13 +42,18 @@ export default function IndiceCompanias() {
 
   useEffect(() => {
     async function fetchData() {
-      const q = query(collection(db, "companias"));
-      const snapshot = await getDocs(q);
-      const sorted = snapshot.docs.map(cleanFirebaseData).sort(
-        (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
-      );
-      setData(sorted);
-      setLoading(false);
+      try {
+        const q = query(collection(db, "companias"));
+        const snapshot = await getDocs(q);
+        const sorted = snapshot.docs.map(cleanFirebaseData).sort(
+          (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
+        );
+        setData(sorted);
+        setLoading(false);
+      } catch (error) {
+        console.error('No se pudieron cargar los datos:', codigoError(error));
+        setErrorCarga(true);
+      }
     }
     fetchData();
   }, []);
@@ -188,7 +194,7 @@ export default function IndiceCompanias() {
       {!loading && buscando && <p style={{ color: 'var(--text-muted)' }}>Buscando…</p>}
       {!loading && !buscando && !falloBusqueda && <p style={{ color: 'var(--text-muted)' }}>Total registros: {sortedData.length}</p>}
       
-      {loading ? <p>Cargando datos...</p> : (
+      {errorCarga ? <p role="alert">No se pudieron cargar los datos. Recargue la página; si el error persiste, avise al equipo técnico.</p> : loading ? <p>Cargando datos...</p> : (
         <div className="tabla-desplazable">
           <table className="sortable">
             <caption className="visually-hidden">Índice de compañías</caption>
