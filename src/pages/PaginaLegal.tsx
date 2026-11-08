@@ -8,7 +8,7 @@ export default function PaginaLegal({ ruta }: { ruta: RutaLegal }) {
       {pagina.secciones.map((s) => (
         <section key={s.encabezado}>
           <h2>{s.encabezado}</h2>
-          {s.parrafos.map((p) => <p key={p}>{p}</p>)}
+          {s.parrafos.map((p, i) => <p key={`${i}-${p}`}>{p}</p>)}
         </section>
       ))}
     </>

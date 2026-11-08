@@ -1,7 +1,8 @@
 // Textos legales de PRETSO. Los fragmentos `[[PENDIENTE: …]]` son datos que debe aportar la Universidad:
 // se dejan tal cual y la puerta de publicación (publicable.ts) impide publicar a producción mientras existan.
 
-export const MARCADOR = /\[\[PENDIENTE:[^\]]*\]\]/;
+// Detecta cualquier apertura de marcador (con o sin «:» y sin depender del cierre), para que la puerta falle cerrada.
+export const MARCADOR = /\[\[\s*PENDIENTE\b/i;
 
 export type RutaLegal = '/aviso-legal' | '/privacidad' | '/cookies' | '/accesibilidad' | '/creditos';
 
