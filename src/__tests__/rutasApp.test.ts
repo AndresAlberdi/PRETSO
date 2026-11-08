@@ -18,7 +18,7 @@ const sinEspacios = (t: string) => t.replace(/\s+/g, '');
 describe('rutas de App.tsx', () => {
   it('declara las rutas esperadas', () => {
     for (const p of ['/buscar', '/', '/agregar', '/transacciones', '/documentos', '/auditoria', '/administracion', '/usuarios',
-      '/caja', '/salarios', '/corpus', '/indicadores', '/companias', '/bibliografia', '*']) {
+      '/caja', '/salarios', '/corpus', '/indicadores', '/companias', '/bibliografia', '/aviso-legal', '/privacidad', '/cookies', '/accesibilidad', '/creditos', '*']) {
       expect(R.has(p), p).toBe(true);
     }
   });
@@ -51,6 +51,16 @@ describe('rutas de App.tsx', () => {
       const t = R.get(p)!;
       expect(t).toContain('ATRAS_BUSCAR');
       expect(t).not.toContain('AdminRoute');
+    },
+  );
+
+  it.each(['/aviso-legal', '/privacidad', '/cookies', '/accesibilidad', '/creditos'])(
+    '%s es pública, sin ninguna guarda, y vuelve a Inicio',
+    (p) => {
+      const t = R.get(p)!;
+      for (const guarda of ['ProtectedRoute', 'ReaderRoute', 'AdminRoute', 'PublicReadRoute']) expect(t, guarda).not.toContain(guarda);
+      expect(t).toContain('PaginaLegal');
+      expect(t).toContain('ATRAS_INICIO');
     },
   );
 

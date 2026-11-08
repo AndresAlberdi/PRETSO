@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Link } from 'react-router';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
+import { PiePagina } from '../components/PiePagina';
 import { useAdmin } from '../context/AdminContext';
 
 export default function SinAcceso() {
@@ -12,6 +13,7 @@ export default function SinAcceso() {
     document.title = 'Acceso pendiente — PRETSO';
   }, []);
   return (
+    <>
     <main id="contenido" tabIndex={-1} className="contenido-principal">
       <h1>Acceso pendiente</h1>
       {authNotice && <div role="alert" className="acceso-error">{authNotice}</div>}
@@ -19,5 +21,7 @@ export default function SinAcceso() {
       <p><Link to="/buscar">Realizar búsquedas</Link></p>
       <button type="button" onClick={() => signOut(auth)}>Salir</button>
     </main>
+    <PiePagina />
+    </>
   );
 }
