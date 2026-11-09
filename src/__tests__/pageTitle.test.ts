@@ -17,6 +17,11 @@ describe('pageTitle', () => {
     ['/auditoria', 'Auditoría — PRETSO'],
     ['/administracion', 'Administración — PRETSO'],
     ['/usuarios', 'Usuarios — PRETSO'],
+    ['/aviso-legal', 'Aviso legal — PRETSO'],
+    ['/privacidad', 'Privacidad — PRETSO'],
+    ['/cookies', 'Cookies — PRETSO'],
+    ['/accesibilidad', 'Accesibilidad — PRETSO'],
+    ['/creditos', 'Créditos — PRETSO'],
     ['/login', 'PRETSO'],
   ];
 

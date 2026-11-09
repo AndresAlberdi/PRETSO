@@ -1,9 +1,12 @@
+import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 import { loadEnv } from 'vite'
 import { configDefaults, defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import { assertPublishable } from './src/utils/firebaseConfig.ts'
 import { assertAppCheckPublishable, assertNoDebugTokenOutsideDevelopment } from './src/utils/appCheckConfig.ts'
+import { assertTextosLegalesPublicables } from './src/legal/publicable.ts'
+import { textosLegalesPlanos } from './src/legal/textosLegales.ts'
 import {
   firebaseConfig as productionConfig,
   recaptchaSiteKey as productionSiteKey,
@@ -30,6 +33,12 @@ export default defineConfig(({ mode, command }) => {
   assertNoDebugTokenOutsideDevelopment(mode, command, viteEnv.VITE_APPCHECK_DEBUG_TOKEN)
   assertPublishable(mode, process.env.GITHUB_REF_TYPE, productionConfig, process.env.GITHUB_EVENT_NAME)
   assertAppCheckPublishable(mode, process.env.GITHUB_REF_TYPE, productionSiteKey, process.env.GITHUB_EVENT_NAME)
+  assertTextosLegalesPublicables(
+    mode,
+    process.env.GITHUB_REF_TYPE,
+    [...textosLegalesPlanos(), readFileSync('public/security.txt', 'utf8')],
+    process.env.GITHUB_EVENT_NAME,
+  )
   return {
     plugins: [react()],
     resolve: {

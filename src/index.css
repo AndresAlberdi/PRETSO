@@ -402,3 +402,12 @@ a.fila-seccion:hover .flecha-seccion { color: var(--primary-color); }
   .contenido-principal { padding: 1rem; }
   h1 { font-size: 1.75rem; }
 }
+
+/* Pie de página legal: usa las variables del tema; el texto y los enlaces cumplen contraste AA sobre el fondo. */
+.pie-pagina { padding: 1.5rem 2rem; background: var(--bg-card); border-top: 1px solid var(--border-color); color: var(--text-secondary); font-size: 0.875rem; }
+.pie-pagina p { margin: 0 0 0.5rem; max-width: 80ch; }
+.pie-pagina ul { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; list-style: none; margin: 0.75rem 0 0; padding: 0; }
+.pie-pagina a { color: var(--primary-color); text-decoration: underline; padding: 0.25rem 0; }
+.pie-pagina a:hover { color: var(--primary-hover); }
+.pie-pagina a:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+@media (max-width: 600px) { .pie-pagina { padding: 1rem; } }
