@@ -1,5 +1,5 @@
 import { useId, useRef } from 'react';
-import type { CSSProperties, ReactNode } from 'react';
+import type { CSSProperties, ReactNode, RefObject } from 'react';
 import Modal from './Modal';
 import readme from '../contenido/README.md?raw';
 
@@ -13,7 +13,7 @@ const panelStyle: CSSProperties = {
 };
 
 /** Convierte el subconjunto de Markdown que usa el README (títulos, citas, listas, párrafos) en elementos React. */
-export function renderizarReadme(texto: string, idTitulo?: string): ReactNode[] {
+export function renderizarReadme(texto: string, idTitulo?: string, refTitulo?: RefObject<HTMLHeadingElement | null>): ReactNode[] {
   const nodos: ReactNode[] = [];
   let items: string[] = [];
   const cerrarLista = () => {
@@ -27,7 +27,7 @@ export function renderizarReadme(texto: string, idTitulo?: string): ReactNode[] 
     cerrarLista();
     const k = `n-${nodos.length}`;
     if (linea.startsWith('## ')) nodos.push(<h3 key={k}>{linea.slice(3)}</h3>);
-    else if (linea.startsWith('# ')) nodos.push(<h2 key={k} id={idTitulo}>{linea.slice(2)}</h2>);
+    else if (linea.startsWith('# ')) nodos.push(<h2 key={k} id={idTitulo} ref={refTitulo} tabIndex={refTitulo ? -1 : undefined}>{linea.slice(2)}</h2>);
     else if (linea.startsWith('> ')) nodos.push(<blockquote key={k}>{linea.slice(2)}</blockquote>);
     else if (linea.trim()) nodos.push(<p key={k}>{linea}</p>);
   }
@@ -49,10 +49,11 @@ export function descargarReadme(): void {
 export default function ReadmeModal({ onClose }: { onClose: () => void }) {
   const titulo = useId();
   const cerrar = useRef<HTMLButtonElement>(null);
+  const encabezado = useRef<HTMLHeadingElement>(null);
   return (
-    <Modal labelledBy={titulo} onEscape={onClose} initialFocus={cerrar} overlayStyle={overlayStyle} panelStyle={panelStyle}>
+    <Modal labelledBy={titulo} onEscape={onClose} initialFocus={encabezado} overlayStyle={overlayStyle} panelStyle={panelStyle}>
       <div className="readme-modal">
-        {renderizarReadme(readme, titulo)}
+        {renderizarReadme(readme, titulo, encabezado)}
         <div className="readme-acciones">
           <button type="button" className="boton boton-primario" onClick={descargarReadme}>Descargar README.md</button>
           <button type="button" ref={cerrar} className="boton boton-secundario" onClick={onClose}>Cerrar</button>
