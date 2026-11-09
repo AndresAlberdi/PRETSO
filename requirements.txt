@@ -9,7 +9,7 @@
 # El .ods se lee de la variable PRETSO_ODS_PATH; por omisión,
 # ~/Documentos/PRETSO/Hacia PRETSO rev AA 1.ods.
 firebase-admin==7.7.0
-pandas==3.1.0
+pandas==3.1.1
 numpy==2.5.4
 # Motor de pandas para leer .ods (pd.read_excel(..., engine='odf')).
 odfpy==1.4.1
@@ -22,6 +22,6 @@ odfpy==1.4.1
 # certifi 2026.7.22 (httpx → firebase-admin) trae las raíces emSign con
 # intermedias comprometidas (GHSA-6q48-6c7w-9gw2 / PYSEC-2026-4320, corregido
 # en 2026.10.18).
-anyio==4.15.1
+anyio==4.16.0
 idna==3.20
 certifi==2026.10.23
