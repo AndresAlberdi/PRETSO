@@ -408,9 +408,19 @@ a.fila-seccion:hover .flecha-seccion { color: var(--primary-color); }
 
 /* Pie de página legal: usa las variables del tema; el texto y los enlaces cumplen contraste AA sobre el fondo. */
 .pie-pagina { padding: 1.5rem 2rem; background: var(--bg-card); border-top: 1px solid var(--border-color); color: var(--text-secondary); font-size: 0.875rem; }
-.pie-pagina p { margin: 0 0 0.5rem; max-width: 80ch; }
-.pie-pagina ul { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; list-style: none; margin: 0.75rem 0 0; padding: 0; }
-.pie-pagina a { color: var(--primary-color); text-decoration: underline; padding: 0.25rem 0; }
-.pie-pagina a:hover { color: var(--primary-hover); }
-.pie-pagina a:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
-@media (max-width: 600px) { .pie-pagina { padding: 1rem; } }
+.pie-pagina p { margin: 0 0 0.5rem; }
+.pie-pagina ul { display: flex; flex-wrap: wrap; gap: 0.5rem 1.25rem; list-style: none; margin: 0; padding: 0; }
+.pie-pagina a, .pie-readme { color: var(--primary-color); text-decoration: underline; padding: 0.25rem 0; }
+.pie-pagina a:hover, .pie-readme:hover { color: var(--primary-hover); }
+.pie-pagina a:focus-visible, .pie-readme:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 2px; }
+.pie-portada .pie-textos { width: 100%; margin-bottom: 1rem; }
+.pie-fila { display: flex; flex-wrap: wrap; gap: 1.5rem 2rem; align-items: flex-end; justify-content: space-between; }
+.pie-izquierda { flex: 1 1 22rem; min-width: 0; display: flex; flex-direction: column; gap: 0.5rem; align-items: flex-start; }
+.pie-explicacion { width: 100%; min-height: 6rem; padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: 6px; white-space: pre-line; color: var(--text-color); }
+.pie-readme { background: none; border: 0; font: inherit; cursor: pointer; }
+.pie-derecha { flex: 0 1 auto; margin-left: auto; }
+.pie-derecha ul { justify-content: flex-end; }
+.readme-modal h2 { margin-top: 0; }
+.readme-modal blockquote { margin: 0 0 1rem; padding-left: 0.75rem; border-left: 3px solid var(--border-color); color: var(--text-secondary); }
+.readme-acciones { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem; }
+@media (max-width: 600px) { .pie-pagina { padding: 1rem; } .pie-derecha { margin-left: 0; } .pie-derecha ul { justify-content: flex-start; } }

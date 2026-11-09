@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, cleanup } from '@testing-library/react';
+import { render, screen, cleanup, fireEvent } from '@testing-library/react';
 
 vi.mock('../firebase', () => ({ db: {}, auth: {} }));
 vi.mock('firebase/auth', () => ({
@@ -35,7 +35,7 @@ vi.mock('../context/AdminContext', () => ({
 import App from '../App';
 import SinAcceso from '../pages/SinAcceso';
 import { MemoryRouter } from 'react-router';
-import { PAGINAS_LEGALES } from '../legal/textosLegales';
+import { PAGINAS_LEGALES, PIE } from '../legal/textosLegales';
 
 function irA(ruta: string) {
   window.history.pushState({}, '', ruta);
@@ -77,6 +77,36 @@ describe('pie de página legal', () => {
     irA('/');
     const enlace = screen.getByRole('navigation', { name: 'Información legal' }).querySelector(`a[href="${ruta}"]`);
     expect(enlace?.textContent).toBe(texto);
+  });
+});
+
+describe('pie de la portada', () => {
+  it('solo la portada muestra titularidad, financiación y recuadro; las demás páginas, solo los enlaces', () => {
+    irA('/');
+    expect(screen.getByText(PIE.titularidad)).toBeTruthy();
+    expect(screen.getByText(PIE.financiacion)).toBeTruthy();
+    expect(screen.getByRole('region', { name: 'Sobre PRETSO' }).textContent).toBe('');
+    cleanup();
+    irA('/caja');
+    expect(screen.queryByText(PIE.titularidad)).toBeNull();
+    expect(screen.queryByText(PIE.financiacion)).toBeNull();
+    expect(screen.queryByRole('region', { name: 'Sobre PRETSO' })).toBeNull();
+    expect(screen.queryByRole('button', { name: /README/ })).toBeNull();
+    expect(screen.getByRole('navigation', { name: 'Información legal' })).toBeTruthy();
+  });
+
+  it('el README se abre en una ventana modal con descarga y se cierra', () => {
+    irA('/');
+    fireEvent.click(screen.getByRole('button', { name: /README\.md/ }));
+    const dialogo = screen.getByRole('dialog');
+    expect(dialogo.textContent).toContain('Precios del Teatro del Siglo de Oro');
+    expect(screen.getByRole('button', { name: 'Descargar README.md' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Cerrar' }));
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('la puerta de publicación trata el recuadro vacío como pendiente', () => {
+    expect(PIE.explicacion).toBe('');
   });
 });
 
