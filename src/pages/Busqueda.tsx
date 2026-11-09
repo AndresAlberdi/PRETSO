@@ -40,10 +40,9 @@ export default function Busqueda() {
 
   return (
     <div>
-      <div style={{ textAlign: 'center', margin: '2rem 0' }}>
+      <div className="busqueda-general">
         <h1 className="titulo-busqueda">Buscar en toda la base de datos</h1>
-
-        <div style={{ display: 'inline-block', textAlign: 'left', minWidth: 'min(300px, 100%)', maxWidth: '600px', width: '100%' }}>
+        <div className="busqueda-general-campo">
           <CampoBusqueda
             etiqueta="Buscar en toda la base de datos"
             etiquetaOculta

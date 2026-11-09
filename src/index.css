@@ -376,7 +376,10 @@ h2.acceso-titulo { text-align: center; font-size: 1.75rem; margin: 0 0 1.25rem; 
 .acceso-error { color: var(--editor-color); background: var(--editor-tint); font-size: 0.9rem; text-align: center; padding: 0.5rem; border-radius: 4px; margin-bottom: 1rem; }
 .acceso-separador { text-align: center; color: var(--text-muted); margin: 1rem 0; }
 button.acceso-google { width: 100%; }
-h1.titulo-busqueda { font-size: 1.375rem; margin: 0 0 1rem; }
+/* Mismo modelo que «Buscar en esta sección»: rótulo claro, en tipografía de texto y a un costado del campo. */
+.busqueda-general { display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 1rem; margin: 2rem 0; }
+.busqueda-general-campo { flex: 0 1 auto; min-width: 0; }
+h1.titulo-busqueda { font-family: var(--font-sans); font-size: 1rem; font-weight: 400; color: #fff; margin: 0; }
 .rotulo-secciones { font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--text-muted); margin: 3rem 0 0.5rem; }
 .lista-secciones { list-style: none; padding: 0; margin: 0; border-top: 1px solid var(--border-color); }
 a.fila-seccion { display: flex; align-items: center; gap: 1.25rem; min-height: 64px; padding: 0 1rem; color: var(--text-color); border-bottom: 1px solid var(--border-color); }
