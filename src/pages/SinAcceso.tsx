@@ -2,7 +2,6 @@ import { useEffect } from 'react';
 import { Link } from 'react-router';
 import { signOut } from 'firebase/auth';
 import { auth } from '../firebase';
-import { PiePagina } from '../components/PiePagina';
 import { useAdmin } from '../context/AdminContext';
 
 export default function SinAcceso() {
@@ -21,7 +20,6 @@ export default function SinAcceso() {
       <p><Link to="/buscar">Realizar búsquedas</Link></p>
       <button type="button" onClick={() => signOut(auth)}>Salir</button>
     </main>
-    <PiePagina />
     </>
   );
 }

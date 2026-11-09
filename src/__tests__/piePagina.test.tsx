@@ -60,17 +60,22 @@ afterEach(() => {
 });
 
 describe('pie de página legal', () => {
-  it.each(['/', '/caja'])('aparece en %s con un solo contentinfo', (ruta) => {
-    irA(ruta);
+  it('aparece en la portada con un solo contentinfo', () => {
+    irA('/');
     expect(screen.getAllByRole('contentinfo')).toHaveLength(1);
     expect(screen.getByRole('navigation', { name: 'Información legal' })).toBeTruthy();
   });
 
-  it('aparece en SinAcceso', () => {
+  it('no aparece en otras páginas', () => {
+    irA('/caja');
+    expect(screen.queryAllByRole('contentinfo')).toHaveLength(0);
+    expect(screen.queryByRole('navigation', { name: 'Información legal' })).toBeNull();
+  });
+
+  it('no aparece en SinAcceso', () => {
     estado = { ...base(), user: { uid: 'a', email: 'a@b.c' } };
     render(<MemoryRouter><SinAcceso /></MemoryRouter>);
-    expect(screen.getAllByRole('contentinfo')).toHaveLength(1);
-    expect(screen.getByRole('link', { name: 'Aviso legal' })).toBeTruthy();
+    expect(screen.queryAllByRole('contentinfo')).toHaveLength(0);
   });
 
   it.each(ENLACES)('el enlace «%s» lleva a %s', (texto, ruta) => {
@@ -81,7 +86,7 @@ describe('pie de página legal', () => {
 });
 
 describe('pie de la portada', () => {
-  it('solo la portada muestra titularidad, financiación y recuadro; las demás páginas, solo los enlaces', () => {
+  it('solo la portada muestra titularidad, financiación y recuadro', () => {
     irA('/');
     expect(screen.getByText(PIE.titularidad)).toBeTruthy();
     expect(screen.getByText(PIE.financiacion)).toBeTruthy();
@@ -92,7 +97,6 @@ describe('pie de la portada', () => {
     expect(screen.queryByText(PIE.financiacion)).toBeNull();
     expect(screen.queryByRole('region', { name: 'Sobre PRETSO' })).toBeNull();
     expect(screen.queryByRole('button', { name: /README/ })).toBeNull();
-    expect(screen.getByRole('navigation', { name: 'Información legal' })).toBeTruthy();
   });
 
   it('el README se abre en una ventana modal con descarga y se cierra', () => {
@@ -119,6 +123,6 @@ describe('páginas legales sin sesión', () => {
     expect(h1[0].textContent).toBe(pagina.titulo);
     expect(screen.getAllByRole('heading', { level: 2 }).length).toBe(pagina.secciones.length);
     expect(screen.getByRole('link', { name: 'Inicio' })).toBeTruthy();
-    expect(screen.getAllByRole('contentinfo')).toHaveLength(1);
+    expect(screen.queryAllByRole('contentinfo')).toHaveLength(0);
   });
 });

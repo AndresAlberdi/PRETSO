@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router';
 import { useAdmin } from '../context/AdminContext';
 import AccesoForm from '../components/AccesoForm';
+import ExplicacionPortada from '../components/ExplicacionPortada';
 
 export default function Portada({ modo }: { modo: 'visitante' | 'sesion' }) {
   const { isAdmin, authNotice } = useAdmin();
@@ -14,11 +15,15 @@ export default function Portada({ modo }: { modo: 'visitante' | 'sesion' }) {
   }
   return (
     <div className="portada">
+      <div className="portada-cuerpo">
+      <div className="portada-izquierda">
       <section className="portada-hero" aria-labelledby="titulo-portada">
         <h1 id="titulo-portada" className="portada-titulo">PRETSO</h1>
         <p className="portada-subtitulo">Precios del Teatro del Siglo de Oro</p>
         <p className="portada-descripcion">Base de datos para el estudio de las dinámicas económicas del teatro comercial en los territorios hispanos (siglos XVI-XVII)</p>
       </section>
+      <ExplicacionPortada />
+      </div>
       <section className="portada-lateral" aria-label="Proyecto y acciones">
         <div className="portada-logos">
           <div className="portada-logo"><img src="/logo_this.jpg" alt="Logo del proyecto THIS: Theater in Imperial Spain" /></div>
@@ -47,6 +52,7 @@ export default function Portada({ modo }: { modo: 'visitante' | 'sesion' }) {
           </div>
         )}
       </section>
+      </div>
     </div>
   );
 }
