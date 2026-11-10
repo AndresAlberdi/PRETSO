@@ -67,7 +67,7 @@ describe('pie de página legal', () => {
   });
 
   it('no aparece en otras páginas', () => {
-    irA('/caja');
+    irA('/aviso-legal');
     expect(screen.queryAllByRole('contentinfo')).toHaveLength(0);
     expect(screen.queryByRole('navigation', { name: 'Información legal' })).toBeNull();
   });
@@ -92,7 +92,7 @@ describe('pie de la portada', () => {
     expect(screen.getByText(PIE.financiacion)).toBeTruthy();
     expect(screen.getByRole('region', { name: 'Sobre PRETSO' }).textContent).toBe('');
     cleanup();
-    irA('/caja');
+    irA('/aviso-legal');
     expect(screen.queryByText(PIE.titularidad)).toBeNull();
     expect(screen.queryByText(PIE.financiacion)).toBeNull();
     expect(screen.queryByRole('region', { name: 'Sobre PRETSO' })).toBeNull();

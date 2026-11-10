@@ -36,15 +36,6 @@ describe('rutas de App.tsx', () => {
     },
   );
 
-  it.each(['/buscar', '/caja', '/salarios', '/corpus', '/indicadores', '/companias', '/bibliografia'])(
-    '%s es de lectura pública: usa PublicReadRoute y ninguna guarda de sesión',
-    (p) => {
-      const t = R.get(p)!;
-      expect(t).toContain('<PublicReadRoute>');
-      for (const guarda of ['ProtectedRoute', 'ReaderRoute', 'AdminRoute']) expect(t, guarda).not.toContain(guarda);
-    },
-  );
-
   it.each(['/caja', '/salarios', '/corpus', '/indicadores', '/companias', '/bibliografia'])(
     '%s usa ATRAS_BUSCAR y no AdminRoute',
     (p) => {
@@ -105,8 +96,7 @@ describe('rutas de App.tsx', () => {
     expect(sinEspacios(R.get('/login')!)).toContain('<Navigateto="/"replace/>');
     const raiz = sinEspacios(R.get('/')!);
     expect(raiz).toContain('<HomeRoute');
-    expect(raiz).toContain('<Portadamodo="visitante"/>');
-    expect(raiz).toContain('<Portadamodo="sesion"/>');
+    expect(raiz).toContain('<Portadaacceso/>');
     expect(raiz).toContain('<ReaderRoute>');
     expect(raiz).not.toContain('<ProtectedRoute>');
   });

@@ -24,9 +24,8 @@ vi.mock('../firebase', () => ({ auth: {} }));
 
 import { AdminProvider } from '../context/AdminContext';
 import HomeRoute from '../components/HomeRoute';
+import AccesoForm from '../components/AccesoForm';
 import ReaderRoute from '../components/ReaderRoute';
-import Portada from '../pages/Portada';
-import { MemoryRouter } from 'react-router';
 
 const protegido = vi.fn();
 function Protegido() {
@@ -38,7 +37,7 @@ function Inicio() {
   return (
     <AdminProvider>
       <HomeRoute
-        signedOut={<main id="contenido" tabIndex={-1}><MemoryRouter><Portada modo="visitante" /></MemoryRouter></main>}
+        signedOut={<main id="contenido" tabIndex={-1}><AccesoForm /></main>}
         signedIn={<ReaderRoute><Protegido /></ReaderRoute>}
       />
     </AdminProvider>
@@ -64,14 +63,12 @@ describe('administración solo por Google (integración)', () => {
     getIdTokenResult.mockResolvedValue({ claims: { admin: true }, signInProvider: 'password' });
     render(<Inicio />);
     await act(async () => { authCb(null); });
-    const boton = screen.getByRole('button', { name: 'Acceso para administración' });
-    expect(boton.getAttribute('aria-expanded')).toBe('false');
+    expect(screen.getByRole('heading', { level: 2, name: 'Iniciar sesión' })).toBeTruthy();
     await act(async () => { authCb(usuario); });
     const alerta = await screen.findByRole('alert');
     expect(alerta.textContent).toContain('solo pueden entrar con «Continuar con Google»');
     expect(signOut).toHaveBeenCalledTimes(1);
     expect(protegido).not.toHaveBeenCalled();
-    expect(screen.getByRole('button', { name: 'Acceso para administración' }).getAttribute('aria-expanded')).toBe('true');
     await waitFor(() => expect(document.activeElement).toBe(alerta));
   });
 
