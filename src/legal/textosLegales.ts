@@ -11,11 +11,13 @@ export interface PaginaLegalTexto {
   secciones: { encabezado: string; parrafos: string[] }[];
 }
 
-export const PIE: { titularidad: string; financiacion: string; urlDeclaracionAgid?: string } = {
+export const PIE: { titularidad: string; financiacion: string; explicacion: string; urlDeclaracionAgid?: string } = {
   titularidad:
     "© [[PENDIENTE: año]] Università Ca' Foscari Venezia, Dipartimento di Studi Linguistici e Culturali Comparati. PRETSO es un resultado del proyecto THIS (Theater in Imperial Spain), financiado por la Unión Europea (MSCA, acuerdo n.º 101150056, HORIZON-MSCA-2023-PF-01).",
   financiacion:
     '[[PENDIENTE: texto exacto del Grant Agreement firmado; habitual: "Financiado por la Unión Europea. Las opiniones y puntos de vista expresados solo comprometen a su(s) autor(es) y no reflejan necesariamente los de la Unión Europea ni los de la Agencia Ejecutiva de Investigación (REA). Ni la Unión Europea ni la autoridad que concede la subvención pueden ser consideradas responsables de ellos."]]',
+  // Recuadro de la portada que redacta Laura. Vacío hasta entonces; la puerta de publicación lo trata como pendiente.
+  explicacion: '',
 };
 
 export const PAGINAS_LEGALES: Record<RutaLegal, PaginaLegalTexto> = {
@@ -165,7 +167,7 @@ export const PAGINAS_LEGALES: Record<RutaLegal, PaginaLegalTexto> = {
 
 /** Todos los textos legales en una lista plana, para la puerta de publicación. */
 export function textosLegalesPlanos(): string[] {
-  const textos: string[] = [PIE.titularidad, PIE.financiacion];
+  const textos: string[] = [PIE.titularidad, PIE.financiacion, PIE.explicacion.trim() || '[[PENDIENTE: explicación de la portada, la redacta Laura]]'];
   if (PIE.urlDeclaracionAgid) textos.push(PIE.urlDeclaracionAgid);
   for (const pagina of Object.values(PAGINAS_LEGALES)) {
     textos.push(pagina.titulo);

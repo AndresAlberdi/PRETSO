@@ -1,4 +1,4 @@
-import { Link } from 'react-router';
+import { Link, useLocation } from 'react-router';
 import { PIE } from '../legal/textosLegales';
 
 const ENLACES = [
@@ -9,8 +9,10 @@ const ENLACES = [
   { to: '/creditos', texto: 'Créditos' },
 ] as const;
 
-// Pie de página con titularidad, financiación y enlaces legales. Es el único landmark contentinfo de la vista.
+// Pie de página con titularidad, financiación y enlaces legales. Aparece solo en la portada y es su único
+// landmark contentinfo; en las demás páginas no se muestra.
 export function PiePagina() {
+  if (useLocation().pathname !== '/') return null;
   return (
     <footer className="pie-pagina">
       <p>{PIE.titularidad}</p>

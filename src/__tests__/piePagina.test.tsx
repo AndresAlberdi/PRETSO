@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { render, screen, cleanup } from '@testing-library/react';
+import { render, screen, cleanup, fireEvent } from '@testing-library/react';
 
 vi.mock('../firebase', () => ({ db: {}, auth: {} }));
 vi.mock('firebase/auth', () => ({
@@ -35,7 +35,7 @@ vi.mock('../context/AdminContext', () => ({
 import App from '../App';
 import SinAcceso from '../pages/SinAcceso';
 import { MemoryRouter } from 'react-router';
-import { PAGINAS_LEGALES } from '../legal/textosLegales';
+import { PAGINAS_LEGALES, PIE } from '../legal/textosLegales';
 
 function irA(ruta: string) {
   window.history.pushState({}, '', ruta);
@@ -60,23 +60,57 @@ afterEach(() => {
 });
 
 describe('pie de página legal', () => {
-  it.each(['/', '/caja'])('aparece en %s con un solo contentinfo', (ruta) => {
-    irA(ruta);
+  it('aparece en la portada con un solo contentinfo', () => {
+    irA('/');
     expect(screen.getAllByRole('contentinfo')).toHaveLength(1);
     expect(screen.getByRole('navigation', { name: 'Información legal' })).toBeTruthy();
   });
 
-  it('aparece en SinAcceso', () => {
+  it('no aparece en otras páginas', () => {
+    irA('/caja');
+    expect(screen.queryAllByRole('contentinfo')).toHaveLength(0);
+    expect(screen.queryByRole('navigation', { name: 'Información legal' })).toBeNull();
+  });
+
+  it('no aparece en SinAcceso', () => {
     estado = { ...base(), user: { uid: 'a', email: 'a@b.c' } };
     render(<MemoryRouter><SinAcceso /></MemoryRouter>);
-    expect(screen.getAllByRole('contentinfo')).toHaveLength(1);
-    expect(screen.getByRole('link', { name: 'Aviso legal' })).toBeTruthy();
+    expect(screen.queryAllByRole('contentinfo')).toHaveLength(0);
   });
 
   it.each(ENLACES)('el enlace «%s» lleva a %s', (texto, ruta) => {
     irA('/');
     const enlace = screen.getByRole('navigation', { name: 'Información legal' }).querySelector(`a[href="${ruta}"]`);
     expect(enlace?.textContent).toBe(texto);
+  });
+});
+
+describe('pie de la portada', () => {
+  it('solo la portada muestra titularidad, financiación y recuadro', () => {
+    irA('/');
+    expect(screen.getByText(PIE.titularidad)).toBeTruthy();
+    expect(screen.getByText(PIE.financiacion)).toBeTruthy();
+    expect(screen.getByRole('region', { name: 'Sobre PRETSO' }).textContent).toBe('');
+    cleanup();
+    irA('/caja');
+    expect(screen.queryByText(PIE.titularidad)).toBeNull();
+    expect(screen.queryByText(PIE.financiacion)).toBeNull();
+    expect(screen.queryByRole('region', { name: 'Sobre PRETSO' })).toBeNull();
+    expect(screen.queryByRole('button', { name: /README/ })).toBeNull();
+  });
+
+  it('el README se abre en una ventana modal con descarga y se cierra', () => {
+    irA('/');
+    fireEvent.click(screen.getByRole('button', { name: /README\.md/ }));
+    const dialogo = screen.getByRole('dialog');
+    expect(dialogo.textContent).toContain('Precios del Teatro del Siglo de Oro');
+    expect(screen.getByRole('button', { name: 'Descargar README.md' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: 'Cerrar' }));
+    expect(screen.queryByRole('dialog')).toBeNull();
+  });
+
+  it('la puerta de publicación trata el recuadro vacío como pendiente', () => {
+    expect(PIE.explicacion).toBe('');
   });
 });
 
@@ -89,6 +123,6 @@ describe('páginas legales sin sesión', () => {
     expect(h1[0].textContent).toBe(pagina.titulo);
     expect(screen.getAllByRole('heading', { level: 2 }).length).toBe(pagina.secciones.length);
     expect(screen.getByRole('link', { name: 'Inicio' })).toBeTruthy();
-    expect(screen.getAllByRole('contentinfo')).toHaveLength(1);
+    expect(screen.queryAllByRole('contentinfo')).toHaveLength(0);
   });
 });
