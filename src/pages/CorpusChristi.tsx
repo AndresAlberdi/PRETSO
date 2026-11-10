@@ -32,7 +32,6 @@ export default function CorpusChristi() {
   const [companias, setCompanias] = useState<any[]>([]);
   const [transaccionesMap, setTransaccionesMap] = useState<Map<number, any>>(new Map());
   const [loading, setLoading] = useState(true);
-  const [errorCarga, setErrorCarga] = useState(false);
   const canEdit = useCanEdit();
   
   const { crudo, termino, fijar, quitar } = useTerminoBusqueda();
@@ -68,28 +67,23 @@ export default function CorpusChristi() {
 
   useEffect(() => {
     async function fetchData() {
-      try {
-        const qData = query(collection(db, "corpus_christi"));
-        const snap = await getDocs(qData);
-        const docsData = snap.docs.map(cleanFirebaseData).sort(
-          (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
-        );
-        setData(docsData);
+      const qData = query(collection(db, "corpus_christi"));
+      const snap = await getDocs(qData);
+      const docsData = snap.docs.map(cleanFirebaseData).sort(
+        (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
+      );
+      setData(docsData);
 
-        const snapComp = await getDocs(query(collection(db, "companias")));
-        setCompanias(snapComp.docs.map(cleanFirebaseData));
+      const snapComp = await getDocs(query(collection(db, "companias")));
+      setCompanias(snapComp.docs.map(cleanFirebaseData));
 
-        const qTrans = query(collection(db, "transacciones"));
-        const snapTrans = await getDocs(qTrans);
-        const tMap = new Map<number, any>();
-        snapTrans.docs.forEach(d => tMap.set(Number(d.data().Num), d.data()));
-        setTransaccionesMap(tMap);
+      const qTrans = query(collection(db, "transacciones"));
+      const snapTrans = await getDocs(qTrans);
+      const tMap = new Map<number, any>();
+      snapTrans.docs.forEach(d => tMap.set(Number(d.data().Num), d.data()));
+      setTransaccionesMap(tMap);
 
-        setLoading(false);
-      } catch (error) {
-        console.error('No se pudieron cargar los datos:', codigoError(error));
-        setErrorCarga(true);
-      }
+      setLoading(false);
     }
     fetchData();
   }, []);
@@ -205,7 +199,7 @@ export default function CorpusChristi() {
 
       {!loading && !selectedCityYear && !termino && <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Mostrando {sortedFilteredGroups.length} registros</p>}
 
-      {errorCarga ? <p role="alert">No se pudieron cargar los datos. Recargue la página; si el error persiste, avise al equipo técnico.</p> : loading ? <p>Cargando datos...</p> : !selectedCityYear ? (
+      {loading ? <p>Cargando datos...</p> : !selectedCityYear ? (
         <div>
           <div className="fila-filtros">
             <select

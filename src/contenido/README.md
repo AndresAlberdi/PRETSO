@@ -8,7 +8,7 @@ PRETSO es una base de datos para el estudio de las dinámicas económicas del te
 
 ## Quién puede usarla
 
-Cualquier persona puede consultar la base de datos sin iniciar sesión. Solo el equipo del proyecto inicia sesión para administrar y editar los datos.
+Para consultar la base de datos hay que iniciar sesión con una cuenta autorizada por el equipo del proyecto. Solo la administración puede editar los datos.
 
 ## Secciones
 
