@@ -47,7 +47,7 @@ const enRouter = (ui: React.ReactElement) => render(<MemoryRouter>{ui}</MemoryRo
 
 describe('Portada', () => {
   it('el lector ve el título, los tres logos y solo «Realizar búsquedas»', () => {
-    enRouter(<Portada modo="sesion" />);
+    enRouter(<Portada />);
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('PRETSO');
     const alts = screen.getAllByRole('img').map((i) => i.getAttribute('alt'));
@@ -63,7 +63,7 @@ describe('Portada', () => {
 
   it('el administrador ve «Editar» y «Administración» como botones de editor', () => {
     estado = { isAdmin: true, adminLoading: false };
-    enRouter(<Portada modo="sesion" />);
+    enRouter(<Portada />);
     const editar = screen.getByRole('link', { name: 'Editar' });
     const admin = screen.getByRole('link', { name: 'Administración' });
     expect(editar.getAttribute('href')).toBe('/buscar');
@@ -73,15 +73,15 @@ describe('Portada', () => {
   });
 });
 
-describe('Portada del visitante (sin sesión)', () => {
-  it('muestra título, logos, «Realizar búsquedas» y el acceso plegado', () => {
-    enRouter(<Portada modo="visitante" />);
+describe('Portada con acceso (sin sesión)', () => {
+  it('muestra título, logos y el acceso, sin botones de la aplicación', () => {
+    enRouter(<Portada acceso />);
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('PRETSO');
     expect(screen.getAllByRole('img')).toHaveLength(3);
-    expect(screen.getByRole('link', { name: 'Realizar búsquedas' }).getAttribute('href')).toBe('/buscar');
-    expect(screen.getByRole('button', { name: 'Acceso para administración' }).getAttribute('aria-expanded')).toBe('false');
-    expect(screen.queryByRole('heading', { level: 2, name: 'Iniciar sesión' })).toBeNull();
+    expect(screen.getByRole('heading', { level: 2, name: 'Iniciar sesión' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Continuar con Google' })).toBeTruthy();
+    expect(screen.queryByRole('link', { name: 'Realizar búsquedas' })).toBeNull();
     expect(screen.queryByRole('link', { name: 'Editar' })).toBeNull();
     expect(screen.queryByRole('link', { name: 'Administración' })).toBeNull();
   });
