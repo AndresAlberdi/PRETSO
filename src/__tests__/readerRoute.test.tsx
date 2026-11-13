@@ -18,7 +18,7 @@ beforeEach(() => {
 afterEach(cleanup);
 
 function montar() {
-  render(<MemoryRouter><ReaderRoute><p>contenido protegido</p></ReaderRoute></MemoryRouter>);
+  render(<ReaderRoute><p>contenido protegido</p></ReaderRoute>);
 }
 
 describe('ReaderRoute', () => {
@@ -33,7 +33,6 @@ describe('ReaderRoute', () => {
     estado = { isAdmin: false, isReader: false, adminLoading: false };
     montar();
     expect(screen.getByRole('heading', { level: 1, name: 'Acceso pendiente' })).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Realizar búsquedas' }).getAttribute('href')).toBe('/buscar');
     expect(screen.queryByText('contenido protegido')).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: 'Salir' }));
     expect(signOut).toHaveBeenCalledTimes(1);

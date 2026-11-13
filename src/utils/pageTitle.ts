@@ -14,6 +14,11 @@ const SECCIONES: Record<string, string> = {
   '/auditoria': 'Auditoría',
   '/administracion': 'Administración',
   '/usuarios': 'Usuarios',
+  '/aviso-legal': 'Aviso legal',
+  '/privacidad': 'Privacidad',
+  '/cookies': 'Cookies',
+  '/accesibilidad': 'Accesibilidad',
+  '/creditos': 'Créditos',
 };
 
 const TITULO_POR_DEFECTO = 'PRETSO';

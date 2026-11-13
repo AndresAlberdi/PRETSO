@@ -30,7 +30,6 @@ export default function Salarios() {
   const [companias, setCompanias] = useState<any[]>([]);
   const [transaccionesMap, setTransaccionesMap] = useState<Map<number, any>>(new Map());
   const [loading, setLoading] = useState(true);
-  const [errorCarga, setErrorCarga] = useState(false);
   const canEdit = useCanEdit();
   
   const { crudo, termino, fijar, quitar } = useTerminoBusqueda();
@@ -60,32 +59,27 @@ export default function Salarios() {
 
   useEffect(() => {
     async function fetchData() {
-      try {
-        const qSal = query(collection(db, "salarios"));
-        const snapSal = await getDocs(qSal);
-        const docsSal = snapSal.docs.map(cleanFirebaseData).sort(
-          (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
-        );
-        setData(docsSal);
+      const qSal = query(collection(db, "salarios"));
+      const snapSal = await getDocs(qSal);
+      const docsSal = snapSal.docs.map(cleanFirebaseData).sort(
+        (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
+      );
+      setData(docsSal);
 
-        const qComp = query(collection(db, "companias"));
-        const snapComp = await getDocs(qComp);
-        const docsComp = snapComp.docs.map(cleanFirebaseData).sort(
-          (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
-        );
-        setCompanias(docsComp);
+      const qComp = query(collection(db, "companias"));
+      const snapComp = await getDocs(qComp);
+      const docsComp = snapComp.docs.map(cleanFirebaseData).sort(
+        (a, b) => Number(a["Indicador de registro"] || 0) - Number(b["Indicador de registro"] || 0)
+      );
+      setCompanias(docsComp);
       
-        const qTrans = query(collection(db, "transacciones"));
-        const snapTrans = await getDocs(qTrans);
-        const tMap = new Map<number, any>();
-        snapTrans.docs.forEach(d => tMap.set(Number(d.data().Num), d.data()));
-        setTransaccionesMap(tMap);
+      const qTrans = query(collection(db, "transacciones"));
+      const snapTrans = await getDocs(qTrans);
+      const tMap = new Map<number, any>();
+      snapTrans.docs.forEach(d => tMap.set(Number(d.data().Num), d.data()));
+      setTransaccionesMap(tMap);
       
-        setLoading(false);
-      } catch (error) {
-        console.error('No se pudieron cargar los datos:', codigoError(error));
-        setErrorCarga(true);
-      }
+      setLoading(false);
     }
     fetchData();
   }, []);
@@ -212,7 +206,7 @@ export default function Salarios() {
 
       {!loading && !selectedCompId && !mensajeBusqueda && <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Mostrando {sortedFilteredCompanias.length} registros</p>}
 
-      {errorCarga ? <p role="alert">No se pudieron cargar los datos. Recargue la página; si el error persiste, avise al equipo técnico.</p> : loading ? <p>Cargando datos...</p> : !selectedCompId ? (
+      {loading ? <p>Cargando datos...</p> : !selectedCompId ? (
         <div>
           <div className="fila-filtros">
             <select

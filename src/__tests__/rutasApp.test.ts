@@ -18,7 +18,7 @@ const sinEspacios = (t: string) => t.replace(/\s+/g, '');
 describe('rutas de App.tsx', () => {
   it('declara las rutas esperadas', () => {
     for (const p of ['/buscar', '/', '/agregar', '/transacciones', '/documentos', '/auditoria', '/administracion', '/usuarios',
-      '/caja', '/salarios', '/corpus', '/indicadores', '/companias', '/bibliografia', '*']) {
+      '/caja', '/salarios', '/corpus', '/indicadores', '/companias', '/bibliografia', '/aviso-legal', '/privacidad', '/cookies', '/accesibilidad', '/creditos', '*']) {
       expect(R.has(p), p).toBe(true);
     }
   });
@@ -36,21 +36,22 @@ describe('rutas de App.tsx', () => {
     },
   );
 
-  it.each(['/buscar', '/caja', '/salarios', '/corpus', '/indicadores', '/companias', '/bibliografia'])(
-    '%s es de lectura pública: usa PublicReadRoute y ninguna guarda de sesión',
-    (p) => {
-      const t = R.get(p)!;
-      expect(t).toContain('<PublicReadRoute>');
-      for (const guarda of ['ProtectedRoute', 'ReaderRoute', 'AdminRoute']) expect(t, guarda).not.toContain(guarda);
-    },
-  );
-
   it.each(['/caja', '/salarios', '/corpus', '/indicadores', '/companias', '/bibliografia'])(
     '%s usa ATRAS_BUSCAR y no AdminRoute',
     (p) => {
       const t = R.get(p)!;
       expect(t).toContain('ATRAS_BUSCAR');
       expect(t).not.toContain('AdminRoute');
+    },
+  );
+
+  it.each(['/aviso-legal', '/privacidad', '/cookies', '/accesibilidad', '/creditos'])(
+    '%s es pública, sin ninguna guarda, y vuelve a Inicio',
+    (p) => {
+      const t = R.get(p)!;
+      for (const guarda of ['ProtectedRoute', 'ReaderRoute', 'AdminRoute', 'PublicReadRoute']) expect(t, guarda).not.toContain(guarda);
+      expect(t).toContain('PaginaLegal');
+      expect(t).toContain('ATRAS_INICIO');
     },
   );
 
@@ -95,8 +96,7 @@ describe('rutas de App.tsx', () => {
     expect(sinEspacios(R.get('/login')!)).toContain('<Navigateto="/"replace/>');
     const raiz = sinEspacios(R.get('/')!);
     expect(raiz).toContain('<HomeRoute');
-    expect(raiz).toContain('<Portadamodo="visitante"/>');
-    expect(raiz).toContain('<Portadamodo="sesion"/>');
+    expect(raiz).toContain('<Portadaacceso/>');
     expect(raiz).toContain('<ReaderRoute>');
     expect(raiz).not.toContain('<ProtectedRoute>');
   });

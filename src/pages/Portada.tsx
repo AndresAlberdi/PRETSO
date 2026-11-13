@@ -1,24 +1,21 @@
-import { useState } from 'react';
 import { Link } from 'react-router';
 import { useAdmin } from '../context/AdminContext';
 import AccesoForm from '../components/AccesoForm';
+import ExplicacionPortada from '../components/ExplicacionPortada';
 
-export default function Portada({ modo }: { modo: 'visitante' | 'sesion' }) {
-  const { isAdmin, authNotice } = useAdmin();
-  // El panel de acceso empieza abierto si hay un aviso pendiente y se abre cuando llega uno.
-  const [abierto, setAbierto] = useState(Boolean(authNotice));
-  const [avisoVisto, setAvisoVisto] = useState<string | null>(authNotice);
-  if (authNotice && authNotice !== avisoVisto) {
-    setAvisoVisto(authNotice);
-    setAbierto(true);
-  }
+export default function Portada({ acceso = false }: { acceso?: boolean }) {
+  const { isAdmin } = useAdmin();
   return (
     <div className="portada">
+      <div className="portada-cuerpo">
+      <div className="portada-izquierda">
       <section className="portada-hero" aria-labelledby="titulo-portada">
         <h1 id="titulo-portada" className="portada-titulo">PRETSO</h1>
         <p className="portada-subtitulo">Precios del Teatro del Siglo de Oro</p>
         <p className="portada-descripcion">Base de datos para el estudio de las dinámicas económicas del teatro comercial en los territorios hispanos (siglos XVI-XVII)</p>
       </section>
+      <ExplicacionPortada />
+      </div>
       <section className="portada-lateral" aria-label="Proyecto y acciones">
         <div className="portada-logos">
           <div className="portada-logo"><img src="/logo_this.jpg" alt="Logo del proyecto THIS: Theater in Imperial Spain" /></div>
@@ -29,15 +26,7 @@ export default function Portada({ modo }: { modo: 'visitante' | 'sesion' }) {
           <p>Proyecto: [101150056] — [THIS] — [HORIZON-MSCA-2023-PF-01]</p>
           <p>IP: Laura Paz Rescala</p>
         </div>
-        {modo === 'visitante' ? (<>
-          <div className="portada-acciones">
-            <Link to="/buscar" className="boton boton-primario">Realizar búsquedas</Link>
-            <button type="button" className="boton boton-secundario" aria-expanded={abierto} aria-controls="acceso-panel" onClick={() => setAbierto((v) => !v)}>Acceso para administración</button>
-          </div>
-          <div id="acceso-panel" className="portada-acceso-panel" hidden={!abierto}>
-            <AccesoForm />
-          </div>
-        </>) : (
+        {acceso ? <AccesoForm /> : (
           <div className="portada-acciones">
             <Link to="/buscar" className="boton boton-primario">Realizar búsquedas</Link>
             {isAdmin && (<>
@@ -47,6 +36,7 @@ export default function Portada({ modo }: { modo: 'visitante' | 'sesion' }) {
           </div>
         )}
       </section>
+      </div>
     </div>
   );
 }
