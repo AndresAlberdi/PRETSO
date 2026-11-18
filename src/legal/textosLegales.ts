@@ -13,11 +13,12 @@ export interface PaginaLegalTexto {
 
 export const PIE: { titularidad: string; financiacion: string; explicacion: string; urlDeclaracionAgid?: string } = {
   titularidad:
-    "© [[PENDIENTE: año]] Università Ca' Foscari Venezia, Dipartimento di Studi Linguistici e Culturali Comparati. PRETSO es un resultado del proyecto THIS (Theater in Imperial Spain), financiado por la Unión Europea (MSCA, acuerdo n.º 101150056, HORIZON-MSCA-2023-PF-01).",
+    'Copy Right: CC BY-NC-ND 4.0. PRETSO es un resultado del proyecto THIS (Theater in Imperial Spain), financiado por la Unión Europea (MSCA, acuerdo n.º 101150056, HORIZON-MSCA-2023-PF-01).',
   financiacion:
-    '[[PENDIENTE: texto exacto del Grant Agreement firmado; habitual: "Financiado por la Unión Europea. Las opiniones y puntos de vista expresados solo comprometen a su(s) autor(es) y no reflejan necesariamente los de la Unión Europea ni los de la Agencia Ejecutiva de Investigación (REA). Ni la Unión Europea ni la autoridad que concede la subvención pueden ser consideradas responsables de ellos."]]',
-  // Recuadro de la portada que redacta Laura. Vacío hasta entonces; la puerta de publicación lo trata como pendiente.
-  explicacion: '',
+    'Financiado por la Unión Europea. Las opiniones y puntos de vista expresados solo comprometen a su(s) autor(es) y no reflejan necesariamente los de la Unión Europea ni los de la Agencia Ejecutiva de Investigación (REA). Ni la Unión Europea ni la autoridad que concede la subvención pueden ser consideradas responsables de ellos.',
+  // Recuadro de la portada (redactado por Laura). Los párrafos se separan con una línea en blanco.
+  explicacion:
+    'PRETSO es una base de datos dedicada al estudio de la actividad económica y las relaciones laborales del teatro profesional hispánico durante la temprana Edad Moderna, principalmente entre la segunda mitad del siglo XVI y las primeras décadas del siglo XVII.\n\nPRETSO tiene como objetivo reunir, organizar y facilitar la consulta de información histórica. Entre otros aspectos, permite estudiar los ingresos y egresos de las compañías, las remuneraciones de los trabajadores teatrales, los encargos de representaciones para las fiestas del Corpus Christi y otros indicadores económicos del mercado teatral.',
 };
 
 export const PAGINAS_LEGALES: Record<RutaLegal, PaginaLegalTexto> = {
@@ -26,36 +27,19 @@ export const PAGINAS_LEGALES: Record<RutaLegal, PaginaLegalTexto> = {
     secciones: [
       {
         encabezado: 'Titular',
-        parrafos: ["Università Ca' Foscari Venezia, [[PENDIENTE: domicilio, CF/P. IVA]]."],
+        parrafos: ["Università Ca’ Foscari Venezia"],
       },
       {
         encabezado: 'Finalidad',
         parrafos: ['PRETSO es una base de datos académica de consulta.'],
       },
       {
-        encabezado: 'Propiedad',
-        parrafos: ['Los resultados son propiedad exclusiva de la Universidad.'],
-      },
-      {
-        encabezado: 'Licencias',
-        parrafos: [
-          'Licencia del corpus: [[PENDIENTE: p. ej. CC BY 4.0]].',
-          'Licencia del código: [[PENDIENTE]].',
-        ],
+        encabezado: 'Licencia',
+        parrafos: ['Copy Right: CC BY-NC-ND 4.0'],
       },
       {
         encabezado: 'Cómo citar',
-        parrafos: ['[[PENDIENTE: texto de Laura]]'],
-      },
-      {
-        encabezado: 'Exención de responsabilidad',
-        parrafos: [
-          'Las transcripciones se ofrecen con fines de investigación y la Universidad no garantiza su exactitud. Se recomienda contrastarlas con las fuentes originales.',
-        ],
-      },
-      {
-        encabezado: 'Ley aplicable',
-        parrafos: ['[[PENDIENTE]]'],
+        parrafos: ['Paz Rescala, Laura, PRETSO: https://pretso-database.web.app/'],
       },
     ],
   },

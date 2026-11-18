@@ -7,7 +7,7 @@ export default function ExplicacionPortada() {
   const [readmeAbierto, setReadmeAbierto] = useState(false);
   return (
     <div className="portada-explicacion">
-      <section className="pie-explicacion" aria-label="Sobre PRETSO">{PIE.explicacion}</section>
+      <section className="pie-explicacion" aria-label="Sobre PRETSO">{PIE.explicacion.split('\n\n').filter(Boolean).map((t) => <p key={t}>{t}</p>)}</section>
       <button type="button" className="pie-readme" aria-haspopup="dialog" onClick={() => setReadmeAbierto(true)}>
         Más sobre la plataforma (README.md)
       </button>
