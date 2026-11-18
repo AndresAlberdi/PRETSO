@@ -90,7 +90,7 @@ describe('pie de la portada', () => {
     irA('/');
     expect(screen.getByText(PIE.titularidad)).toBeTruthy();
     expect(screen.getByText(PIE.financiacion)).toBeTruthy();
-    expect(screen.getByRole('region', { name: 'Sobre PRETSO' }).textContent).toBe('');
+    expect(screen.getByRole('region', { name: 'Sobre PRETSO' }).textContent).toContain('PRETSO es una base de datos dedicada');
     cleanup();
     irA('/aviso-legal');
     expect(screen.queryByText(PIE.titularidad)).toBeNull();
@@ -109,8 +109,9 @@ describe('pie de la portada', () => {
     expect(screen.queryByRole('dialog')).toBeNull();
   });
 
-  it('la puerta de publicación trata el recuadro vacío como pendiente', () => {
-    expect(PIE.explicacion).toBe('');
+  it('el recuadro de la portada trae la explicación de Laura y ya no cuenta como pendiente', () => {
+    expect(PIE.explicacion).toContain('PRETSO es una base de datos dedicada al estudio');
+    expect(screen.queryByText(/Base de datos para el estudio de las dinámicas/)).toBeNull();
   });
 });
 

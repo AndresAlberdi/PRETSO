@@ -12,7 +12,6 @@ export default function Portada({ acceso = false }: { acceso?: boolean }) {
       <section className="portada-hero" aria-labelledby="titulo-portada">
         <h1 id="titulo-portada" className="portada-titulo">PRETSO</h1>
         <p className="portada-subtitulo">Precios del Teatro del Siglo de Oro</p>
-        <p className="portada-descripcion">Base de datos para el estudio de las dinámicas económicas del teatro comercial en los territorios hispanos (siglos XVI-XVII)</p>
       </section>
       <ExplicacionPortada />
       </div>

@@ -37,8 +37,8 @@ describe('assertTextosLegalesPublicables', () => {
     expect(detectadas).toBeGreaterThan(0);
     expect(fuente.replace(new RegExp(MARCADOR.source, 'gi'), '')).not.toMatch(/\[\[PENDIENTE/);
   });
-  it('el recuadro vacío de la portada cuenta como pendiente', () => {
-    expect(textosLegalesPlanos().some((t) => MARCADOR.test(t) && t.includes('portada'))).toBe(true);
+  it('el recuadro de la portada con texto no cuenta como pendiente', () => {
+    expect(textosLegalesPlanos().some((t) => MARCADOR.test(t) && t.includes('portada'))).toBe(false);
   });
   it('los textos planos incluyen el pie y todas las páginas', () => {
     const planos = textosLegalesPlanos();
