@@ -12,7 +12,7 @@ const panelStyle: CSSProperties = {
   maxWidth: '720px', width: '92%', maxHeight: '85vh', overflowY: 'auto', boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
 };
 
-/** Convierte el subconjunto de Markdown que usa el README (títulos, citas, listas, párrafos) en elementos React. */
+/** Convierte el subconjunto de Markdown que usa el README (títulos, negrita de línea completa, citas, listas, párrafos) en elementos React. */
 export function renderizarReadme(texto: string, idTitulo?: string, refTitulo?: RefObject<HTMLHeadingElement | null>): ReactNode[] {
   const nodos: ReactNode[] = [];
   let items: string[] = [];
@@ -26,9 +26,11 @@ export function renderizarReadme(texto: string, idTitulo?: string, refTitulo?: R
     if (linea.startsWith('- ')) { items.push(linea.slice(2)); continue; }
     cerrarLista();
     const k = `n-${nodos.length}`;
-    if (linea.startsWith('## ')) nodos.push(<h3 key={k}>{linea.slice(3)}</h3>);
+    if (linea.startsWith('### ')) nodos.push(<h4 key={k}>{linea.slice(4)}</h4>);
+    else if (linea.startsWith('## ')) nodos.push(<h3 key={k}>{linea.slice(3)}</h3>);
     else if (linea.startsWith('# ')) nodos.push(<h2 key={k} id={idTitulo} ref={refTitulo} tabIndex={refTitulo ? -1 : undefined}>{linea.slice(2)}</h2>);
     else if (linea.startsWith('> ')) nodos.push(<blockquote key={k}>{linea.slice(2)}</blockquote>);
+    else if (/^\*\*.+\*\*$/.test(linea.trim())) nodos.push(<p key={k}><strong>{linea.trim().slice(2, -2)}</strong></p>);
     else if (linea.trim()) nodos.push(<p key={k}>{linea}</p>);
   }
   cerrarLista();
