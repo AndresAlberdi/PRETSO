@@ -245,11 +245,11 @@ export default function Salarios() {
           ) : (
           <div className="tabla-desplazable">
             <table className="sortable">
-              <caption className="visually-hidden">Compañías de Remuneraciones</caption>
+              <caption className="visually-hidden">Empleadores de Remuneraciones</caption>
               <thead>
                 <tr>
-                  <SortableTh label="Compañía" sortKey="Sigla Compañía" sortConfig={scComp} onSort={sortComp} />
-                  <SortableTh label="Autores" sortKey="Autores" sortConfig={scComp} onSort={sortComp} />
+                  <SortableTh label="Compañía u otro" sortKey="Sigla Compañía" sortConfig={scComp} onSort={sortComp} />
+                  <SortableTh label="Empleadores" sortKey="Autores" sortConfig={scComp} onSort={sortComp} />
                   <SortableTh label="Temporadas" sortKey="Temporadas teatrales" sortConfig={scComp} onSort={sortComp} />
                   <SortableTh label="Ámbito" sortKey="Ámbito" sortConfig={scComp} onSort={sortComp} />
                   <th scope="col"><span className="visually-hidden">Detalle</span></th>

@@ -5,7 +5,7 @@ import {
   siglaParaExportar,
   textoVisibleCompania,
 } from '../referenciaCompania';
-import { CAMPOS_DATASET, CAMPOS_ENCABEZADO_CORPUS } from './campos';
+import { CAMPOS_DATASET, CAMPOS_EMPLEADOR_REMUNERACIONES, CAMPOS_ENCABEZADO_CORPUS } from './campos';
 import { transaccionXml, type Enlaces } from './enlaces';
 import { ordenarPorNumero } from './orden';
 import { asignarNombresUnicos, sanearNombreArchivo } from './nombres';
@@ -91,7 +91,7 @@ export function generarCarpetaCompania(
     for (const r of ordenarPorIndicador(lista)) {
       s += `    <${elemento}>\n` + camposXml(defs, r, 3);
       if (huerfano) {
-        s += elementoReferencia(3, 'company_reference', 'Compañía', siglaParaExportar(r['Sigla Compañía'], datos.companias));
+        s += elementoReferencia(3, 'company_reference', esCaja ? 'Compañía' : 'Compañía u otro', siglaParaExportar(r['Sigla Compañía'], datos.companias));
       }
       // Los avisos son conjuntos de referencias únicas: B5 unirá los conjuntos de todas las carpetas
       // (no suma tamaños), de modo que una misma referencia citada en varias carpetas no se infla.
@@ -111,7 +111,9 @@ export function generarCarpetaCompania(
       continue;
     }
     unidades.push({ nombre: textoVisibleCompania(c), seccion: CARPETAS[carpeta], cuerpo: cuerpoRegistros(lista, false), registros: lista.length });
-    encabezados.push('  <company>\n' + camposXml(CAMPOS_DATASET.companias, c, 2) + '  </company>\n');
+    encabezados.push(esCaja
+      ? '  <company>\n' + camposXml(CAMPOS_DATASET.companias, c, 2) + '  </company>\n'
+      : '  <employer>\n' + camposXml(CAMPOS_EMPLEADOR_REMUNERACIONES, c, 2) + '  </employer>\n');
   }
   if (huerfanos.length > 0) {
     unidades.push({ nombre: SIN_UNIDAD.companias, seccion: CARPETAS[carpeta], cuerpo: cuerpoRegistros(huerfanos, true), registros: huerfanos.length });

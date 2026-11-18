@@ -15,7 +15,7 @@ const ESPERADO: Record<string, string[]> = {
   'IndiceCompanias.tsx': ['Sigla', 'Autores', 'Temporadas teatrales', 'Ámbito'],
   'Indicadores.tsx': ['Categoría', 'Ciudad', 'Años'],
   'ManejoCaja.tsx': ['Compañía', 'Autores', 'Temporadas', 'Ámbito'],
-  'Salarios.tsx': ['Compañía', 'Autores', 'Temporadas', 'Ámbito'],
+  'Salarios.tsx': ['Compañía u otro', 'Empleadores', 'Temporadas', 'Ámbito'],
   'Transacciones.tsx': ['Nro.'],
 };
 

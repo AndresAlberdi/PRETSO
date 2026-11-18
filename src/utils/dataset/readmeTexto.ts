@@ -17,7 +17,7 @@ export const CODIFICACION_TEXTO =
 /** Descripción de cada carpeta; `{n}` y `{m}` no se usan: los conteos los agrega el generador. */
 export const DESCRIPCION_CARPETAS = {
   caja: 'un XML por compañía con registros de caja.',
-  remuneraciones: 'un XML por compañía (trato).',
+  remuneraciones: 'un XML por empleador (compañía u otro) (trato).',
   corpus: 'un XML por ciudad y año (trato), llamado `Ciudad-Año.xml`.',
   companias: 'un XML con todas las compañías.',
   transacciones: 'un XML con cada transacción y, anidados, sus documentos con el texto completo.',
@@ -101,7 +101,7 @@ export function ejemploCaja(nombreCarpeta: string): string {
 }
 
 export const NOTA_REMUNERACIONES =
-  'Igual que Manejo de caja, con `<salaries><salary>` y los campos year, city, beneficiary, role, amount_paid, daily_allowance, performance_pay, más `<transaction>`.';
+  'Igual que Manejo de caja, pero el encabezado es `<employer>` con `company_or_other` (rótulo «Compañía u otro»: la sigla si es compañía) y `employers` (rótulo «Empleadores»: los autores si es compañía), y los registros van en `<salaries><salary>` con los campos year, city, beneficiary, role, amount_paid, daily_allowance, performance_pay, más `<transaction>`.';
 
 export const EJEMPLO_CORPUS = [
   '  <city_year>',

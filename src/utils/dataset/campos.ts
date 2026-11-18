@@ -66,6 +66,15 @@ export const CAMPOS_DATASET: Record<ColeccionDataset, readonly CampoDataset[]> =
   ],
 };
 
+/**
+ * Encabezado de cada archivo de Remuneraciones: el empleador puede ser una compañía u otro.
+ * Los nombres de elemento van en inglés; los rótulos, en español.
+ */
+export const CAMPOS_EMPLEADOR_REMUNERACIONES: readonly CampoDataset[] = [
+  { campo: 'Sigla Compañía', elemento: 'company_or_other', etiqueta: 'Compañía u otro' },
+  { campo: 'Autores', elemento: 'employers', etiqueta: 'Empleadores' },
+];
+
 export const CAMPOS_ENCABEZADO_CORPUS: readonly CampoDataset[] = [
   { campo: 'Ciudad', elemento: 'city', etiqueta: 'Ciudad' },
   { campo: 'Año', elemento: 'year', etiqueta: 'Año' },

@@ -69,6 +69,20 @@ describe('generarCarpetaCompania', () => {
     expect(r.archivos[0].contenido).toContain('<salary>');
   });
 
+  it('el encabezado de Remuneraciones usa «Compañía u otro» y «Empleadores» con elementos en inglés', () => {
+    const datos = datosBase({
+      companias: [gaspar],
+      salarios: [{ 'Indicador de registro': 1, 'Sigla Compañía': 7 }],
+    });
+    const x = generarCarpetaCompania('remuneraciones', datos, enlacesVacios, FECHA).archivos[0].contenido;
+    expect(x).toContain('<employer>');
+    expect(x).toContain('<company_or_other label="Compañía u otro">');
+    expect(x).toContain('<employers label="Empleadores">');
+    expect(x).not.toContain('<company>');
+    const caja = generarCarpetaCompania('caja', datosBase({ companias: [gaspar], manejo_de_caja: [{ 'Indicador de registro': 1, 'Sigla Compañía': 7 }] }), enlacesVacios, FECHA).archivos[0].contenido;
+    expect(caja).toContain('<company_code label="Sigla">');
+  });
+
   it('manda a un archivo aparte lo que no resuelve y cuenta las compañías sin registros', () => {
     const datos = datosBase({
       companias: [gaspar, { 'Indicador de registro': 8, 'Sigla Compañía': 'XX' }],
