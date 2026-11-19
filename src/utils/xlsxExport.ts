@@ -3,6 +3,7 @@ import { db } from "../firebase";
 import ExcelJS from "exceljs";
 import { camposReferenciaCompania, siglaParaExportar } from "./referenciaCompania";
 import { NOMBRES_COLECCION, nombreColeccion } from "./etiquetas";
+import { esEmpleadorOtro, TEXTO_OTRO } from "./empleadorSalario";
 
 // Column ordering for each sheet to display them logically
 export const COLUMN_ORDERS: Record<string, string[]> = {
@@ -10,7 +11,7 @@ export const COLUMN_ORDERS: Record<string, string[]> = {
   companias: ['Indicador de registro', 'Sigla Compañía', 'Nombre Compañía', 'Autores', 'Temporadas teatrales', 'Índice de compañías', 'Ámbito'],
   transacciones: ['Num', 'Noticia', 'Fuentes para la generación del dato', 'Doc1', 'Doc2', 'Doc3', 'Doc4', 'Doc5', 'Doc6', 'Doc7', 'Doc8', 'Doc9', 'Doc10'],
   manejo_de_caja: ['Indicador de registro', 'Sigla Compañía', 'Año', 'Ciudad', 'Ingresos', 'Egresos', 'Otros bienes de la compañía', 'Transacción'],
-  salarios: ['Indicador de registro', 'Sigla Compañía', 'Año', 'Ciudad', 'Beneficiario ', 'Encargo', 'Monto a pagar', 'Transacción', 'Ración diaria', 'Pago por representación'],
+  salarios: ['Indicador de registro', 'Sigla Compañía', 'Empleador', 'Temporadas teatrales', 'Ámbito', 'Año', 'Ciudad', 'Beneficiario ', 'Encargo', 'Monto a pagar', 'Transacción', 'Ración diaria', 'Pago por representación'],
   corpus_christi: ['Indicador de registro', 'Ciudad', 'Año', 'Encargado ', 'Encargo', 'Monto a pagar', 'Fondos', 'Transacción', 'Compañía', 'Compañía2', 'Compañía3', 'Compañía4', 'Compañía5', 'Compañía6', 'Compañía7', 'Compañía8', 'Compañía9', 'Compañía10', 'Cmp', 'Cmp2'],
   indicadores: ['Indicador de registro', 'Ciudad', 'Años', 'Concepto', 'Monto', 'Nota', 'Categorías', 'Transacción', 'Sigla Compañía'],
   bibliografia: ['Autores', 'Referencias bibliográficas']
@@ -22,6 +23,12 @@ const HEADER_CLEANUPS: Record<string, string> = {
   'Encargado ': 'Encargado',
   'Num': 'Nro.',
 };
+
+// Títulos propios de una hoja (tienen prioridad sobre HEADER_CLEANUPS).
+const HEADER_POR_COLECCION: Record<string, Record<string, string>> = {
+  salarios: { 'Sigla Compañía': 'Compañía u otro' },
+};
+const tituloColumna = (coll: string, col: string): string => HEADER_POR_COLECCION[coll]?.[col] ?? HEADER_CLEANUPS[col] ?? col;
 
 // Columnas que se leen pero no se muestran en el Excel de consulta.
 const XLSX_OMITTED_COLUMNS: Record<string, string[]> = {
@@ -76,8 +83,10 @@ export async function generateDatabaseXlsx(): Promise<Blob> {
       const columns = (COLUMN_ORDERS[collName] || Object.keys(rowData).sort()).filter(c => !omitted.includes(c));
 
       columns.forEach(col => {
-        const cleanHeader = HEADER_CLEANUPS[col] || col;
-        if (refCols.includes(col)) {
+        const cleanHeader = tituloColumna(collName, col);
+        if (collName === 'salarios' && col === 'Sigla Compañía' && esEmpleadorOtro(rowData)) {
+          newRow[cleanHeader] = TEXTO_OTRO;
+        } else if (refCols.includes(col)) {
           newRow[cleanHeader] = siglaParaExportar(rowData[col], companias);
         } else {
           newRow[cleanHeader] = rowData[col] !== undefined && rowData[col] !== null ? rowData[col] : '';
@@ -95,7 +104,7 @@ export async function generateDatabaseXlsx(): Promise<Blob> {
     }
     
     ws.columns = columns.map(c => {
-       const header = HEADER_CLEANUPS[c] || c;
+       const header = tituloColumna(collName, c);
        return { header, key: header, width: 20 };
     });
     

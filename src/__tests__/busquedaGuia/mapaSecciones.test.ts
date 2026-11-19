@@ -40,7 +40,7 @@ describe('MAPA_SECCIONES', () => {
   it('marca los campos de año', () => {
     const anios = MAPA_SECCIONES.flatMap(s => s.campos.filter(c => c.anio).map(c => `${s.coleccion}.${c.campo}`)).sort();
     expect(anios).toEqual([
-      'companias.Temporadas teatrales', 'corpus_christi.Año', 'indicadores.Años', 'manejo_de_caja.Año', 'salarios.Año',
+      'companias.Temporadas teatrales', 'corpus_christi.Año', 'indicadores.Años', 'manejo_de_caja.Año', 'salarios.Año', 'salarios.Temporadas teatrales',
     ]);
   });
 });

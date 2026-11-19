@@ -25,7 +25,10 @@ Registra ingresos, egresos y el manejo de bienes económicos asociados a las com
 
 ### 3. `salarios`
 Registros de salarios o pagos emitidos a individuos, autores o miembros del gremio.
-*   **`Sigla Compañía`** (Number): número del `Indicador de registro` de `companias`; se acepta "7.0" y siglas heredadas (`resolverCompania`). Si no se resuelve, se muestra «Compañía no encontrada».
+*   **`Sigla Compañía`** (Number): número del `Indicador de registro` de `companias`; se acepta "7.0" y siglas heredadas (`resolverCompania`). Si no se resuelve, se muestra «Compañía no encontrada». Vacío (null) cuando el empleador es «otro».
+*   **`Empleador`** (String, opcional): nombre del empleador escrito a mano cuando no es una compañía («otro»). Con sigla y `Empleador` a la vez, manda la compañía.
+*   **`Temporadas teatrales`** (String, solo «otro»): obligatorio con «otro»; puede ser «desconocido».
+*   **`Ámbito`** (String, solo «otro»): obligatorio con «otro»; puede ser «desconocido».
 *   **`Ciudad`** (String): Ciudad de pago.
 *   **`Año`** (String): Año del salario.
 *   **`Beneficiario `** (String): Persona que recibe el pago.

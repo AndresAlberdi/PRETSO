@@ -45,6 +45,9 @@ const FIELD_TRANSLATIONS: Record<string, Record<string, string>> = {
   salarios: {
     'Indicador de registro': 'record_indicator',
     'Sigla Compañía': 'company_code',
+    'Empleador': 'employer',
+    'Temporadas teatrales': 'theatrical_seasons',
+    'Ámbito': 'scope',
     'Ciudad': 'city',
     'Año': 'year',
     'Beneficiario ': 'beneficiary',

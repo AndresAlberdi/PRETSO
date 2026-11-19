@@ -3,6 +3,11 @@ import { translateField, escapeXml, COLLECTION_ELEMENT_MAP } from '../utils/back
 
 describe('XML Backup Utilities', () => {
   describe('translateField', () => {
+    it('traduce los campos del empleador «otro» de salarios', () => {
+      expect(translateField('salarios', 'Empleador')).toBe('employer');
+      expect(translateField('salarios', 'Temporadas teatrales')).toBe('theatrical_seasons');
+      expect(translateField('salarios', 'Ámbito')).toBe('scope');
+    });
     it('should map Spanish fields to English correctly using translations map', () => {
       expect(translateField('documentos', 'Doc')).toBe('doc_id');
       expect(translateField('documentos', 'Documento')).toBe('document_text');

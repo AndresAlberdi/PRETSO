@@ -60,10 +60,10 @@ describe('generateDatabaseXlsx', () => {
     }];
   });
 
-  it('la hoja Remuneraciones tiene solo las columnas A a J', async () => {
+  it('la hoja Remuneraciones tiene 13 columnas, con «Compañía u otro» y los datos del empleador', async () => {
     const wb = await leerLibro();
     expect(encabezados(wb, 'Remuneraciones')).toEqual([
-      'Indicador de registro', 'Sigla Compañía', 'Año', 'Ciudad', 'Beneficiario',
+      'Indicador de registro', 'Compañía u otro', 'Empleador', 'Temporadas teatrales', 'Ámbito', 'Año', 'Ciudad', 'Beneficiario',
       'Encargo', 'Monto a pagar', 'Transacción', 'Ración diaria', 'Pago por representación',
     ]);
   });
@@ -71,12 +71,24 @@ describe('generateDatabaseXlsx', () => {
   it('no emite los campos de días y representaciones aunque el documento los traiga', async () => {
     const wb = await leerLibro();
     const ws = wb.getWorksheet('Remuneraciones')!;
-    expect(ws.columnCount).toBe(10);
+    expect(ws.columnCount).toBe(13);
     const fila = (ws.getRow(2).values as unknown[]).slice(1);
-    expect(fila).toHaveLength(10);
+    expect(fila).toHaveLength(13);
     expect(fila).not.toContain(365);
     expect(fila).not.toContain(12);
-    expect(fila[9]).toBe(3);
+    expect(fila[12]).toBe(3);
+  });
+
+  it('un empleador «otro» sale con «otro» y sus tres textos; la compañía, con su sigla y celdas vacías', async () => {
+    datos.salarios.push({
+      'Indicador de registro': 2, 'Sigla Compañía': null, Empleador: 'Pepito Pérez', 'Temporadas teatrales': '1615', 'Ámbito': 'desconocido',
+      'Año': 1700, 'Ciudad': 'Lima', 'Beneficiario ': 'Ana', 'Encargo': 'Música', 'Monto a pagar': 5, 'Transacción': 6,
+    });
+    const ws = (await leerLibro()).getWorksheet('Remuneraciones')!;
+    const compania = (ws.getRow(2).values as unknown[]).slice(1);
+    expect(compania.slice(1, 5)).toEqual(['ABC', '', '', '']);
+    const otro = (ws.getRow(3).values as unknown[]).slice(1);
+    expect(otro.slice(1, 5)).toEqual(['otro', 'Pepito Pérez', '1615', 'desconocido']);
   });
 
   it('Manejo de caja e Indicadores conservan sus encabezados', async () => {
@@ -146,7 +158,7 @@ describe('generateDatabaseXlsx', () => {
     ]) {
       const cols = encabezados(wb, hoja);
       for (const campo of camposReferenciaCompania(coleccion)) {
-        const idx = cols.indexOf(campo);
+        const idx = cols.indexOf(coleccion === 'salarios' && campo === 'Sigla Compañía' ? 'Compañía u otro' : campo);
         expect(idx).toBeGreaterThanOrEqual(0);
         const ws = wb.getWorksheet(hoja)!;
         expect(ws.rowCount).toBeGreaterThanOrEqual(2);

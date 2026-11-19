@@ -122,7 +122,7 @@ describe('edición: la compañía es un selector', () => {
   async function abrirEdicion(coleccion: string, record: any) {
     const onSave = vi.fn().mockResolvedValue(undefined);
     render(<GenericEditModal collectionName={coleccion} record={record} onSave={onSave} onClose={vi.fn()} />);
-    const selector = (await screen.findByLabelText('Compañía')) as HTMLSelectElement;
+    const selector = (await screen.findByLabelText(coleccion === 'salarios' ? 'Sigla de la compañía (obligatorio)' : 'Compañía')) as HTMLSelectElement;
     await waitFor(() => expect(selector.options.length).toBeGreaterThan(2));
     return { onSave, selector };
   }

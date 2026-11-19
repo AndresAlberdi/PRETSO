@@ -23,6 +23,11 @@ describe('generarReadme', () => {
     expect(md).toContain('`Manejo de caja/`');
   });
 
+  it('explica el empleador «otro» de Remuneraciones', () => {
+    expect(md).toContain('otro - ');
+    expect(md).toContain('company_or_other');
+  });
+
   it('declara UTF-8 y la fecha en UTC', () => {
     expect(md).toContain('UTF-8');
     expect(md).toContain('Generado el 2026-11-06 09:05 UTC');

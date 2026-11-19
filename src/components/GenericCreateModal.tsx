@@ -11,6 +11,8 @@ import {
 } from '../utils/siglas';
 import { TEXTO_LIBRE, TEXTO_CODIGO } from '../utils/correctorOrtografico';
 import SelectorCompania from './SelectorCompania';
+import CamposEmpleadorSalario, { type TipoEmpleador } from './CamposEmpleadorSalario';
+import { CAMPOS_EMPLEADOR_OTRO, textoManual, validarEmpleadorOtro } from '../utils/empleadorSalario';
 import { nombreColeccion } from '../utils/etiquetas';
 import Modal from './Modal';
 import ConfirmModal from './ConfirmModal';
@@ -67,6 +69,7 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
   // Se activa con cualquier edición del usuario (no con los valores por defecto precargados);
   // decide si Escape pide confirmar el descarte.
   const [touched, setTouched] = useState(false);
+  const [tipoEmpleador, setTipoEmpleador] = useState<TipoEmpleador>('compania');
   const [confirmDiscard, setConfirmDiscard] = useState(false);
   const titleId = useId();
   const fieldId = useId();
@@ -285,8 +288,16 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
 
       // Salarios
       if (collectionName === 'salarios') {
-        if (canonizarReferencia(recordToSave['Sigla Compañía']) === '') {
-          throw new ValidationError('Sigla Compañía', "Debe elegir una compañía existente.");
+        if (tipoEmpleador === 'otro') {
+          const falla = validarEmpleadorOtro(recordToSave);
+          if (falla) throw new ValidationError(falla.campo, falla.mensaje);
+          recordToSave['Sigla Compañía'] = null;
+          for (const c of CAMPOS_EMPLEADOR_OTRO) recordToSave[c] = textoManual(recordToSave[c]);
+        } else {
+          if (canonizarReferencia(recordToSave['Sigla Compañía']) === '') {
+            throw new ValidationError('Sigla Compañía', "Debe elegir una compañía existente.");
+          }
+          for (const c of CAMPOS_EMPLEADOR_OTRO) delete recordToSave[c];
         }
         if (!recordToSave['Transacción']) {
           throw new ValidationError('Transacción', "Debe asociar obligatoriamente una transacción existente.");
@@ -650,20 +661,17 @@ export default function GenericCreateModal({ collectionName, onClose, onCreated 
             {/* --- SALARIOS --- */}
             {collectionName === 'salarios' && (
               <>
-                <label htmlFor={`${fieldId}-compania`} style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                  <strong>Sigla de la compañía (obligatorio)</strong>
-                  <SelectorCompania
-                    id={`${fieldId}-compania`}
-                    required
-                    ariaInvalid={errorField === 'Sigla Compañía'}
-                    ariaDescribedBy={errorField === 'Sigla Compañía' ? errorId : undefined}
-                    companias={companies}
-                    cargando={loading}
-                    value={formData['Sigla Compañía']}
-                    onChange={v => handleChange('Sigla Compañía', v ?? '')}
-                    textoVacio="Seleccione una compañía..."
-                  />
-                </label>
+                <CamposEmpleadorSalario
+                  idBase={fieldId}
+                  tipo={tipoEmpleador}
+                  onTipo={t => { setTouched(true); setTipoEmpleador(t); }}
+                  companias={companies}
+                  cargando={loading}
+                  datos={formData}
+                  onCampo={handleChange}
+                  errorCampo={errorField}
+                  errorId={errorId}
+                />
                 <label style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                   <strong>Transacción relacionada (obligatorio)</strong>
                   <select
