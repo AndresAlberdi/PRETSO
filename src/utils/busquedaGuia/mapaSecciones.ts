@@ -1,3 +1,4 @@
+import { claveEmpleadorOtro, esEmpleadorOtro, PARAMETRO_EMPLEADOR, textoManual, TEXTO_OTRO } from '../empleadorSalario';
 import { CAMPOS_DOC } from '../documentosTransaccion';
 import { textoVisibleCompania, canonizarReferencia, resolverCompania, siglaParaExportar, type CompaniaRef } from '../referenciaCompania';
 
@@ -42,6 +43,16 @@ function unidadCompania(registro: Record<string, unknown>, companias: CompaniaRe
   return { nombre, parametros: { compania: ref } };
 }
 
+function unidadSalario(registro: Record<string, unknown>, companias: CompaniaRef[]): UnidadBusqueda | null {
+  if (esEmpleadorOtro(registro)) {
+    return {
+      nombre: `${TEXTO_OTRO} / ${textoManual(registro['Empleador'])}`,
+      parametros: { [PARAMETRO_EMPLEADOR]: claveEmpleadorOtro(registro) },
+    };
+  }
+  return unidadCompania(registro, companias);
+}
+
 const comp = (campo: string): CampoBuscable => ({ campo, compania: true });
 const anio = (campo: string): CampoBuscable => ({ campo, anio: true });
 const txt = (campo: string): CampoBuscable => ({ campo });
@@ -66,9 +77,10 @@ export const MAPA_SECCIONES: readonly SeccionBuscable[] = [
     campos: [
       comp('Sigla Compañía'), anio('Año'), txt('Ciudad'), txt('Beneficiario '), txt('Encargo'),
       txt('Monto a pagar'), txt('Ración diaria'), txt('Pago por representación'),
+      txt('Empleador'), anio('Temporadas teatrales'), txt('Ámbito'),
     ],
     camposCompania: CAMPOS_COMPANIA_LISTADO,
-    unidad: unidadCompania,
+    unidad: unidadSalario,
   },
   {
     coleccion: 'corpus_christi',

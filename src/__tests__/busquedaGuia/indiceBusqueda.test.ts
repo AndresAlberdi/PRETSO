@@ -219,3 +219,27 @@ describe('campos de la compañía en Manejo de caja y Remuneraciones', () => {
     expect(buscarEnIndice(otro, 'Ramírez', { colecciones: ['corpus_christi'] })).toEqual([]);
   });
 });
+
+describe('empleador «otro» en Remuneraciones', () => {
+  const idx = construirIndice({
+    companias: [{ 'Indicador de registro': 1, 'Sigla Compañía': 'GA-JR' }],
+    salarios: [
+      { id: 'a', 'Indicador de registro': 1, 'Sigla Compañía': null, Empleador: 'Pepito Pérez', 'Temporadas teatrales': 'De 1615 a 1616', 'Ámbito': 'desconocido', Ciudad: 'Lima', Año: 1620 },
+      { id: 'b', 'Indicador de registro': 2, 'Sigla Compañía': null, Empleador: 'pepito perez', 'Temporadas teatrales': 'De 1615 a 1616', 'Ámbito': 'Desconocido', Ciudad: 'Quito', Año: 1621 },
+      { id: 'c', 'Indicador de registro': 3, 'Sigla Compañía': 1, Ciudad: 'Cuzco', Año: 1622 },
+    ],
+  });
+  const unidades = (t: string) => buscarEnIndice(idx, t, { colecciones: ['salarios'] })[0]?.unidades ?? [];
+
+  it('se encuentra por el empleador, el ámbito y un año de las temporadas', () => {
+    expect(unidades('Pepito')).toHaveLength(1);
+    expect(unidades('desconocido')).toHaveLength(1);
+    expect(unidades('1616')).toHaveLength(1);
+  });
+  it('dos registros del mismo grupo dan una sola unidad con el parámetro empleador', () => {
+    expect(unidades('Pepito')[0].parametros).toEqual({ empleador: 'pepito perez|de 1615 a 1616|desconocido' });
+  });
+  it('un registro de compañía sigue dando compania', () => {
+    expect(unidades('Cuzco')[0].parametros).toEqual({ compania: '1' });
+  });
+});
