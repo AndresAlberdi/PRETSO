@@ -20,10 +20,24 @@ import SortableTh from "../components/SortableTh";
 import { contar } from "../utils/anuncios";
 import Tooltip from "../components/Tooltip";
 import { resolverCompania, siglaDeReferencia, textoVisibleCompania } from "../utils/referenciaCompania";
+import { agruparEmpleadoresOtro, PARAMETRO_EMPLEADOR, TEXTO_OTRO, VALOR_FILTRO_OTRO, type GrupoEmpleadorOtro } from "../utils/empleadorSalario";
 import DetailsModal from "../components/DetailsModal";
 import { useTerminoBusqueda, useNavegacionGuia } from "../hooks/useTerminoBusqueda";
 import { useCoincidenciasSeccion } from "../hooks/useIndiceBusqueda";
 import { useDesplazarACoincidencia } from "../hooks/useDesplazarACoincidencia";
+
+// Fila del listado inicial: una compañía o un grupo de empleadores «otro» (mismo nombre, temporadas y ámbito).
+interface FilaEmpleador {
+  clave: string;
+  tipo: 'compania' | 'otro';
+  compania: any | null;
+  grupo: GrupoEmpleadorOtro<any> | null;
+  "Sigla Compañía": string;
+  textoCompania: string;
+  Autores: string;
+  "Temporadas teatrales": string;
+  "Ámbito": string;
+}
 
 export default function Salarios() {
   const [data, setData] = useState<any[]>([]);
@@ -44,6 +58,7 @@ export default function Salarios() {
   const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
 
   const [selectedCompId, setSelectedCompId] = useState<string | null>(null);
+  const [selectedEmpleador, setSelectedEmpleador] = useState<string | null>(null);
   const [activeTransaction, setActiveTransaction] = useState<string | number | null>(null);
   const [activeDocuments, setActiveDocuments] = useState<string | number | null>(null);
   const [recordToView, setRecordToView] = useState<any | null>(null);
@@ -55,6 +70,7 @@ export default function Salarios() {
   useEffect(() => {
     // Refleja la URL en la selección, también cuando el parámetro falta (botón Atrás).
     setSelectedCompId(parametros.get("compania"));
+    setSelectedEmpleador(parametros.get(PARAMETRO_EMPLEADOR));
   }, [parametros]);
 
   useEffect(() => {
@@ -126,29 +142,68 @@ export default function Salarios() {
   // Misma regla que cuenta el índice de compañías (resolverCompania): número, "7.0" o sigla heredada.
   const companiasReferenciadas = new Set<unknown>(data.map(d => resolverCompania(d["Sigla Compañía"], companias)).filter(Boolean));
   const companiasInData = companias.filter(c => companiasReferenciadas.has(c));
+  const gruposOtro = useMemo(() => agruparEmpleadoresOtro(data), [data]);
+  const filas: FilaEmpleador[] = [
+    ...companiasInData.map((c): FilaEmpleador => ({
+      clave: `c:${c["Indicador de registro"]}`,
+      tipo: 'compania',
+      compania: c,
+      grupo: null,
+      "Sigla Compañía": c["Sigla Compañía"],
+      textoCompania: c["Nombre Compañía"] ? `${c["Sigla Compañía"]} / ${c["Nombre Compañía"]}` : c["Sigla Compañía"],
+      Autores: c["Autores"],
+      "Temporadas teatrales": c["Temporadas teatrales"],
+      "Ámbito": c["Ámbito"],
+    })),
+    ...gruposOtro.map((g): FilaEmpleador => ({
+      clave: `o:${g.clave}`,
+      tipo: 'otro',
+      compania: null,
+      grupo: g,
+      "Sigla Compañía": TEXTO_OTRO,
+      textoCompania: TEXTO_OTRO,
+      Autores: g.nombre,
+      "Temporadas teatrales": g.temporadas,
+      "Ámbito": g.ambito,
+    })),
+  ];
   const uniqueCompanias = Array.from(new Set(companiasInData.map(c => String(c["Indicador de registro"])))).filter(Boolean).sort();
-  const uniqueTemporadas = Array.from(new Set(companiasInData.map(c => c["Temporadas teatrales"]))).filter(Boolean).sort();
-  const uniqueAmbitos = Array.from(new Set(companiasInData.map(c => c["Ámbito"]))).filter(Boolean).sort();
+  const uniqueTemporadas = Array.from(new Set(filas.map(f => f["Temporadas teatrales"]))).filter(Boolean).sort();
+  const uniqueAmbitos = Array.from(new Set(filas.map(f => f["Ámbito"]))).filter(Boolean).sort();
 
-  // Nivel 2: con un término válido solo se listan las compañías con coincidencia.
+  // Nivel 2: con un término válido solo se listan las compañías y los empleadores «otro» con coincidencia.
   const conCoincidencia = new Set<unknown>(guia.unidades.map(u => resolverCompania(u.parametros.compania, companias)).filter(Boolean));
+  const otrosConCoincidencia = new Set<string>(guia.unidades.map(u => u.parametros[PARAMETRO_EMPLEADOR]).filter(Boolean));
+  const coincideFila = (f: FilaEmpleador) => (f.tipo === 'compania' ? conCoincidencia.has(f.compania) : otrosConCoincidencia.has(f.grupo!.clave));
 
-  const filteredCompanias = companiasInData.filter(c => {
-    if (termino && !conCoincidencia.has(c)) return false;
-    if (filterCompania && String(c["Indicador de registro"]) !== filterCompania) return false;
-    if (filterTemporada && c["Temporadas teatrales"] !== filterTemporada) return false;
-    if (filterAmbito && c["Ámbito"] !== filterAmbito) return false;
+  const filteredCompanias = filas.filter(f => {
+    if (termino && !coincideFila(f)) return false;
+    if (filterCompania === VALOR_FILTRO_OTRO) {
+      if (f.tipo !== 'otro') return false;
+    } else if (filterCompania && (f.tipo !== 'compania' || String(f.compania["Indicador de registro"]) !== filterCompania)) return false;
+    if (filterTemporada && f["Temporadas teatrales"] !== filterTemporada) return false;
+    if (filterAmbito && f["Ámbito"] !== filterAmbito) return false;
     return true;
   });
 
+  const haySeleccion = selectedCompId !== null || selectedEmpleador !== null;
+  const esDetalleOtro = selectedEmpleador !== null;
+  const claveSeleccion = esDetalleOtro ? `otro:${selectedEmpleador}` : selectedCompId;
+
   useRestoreFocusOnViewChange(
     termino
-      ? (selectedCompId ? `detail:${selectedCompId}` : `search:${termino}`)
-      : selectedCompId ? `detail:${selectedCompId}` : 'list'
+      ? (haySeleccion ? `detail:${claveSeleccion}` : `search:${termino}`)
+      : haySeleccion ? `detail:${claveSeleccion}` : 'list'
   );
-  const siglaSeleccionada = siglaDeReferencia(selectedCompId, companias);
-  const companiaSeleccionada = resolverCompania(selectedCompId, companias);
-  const detailData = companiaSeleccionada
+  const grupoSeleccionado = esDetalleOtro ? gruposOtro.find(g => g.clave === selectedEmpleador) ?? null : null;
+  const companiaSeleccionada = esDetalleOtro ? null : resolverCompania(selectedCompId, companias);
+  const seleccionResuelta = esDetalleOtro ? grupoSeleccionado : companiaSeleccionada;
+  const siglaSeleccionada = esDetalleOtro
+    ? `${TEXTO_OTRO} / ${grupoSeleccionado?.nombre ?? ''}`
+    : siglaDeReferencia(selectedCompId, companias);
+  const detailData = grupoSeleccionado
+    ? grupoSeleccionado.registros
+    : companiaSeleccionada
     ? data.filter(d => resolverCompania(d["Sigla Compañía"], [companiaSeleccionada]) !== null)
     : [];
 
@@ -163,23 +218,23 @@ export default function Salarios() {
     : guia.estado === 'cargando' && guia.unidades.length === 0 ? 'Buscando…'
     : null;
 
-  const anuncioResultados = avisoCarga && (!selectedCompId || companiaSeleccionada)
+  const anuncioResultados = avisoCarga && (!haySeleccion || seleccionResuelta)
     ? avisoCarga
-    : !selectedCompId
+    : !haySeleccion
     ? (termino
       ? `Búsqueda: ${contar(sortedFilteredCompanias.length, 'compañía', 'compañías')} con «${crudo}»`
       : `Listado: ${contar(sortedFilteredCompanias.length, 'registro', 'registros')}`)
-    : !companiaSeleccionada
-    ? 'No se encontró la compañía seleccionada'
+    : !seleccionResuelta
+    ? (esDetalleOtro ? 'No se encontró el empleador seleccionado' : 'No se encontró la compañía seleccionada')
     : termino
     ? `Detalle de ${siglaSeleccionada}: ${contar(sortedDetailData.length, 'registro', 'registros')}, ${registrosConCoincidencia} con «${crudo}»`
     : `Detalle de ${siglaSeleccionada}: ${contar(sortedDetailData.length, 'registro', 'registros')}`;
 
   // Espera a los datos de la página y al índice: con el índice en caché el efecto correría antes de que existan las filas.
-  useDesplazarACoincidencia(!loading && termino && guia.estado === 'listo' && selectedCompId ? `${termino}|${selectedCompId}` : null);
+  useDesplazarACoincidencia(!loading && termino && guia.estado === 'listo' && haySeleccion ? `${termino}|${claveSeleccion}` : null);
 
   // Sin coincidencias del término (no por los desplegables): se informa en lugar de mostrar la tabla vacía.
-  const sinCoincidencias = termino !== null && !companiasInData.some(c => conCoincidencia.has(c));
+  const sinCoincidencias = termino !== null && !filas.some(coincideFila);
   const mensajeBusqueda = avisoCarga ?? (sinCoincidencias ? `No se encontró «${crudo}» en Remuneraciones.` : null);
 
   return (
@@ -190,7 +245,7 @@ export default function Salarios() {
           <Tooltip label="Acerca de Remuneraciones" content="En esta sección se listan las remuneraciones y pagos específicos que la compañía efectuó a diversas personas (actores, músicos, tramoyistas, etc.) por su trabajo durante las diferentes temporadas." />
         </div>
         <div className="acciones-cabecera">
-          <CampoBusqueda etiqueta="Buscar en esta sección" valorInicial={crudo} onBuscar={t => { setSelectedCompId(null); fijar(t); }} onLimpiar={quitar} />
+          <CampoBusqueda etiqueta="Buscar en esta sección" valorInicial={crudo} onBuscar={t => { setSelectedCompId(null); setSelectedEmpleador(null); fijar(t); }} onLimpiar={quitar} />
           <EditToggle />
           {canEdit && (
             <button type="button" className="boton boton-editor" onClick={() => setIsCreateOpen(true)}>Nuevo registro</button>
@@ -200,13 +255,13 @@ export default function Salarios() {
 
       {!loading && <output aria-live="polite" className="visually-hidden">{anuncioResultados}</output>}
       
-      {selectedCompId && (
-        <button onClick={() => { setSelectedCompId(null); irA({ compania: null }); }} style={{ padding: '0.5rem 1rem', marginBottom: '1rem' }}>{termino ? 'Volver a los resultados' : 'Volver a listado inicial'}</button>
+      {haySeleccion && (
+        <button onClick={() => { setSelectedCompId(null); setSelectedEmpleador(null); irA({ compania: null, [PARAMETRO_EMPLEADOR]: null }); }} style={{ padding: '0.5rem 1rem', marginBottom: '1rem' }}>{termino ? 'Volver a los resultados' : 'Volver a listado inicial'}</button>
       )}
 
-      {!loading && !selectedCompId && !mensajeBusqueda && <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Mostrando {sortedFilteredCompanias.length} registros</p>}
+      {!loading && !haySeleccion && !mensajeBusqueda && <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Mostrando {sortedFilteredCompanias.length} registros</p>}
 
-      {loading ? <p>Cargando datos...</p> : !selectedCompId ? (
+      {loading ? <p>Cargando datos...</p> : !haySeleccion ? (
         <div>
           <div className="fila-filtros">
             <select
@@ -219,6 +274,7 @@ export default function Salarios() {
                 const c = companiasMap.get(opt);
                 return <option key={opt} value={opt}>{c ? textoVisibleCompania(c) : siglaDeReferencia(opt, companias)}</option>;
               })}
+              {gruposOtro.length > 0 && <option value={VALOR_FILTRO_OTRO}>{TEXTO_OTRO}</option>}
             </select>
             <select
               value={filterTemporada}
@@ -256,24 +312,31 @@ export default function Salarios() {
                 </tr>
               </thead>
               <tbody>
-                {sortedFilteredCompanias.map((c, i) => {
-                  const fullName = c["Nombre Compañía"] ? `${c["Sigla Compañía"]} / ${c["Nombre Compañía"]}` : c["Sigla Compañía"];
-                  return (
-                  <tr key={i}>
-                    <td><Resaltado texto={fullName} termino={termino} /></td>
-                    <td><Resaltado texto={c["Autores"]} termino={termino} /></td>
-                    <td><Resaltado texto={c["Temporadas teatrales"]} termino={termino} anio /></td>
-                    <td><Resaltado texto={c["Ámbito"]} termino={termino} /></td>
-                    <td><button onClick={() => { const id = String(c["Indicador de registro"]); setSelectedCompId(id); irA({ compania: id }); }}>TRATO</button></td>
+                {sortedFilteredCompanias.map(f => (
+                  <tr key={f.clave}>
+                    <td><Resaltado texto={f.textoCompania} termino={termino} /></td>
+                    <td><Resaltado texto={f["Autores"]} termino={termino} /></td>
+                    <td><Resaltado texto={f["Temporadas teatrales"]} termino={termino} anio /></td>
+                    <td><Resaltado texto={f["Ámbito"]} termino={termino} /></td>
+                    <td><button onClick={() => {
+                      if (f.tipo === 'otro') {
+                        setSelectedCompId(null); setSelectedEmpleador(f.grupo!.clave);
+                        irA({ compania: null, [PARAMETRO_EMPLEADOR]: f.grupo!.clave });
+                      } else {
+                        const id = String(f.compania["Indicador de registro"]);
+                        setSelectedEmpleador(null); setSelectedCompId(id);
+                        irA({ compania: id, [PARAMETRO_EMPLEADOR]: null });
+                      }
+                    }}>TRATO</button></td>
                   </tr>
-                )})}
+                ))}
               </tbody>
             </table>
           </div>
           )}
         </div>
-      ) : !companiaSeleccionada ? (
-        <p style={{ color: 'var(--text-muted)' }}>Compañía no encontrada</p>
+      ) : !seleccionResuelta ? (
+        <p style={{ color: 'var(--text-muted)' }}>{esDetalleOtro ? 'Empleador no encontrado' : 'Compañía no encontrada'}</p>
       ) : (
         <div className="tabla-desplazable">
           {termino && guia.porId.size === 0 && (guia.estado === 'cargando' || guia.estado === 'error') && (

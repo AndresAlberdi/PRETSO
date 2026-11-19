@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import IndiceCompanias from '../pages/IndiceCompanias';
+import { contarReferenciasACompania } from '../utils/integridadCompanias';
 
 const companias = [
   { id: 'c0', 'Indicador de registro': 0, 'Sigla Compañía': 'CERO', Autores: 'Cero' },
@@ -128,5 +129,19 @@ describe('borrado de compañías: integridad referencial', () => {
     expect(screen.queryByText('Confirmar borrado')).toBeNull();
     expect(deleteDoc).not.toHaveBeenCalled();
     expect(screen.queryByText(/analizando/i)).toBeNull();
+  });
+});
+
+describe('empleador «otro» y la integridad de compañías', () => {
+  it('un empleador «otro» con el nombre igual a una sigla no cuenta como referencia', async () => {
+    colecciones = {
+      companias,
+      salarios: [
+        { id: 's1', 'Sigla Compañía': null, Empleador: 'GA-JR', 'Temporadas teatrales': '1615', 'Ámbito': 'desconocido' },
+        { id: 's2', 'Sigla Compañía': 12 },
+      ],
+    };
+    expect(await contarReferenciasACompania('salarios', companias[1])).toBe(0);
+    expect(await contarReferenciasACompania('salarios', companias[2])).toBe(1);
   });
 });
