@@ -122,6 +122,33 @@ describe('edición de Remuneraciones: empleador «otro»', () => {
     expect(g['Ámbito']).toBeNull();
   });
 
+  it('compañía → otro → escribir → compañía no deja el empleador «otro» en el registro', async () => {
+    const onSave = await abrirEdicion({ id: 'r4', 'Indicador de registro': 4, 'Sigla Compañía': 7, 'Beneficiario ': 'Ana' });
+    fireEvent.click(screen.getByLabelText('Otro (escrito a mano)'));
+    fireEvent.change(screen.getByLabelText('Nombre del empleador (obligatorio)'), { target: { value: 'Pepito' } });
+    fireEvent.click(screen.getByLabelText('Compañía de la lista'));
+    await screen.findByRole('option', { name: /GA-JR/ });
+    fireEvent.change(screen.getByLabelText('Sigla de la compañía (obligatorio)'), { target: { value: '7' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar cambios' }));
+    await waitFor(() => expect(onSave).toHaveBeenCalled());
+    expect(onSave.mock.calls[0][0]).not.toHaveProperty('Empleador');
+  });
+
+  it('pasar de compañía a «otro» con los tres campos guarda sigla null y textos recortados', async () => {
+    const onSave = await abrirEdicion({ id: 'r5', 'Indicador de registro': 5, 'Sigla Compañía': 7, 'Beneficiario ': 'Ana' });
+    fireEvent.click(screen.getByLabelText('Otro (escrito a mano)'));
+    fireEvent.change(screen.getByLabelText('Nombre del empleador (obligatorio)'), { target: { value: '  Pepito  ' } });
+    fireEvent.change(screen.getByLabelText('Temporadas teatrales (obligatorio)'), { target: { value: ' 1615 ' } });
+    fireEvent.change(screen.getByLabelText(/Ámbito \(obligatorio/), { target: { value: 'desconocido' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Guardar cambios' }));
+    await waitFor(() => expect(onSave).toHaveBeenCalled());
+    const g = onSave.mock.calls[0][0];
+    expect(g['Sigla Compañía']).toBeNull();
+    expect(g['Empleador']).toBe('Pepito');
+    expect(g['Temporadas teatrales']).toBe('1615');
+    expect(g['Ámbito']).toBe('desconocido');
+  });
+
   it('pasar a «otro» sin nombre no guarda y muestra el error', async () => {
     const onSave = await abrirEdicion({ id: 'r2', 'Indicador de registro': 2, 'Sigla Compañía': 7, 'Beneficiario ': 'Ana' });
     fireEvent.click(screen.getByLabelText('Otro (escrito a mano)'));

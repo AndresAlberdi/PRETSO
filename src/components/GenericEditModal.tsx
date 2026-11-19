@@ -224,7 +224,10 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
             return;
           }
           // Los datos del empleador «otro» dejan de valer; solo se anulan los que el registro ya tenía.
-          for (const c of CAMPOS_EMPLEADOR_OTRO) if (c in record) processedData[c] = null;
+          for (const c of CAMPOS_EMPLEADOR_OTRO) {
+            if (c in record) processedData[c] = null;
+            else delete processedData[c];
+          }
         }
       }
 
