@@ -158,7 +158,7 @@ describe('generateDatabaseXlsx', () => {
     ]) {
       const cols = encabezados(wb, hoja);
       for (const campo of camposReferenciaCompania(coleccion)) {
-        const idx = cols.indexOf(campo);
+        const idx = cols.indexOf(coleccion === 'salarios' && campo === 'Sigla Compañía' ? 'Compañía u otro' : campo);
         expect(idx).toBeGreaterThanOrEqual(0);
         const ws = wb.getWorksheet(hoja)!;
         expect(ws.rowCount).toBeGreaterThanOrEqual(2);
