@@ -69,6 +69,53 @@ describe('generarCarpetaCompania', () => {
     expect(r.archivos[0].contenido).toContain('<salary>');
   });
 
+  describe('empleador «otro»', () => {
+    const otro = (n: number, extra: Registro = {}): Registro => ({
+      'Indicador de registro': n, 'Sigla Compañía': null, Empleador: 'Juan', 'Temporadas teatrales': '1615-1616', 'Ámbito': 'España', ...extra,
+    });
+
+    it('un grupo «otro» genera un archivo propio con su encabezado', () => {
+      const datos = datosBase({ companias: [gaspar], salarios: [otro(1), otro(2), { 'Indicador de registro': 3, 'Sigla Compañía': 7 }] });
+      const r = generarCarpetaCompania('remuneraciones', datos, enlacesVacios, FECHA);
+      expect(r.archivos.map((a) => a.nombre)).toEqual(['GA-AR', 'otro - Juan - 1615-1616']);
+      const x = r.archivos[1].contenido;
+      expect(r.archivos[1].registros).toBe(2);
+      expect(x).toContain('<company_or_other label="Compañía u otro">otro</company_or_other>');
+      expect(x).toContain('<employers label="Empleadores">Juan</employers>');
+      expect(x).toContain('<theatrical_seasons label="Temporadas teatrales">1615-1616</theatrical_seasons>');
+      expect(x).toContain('<scope label="Ámbito">España</scope>');
+      expect(x).not.toContain('company_reference');
+      expect(sinErrores(x)).toBe(true);
+      expect(r.avisos.registrosSinUnidad).toBe(0);
+    });
+
+    it('el archivo de una compañía también lleva temporadas y ámbito en el encabezado', () => {
+      const datos = datosBase({ companias: [{ ...gaspar, 'Temporadas teatrales': 'De 1580 a 1581', 'Ámbito': 'España' }], salarios: [{ 'Indicador de registro': 1, 'Sigla Compañía': 7 }] });
+      const x = generarCarpetaCompania('remuneraciones', datos, enlacesVacios, FECHA).archivos[0].contenido;
+      expect(x).toContain('<theatrical_seasons label="Temporadas teatrales">De 1580 a 1581</theatrical_seasons>');
+      expect(x).toContain('<scope label="Ámbito">España</scope>');
+    });
+
+    it('mismo nombre y temporada con otro ámbito: nombres únicos', () => {
+      const datos = datosBase({ salarios: [otro(1), otro(2, { 'Ámbito': 'Perú' })] });
+      const r = generarCarpetaCompania('remuneraciones', datos, enlacesVacios, FECHA);
+      expect(r.archivos.map((a) => a.nombre)).toEqual(['otro - Juan - 1615-1616', 'otro - Juan - 1615-1616-2']);
+    });
+
+    it('la sigla vacía sin empleador sigue en «Sin compañía identificada»', () => {
+      const datos = datosBase({ salarios: [{ 'Indicador de registro': 1, 'Sigla Compañía': null }, otro(2)] });
+      const r = generarCarpetaCompania('remuneraciones', datos, enlacesVacios, FECHA);
+      expect(r.archivos.map((a) => a.unidad)).toEqual(['otro - Juan - 1615-1616', 'Sin compañía identificada']);
+      expect(r.avisos.registrosSinUnidad).toBe(1);
+    });
+
+    it('Manejo de caja no cambia aunque un registro traiga «Empleador»', () => {
+      const datos = datosBase({ manejo_de_caja: [{ 'Indicador de registro': 1, 'Sigla Compañía': null, Empleador: 'Juan' }] });
+      const r = generarCarpetaCompania('caja', datos, enlacesVacios, FECHA);
+      expect(r.archivos.map((a) => a.unidad)).toEqual(['Sin compañía identificada']);
+    });
+  });
+
   it('el encabezado de Remuneraciones usa «Compañía u otro» y «Empleadores» con elementos en inglés', () => {
     const datos = datosBase({
       companias: [gaspar],

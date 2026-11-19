@@ -101,7 +101,7 @@ export function ejemploCaja(nombreCarpeta: string): string {
 }
 
 export const NOTA_REMUNERACIONES =
-  'Igual que Manejo de caja, pero el encabezado es `<employer>` con `company_or_other` (rótulo «Compañía u otro»: la sigla si es compañía) y `employers` (rótulo «Empleadores»: los autores si es compañía), y los registros van en `<salaries><salary>` con los campos year, city, beneficiary, role, amount_paid, daily_allowance, performance_pay, más `<transaction>`.';
+  'Igual que Manejo de caja, pero el encabezado es `<employer>` con `company_or_other` (rótulo «Compañía u otro»: la sigla si es compañía, o «otro»), `employers` (rótulo «Empleadores»: los autores si es compañía, o el nombre del empleador escrito a mano), `theatrical_seasons` y `scope` (temporadas teatrales y ámbito; en un empleador «otro» pueden decir «desconocido»), y los registros van en `<salaries><salary>` con los campos year, city, beneficiary, role, amount_paid, daily_allowance, performance_pay, más `<transaction>`. Cada empleador «otro» con el mismo nombre, temporadas y ámbito tiene su propio archivo, cuyo nombre empieza por «otro - ».';
 
 export const EJEMPLO_CORPUS = [
   '  <city_year>',

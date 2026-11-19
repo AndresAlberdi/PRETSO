@@ -73,6 +73,8 @@ export const CAMPOS_DATASET: Record<ColeccionDataset, readonly CampoDataset[]> =
 export const CAMPOS_EMPLEADOR_REMUNERACIONES: readonly CampoDataset[] = [
   { campo: 'Sigla Compañía', elemento: 'company_or_other', etiqueta: 'Compañía u otro' },
   { campo: 'Autores', elemento: 'employers', etiqueta: 'Empleadores' },
+  { campo: 'Temporadas teatrales', elemento: 'theatrical_seasons', etiqueta: 'Temporadas teatrales' },
+  { campo: 'Ámbito', elemento: 'scope', etiqueta: 'Ámbito' },
 ];
 
 export const CAMPOS_ENCABEZADO_CORPUS: readonly CampoDataset[] = [

@@ -18,6 +18,7 @@ import {
   type Registro,
   type ResultadoCarpeta,
 } from './tipos';
+import { agruparEmpleadoresOtro, esEmpleadorOtro, TEXTO_OTRO } from '../empleadorSalario';
 import { atributoXml, cabeceraXml, camposXml, CIERRE_XML, textoXml } from './xml';
 
 const indicador = (r: Registro) => Number(r['Indicador de registro']);
@@ -75,9 +76,11 @@ export function generarCarpetaCompania(
 
   const grupos = new Map<Registro, Registro[]>();
   const huerfanos: Registro[] = [];
+  const otros: Registro[] = [];
   for (const r of registros) {
     const c = resolverCompania(r['Sigla Compañía'], datos.companias);
-    if (!c) huerfanos.push(r);
+    if (!c && !esCaja && esEmpleadorOtro(r)) otros.push(r);
+    else if (!c) huerfanos.push(r);
     else {
       const l = grupos.get(c);
       if (l) l.push(r);
@@ -114,6 +117,14 @@ export function generarCarpetaCompania(
     encabezados.push(esCaja
       ? '  <company>\n' + camposXml(CAMPOS_DATASET.companias, c, 2) + '  </company>\n'
       : '  <employer>\n' + camposXml(CAMPOS_EMPLEADOR_REMUNERACIONES, c, 2) + '  </employer>\n');
+  }
+  for (const g of agruparEmpleadoresOtro(otros)) {
+    unidades.push({ nombre: `${TEXTO_OTRO} - ${g.nombre} - ${g.temporadas}`, seccion: CARPETAS[carpeta], cuerpo: cuerpoRegistros(g.registros, false), registros: g.registros.length });
+    encabezados.push(
+      '  <employer>\n' +
+        camposXml(CAMPOS_EMPLEADOR_REMUNERACIONES, { 'Sigla Compañía': TEXTO_OTRO, Autores: g.nombre, 'Temporadas teatrales': g.temporadas, 'Ámbito': g.ambito }, 2) +
+        '  </employer>\n',
+    );
   }
   if (huerfanos.length > 0) {
     unidades.push({ nombre: SIN_UNIDAD.companias, seccion: CARPETAS[carpeta], cuerpo: cuerpoRegistros(huerfanos, true), registros: huerfanos.length });
