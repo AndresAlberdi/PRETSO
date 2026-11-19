@@ -2,7 +2,9 @@ import React, { useEffect, useId, useRef, useState } from 'react';
 import { collection, query, getDocs } from 'firebase/firestore';
 import { db } from '../firebase';
 import { cleanFirebaseData } from '../utils';
-import { esCampoCompaniaCorpus } from '../utils/referenciaCompania';
+import { canonizarReferencia, esCampoCompaniaCorpus } from '../utils/referenciaCompania';
+import { CAMPOS_EMPLEADOR_OTRO, esEmpleadorOtro, textoManual, validarEmpleadorOtro } from '../utils/empleadorSalario';
+import CamposEmpleadorSalario, { type TipoEmpleador } from './CamposEmpleadorSalario';
 import { leerSiglasCompanias } from '../utils/integridadCompanias';
 import {
   prepararSigla, claveSigla, errorFormatoSigla, evaluarSigla, lineaParecido, introAvisoSigla,
@@ -71,6 +73,11 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
   const errorId = `${fieldIdBase}-error`;
   const [error, setError] = useState<string | null>(null);
   const [errorEnSigla, setErrorEnSigla] = useState(false);
+  // Remuneraciones: el empleador es una compañía de la lista u «otro», escrito a mano.
+  const esSalarios = collectionName === 'salarios';
+  const [tipoEmpleador, setTipoEmpleador] = useState<TipoEmpleador>(() => (esSalarios && esEmpleadorOtro(record) ? 'otro' : 'compania'));
+  const [errorCampo, setErrorCampo] = useState<string | null>(null);
+  const camposEmpleador: readonly string[] = ['Sigla Compañía', ...CAMPOS_EMPLEADOR_OTRO];
   // Aviso (no bloqueante) de sigla parecida a otra; la aceptación queda atada a la sigla aceptada.
   const [avisoSigla, setAvisoSigla] = useState<{ sigla: string; parecidos: ParecidoSigla[] } | null>(null);
   const avisoAceptadoRef = useRef<string | null>(null);
@@ -115,6 +122,10 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
   const handleChange = (key: string, value: any) => {
     setTouched(true);
     setFormData((prev: any) => ({ ...prev, [key]: value }));
+    if (esSalarios && errorCampo) {
+      setErrorCampo(null);
+      setError(null);
+    }
     // Al corregir la sigla se limpia el error que la señalaba.
     if (esSiglaCompania(key)) {
       setErrorEnSigla(false);
@@ -139,12 +150,14 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
     try {
       setError(null);
       setErrorEnSigla(false);
+      setErrorCampo(null);
       // Auto-convert fields back to their original types (number, boolean) before saving
       const processedData = { ...formData };
       for (const key of Object.keys(processedData)) {
         if (key === 'id') continue;
         // El selector de compañía ya entrega el número (o conserva el valor original)
         if (referenciaCompania(key)) continue;
+        if (esSalarios && (CAMPOS_EMPLEADOR_OTRO as readonly string[]).includes(key)) continue;
         const originalValue = record[key];
 
         // Handle number type conversions
@@ -194,6 +207,27 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
         }
       }
 
+      if (esSalarios) {
+        if (tipoEmpleador === 'otro') {
+          const falla = validarEmpleadorOtro(processedData);
+          if (falla) {
+            setError(falla.mensaje);
+            setErrorCampo(falla.campo);
+            return;
+          }
+          processedData['Sigla Compañía'] = null;
+          for (const c of CAMPOS_EMPLEADOR_OTRO) processedData[c] = textoManual(processedData[c]);
+        } else {
+          if (canonizarReferencia(processedData['Sigla Compañía']) === '') {
+            setError('Debe elegir una compañía existente.');
+            setErrorCampo('Sigla Compañía');
+            return;
+          }
+          // Los datos del empleador «otro» dejan de valer; solo se anulan los que el registro ya tenía.
+          for (const c of CAMPOS_EMPLEADOR_OTRO) if (c in record) processedData[c] = null;
+        }
+      }
+
       await onSave(processedData);
     } finally {
       savingRef.current = false;
@@ -203,7 +237,7 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
 
   // Sort keys custom function to place primary keys first and Doc1..Doc10 last
   const getSortedKeys = () => {
-    const keys = Object.keys(record).filter(k => k !== 'id' && !esCampoRetirado(collectionName, k));
+    const keys = Object.keys(record).filter(k => k !== 'id' && !esCampoRetirado(collectionName, k) && !(esSalarios && camposEmpleador.includes(k)));
     
     let indexField = '';
     if (collectionName === 'documentos') indexField = 'Doc';
@@ -247,6 +281,20 @@ export default function GenericEditModal({ collectionName, record, onSave, onClo
           Editar registro: {nombreColeccion(collectionName).toUpperCase()}
         </h2>
         <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1.2rem', marginTop: '1.5rem' }}>
+          {esSalarios && (
+            <CamposEmpleadorSalario
+              idBase={`${fieldIdBase}-empleador`}
+              tipo={tipoEmpleador}
+              onTipo={t => { setTouched(true); setErrorCampo(null); setError(null); setTipoEmpleador(t); }}
+              companias={companias}
+              cargando={!companiasCargadas}
+              datos={formData}
+              onCampo={handleChange}
+              errorCampo={errorCampo}
+              errorId={errorId}
+              disabled={loading}
+            />
+          )}
           {getSortedKeys().map((key, i) => {
             const isReadOnly = READONLY_FIELDS.includes(key);
             const isTextarea = TEXTAREA_FIELDS.includes(key);

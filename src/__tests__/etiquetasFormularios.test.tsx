@@ -150,7 +150,7 @@ describe('formulario de edición etiquetado', () => {
 
   it('remuneraciones: cada etiqueta queda asociada a su campo', async () => {
     const dialogo = await abrirEdicion('salarios', { id: 'x', 'Indicador de registro': 3, 'Sigla Compañía': 7, 'Beneficiario ': 'Ana' });
-    expect(screen.getByLabelText('Compañía').tagName).toBe('SELECT');
+    expect(screen.getByLabelText('Sigla de la compañía (obligatorio)').tagName).toBe('SELECT');
     expect((screen.getByLabelText('Indicador de registro (no editable)') as HTMLInputElement).disabled).toBe(true);
     expect((screen.getByLabelText('Beneficiario') as HTMLInputElement).value).toBe('Ana');
     expect(sinNombre(dialogo)).toEqual([]);
