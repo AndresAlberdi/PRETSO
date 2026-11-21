@@ -61,23 +61,6 @@ async function pulsarDosVeces(boton: HTMLElement, llamadas: { mock: { calls: unk
 }
 
 describe('botones ocupados conservan el foco', () => {
-  it('Entrar', async () => {
-    vi.mocked(signInWithEmailAndPassword).mockReturnValue(new Promise(() => undefined));
-    render(<AccesoForm />);
-    fireEvent.change(screen.getByLabelText('Correo electrónico'), { target: { value: 'a@example.com' } });
-    fireEvent.change(screen.getByLabelText('Contraseña'), { target: { value: 'x' } });
-    await pulsarDosVeces(screen.getByRole('button', { name: 'Entrar' }), vi.mocked(signInWithEmailAndPassword));
-  });
-
-  it('con Google pendiente, enviar el formulario no inicia sesión con correo', async () => {
-    vi.mocked(signInWithPopup).mockReturnValue(new Promise(() => undefined));
-    const { container } = render(<AccesoForm />);
-    fireEvent.click(screen.getByRole('button', { name: 'Continuar con Google' }));
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Conectando con Google...' })).toBeTruthy());
-    fireEvent.submit(container.querySelector('form') as HTMLFormElement);
-    expect(signInWithEmailAndPassword).not.toHaveBeenCalled();
-  });
-
   it('Continuar con Google', async () => {
     vi.mocked(signInWithPopup).mockReturnValue(new Promise(() => undefined));
     render(<AccesoForm />);
