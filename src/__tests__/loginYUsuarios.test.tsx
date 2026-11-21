@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
-import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
+import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import UserManagement from '../pages/UserManagement';
 
@@ -31,60 +31,12 @@ afterEach(() => {
 });
 
 describe('UserManagement', () => {
-  it('asocia etiquetas, no autocompleta el correo ajeno y anuncia el resultado', async () => {
+  it('ya no crea usuarios con contraseña: solo informa y lista las cuentas', async () => {
     render(<UserManagement />);
-    const correo = screen.getByLabelText('Correo electrónico (lector)') as HTMLInputElement;
-    const clave = screen.getByLabelText('Contraseña') as HTMLInputElement;
-    expect(correo.type).toBe('email');
-    expect(correo.getAttribute('autocomplete')).toBe('off');
-    expect(clave.getAttribute('autocomplete')).toBe('new-password');
-
-    vi.mocked(createUserWithEmailAndPassword).mockRejectedValueOnce(new Error('ya existe'));
-    fireEvent.change(correo, { target: { value: 'a@b.co' } });
-    fireEvent.change(clave, { target: { value: '123456' } });
-    fireEvent.submit(correo.closest('form') as HTMLFormElement);
-    expect((await screen.findByRole('alert')).textContent).toContain('Error al crear usuario:');
-
-    vi.mocked(createUserWithEmailAndPassword).mockResolvedValueOnce({} as never);
-    fireEvent.submit(correo.closest('form') as HTMLFormElement);
-    await waitFor(() => expect(screen.getByRole('alert').textContent).toContain('creado exitosamente como lector'));
-  });
-
-  it('no registra el correo ni muestra textos crudos al fallar el alta', async () => {
-    const errorSpy = vi.mocked(console.error);
-    errorSpy.mockClear();
-    vi.mocked(createUserWithEmailAndPassword)
-      .mockRejectedValueOnce({
-        code: 'auth/email-already-in-use',
-        message: 'Firebase: Error (auth/email-already-in-use).',
-        customData: { email: 'persona@example.com' },
-      })
-      .mockRejectedValueOnce({ code: 'auth/weak-password', message: 'Firebase: Error (auth/weak-password).' });
-    render(<UserManagement />);
-    const correo = screen.getByLabelText('Correo electrónico (lector)') as HTMLInputElement;
-    fireEvent.change(correo, { target: { value: 'persona@example.com' } });
-    fireEvent.change(screen.getByLabelText('Contraseña'), { target: { value: '123456' } });
-    const form = correo.closest('form') as HTMLFormElement;
-
-    fireEvent.submit(form);
-    const primera = (await screen.findByRole('alert')).textContent ?? '';
-    expect(primera).toBe('Error al crear usuario: Ya existe un usuario con ese correo.');
-    expect(primera.includes('auth/')).toBe(false);
-    expect(primera.includes('Firebase')).toBe(false);
-    await waitFor(() => expect(errorSpy).toHaveBeenCalledTimes(1));
-    expect(errorSpy.mock.calls).toEqual([['Error al crear usuario:', 'auth/email-already-in-use']]);
-
-    await waitFor(() => expect(screen.getByRole('button', { name: /crear/i })).toBeTruthy());
-    fireEvent.submit(form);
-    await waitFor(() =>
-      expect(screen.getByRole('alert').textContent).toBe(
-        'Error al crear usuario: La contraseña es demasiado débil; use al menos 6 caracteres.',
-      ),
-    );
-    await waitFor(() => expect(errorSpy).toHaveBeenCalledTimes(2));
-    expect(errorSpy.mock.calls).toEqual([
-      ['Error al crear usuario:', 'auth/email-already-in-use'],
-      ['Error al crear usuario:', 'auth/weak-password'],
-    ]);
+    expect(screen.getByRole('heading', { level: 1, name: 'Cuentas con acceso' })).toBeTruthy();
+    expect(screen.queryByLabelText('Correo electrónico (lector)')).toBeNull();
+    expect(screen.queryByRole('button', { name: /crear usuario/i })).toBeNull();
+    expect(createUserWithEmailAndPassword).not.toHaveBeenCalled();
+    await waitFor(() => expect(screen.getByRole('heading', { level: 1 })).toBeTruthy());
   });
 });

@@ -30,12 +30,6 @@ const LISTA_BLANCA: Permitido[] = [
     motivo: 'botón transparente sobre el fondo oscuro de la página',
   },
   {
-    archivo: 'pages/UserManagement.tsx',
-    fragmento: "background: 'var(--bg-body)', color: 'white' }}",
-    veces: 2,
-    motivo: 'campos con fondo var(--bg-body) oscuro',
-  },
-  {
     archivo: 'components/ProtectedRoute.tsx',
     fragmento: "textAlign: 'center', color: '#fff' }}>Cargando...",
     veces: 1,
