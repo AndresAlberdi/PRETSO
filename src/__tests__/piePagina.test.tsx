@@ -99,7 +99,14 @@ describe('pie de la portada', () => {
     expect(screen.queryByRole('button', { name: /README/ })).toBeNull();
   });
 
-  it('el README se abre en una ventana modal con descarga y se cierra', () => {
+  it('sin sesión la portada no ofrece el README', () => {
+    irA('/');
+    expect(screen.queryByRole('button', { name: /README\.md/ })).toBeNull();
+    expect(screen.getByRole('region', { name: 'Sobre PRETSO' })).toBeTruthy();
+  });
+
+  it('con sesión el README se abre en una ventana modal con descarga y se cierra', () => {
+    estado = { ...base(), user: { email: 'lector@example.com' }, isReader: true };
     irA('/');
     fireEvent.click(screen.getByRole('button', { name: /README\.md/ }));
     const dialogo = screen.getByRole('dialog');
