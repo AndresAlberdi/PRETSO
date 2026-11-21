@@ -2,7 +2,6 @@ import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import { signInWithEmailAndPassword, signInWithPopup, createUserWithEmailAndPassword } from 'firebase/auth';
 import AccesoForm from '../components/AccesoForm';
-import UserManagement from '../pages/UserManagement';
 import Administracion from '../pages/Administracion';
 import { generateDatabaseXml } from '../utils/backup';
 import { generateDatabaseXlsx } from '../utils/xlsxExport';
@@ -83,14 +82,6 @@ describe('botones ocupados conservan el foco', () => {
     vi.mocked(signInWithPopup).mockReturnValue(new Promise(() => undefined));
     render(<AccesoForm />);
     await pulsarDosVeces(screen.getByRole('button', { name: 'Continuar con Google' }), vi.mocked(signInWithPopup));
-  });
-
-  it('Crear usuario lector', async () => {
-    vi.mocked(createUserWithEmailAndPassword).mockReturnValue(new Promise(() => undefined));
-    render(<UserManagement />);
-    fireEvent.change(screen.getByLabelText('Correo electrónico (lector)'), { target: { value: 'l@example.com' } });
-    fireEvent.change(screen.getByLabelText(/Contraseña/), { target: { value: 'ClaveSegura-1' } });
-    await pulsarDosVeces(screen.getByRole('button', { name: 'Crear usuario lector' }), vi.mocked(createUserWithEmailAndPassword));
   });
 
   it.each([

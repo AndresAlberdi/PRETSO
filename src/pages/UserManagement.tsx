@@ -1,106 +1,15 @@
-import { useId, useState } from 'react';
-import { initializeApp } from "firebase/app";
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
-import { firebaseConfig } from "../firebase";
-import { createUserErrorMessage, loginErrorCode } from "../utils/authErrors";
 import AccountList from "../components/AccountList";
 
-let secondaryApp: any;
-let secondaryAuth: any;
-try {
-  secondaryApp = initializeApp(firebaseConfig, "SecondaryApp");
-  secondaryAuth = getAuth(secondaryApp);
-} catch {
-  // Ignorar errores de app ya inicializada
-}
-
+// Cuentas con acceso a PRETSO. El ingreso es solo con Google: los roles (administrador o lector) se
+// asignan en el servidor con el script de claims; aquí solo se consultan.
 export default function UserManagement() {
-  const emailId = useId();
-  const passwordId = useId();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [status, setStatus] = useState({ message: '', type: '' });
-  const [loading, setLoading] = useState(false);
-  const [refreshSignal, setRefreshSignal] = useState(0);
-
-  const handleCreateUser = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (loading) return;
-    setLoading(true);
-    setStatus({ message: '', type: '' });
-    
-    try {
-      if (!secondaryAuth) {
-        secondaryApp = initializeApp(firebaseConfig, `SecondaryApp_${Date.now()}`);
-        secondaryAuth = getAuth(secondaryApp);
-      }
-      
-      await createUserWithEmailAndPassword(secondaryAuth, email, password);
-      setStatus({ message: `Usuario ${email} creado exitosamente como lector.`, type: 'success' });
-      setEmail('');
-      setPassword('');
-      setRefreshSignal(n => n + 1);
-    } catch (error: unknown) {
-      console.error('Error al crear usuario:', loginErrorCode(error));
-      setStatus({ message: `Error al crear usuario: ${createUserErrorMessage(error)}`, type: 'error' });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <div style={{ maxWidth: '900px', margin: '2rem auto', padding: '2rem', background: 'var(--bg-card)', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
-      <h1 style={{ marginTop: 0, marginBottom: '0.83em', fontSize: '1.5em', color: 'var(--primary-color)' }}>Gestión de usuarios lectores</h1>
+      <h1 style={{ marginTop: 0, marginBottom: '0.83em', fontSize: '1.5em', color: 'var(--primary-color)' }}>Cuentas con acceso</h1>
       <p style={{ color: 'var(--text-secondary)', lineHeight: 1.5 }}>
-        Crea usuarios con acceso de solo lectura. Estos usuarios podrán acceder a la plataforma pero no podrán modificar ni borrar ningún registro, dado que la base de datos solo permite escrituras al administrador.
+        El ingreso a PRETSO es solo con una cuenta de Google autorizada. Los administradores pueden editar los datos; los lectores solo consultarlos. Los roles los asigna la administración técnica del proyecto.
       </p>
-      
-      <form onSubmit={handleCreateUser} style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '2rem' }}>
-        <div>
-          <label htmlFor={emailId} style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Correo electrónico (lector)</label>
-          <input 
-            id={emailId}
-            autoComplete="off"
-            type="email" 
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            placeholder="lector@pretso.com"
-            required
-            style={{ width: '100%', padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--input-border)', background: 'var(--bg-body)', color: 'white' }}
-          />
-        </div>
-        
-        <div>
-          <label htmlFor={passwordId} style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Contraseña</label>
-          <input 
-            id={passwordId}
-            autoComplete="new-password"
-            type="password" 
-            value={password}
-            onChange={e => setPassword(e.target.value)}
-            placeholder="********"
-            required
-            minLength={6}
-            style={{ width: '100%', padding: '0.8rem', borderRadius: '4px', border: '1px solid var(--input-border)', background: 'var(--bg-body)', color: 'white' }}
-          />
-        </div>
-
-        {status.message && (
-          <div role="alert" style={{ padding: '1rem', borderRadius: '4px', background: status.type === 'error' ? 'rgba(231,76,60,0.2)' : 'rgba(46,204,113,0.2)', color: status.type === 'error' ? '#ff6b6b' : '#2ecc71', border: `1px solid ${status.type === 'error' ? '#e74c3c' : '#2ecc71'}` }}>
-            {status.message}
-          </div>
-        )}
-
-        <button 
-          type="submit" 
-          aria-disabled={loading || undefined}
-          style={{ padding: '1rem', marginTop: '1rem', background: 'var(--primary-color)', color: 'var(--on-primary)', border: 'none', borderRadius: '4px', fontWeight: 'bold', cursor: loading ? 'not-allowed' : 'pointer' }}
-        >
-          {loading ? 'Creando...' : 'Crear usuario lector'}
-        </button>
-      </form>
-
-      <AccountList refreshSignal={refreshSignal} />
+      <AccountList refreshSignal={0} />
     </div>
   );
 }
