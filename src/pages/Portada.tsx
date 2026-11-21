@@ -13,7 +13,7 @@ export default function Portada({ acceso = false }: { acceso?: boolean }) {
         <h1 id="titulo-portada" className="portada-titulo">PRETSO</h1>
         <p className="portada-subtitulo">Precios del Teatro del Siglo de Oro</p>
       </section>
-      <ExplicacionPortada />
+      <ExplicacionPortada conReadme={!acceso} />
       </div>
       <section className="portada-lateral" aria-label="Proyecto y acciones">
         <div className="portada-logos">

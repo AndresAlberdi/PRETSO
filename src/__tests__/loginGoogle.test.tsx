@@ -51,13 +51,12 @@ describe('Login con Google', () => {
     expect(screen.queryByRole('alert')).toBeNull();
   });
 
-  it('pendiente: ambos botones quedan deshabilitados', async () => {
+  it('pendiente: el botón de Google queda deshabilitado', async () => {
     vi.mocked(signInWithPopup).mockReturnValue(new Promise(() => undefined));
     render(<AccesoForm />);
     fireEvent.click(screen.getByRole('button', { name: 'Continuar con Google' }));
     const google = await screen.findByRole('button', { name: 'Conectando con Google...' });
     expect(google.getAttribute('aria-disabled')).toBe('true');
-    expect(screen.getByRole('button', { name: 'Entrar' }).getAttribute('aria-disabled')).toBe('true');
   });
 
   it('rechazo no autorizado: un alert, registro solo con el código y sin navegar', async () => {
@@ -85,11 +84,13 @@ describe('Login con Google', () => {
     await waitFor(() => expect(screen.queryByRole('alert')).toBeNull());
   });
 
-  it('el botón es type="button" y el envío del formulario no abre el popup', () => {
+  it('es la única forma de ingreso: sin formulario, correo ni contraseña', () => {
     const { container } = render(<AccesoForm />);
     expect(screen.getByRole('button', { name: 'Continuar con Google' }).getAttribute('type')).toBe('button');
-    fireEvent.submit(container.querySelector('form') as HTMLFormElement);
-    expect(signInWithPopup).not.toHaveBeenCalled();
+    expect(container.querySelector('form')).toBeNull();
+    expect(screen.queryByLabelText('Correo electrónico')).toBeNull();
+    expect(screen.queryByLabelText('Contraseña')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Entrar' })).toBeNull();
   });
 
   it('no tiene h1 (lo pone la portada) y sí el h2 «Iniciar sesión»', () => {
@@ -106,19 +107,10 @@ describe('Login con Google', () => {
     expect(document.activeElement).toBe(alerta);
   });
 
-  it('un intento nuevo (Google o formulario) limpia el aviso', async () => {
+  it('un intento nuevo con Google limpia el aviso', async () => {
     vi.mocked(signInWithPopup).mockResolvedValue({} as never);
-    const { container } = render(<AccesoForm />);
+    render(<AccesoForm />);
     fireEvent.click(screen.getByRole('button', { name: 'Continuar con Google' }));
     expect(avisoMock.limpiar).toHaveBeenCalledTimes(1);
-    // El intento previo debe terminar: con una acción en curso se ignoran los nuevos intentos.
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Continuar con Google' })).toBeTruthy());
-    fireEvent.submit(container.querySelector('form') as HTMLFormElement);
-    expect(avisoMock.limpiar).toHaveBeenCalledTimes(2);
-  });
-
-  it('el marcador del correo no sugiere una cuenta de administración', () => {
-    render(<AccesoForm />);
-    expect(screen.getByLabelText('Correo electrónico').getAttribute('placeholder')).toBe('nombre@example.com');
   });
 });
