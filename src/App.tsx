@@ -33,7 +33,7 @@ const ATRAS_AGREGAR = <TopBar volver={{ to: '/agregar', texto: 'Atrás' }} />;
 
 function Layout({ barra, children }: { barra: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div>
+    <div className="layout-pagina">
       <SkipLink />
       {barra}
 

@@ -314,7 +314,9 @@ main {
 }
 
 /* Reflujo a 320 px CSS (WCAG 1.4.10) */
-.contenido-principal { padding: 2rem; }
+.layout-pagina { display: flex; flex-direction: column; min-height: 100vh; min-height: 100dvh; }
+.contenido-principal { padding: 2rem; flex: 1 0 auto; }
+.layout-pagina > .pie-pagina { flex-shrink: 0; }
 .tabla-desplazable { overflow-x: auto; max-width: 100%; }
 .cabecera-pagina { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
 .acciones-cabecera { display: flex; gap: 1rem; align-items: center; }
