@@ -91,7 +91,7 @@ Algunos campos se retiraron del sistema: la interfaz y las exportaciones los ign
 
 ## Dataset XML
 
-El administrador descarga un ZIP con un XML por unidad de registro y listas de un solo XML. El código vive en `src/utils/dataset/`. Solo se exportan los campos de la lista blanca `CAMPOS_DATASET` (`src/utils/dataset/campos.ts`), en orden fijo; nunca se recorren las claves de un registro, de modo que los campos retirados quedan fuera. Los nombres de elemento XML están en inglés. El ZIP incluye un README en español que genera `src/utils/dataset/readmeTexto.ts`; su contenido no se duplica aquí.
+El administrador descarga un ZIP con un XML por unidad de registro y listas de un solo XML. El código vive en `src/utils/dataset/`. Solo se exportan los campos de la lista blanca `CAMPOS_DATASET` (`src/utils/dataset/campos.ts`), en orden fijo; nunca se recorren las claves de un registro, de modo que los campos retirados quedan fuera. Los nombres de elemento XML están en inglés. El ZIP incluye en su raíz un `README.pdf` en español (texto en `src/utils/dataset/readmeTexto.ts`, maquetado con pdfmake desde `readme.ts`, que se carga con `import()` dinámico solo al descargar); su contenido no se duplica aquí.
 
 ## Búsqueda guiada
 

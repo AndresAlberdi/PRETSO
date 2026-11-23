@@ -6,7 +6,7 @@ PRETSO es una aplicación web diseñada para la consulta, gestión y análisis d
 
 - **Gestión Documental Completa**: Visualización e interrelación de registros sobre Compañías, Transacciones, Manejo de Caja, Salarios, Corpus Christi, Indicadores y Bibliografía.
 - **Búsqueda guiada**: un solo campo de búsqueda con guía por niveles; dos palabras se tratan como frase exacta y se busca por la sigla de la compañía (reglas en [`estructura_datos.md`](./estructura_datos.md)).
-- **Dataset XML**: la administración descarga un ZIP con un XML por unidad de registro y un README en español (`src/utils/dataset/`).
+- **Dataset XML**: la administración descarga un ZIP con un XML por unidad de registro y un `README.pdf` en español (`src/utils/dataset/`).
 - **Interfaz Interactiva**: Tablas con ordenamiento dinámico (`useSortableTable`), tooltips explicativos y navegación ágil (SPA).
 - **Seguridad y Accesos**:
   - Autenticación con Firebase Auth (acceso con Google).

@@ -6,7 +6,7 @@ import { asignarNombresUnicos } from './nombres';
  * se consideran duplicadas (misma clave que `asignarNombresUnicos`).
  */
 export async function armarZip(
-  entradas: Array<{ ruta: string; contenido: string }>,
+  entradas: Array<{ ruta: string; contenido: string | Uint8Array }>,
   fecha: Date,
 ): Promise<Blob> {
   const unicas = asignarNombresUnicos(entradas.map((e) => e.ruta));
