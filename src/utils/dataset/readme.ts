@@ -1,91 +1,70 @@
-import { CARPETAS, SIN_UNIDAD, type ClaveCarpeta, type ResumenDataset } from './tipos';
-import {
-  ACERCA_DEL_PROYECTO,
-  CODIFICACION_TEXTO,
-  COMO_CITAR,
-  DESCRIPCION_CARPETAS,
-  EJEMPLO_BIBLIOGRAFIA,
-  EJEMPLO_CORPUS,
-  ESQUEMA_COMUN,
-  LICENCIA,
-  NOTA_COMPANIAS,
-  NOTA_REMUNERACIONES,
-  NOTA_SIN_ARCHIVO_PROPIO,
-  NOTA_TRANSACCIONES,
-  QUE_NO_INCLUYE,
-  RELACIONES,
-  TITULO,
-  ejemploCaja,
-} from './readmeTexto';
+import type { Content, TDocumentDefinitions } from 'pdfmake/interfaces';
+import { bloquesReadme, type Bloque } from './readmeTexto';
+import type { ResumenDataset } from './tipos';
 
-const FENCE = '```';
-const ORDEN = Object.keys(CARPETAS) as ClaveCarpeta[];
-
-/** Fecha en formato `AAAA-MM-DD HH:MM` (UTC). */
-function fechaUtc(d: Date): string {
-  return d.toISOString().slice(0, 16).replace('T', ' ');
+function aContenido(b: Bloque): Content {
+  switch (b.tipo) {
+    case 'titulo':
+      return { text: b.texto, style: 'titulo' };
+    case 'subtitulo':
+      return { text: b.texto, style: 'subtitulo' };
+    case 'h1':
+      return { text: b.texto, style: 'h1', headlineLevel: 1 };
+    case 'h2':
+      return { text: b.texto, style: 'h2', headlineLevel: 2 };
+    case 'p':
+      return { text: b.texto, style: 'p' };
+    case 'enlace':
+      return { text: b.texto, link: b.url, style: 'enlace' };
+    case 'lista':
+      return { ul: b.items, style: 'lista' };
+    case 'tabla':
+      return {
+        style: 'tabla',
+        table: {
+          headerRows: 1,
+          widths: b.anchos,
+          body: [
+            b.encabezado.map((t) => ({ text: t, bold: true, fillColor: '#eeeeee' })),
+            ...b.filas.map((fila) => fila.map((t) => ({ text: t }))),
+          ],
+        },
+        layout: 'lightHorizontalLines',
+      };
+  }
 }
 
-function bloqueXml(contenido: string): string {
-  return `${FENCE}xml\n${contenido}\n${FENCE}`;
+/** Árbol del documento pdfmake del README; función pura, sin cargar pdfmake. */
+export function construirDocumentoReadme(resumen: ResumenDataset): TDocumentDefinitions {
+  return {
+    info: {
+      title: 'PRETSO. Precios del Teatro del Siglo de Oro: dataset (Readme)',
+      author: 'PRETSO',
+      creationDate: resumen.generadoEn,
+    },
+    pageSize: 'A4',
+    pageMargins: [56, 56, 56, 56],
+    defaultStyle: { font: 'Roboto', fontSize: 10.5, lineHeight: 1.25 },
+    content: bloquesReadme(resumen).map(aContenido),
+    styles: {
+      titulo: { fontSize: 24, bold: true, margin: [0, 0, 0, 4] },
+      subtitulo: { fontSize: 13, color: '#444444', margin: [0, 0, 0, 14] },
+      h1: { fontSize: 15, bold: true, margin: [0, 14, 0, 6] },
+      h2: { fontSize: 12.5, bold: true, margin: [0, 10, 0, 4] },
+      p: { margin: [0, 0, 0, 6] },
+      lista: { margin: [0, 0, 0, 8] },
+      tabla: { margin: [0, 2, 0, 10] },
+      enlace: { color: '#1a5fb4', decoration: 'underline', margin: [0, 0, 0, 6] },
+    },
+  };
 }
 
-/** Genera el README.md del dataset a partir del resumen de la generación. */
-export function generarReadme(resumen: ResumenDataset): string {
-  const porClave = new Map(resumen.carpetas.map((c) => [c.carpeta, c]));
-  const lineasCarpetas = ORDEN.map((clave) => {
-    const c = porClave.get(clave);
-    const archivos = c?.archivos ?? 0;
-    const registros = c?.registros ?? 0;
-    const conteo = clave === 'companias' || clave === 'transacciones' || clave === 'bibliografia'
-      ? `${registros} registros.`
-      : `${archivos} archivos, ${registros} registros.`;
-    return `- \`${CARPETAS[clave]}/\`: ${DESCRIPCION_CARPETAS[clave]} ${conteo}`;
-  });
-  const sinCaja = porClave.get('caja')?.unidadesSinRegistros ?? 0;
-  const sinRemu = porClave.get('remuneraciones')?.unidadesSinRegistros ?? 0;
-  const a = resumen.avisos;
-
-  const esquemas = [
-    `### ${CARPETAS.caja}`,
-    bloqueXml(ejemploCaja(CARPETAS.caja)),
-    `### ${CARPETAS.remuneraciones}`,
-    NOTA_REMUNERACIONES,
-    `### ${CARPETAS.corpus}`,
-    bloqueXml(EJEMPLO_CORPUS),
-    `### ${CARPETAS.companias}`,
-    NOTA_COMPANIAS,
-    `### ${CARPETAS.transacciones}`,
-    NOTA_TRANSACCIONES,
-    `### ${CARPETAS.bibliografia}`,
-    bloqueXml(EJEMPLO_BIBLIOGRAFIA),
-  ];
-
-  const partes = [
-    TITULO,
-    `Generado el ${fechaUtc(resumen.generadoEn)} UTC. Este archivo se regenera entero en cada descarga; reemplaza a cualquier versión anterior.`,
-    '## Acerca del proyecto',
-    ACERCA_DEL_PROYECTO,
-    '## Codificación y cómo abrir los archivos',
-    CODIFICACION_TEXTO,
-    '## Estructura',
-    lineasCarpetas.join('\n'),
-    `Compañías sin registros de caja: ${sinCaja}; sin remuneraciones: ${sinRemu}. ${NOTA_SIN_ARCHIVO_PROPIO}`,
-    '## Esquema común',
-    ESQUEMA_COMUN,
-    '## Esquema por carpeta',
-    ...esquemas,
-    '## Relaciones y redundancia',
-    RELACIONES,
-    '## Datos incompletos',
-    `Transacciones citadas y no encontradas: ${a.transaccionesNoEncontradas}. Documentos citados y no encontrados: ${a.documentosNoEncontrados}. Se marcan con \`found="false"\`. ` +
-      `Las transacciones cuyo número está repetido o vacío se incluyen igualmente en \`${CARPETAS.transacciones}\` con el atributo \`number_status="duplicate"\` o \`number_status="missing"\`. ` +
-      `Registros sin compañía o sin ciudad y año: ${a.registrosSinUnidad}; están en \`${SIN_UNIDAD.companias}.xml\` (puede existir en \`${CARPETAS.caja}/\` y en \`${CARPETAS.remuneraciones}/\`) y en \`${SIN_UNIDAD.corpus}.xml\` (en \`${CARPETAS.corpus}/\`).`,
-    '## Qué no incluye',
-    QUE_NO_INCLUYE,
-    '## Cómo citar y licencia',
-    `Cómo citar: ${COMO_CITAR}`,
-    `Licencia: ${LICENCIA}`,
-  ];
-  return `${partes.join('\n\n')}\n`;
+/** Genera el README.pdf. pdfmake (y su fuente Roboto) se cargan solo al llamar a esta función. */
+export async function generarReadmePdf(resumen: ResumenDataset): Promise<Uint8Array> {
+  const [{ default: pdfMake }, { default: vfs }] = await Promise.all([
+    import('pdfmake/build/pdfmake'),
+    import('pdfmake/build/vfs_fonts'),
+  ]);
+  pdfMake.addVirtualFileSystem(vfs);
+  return pdfMake.createPdf(construirDocumentoReadme(resumen)).getBuffer();
 }

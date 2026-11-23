@@ -1,7 +1,7 @@
 import { construirEnlaces } from './enlaces';
 import { generarBibliografia, generarIndiceCompanias, generarListaTransacciones } from './listas';
 import { generarCarpetaCompania, generarCarpetaCorpus } from './porUnidad';
-import { generarReadme } from './readme';
+import { generarReadmePdf } from './readme';
 import { CARPETAS, combinarAvisos, contarAvisos, type DatosDataset, type ResumenDataset, type ResultadoCarpeta } from './tipos';
 import { armarZip } from './zip';
 
@@ -10,7 +10,7 @@ export function nombreZipDataset(d: Date): string {
   return `PRETSO_dataset_${d.toISOString().slice(0, 10)}.zip`;
 }
 
-/** Genera todos los archivos del dataset (seis carpetas y el README de la raíz) y su resumen. */
+/** Genera todos los archivos del dataset (las seis carpetas; el README.pdf se agrega al empaquetar) y su resumen. */
 export function generarArchivosDataset(
   datos: DatosDataset,
   generadoEn: Date,
@@ -38,7 +38,6 @@ export function generarArchivosDataset(
     })),
     avisos: contarAvisos(combinarAvisos(...resultados.map(([, r]) => r.avisos))),
   };
-  entradas.push({ ruta: 'README.md', contenido: generarReadme(resumen) });
   return { entradas, resumen };
 }
 
@@ -47,6 +46,7 @@ export async function generarDatasetZip(
   generadoEn: Date,
 ): Promise<{ nombre: string; blob: Blob; resumen: ResumenDataset }> {
   const { entradas, resumen } = generarArchivosDataset(datos, generadoEn);
-  const blob = await armarZip(entradas, generadoEn);
+  const readme = await generarReadmePdf(resumen);
+  const blob = await armarZip([...entradas, { ruta: 'README.pdf', contenido: readme }], generadoEn);
   return { nombre: nombreZipDataset(generadoEn), blob, resumen };
 }

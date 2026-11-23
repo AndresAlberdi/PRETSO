@@ -22,14 +22,14 @@ const datos: DatosDataset = {
 };
 
 describe('generarArchivosDataset', () => {
-  it('produce las rutas esperadas, el README y exactamente seis carpetas', () => {
+  it('produce las rutas esperadas, sin README (lo agrega el empaquetado) y exactamente seis carpetas', () => {
     const { entradas, resumen } = generarArchivosDataset(datos, FECHA);
     const rutas = entradas.map((e) => e.ruta);
     expect(rutas).toContain('Manejo de caja/GA-AR.xml');
     expect(rutas).toContain('Remuneraciones/GA-AR.xml');
     expect(rutas).toContain('Corpus Christi/Madrid-1615.xml');
-    expect(rutas).toContain('README.md');
-    expect(rutas[rutas.length - 1]).toBe('README.md');
+    expect(rutas).not.toContain('README.md');
+    expect(rutas).not.toContain('README.pdf');
     const carpetas = rutas.filter((r) => r.includes('/')).map((r) => r.split('/')[0]).filter((c, i, todas) => todas.indexOf(c) === i);
     expect(carpetas).toEqual(Object.values(CARPETAS));
     expect(rutas.some((r) => r.startsWith('Identificación'))).toBe(false);
@@ -54,7 +54,11 @@ describe('generarArchivosDataset', () => {
     const { nombre, blob } = await generarDatasetZip(datos, FECHA);
     expect(nombre).toBe('PRETSO_dataset_2026-11-06.zip');
     const zip = await JSZip.loadAsync(await blob.arrayBuffer());
-    expect(zip.file('README.md')).not.toBeNull();
+    expect(zip.file('README.md')).toBeNull();
+    expect(zip.file('README.pdf')).not.toBeNull();
+    expect(Object.keys(zip.files).filter((n) => !n.endsWith('/')).pop()).toBe('README.pdf');
+    const crudo = await zip.file('README.pdf')!.async('uint8array');
+    expect(new TextDecoder().decode(crudo.slice(0, 5))).toBe('%PDF-');
     expect(zip.file('Manejo de caja/GA-AR.xml')).not.toBeNull();
   });
 });
