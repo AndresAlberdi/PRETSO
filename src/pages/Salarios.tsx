@@ -57,8 +57,9 @@ export default function Salarios() {
 
   const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
 
-  const [selectedCompId, setSelectedCompId] = useState<string | null>(null);
-  const [selectedEmpleador, setSelectedEmpleador] = useState<string | null>(null);
+  // La selección se deriva de la URL (también cuando el parámetro falta: botón Atrás).
+  const selectedCompId = parametros.get("compania");
+  const selectedEmpleador = parametros.get(PARAMETRO_EMPLEADOR);
   const [activeTransaction, setActiveTransaction] = useState<string | number | null>(null);
   const [activeDocuments, setActiveDocuments] = useState<string | number | null>(null);
   const [recordToView, setRecordToView] = useState<any | null>(null);
@@ -66,12 +67,6 @@ export default function Salarios() {
   const [filterCompania, setFilterCompania] = useState('');
   const [filterTemporada, setFilterTemporada] = useState('');
   const [filterAmbito, setFilterAmbito] = useState('');
-
-  useEffect(() => {
-    // Refleja la URL en la selección, también cuando el parámetro falta (botón Atrás).
-    setSelectedCompId(parametros.get("compania"));
-    setSelectedEmpleador(parametros.get(PARAMETRO_EMPLEADOR));
-  }, [parametros]);
 
   useEffect(() => {
     async function fetchData() {
@@ -245,7 +240,7 @@ export default function Salarios() {
           <Tooltip label="Acerca de Remuneraciones" content="En esta sección se listan las remuneraciones y pagos específicos que la compañía efectuó a diversas personas (actores, músicos, tramoyistas, etc.) por su trabajo durante las diferentes temporadas." />
         </div>
         <div className="acciones-cabecera">
-          <CampoBusqueda etiqueta="Buscar en esta sección" valorInicial={crudo} onBuscar={t => { setSelectedCompId(null); setSelectedEmpleador(null); fijar(t); }} onLimpiar={quitar} />
+          <CampoBusqueda etiqueta="Buscar en esta sección" valorInicial={crudo} onBuscar={fijar} onLimpiar={quitar} />
           <EditToggle />
           {canEdit && (
             <button type="button" className="boton boton-editor" onClick={() => setIsCreateOpen(true)}>Nuevo registro</button>
@@ -256,7 +251,7 @@ export default function Salarios() {
       {!loading && <output aria-live="polite" className="visually-hidden">{anuncioResultados}</output>}
       
       {haySeleccion && (
-        <button onClick={() => { setSelectedCompId(null); setSelectedEmpleador(null); irA({ compania: null, [PARAMETRO_EMPLEADOR]: null }); }} style={{ padding: '0.5rem 1rem', marginBottom: '1rem' }}>{termino ? 'Volver a los resultados' : 'Volver a listado inicial'}</button>
+        <button onClick={() => { irA({ compania: null, [PARAMETRO_EMPLEADOR]: null }); }} style={{ padding: '0.5rem 1rem', marginBottom: '1rem' }}>{termino ? 'Volver a los resultados' : 'Volver a listado inicial'}</button>
       )}
 
       {!loading && !haySeleccion && !mensajeBusqueda && <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Mostrando {sortedFilteredCompanias.length} registros</p>}
@@ -320,11 +315,9 @@ export default function Salarios() {
                     <td><Resaltado texto={f["Ámbito"]} termino={termino} /></td>
                     <td><button onClick={() => {
                       if (f.tipo === 'otro') {
-                        setSelectedCompId(null); setSelectedEmpleador(f.grupo!.clave);
                         irA({ compania: null, [PARAMETRO_EMPLEADOR]: f.grupo!.clave });
                       } else {
                         const id = String(f.compania["Indicador de registro"]);
-                        setSelectedEmpleador(null); setSelectedCompId(id);
                         irA({ compania: id, [PARAMETRO_EMPLEADOR]: null });
                       }
                     }}>TRATO</button></td>

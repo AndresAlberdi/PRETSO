@@ -43,7 +43,8 @@ export default function ManejoCaja() {
 
   const [recordToEdit, setRecordToEdit] = useState<any | null>(null);
 
-  const [selectedCompId, setSelectedCompId] = useState<string | null>(null);
+  // La selección se deriva de la URL (también cuando el parámetro falta: botón Atrás).
+  const selectedCompId = parametros.get("compania");
   const [activeTransaction, setActiveTransaction] = useState<string | number | null>(null);
   const [activeDocuments, setActiveDocuments] = useState<string | number | null>(null);
   const [recordToView, setRecordToView] = useState<any | null>(null);
@@ -51,11 +52,6 @@ export default function ManejoCaja() {
   const [filterCompania, setFilterCompania] = useState('');
   const [filterTemporada, setFilterTemporada] = useState('');
   const [filterAmbito, setFilterAmbito] = useState('');
-
-  useEffect(() => {
-    // Refleja la URL en la selección, también cuando el parámetro falta (botón Atrás).
-    setSelectedCompId(parametros.get("compania"));
-  }, [parametros]);
 
   useEffect(() => {
     async function fetchData() {
@@ -190,7 +186,7 @@ export default function ManejoCaja() {
           <Tooltip label="Acerca de Manejo de caja" content="Esta sección muestra información detallada sobre los ingresos, egresos y otros bienes monetarios gestionados por las diversas compañías durante sus temporadas teatrales. Sirve para entender los flujos de dinero y la salud financiera." />
         </div>
         <div className="acciones-cabecera">
-          <CampoBusqueda etiqueta="Buscar en esta sección" valorInicial={crudo} onBuscar={t => { setSelectedCompId(null); fijar(t); }} onLimpiar={quitar} />
+          <CampoBusqueda etiqueta="Buscar en esta sección" valorInicial={crudo} onBuscar={fijar} onLimpiar={quitar} />
           <EditToggle />
           {canEdit && (
             <button type="button" className="boton boton-editor" onClick={() => setIsCreateOpen(true)}>Nuevo registro</button>
@@ -201,7 +197,7 @@ export default function ManejoCaja() {
       {!loading && <output aria-live="polite" className="visually-hidden">{anuncioResultados}</output>}
       
       {selectedCompId && (
-        <button onClick={() => { setSelectedCompId(null); irA({ compania: null }); }} style={{ padding: '0.5rem 1rem', marginBottom: '1rem' }}>{termino ? 'Volver a los resultados' : 'Volver a listado inicial'}</button>
+        <button onClick={() => { irA({ compania: null }); }} style={{ padding: '0.5rem 1rem', marginBottom: '1rem' }}>{termino ? 'Volver a los resultados' : 'Volver a listado inicial'}</button>
       )}
 
       {!loading && !selectedCompId && !mensajeBusqueda && <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Mostrando {sortedFilteredCompanias.length} registros</p>}
@@ -264,7 +260,7 @@ export default function ManejoCaja() {
                     <td><Resaltado texto={c["Autores"]} termino={termino} /></td>
                     <td><Resaltado texto={c["Temporadas teatrales"]} termino={termino} anio /></td>
                     <td><Resaltado texto={c["Ámbito"]} termino={termino} /></td>
-                    <td><button onClick={() => { const id = String(c["Indicador de registro"]); setSelectedCompId(id); irA({ compania: id }); }}>CAJA</button></td>
+                    <td><button onClick={() => { const id = String(c["Indicador de registro"]); irA({ compania: id }); }}>CAJA</button></td>
                   </tr>
                 )})}
               </tbody>
