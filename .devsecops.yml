@@ -35,35 +35,35 @@ seguridad:
     - id: afb0c3d5042a2fee75b0cba0e0a84a95aacf31ea:Pretso_Dependabot_28062026.md:gcp-api-key:55
       herramienta: gitleaks
       justificacion: >-
-        sin acceso a verificar el 2026-11-23; se presume proyecto borrado tras 30 días
+        Clave de API del proyecto GCP pretso-platform (primera versión de PRETSO, sin uso), pegada en un aviso de Dependabot. Quitada del árbol en #15; queda solo en el historial. El proyecto está en DELETE_REQUESTED (verificado el 2026-09-26): sus APIs no responden y la clave se elimina con el borrado definitivo. Reescribir el historial público no reduce el riesgo. 2026-11-23: el proyecto ya no es accesible con la cuenta del propietario (coherente con el borrado definitivo, 30 días después de DELETE_REQUESTED del 2026-09-26); no se pudo verificar de otro modo.
       aprobado_por: AndresAlberdi
       creado: "2026-11-23"
       vence: "2027-02-21"
     - id: afb0c3d5042a2fee75b0cba0e0a84a95aacf31ea:Pretso_Dependabot_28062026.md:gcp-api-key:66
       herramienta: gitleaks
       justificacion: >-
-        sin acceso a verificar el 2026-11-23; se presume proyecto borrado tras 30 días
+        Clave de API del proyecto GCP pretso-platform (primera versión de PRETSO, sin uso), pegada en un aviso de Dependabot. Quitada del árbol en #15; queda solo en el historial. El proyecto está en DELETE_REQUESTED (verificado el 2026-09-26): sus APIs no responden y la clave se elimina con el borrado definitivo. Reescribir el historial público no reduce el riesgo. 2026-11-23: el proyecto ya no es accesible con la cuenta del propietario (coherente con el borrado definitivo, 30 días después de DELETE_REQUESTED del 2026-09-26); no se pudo verificar de otro modo.
       aprobado_por: AndresAlberdi
       creado: "2026-11-23"
       vence: "2027-02-21"
     - id: 61d4121fb4d5a2bbd8fe881c6b700fd9223bc5dc:src/firebase.ts:generic-api-key:9
       herramienta: gitleaks
       justificacion: >-
-        restricción de la clave verificada el 2026-11-23 (3 referentes y 4 APIs); App Check sigue en monitoreo
+        apiKey web de Firebase del proyecto pretso-database: identificador público por diseño, que el navegador recibe en cada carga del sitio; no da acceso por sí sola (los datos los protegen firestore.rules y Firebase Auth). El hallazgo está en el historial. 2026-11-23: restricción de la clave por referente HTTP y API verificada (3 referentes y 4 APIs). Riesgo aceptado: App Check sigue en monitoreo y no aplicado; esta excepción vence para obligar a revisarlo.
       aprobado_por: AndresAlberdi
       creado: "2026-11-23"
       vence: "2027-02-21"
     - id: 61d4121fb4d5a2bbd8fe881c6b700fd9223bc5dc:src/firebase-config.json:generic-api-key:5
       herramienta: gitleaks
       justificacion: >-
-        restricción de la clave verificada el 2026-11-23 (3 referentes y 4 APIs); App Check sigue en monitoreo
+        apiKey web de Firebase del proyecto pretso-database: identificador público por diseño, que el navegador recibe en cada carga del sitio; no da acceso por sí sola (los datos los protegen firestore.rules y Firebase Auth). El hallazgo está en el historial. 2026-11-23: restricción de la clave por referente HTTP y API verificada (3 referentes y 4 APIs). Riesgo aceptado: App Check sigue en monitoreo y no aplicado; esta excepción vence para obligar a revisarlo.
       aprobado_por: AndresAlberdi
       creado: "2026-11-23"
       vence: "2027-02-21"
     - id: b36587db14d14afeef41dd63375999836cf4fba9:src/pages/UserManagement.tsx:gcp-api-key:9
       herramienta: gitleaks
       justificacion: >-
-        restricción de la clave verificada el 2026-11-23 (3 referentes y 4 APIs); App Check sigue en monitoreo
+        apiKey web de Firebase del proyecto pretso-database: identificador público por diseño, que el navegador recibe en cada carga del sitio; no da acceso por sí sola (los datos los protegen firestore.rules y Firebase Auth). El hallazgo está en el historial. 2026-11-23: restricción de la clave por referente HTTP y API verificada (3 referentes y 4 APIs). Riesgo aceptado: App Check sigue en monitoreo y no aplicado; esta excepción vence para obligar a revisarlo.
       aprobado_por: AndresAlberdi
       creado: "2026-11-23"
       vence: "2027-02-21"
