@@ -19,7 +19,7 @@ import PaginaLegal from './pages/PaginaLegal';
 import Administracion from './pages/Administracion';
 import UserManagement from './pages/UserManagement';
 import './index.css';
-import { AdminProvider } from './context/AdminContext';
+import { AdminProvider } from './context/AdminProvider';
 import RouteEffects from './components/RouteEffects';
 import EditModeRouteReset from './components/EditModeRouteReset';
 import { SkipLink } from './components/SkipLink';

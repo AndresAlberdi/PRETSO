@@ -2,22 +2,18 @@ import { describe, it, expect, vi, afterEach, beforeEach } from 'vitest';
 import { render, screen, fireEvent, within, cleanup } from '@testing-library/react';
 import ManejoCaja from '../pages/ManejoCaja';
 import Salarios from '../pages/Salarios';
+import { ubicacion, navegar } from './ayudas/routerFalso';
 import { invalidarIndice } from '../utils/busquedaGuia/cargaIndice';
 import { CLASE_BOTON_COINCIDENCIA, CLASE_FILA_COINCIDENCIA } from '../components/Resaltado';
 
 type Fila = { id: string } & Record<string, unknown>;
 
 let colecciones: Record<string, Fila[]> = {};
-const ubicacion = vi.hoisted(() => ({ search: '' }));
-const navegar = vi.hoisted(() => vi.fn());
 const consultadas = vi.hoisted(() => ({ nombres: [] as string[], fallar: false, retener: false }));
 
 vi.mock('../firebase', () => ({ db: {} }));
 vi.mock('../utils/audit', () => ({ logAction: vi.fn() }));
-vi.mock('react-router', () => ({
-  useNavigate: () => navegar,
-  useLocation: () => ({ pathname: '/x', search: ubicacion.search, hash: '', state: null }),
-}));
+vi.mock('react-router', async () => (await import('./ayudas/routerFalso')).routerFalso);
 vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isEditMode: false }) }));
 vi.mock('firebase/firestore', () => ({
   collection: (_db: unknown, nombre: string) => nombre,

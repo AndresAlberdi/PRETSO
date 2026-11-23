@@ -22,7 +22,7 @@ vi.mock('firebase/auth', () => ({
 }));
 vi.mock('../firebase', () => ({ auth: {} }));
 
-import { AdminProvider } from '../context/AdminContext';
+import { AdminProvider } from '../context/AdminProvider';
 import HomeRoute from '../components/HomeRoute';
 import AccesoForm from '../components/AccesoForm';
 import ReaderRoute from '../components/ReaderRoute';
