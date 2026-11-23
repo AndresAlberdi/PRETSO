@@ -17,7 +17,8 @@ vi.mock('firebase/auth', () => ({
 }));
 vi.mock('../firebase', () => ({ auth: { currentUser: null } }));
 
-import { AdminProvider, useAdmin } from '../context/AdminContext';
+import { useAdmin } from '../context/AdminContext';
+import { AdminProvider } from '../context/AdminProvider';
 
 function Probe() {
   const { isAdmin, isReader, isEditMode, setIsEditMode, adminLoading, authNotice, clearAuthNotice } = useAdmin();

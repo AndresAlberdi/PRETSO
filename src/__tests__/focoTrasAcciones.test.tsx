@@ -6,6 +6,7 @@ import SearchBar from '../components/SearchBar';
 import GenericCreateModal from '../components/GenericCreateModal';
 import GenericEditModal from '../components/GenericEditModal';
 import ManejoCaja from '../pages/ManejoCaja';
+import { ubicacion } from './ayudas/routerFalso';
 import { invalidarIndice } from '../utils/busquedaGuia/cargaIndice';
 import { useRestoreFocusOnViewChange } from '../hooks/useRestoreFocusOnViewChange';
 
@@ -17,13 +18,9 @@ const colecciones: Record<string, any[]> = {
 };
 
 const setDoc = vi.hoisted(() => vi.fn());
-const ubicacion = vi.hoisted(() => ({ search: '' }));
 vi.mock('../firebase', () => ({ db: {} }));
 vi.mock('../utils/audit', () => ({ logAction: vi.fn() }));
-vi.mock('react-router', () => ({
-  useNavigate: () => vi.fn(),
-  useLocation: () => ({ pathname: '/x', search: ubicacion.search, state: null }),
-}));
+vi.mock('react-router', async () => (await import('./ayudas/routerFalso')).routerFalso);
 vi.mock('../context/AdminContext', () => ({ useAdmin: () => ({ isEditMode: false }) }));
 vi.mock('firebase/firestore', () => ({
   collection: (_db: unknown, nombre: string) => nombre,
@@ -92,6 +89,7 @@ function ArnesHook({ conservar, inicial = 'a', cambiarEnEfecto = false }: { cons
   const [vista, setVista] = useState(inicial);
   useRestoreFocusOnViewChange(vista);
   useEffect(() => {
+    // oxlint-disable-next-line react/set-state-in-effect -- arnés que simula el caso
     if (cambiarEnEfecto) setVista('b');
   }, [cambiarEnEfecto]);
   return (

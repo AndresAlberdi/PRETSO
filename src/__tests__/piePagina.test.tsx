@@ -29,6 +29,8 @@ const base = (): Estado => ({
 let estado: Estado = base();
 vi.mock('../context/AdminContext', () => ({
   useAdmin: () => estado,
+}));
+vi.mock('../context/AdminProvider', () => ({
   AdminProvider: ({ children }: { children: React.ReactNode }) => children,
 }));
 
