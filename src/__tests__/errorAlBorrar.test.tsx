@@ -8,10 +8,8 @@ import Transacciones from '../pages/Transacciones';
 
 vi.mock('../firebase', () => ({ auth: {}, db: {}, firebaseConfig: {} }));
 vi.mock('../utils/audit', () => ({ logAction: vi.fn() }));
-vi.mock('react-router', () => ({
-  useNavigate: () => vi.fn(),
-  useLocation: () => ({ pathname: '/x', search: '', state: null }),
-}));
+import './ayudas/routerFalso';
+vi.mock('react-router', async () => (await import('./ayudas/routerFalso')).routerFalso);
 const estado = vi.hoisted(() => ({
   isAdmin: true, isReader: false, isEditMode: true, setIsEditMode: vi.fn(),
 }));

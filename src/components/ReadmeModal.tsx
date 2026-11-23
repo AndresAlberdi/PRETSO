@@ -13,7 +13,7 @@ const panelStyle: CSSProperties = {
 };
 
 /** Convierte el subconjunto de Markdown que usa el README (títulos, negrita de línea completa, citas, listas, párrafos) en elementos React. */
-export function renderizarReadme(texto: string, idTitulo?: string, refTitulo?: RefObject<HTMLHeadingElement | null>): ReactNode[] {
+function renderizarReadme(texto: string, idTitulo?: string, refTitulo?: RefObject<HTMLHeadingElement | null>): ReactNode[] {
   const nodos: ReactNode[] = [];
   let items: string[] = [];
   const cerrarLista = () => {
@@ -37,7 +37,7 @@ export function renderizarReadme(texto: string, idTitulo?: string, refTitulo?: R
   return nodos;
 }
 
-export function descargarReadme(): void {
+function descargarReadme(): void {
   const url = URL.createObjectURL(new Blob([readme], { type: 'text/markdown;charset=utf-8' }));
   const a = document.createElement('a');
   a.href = url;
